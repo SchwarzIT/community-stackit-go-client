@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	key "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/access-keys"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -59,6 +59,7 @@ func TestStorageObjectKeyService_Get(t *testing.T) {
 		wantErr bool
 	}{
 		{"all ok", args{context.Background(), projectID, credentialsGroup}, want, false},
+		{"all ok 2", args{context.Background(), projectID, ""}, want, false},
 		{"ctx is canceled", args{ctx, projectID, credentialsGroup}, want, true},
 		{"project not found", args{context.Background(), "my-project", credentialsGroup}, want, true},
 		{"invalid credentials group", args{context.Background(), projectID, "invalid"}, want, true},
@@ -122,6 +123,7 @@ func TestStorageObjectKeyService_Create(t *testing.T) {
 		wantErr bool
 	}{
 		{"all ok", args{context.Background(), projectID, credentialsGroup}, want, false},
+		{"all ok 2", args{context.Background(), projectID, ""}, want, false},
 		{"ctx is canceled", args{ctx, projectID, credentialsGroup}, want, true},
 		{"project not found", args{context.Background(), "my-project", credentialsGroup}, want, true},
 		{"invalid credentials group", args{context.Background(), projectID, "invalid"}, want, true},
@@ -172,6 +174,7 @@ func TestStorageObjectKeyService_Delete(t *testing.T) {
 		wantErr bool
 	}{
 		{"all ok", args{context.Background(), projectID, keyID, credentialsGroup}, false},
+		{"all ok 2", args{context.Background(), projectID, keyID, ""}, false},
 		{"ctx is canceled", args{ctx, projectID, keyID, credentialsGroup}, true},
 		{"project not found", args{context.Background(), "my-project", keyID, credentialsGroup}, true},
 		{"key not found", args{context.Background(), projectID, "some-key", credentialsGroup}, true},

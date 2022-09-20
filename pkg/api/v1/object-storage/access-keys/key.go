@@ -17,9 +17,12 @@ import (
 
 // constants
 const (
-	apiPathList   = consts.API_PATH_OBJECT_STORAGE_KEYS_WITH_PARAMS
-	apiPathCreate = consts.API_PATH_OBJECT_STORAGE_KEY_WITH_PARAMS
-	apiPathDelete = consts.API_PATH_OBJECT_STORAGE_WITH_KEY_ID_WITH_PARAMS
+	apiPathList             = consts.API_PATH_OBJECT_STORAGE_KEYS
+	apiPathListWithParams   = consts.API_PATH_OBJECT_STORAGE_KEYS_WITH_PARAMS
+	apiPathCreate           = consts.API_PATH_OBJECT_STORAGE_KEY
+	apiPathCreateWithParams = consts.API_PATH_OBJECT_STORAGE_KEY_WITH_PARAMS
+	apiPathDelete           = consts.API_PATH_OBJECT_STORAGE_WITH_KEY_ID
+	apiPathDeleteWithParams = consts.API_PATH_OBJECT_STORAGE_WITH_KEY_ID_WITH_PARAMS
 )
 
 // New returns a new handler for the service
@@ -68,12 +71,14 @@ func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, 
 		err = validate.WrapError(err)
 		return
 	}
-
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID, credentialsGroupID), nil)
+	path := fmt.Sprintf(apiPathListWithParams, projectID, credentialsGroupID)
+	if credentialsGroupID == "" {
+		path = fmt.Sprintf(apiPathList, projectID)
+	}
+	req, err := svc.Client.Request(ctx, http.MethodGet, path, nil)
 	if err != nil {
 		return
 	}
-
 	_, err = svc.Client.Do(req, &res)
 	return
 }
@@ -86,15 +91,17 @@ func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID
 		err = validate.WrapError(err)
 		return
 	}
-
+	path := fmt.Sprintf(apiPathCreateWithParams, projectID, credentialsGroupID)
+	if credentialsGroupID == "" {
+		path = fmt.Sprintf(apiPathCreate, projectID)
+	}
 	body, _ := json.Marshal(Expiry{
 		Expires: expires,
 	})
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, credentialsGroupID), body)
+	req, err := svc.Client.Request(ctx, http.MethodPost, path, body)
 	if err != nil {
 		return
 	}
-
 	_, err = svc.Client.Do(req, &res)
 	return
 }
@@ -106,12 +113,14 @@ func (svc *ObjectStorageAccessKeysService) Delete(ctx context.Context, projectID
 		err = validate.WrapError(err)
 		return
 	}
-
-	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathDelete, projectID, keyID, credentialsGroupID), nil)
+	path := fmt.Sprintf(apiPathDeleteWithParams, projectID, keyID, credentialsGroupID)
+	if credentialsGroupID == "" {
+		path = fmt.Sprintf(apiPathDelete, projectID, keyID)
+	}
+	req, err := svc.Client.Request(ctx, http.MethodDelete, path, nil)
 	if err != nil {
 		return
 	}
-
 	_, err = svc.Client.Do(req, nil)
 	return
 }
