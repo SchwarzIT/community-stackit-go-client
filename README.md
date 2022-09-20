@@ -1,5 +1,7 @@
 # Community Go Client for STACKIT
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/community-stackit-go-client)](https://goreportcard.com/report/github.com/SchwarzIT/community-stackit-go-client) [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 <br />
 
 🚀&nbsp; This repo's goal is to create a go-based http client for consuming STACKIT APIs
