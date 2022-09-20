@@ -1,4 +1,4 @@
-# Community HTTP client for STACKIT
+# Community GO Client for STACKIT
 
 <br />
 
