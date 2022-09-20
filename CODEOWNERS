@@ -1,0 +1,8 @@
+# These default owners for everything
+*   deangili.oren@mail.schwarz
+
+# Costs integration owners
+pkg/api/v1/costs/* willi.esser@camao.one
+
+# Object Storage Credentials group
+client/pkg/api/v1/object-storage/credentials-group/* johannes.riecken1@mail.schwarz,johann.friesen@camao.one
