@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
-	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
+	credentialsGroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
@@ -63,13 +63,13 @@ type Expiry struct {
 
 // List returns a list of access keys assigned to a given Project ID
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/get_access_keys_v1_project__projectId__access_keys_get
-func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, credentialsGroupId string) (res AccessKeyListResponse, err error) {
-	if err = credentialsgroup.ValidateCredentialsGroupID(credentialsGroupId); err != nil {
+func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, credentialsGroupID string) (res AccessKeyListResponse, err error) {
+	if err = credentialsGroup.ValidateCredentialsGroupID(credentialsGroupID); err != nil && credentialsGroupID != "" {
 		err = validate.WrapError(err)
 		return
 	}
 
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID, credentialsGroupId), nil)
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID, credentialsGroupID), nil)
 	if err != nil {
 		return
 	}
@@ -81,8 +81,8 @@ func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, 
 // Create creates an Access Keys
 // If expires is empty, the key will not expire
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create_project_v1_project__projectId__post
-func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID, expires, credentialsGroupId string) (res AccessKeyCreateResponse, err error) {
-	if err = credentialsgroup.ValidateCredentialsGroupID(credentialsGroupId); err != nil {
+func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID, expires, credentialsGroupID string) (res AccessKeyCreateResponse, err error) {
+	if err = credentialsGroup.ValidateCredentialsGroupID(credentialsGroupID); err != nil && credentialsGroupID != "" {
 		err = validate.WrapError(err)
 		return
 	}
@@ -90,7 +90,7 @@ func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID
 	body, _ := json.Marshal(Expiry{
 		Expires: expires,
 	})
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, credentialsGroupId), body)
+	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, credentialsGroupID), body)
 	if err != nil {
 		return
 	}
@@ -101,13 +101,13 @@ func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID
 
 // Delete deletes an Access Keys by ID
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/delete_access_key_v1_project__projectId__access_key__keyId__delete
-func (svc *ObjectStorageAccessKeysService) Delete(ctx context.Context, projectID, keyID, credentialsGroupId string) (err error) {
-	if err = credentialsgroup.ValidateCredentialsGroupID(credentialsGroupId); err != nil {
+func (svc *ObjectStorageAccessKeysService) Delete(ctx context.Context, projectID, keyID, credentialsGroupID string) (err error) {
+	if err = credentialsGroup.ValidateCredentialsGroupID(credentialsGroupID); err != nil && credentialsGroupID != "" {
 		err = validate.WrapError(err)
 		return
 	}
 
-	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathDelete, projectID, keyID, credentialsGroupId), nil)
+	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathDelete, projectID, keyID, credentialsGroupID), nil)
 	if err != nil {
 		return
 	}

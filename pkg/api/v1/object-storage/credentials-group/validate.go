@@ -1,6 +1,7 @@
 package credentialsgroup
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 )
@@ -16,6 +17,9 @@ func ValidateDisplayName(name string) error {
 
 // ValidateCredentialsGroupID validates a given  credentials group ID
 func ValidateCredentialsGroupID(id string) error {
+	if id == "" {
+		return errors.New("received an empty crdentials group ID")
+	}
 	exp := `^[a-z0-9-]{36}$`
 	r := regexp.MustCompile(exp)
 	if !r.MatchString(id) {
