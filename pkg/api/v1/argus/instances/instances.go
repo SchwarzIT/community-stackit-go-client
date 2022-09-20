@@ -11,6 +11,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/plans"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -131,6 +132,7 @@ func (svc *InstancesService) buildRequest(name, planID string, params map[string
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_create
 func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -148,6 +150,7 @@ func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_update
 func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

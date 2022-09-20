@@ -11,6 +11,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership/members"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -74,6 +75,7 @@ func (svc *PermissionsService) List(ctx context.Context) (p PermissionList, err 
 // Reference: https://api.stackit.schwarz/membership-service/openapi.v2.html#operation/get-user-permissions
 func (svc *PermissionsService) GetByEmail(ctx context.Context, email string, limit, offset int) (up UserPermissions, err error) {
 	if err = validatePagination(limit, offset); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

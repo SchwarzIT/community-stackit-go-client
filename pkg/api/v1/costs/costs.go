@@ -113,18 +113,18 @@ func (svc *CostsService) GetCustomerAccountCosts(
 // See https://api.stackit.schwarz/costs-service/openapi.v1.html#operation/get-costs-project
 func (svc *CostsService) GetProjectCosts(
 	ctx context.Context,
-	projectId string,
+	projectID string,
 	from, to time.Time,
 	granularity, depth string,
 ) (*ProjectDetailResponse, error) {
-	err := validate.ProjectID(projectId)
+	err := validate.ProjectID(projectID)
 	if err != nil {
-		return nil, fmt.Errorf("getting project costs: projectId: %v", err)
+		return nil, validate.WrapError(err)
 	}
 
 	path := fmt.Sprintf(apiPathProjects,
 		svc.Client.OrganizationID(),
-		projectId,
+		projectID,
 		from.Format(timeFormat),
 		to.Format(timeFormat),
 		granularity,

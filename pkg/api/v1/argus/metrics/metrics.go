@@ -10,6 +10,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -60,6 +61,7 @@ func (svc *MetricsService) GetConfig(ctx context.Context, projectID, instanceID 
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_metrics-storage-retentions_update
 func (svc *MetricsService) UpdateConfig(ctx context.Context, projectID, instanceID string, cfg Config) (res UpdateConfigResponse, err error) {
 	if err = cfg.Validate(); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 	body, _ := json.Marshal(cfg)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -187,6 +188,7 @@ func (svc *KubernetesClusterService) Create(
 		hibernation,
 		extensions,
 	); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

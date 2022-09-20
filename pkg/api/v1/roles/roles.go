@@ -106,7 +106,7 @@ func (svc *RolesService) Get(ctx context.Context, projectID string) (ProjectRole
 // AddUsers adds users and/or service accounts to a given project role
 func (svc *RolesService) AddUsers(ctx context.Context, projectID, role string, users []string, serviceAccounts []string) error {
 	if err := validate.Role(role); err != nil {
-		return err
+		return validate.WrapError(err)
 	}
 	for _, sa := range serviceAccounts {
 		if err := svc.addServiceAccounts(ctx, projectID, role, sa); err != nil {
@@ -181,7 +181,7 @@ func (svc *RolesService) buildAddSARequestBody(serviceAccountID string) ([]byte,
 // Reference: https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/patch-projects-projectId-roles
 func (svc *RolesService) DeleteUsers(ctx context.Context, projectID, role string, users []string, serviceAccounts []string) error {
 	if err := validate.Role(role); err != nil {
-		return err
+		return validate.WrapError(err)
 	}
 	for _, sa := range serviceAccounts {
 		if err := svc.deleteServiceAccount(ctx, projectID, role, sa); err != nil {

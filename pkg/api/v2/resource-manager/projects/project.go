@@ -11,6 +11,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -93,6 +94,7 @@ type ProjectsResponse struct {
 // See also https://api.stackit.schwarz/resource-management/openapi.v2.html#operation/post-projects
 func (svc *ProjectsService) Create(ctx context.Context, name string, labels map[string]string, members ...ProjectMember) (res ProjectResponse, err error) {
 	if err = svc.ValidateCreateData(name, labels, members); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -187,6 +189,7 @@ type UpdateProjectRequest struct {
 // See also https://api.stackit.schwarz/resource-management/openapi.v2.html#operation/patch-projects-containerId
 func (svc *ProjectsService) Update(ctx context.Context, containerID, name, containerParentID string, labels map[string]string) (res ProjectResponse, err error) {
 	if err = svc.ValidateUpdateData(containerID, containerParentID, name, labels); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

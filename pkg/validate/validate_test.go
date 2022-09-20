@@ -311,7 +311,7 @@ func TestSetClientError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validate.SetClientError(tt.args.err); err.Error() != errors.Wrap(tt.args.err, "client validation error (Bad Request)").Error() {
+			if err := validate.WrapError(tt.args.err); err.Error() != errors.Wrap(tt.args.err, "client validation error (Bad Request)").Error() {
 				t.Errorf("SetClientError() error = %v, wantErr %v", err, errors.Wrap(tt.args.err, "client validation error (Bad Request)"))
 			}
 		})

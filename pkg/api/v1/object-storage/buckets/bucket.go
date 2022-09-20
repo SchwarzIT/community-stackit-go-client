@@ -9,6 +9,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -76,6 +77,7 @@ func (svc *ObjectStorageBucketsService) Get(ctx context.Context, projectID, buck
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create_bucket_v1_project__projectId__bucket__bucketName__post
 func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, bucketName string) (err error) {
 	if err = ValidateBucketName(bucketName); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

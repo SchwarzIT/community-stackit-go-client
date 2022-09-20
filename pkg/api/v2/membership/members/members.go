@@ -56,6 +56,7 @@ type ResourceMembers struct {
 // Reference: https://api.stackit.schwarz/membership-service/openapi.v2.html#operation/get-members
 func (svc *MembersService) Get(ctx context.Context, resourceID, resourceType string) (members ResourceMembers, err error) {
 	if err = validate.ResourceType(resourceType); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathWithResourceType, resourceType, resourceID), nil)
@@ -86,6 +87,7 @@ func (svc *MembersService) buildRequest(resourceType string, members []Member) (
 // https://api.stackit.schwarz/membership-service/openapi.v2.html#operation/patch-members
 func (svc *MembersService) Add(ctx context.Context, resourceID, resourceType string, members []Member) (res ResourceMembers, err error) {
 	if err = validate.ResourceType(resourceType); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -106,6 +108,7 @@ func (svc *MembersService) Add(ctx context.Context, resourceID, resourceType str
 // https://api.stackit.schwarz/membership-service/openapi.v2.html#operation/post-members-remove
 func (svc *MembersService) Remove(ctx context.Context, resourceID, resourceType string, members []Member) (res ResourceMembers, err error) {
 	if err = validate.ResourceType(resourceType); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -123,6 +126,7 @@ func (svc *MembersService) Remove(ctx context.Context, resourceID, resourceType 
 // https://api.stackit.schwarz/membership-service/openapi.v2.html#operation/put-members
 func (svc *MembersService) Replace(ctx context.Context, resourceID, resourceType string, members []Member) (res ResourceMembers, err error) {
 	if err = validate.ResourceType(resourceType); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -141,6 +145,7 @@ func (svc *MembersService) Replace(ctx context.Context, resourceID, resourceType
 // https://api.stackit.schwarz/membership-service/openapi.v2.html#operation/post-members-validate
 func (svc *MembersService) Validate(ctx context.Context, resourceID, resourceType string, members []Member) (res ResourceMembers, err error) {
 	if err = validate.ResourceType(resourceType); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

@@ -112,14 +112,14 @@ type ProjectsParentResBody struct {
 // See also https://api.stackit.schwarz/resource-management/openapi.v1.html#operation/post-organizations-organizationId-projects
 func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, roles ...ProjectRole) (Project, error) {
 	if err := ValidateProjectCreationRoles(roles); err != nil {
-		return Project{}, err
+		return Project{}, validate.WrapError(err)
 	}
 	if err := validate.ProjectName(name); err != nil {
-		return Project{}, err
+		return Project{}, validate.WrapError(err)
 	}
 
 	if err := validate.BillingRef(billingRef); err != nil {
-		return Project{}, err
+		return Project{}, validate.WrapError(err)
 	}
 
 	body, err := svc.buildCreateRequestBody(name, billingRef, roles...)
@@ -237,11 +237,11 @@ func (svc *ProjectService) GetLifecycleState(ctx context.Context, projectID stri
 // See also https://api.stackit.schwarz/resource-management/openapi.v1.html#operation/patch-project-projectId
 func (svc *ProjectService) Update(ctx context.Context, id, name, billingRef string) error {
 	if err := validate.ProjectName(name); err != nil {
-		return err
+		return validate.WrapError(err)
 	}
 
 	if err := validate.BillingRef(billingRef); err != nil {
-		return err
+		return validate.WrapError(err)
 	}
 
 	body, err := svc.buildUpdateRequestBody(name, billingRef)

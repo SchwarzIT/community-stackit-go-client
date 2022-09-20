@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -64,6 +65,7 @@ type Expiry struct {
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/get_access_keys_v1_project__projectId__access_keys_get
 func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, credentialsGroupId string) (res AccessKeyListResponse, err error) {
 	if err = credentialsgroup.ValidateCredentialsGroupID(credentialsGroupId); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -81,6 +83,7 @@ func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, 
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create_project_v1_project__projectId__post
 func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID, expires, credentialsGroupId string) (res AccessKeyCreateResponse, err error) {
 	if err = credentialsgroup.ValidateCredentialsGroupID(credentialsGroupId); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -100,6 +103,7 @@ func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/delete_access_key_v1_project__projectId__access_key__keyId__delete
 func (svc *ObjectStorageAccessKeysService) Delete(ctx context.Context, projectID, keyID, credentialsGroupId string) (err error) {
 	if err = credentialsgroup.ValidateCredentialsGroupID(credentialsGroupId); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 

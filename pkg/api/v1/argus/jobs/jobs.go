@@ -135,7 +135,7 @@ func (svc *JobsService) Get(ctx context.Context, projectID, instanceID, jobName 
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_scrapeconfigs_create
 func (svc *JobsService) Create(ctx context.Context, projectID, instanceID string, job Job) (res ListJobsResponse, err error) {
 	if err = job.Validate(); err != nil {
-		err = validate.SetClientError(err)
+		err = validate.WrapError(err)
 		return
 	}
 
@@ -156,7 +156,7 @@ func (svc *JobsService) buildCreateRequest(job Job) ([]byte, error) {
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_scrapeconfigs_create
 func (svc *JobsService) Update(ctx context.Context, projectID, instanceID string, job Job) (res ListJobsResponse, err error) {
 	if err = job.Validate(); err != nil {
-		err = validate.SetClientError(err)
+		err = validate.WrapError(err)
 		return
 	}
 

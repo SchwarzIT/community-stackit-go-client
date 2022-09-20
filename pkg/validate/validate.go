@@ -13,7 +13,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func SetClientError(err error) error {
+func WrapError(err error) error {
 	return errors.Wrap(err, "client validation error (Bad Request)")
 }
 

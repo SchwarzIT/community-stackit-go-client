@@ -10,6 +10,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 // constants
@@ -64,6 +65,7 @@ func (svc *ObjectStorageCredentialsGroupService) List(ctx context.Context, proje
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create-credentials-group-v1-project-projectId-credentials-group-post
 func (svc *ObjectStorageCredentialsGroupService) Create(ctx context.Context, projectID, displayName string) (err error) {
 	if err = ValidateDisplayName(displayName); err != nil {
+		err = validate.WrapError(err)
 		return
 	}
 
