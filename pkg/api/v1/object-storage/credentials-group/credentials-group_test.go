@@ -12,7 +12,7 @@ import (
 	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/credentials-group"
 	"golang.org/x/exp/slices"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
@@ -140,7 +140,7 @@ func TestAccProjectsService_Delete(t *testing.T) {
 			if i == -1 {
 				t.Fatalf("credentials group %s not found", tt.args.displayName)
 			}
-			credentialsGroupId := resp.CredentialsGroups[i].CredentialsGroupId
+			credentialsGroupId := resp.CredentialsGroups[i].CredentialsGroupID
 			err = s.Delete(tt.args.ctx, tt.args.projectID, credentialsGroupId)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ObjectStorageCredentialsGroupService.List() error = %v, wantErr %v", err, tt.wantErr)
@@ -156,11 +156,11 @@ func TestObjectStorageCredentialsGroupsService_List(t *testing.T) {
 	s := objectstorage.New(c).CredentialsGroup
 
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
-	credentialsGroupName := "my-credentialsGroup"
+	credentialsGroupID := "1dae0334-df56-u6q7-e7fb-g58763a47wa3"
 	want := credentialsgroup.CredentialsGroupResponse{
 		Project: projectID,
 		CredentialsGroups: []credentialsgroup.CredentialsGroup{
-			{CredentialsGroupId: credentialsGroupName},
+			{CredentialsGroupID: credentialsGroupID},
 		},
 	}
 	ctx, cancel := context.WithCancel(context.TODO())

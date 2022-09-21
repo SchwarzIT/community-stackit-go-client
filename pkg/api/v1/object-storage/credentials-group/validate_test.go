@@ -9,6 +9,7 @@ func TestValidateCredentialsGroupID(t *testing.T) {
 		wantErr bool
 	}{
 		{"all ok", "3969597f-d2f3-4c07-8533-1a4bf8159c0e", false},
+		{"empty", "", true},
 		{"err", "123", true},
 	}
 	for _, tt := range tests {
