@@ -44,8 +44,8 @@ type CredentialsGroupDeleteResponse struct {
 
 // CredentialsGroup holds all the credentialsGroup information
 type CredentialsGroup struct {
-	CredentialsGroupId string `json:"credentialsGroupId"`
-	Urn                string `json:"urn"`
+	CredentialsGroupID string `json:"credentialsGroupId"`
+	URN                string `json:"urn"`
 	DisplayName        string `json:"displayName"`
 }
 
