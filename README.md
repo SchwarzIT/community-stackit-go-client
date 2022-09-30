@@ -11,11 +11,10 @@ The client is community-supported and not an official STACKIT release, it is mai
 
 ## Usage example
 
-
+To get started, a Service Account[^1] and a Customer Account[^2] must be in place
 
 - If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
-- To use the Service Account it must be assigned relevant roles using the [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)
-- If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
+- 
 
 ```
 package main
@@ -51,6 +50,10 @@ func main() {
 
 ```
 
-[^1]: In order to use the client, a Service Account and Token needs to be created [using the Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)
+[^1]: In order to use the client, a Service Account and Token needs to be created [using the Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
+To use the Service Account, it must be assigned relevant roles using the [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)
+If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
+
+<br />
 
 [^2]: The Customer account ID (or Organization ID) must also be known in advanced. Every project belongs to a Customer Account.
