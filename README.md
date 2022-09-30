@@ -13,8 +13,7 @@ The client is community-supported and not an official STACKIT release, it is mai
 
 To get started, a Service Account[^1] and a Customer Account[^2] must be in place
 
-- If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
-- 
+> **_NOTE:_** If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
 
 ```
 package main
