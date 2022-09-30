@@ -11,13 +11,9 @@ The client is community-supported and not an official STACKIT release, it is mai
 
 ## Usage example
 
-In order to use the client, a Service Account needs to be created first. At the moment, this can be done strictly [from the API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2).
+To get started, a Service Account[^1] and a Customer Account[^2] must be in place
 
-The customer account ID of your company or team must also be known in advanced.
-
-- If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
-- To use the Service Account it must be assigned relevant roles using the [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)
-- If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
+If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
 
 ```
 package main
@@ -32,9 +28,9 @@ import (
 
 func main() {
 	c, err := client.New(context.Background(), &client.Config{
-		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
+		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"), [^1]
 		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:   os.Getenv("STACKIT_CUSTOMER_ACCOUNT_ID"),
+		OrganizationID:   os.Getenv("STACKIT_CUSTOMER_ACCOUNT_ID"), [^2]
 	})
 	if err != nil {
 		panic(err)
@@ -52,3 +48,13 @@ func main() {
 }
 
 ```
+
+Another usage example can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) which is built using the community client
+
+[^1]: In order to use the client, a Service Account and Token must be created [using the Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
+After creation, assign roles to the Service Account using [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)<br />
+If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
+
+<br />
+
+[^2]: The Customer Account ID is also referred to as Organization ID
