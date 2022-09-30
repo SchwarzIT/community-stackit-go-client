@@ -1,4 +1,4 @@
-name: UnitTests
+name: Unit Tests
 
 on:
   push:
@@ -18,8 +18,10 @@ jobs:
       with:
         go-version: 1.18
 
-    - name: Build
-      run: go build -v ./...
-
     - name: Test
-      run: go test -v ./...
+      run: go test -v -coverprofile=profile.cov ./...
+
+    - name: Send Coverage Report
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: profile.cov
