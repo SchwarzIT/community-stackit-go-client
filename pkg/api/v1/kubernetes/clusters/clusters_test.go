@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/clusters"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -256,13 +256,15 @@ func TestKubernetesClusterService_List(t *testing.T) {
 
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 	clusterName := "cname"
-	want := []clusters.Cluster{{
-		Name:        clusterName,
-		Kubernetes:  k_ok,
-		Nodepools:   np_ok,
-		Maintenance: m_ok,
-		Hibernation: h_ok,
-	}}
+	want := clusters.ClusterList{
+		Items: []clusters.Cluster{{
+			Name:        clusterName,
+			Kubernetes:  k_ok,
+			Nodepools:   np_ok,
+			Maintenance: m_ok,
+			Hibernation: h_ok,
+		}},
+	}
 
 	mux.HandleFunc("/ske/v1/projects/"+projectID+"/clusters", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
@@ -286,7 +288,7 @@ func TestKubernetesClusterService_List(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes []clusters.Cluster
+		wantRes clusters.ClusterList
 		wantErr bool
 	}{
 		{"ctx is canceled", args{ctx_bad, projectID}, want, true},

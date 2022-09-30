@@ -30,6 +30,11 @@ func New(c common.Client) *KubernetesClusterService {
 // CRUD functionality for SKE clusters
 type KubernetesClusterService common.Service
 
+// ClusterList is the response for listing clusters
+type ClusterList struct {
+	Items []Cluster `json:"items"`
+}
+
 // Cluster is a struct representation of a cluster in STACKIT api
 type Cluster struct {
 	Name        string       `json:"name"` // 11 lowercase letters, numbers, or hyphens
@@ -146,7 +151,7 @@ type Status struct {
 
 // List returns the clusters in the project
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_ListClusters
-func (svc *KubernetesClusterService) List(ctx context.Context, projectID string) (res []Cluster, err error) {
+func (svc *KubernetesClusterService) List(ctx context.Context, projectID string) (res ClusterList, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPath, projectID), nil)
 	if err != nil {
 		return
