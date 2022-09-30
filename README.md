@@ -49,8 +49,8 @@ func main() {
 
 ```
 
-[^1]: In order to use the client, a Service Account and Token needs to be created [using the Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
-To use the Service Account, it must be assigned relevant roles using the [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)
+[^1]: In order to use the client, a Service Account and Token must be created [using the Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
+After creation, assign roles to the Service Account using [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)
 If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
 
 <br />
