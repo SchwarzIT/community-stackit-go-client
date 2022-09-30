@@ -13,7 +13,7 @@ The client is community-supported and not an official STACKIT release, it is mai
 
 To get started, a Service Account[^1] and a Customer Account[^2] must be in place
 
-> **_NOTE:_** If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
+> If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
 
 ```
 package main
@@ -55,4 +55,4 @@ If your Service Account needs to operate outside the scope of your project, you 
 
 <br />
 
-[^2]: The Customer account ID (or Organization ID) must also be known in advanced. Every project belongs to a Customer Account.
+[^2]: The Customer Account ID is also referred to as Organization ID
