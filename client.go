@@ -25,7 +25,9 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
 	resourceManager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
 
@@ -33,6 +35,7 @@ import (
 type Client struct {
 	client *http.Client
 	config *Config
+	retry  *retry.Retry
 
 	// Productive services - services that are ready to be used in production
 	ProductiveServices
@@ -50,6 +53,14 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 	c := &Client{config: cfg}
 	return c.init(ctx), nil
+}
+
+// WithRetry sets retry.Retry in a shallow copy of the given client
+// and returns the new copy
+func (c *Client) WithRetry(r *retry.Retry) *Client {
+	nc := *c
+	nc.retry = r
+	return &nc
 }
 
 // Service management
@@ -137,8 +148,60 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 	return req, nil
 }
 
-// Do performs the request and decodes the response if given interface != nil
+// Do is a wrapper for do() which also manages retry if set
 func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+	if c.retry == nil {
+		return c.do(req, v, errorHandlers...)
+	}
+	return c.startDoWithRetry(req, v, errorHandlers...)
+}
+
+func (c *Client) startDoWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+	nc, cancel := context.WithTimeout(req.Context(), c.retry.Timeout)
+	defer cancel()
+	req = req.WithContext(nc)
+	return c.doWithRetry(req, v, errorHandlers, c.retry.MaxRetries, nil)
+}
+
+func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers []func(*http.Response) error, maxRetries *int, prevError error) (*http.Response, error) {
+	if err := req.Context().Err(); err != nil {
+		if prevError != nil {
+			return nil, errors.Wrap(prevError, err.Error())
+		}
+		return nil, err
+	}
+
+	if maxRetries != nil {
+		if *maxRetries <= 0 {
+			err := errors.New("reached maximum client retries")
+			if prevError != nil {
+				err = errors.Wrap(prevError, err.Error())
+			}
+			return nil, err
+		}
+		n := *maxRetries - 1
+		maxRetries = &n
+	}
+
+	res, err := c.do(req, v, errorHandlers...)
+	if err == nil {
+		return res, err
+	}
+
+	agg := true
+	for _, f := range c.retry.IsRetryableFns {
+		agg := agg && f(err)
+		if !agg {
+			return res, err
+		}
+	}
+
+	time.Sleep(c.retry.Interval)
+	return c.doWithRetry(req, v, errorHandlers, maxRetries, err)
+}
+
+// Do performs the request and decodes the response if given interface != nil
+func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
