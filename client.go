@@ -174,21 +174,18 @@ func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...
 		retries = *maxRetries
 	}
 
-	res, retries, retry, lastErr = c.doTick(req, v, errorHandlers, maxRetries != nil, retries)
-	if lastErr == nil || !retry {
-		return res, lastErr
-	}
-
 	for {
+		res, retries, retry, lastErr = c.doTick(req, v, errorHandlers, maxRetries != nil, retries)
+		if lastErr == nil || !retry {
+			return res, lastErr
+		}
+
 		tick, cancelTick := context.WithTimeout(context.Background(), c.retry.Throttle)
 		defer cancelTick()
 
 		select {
 		case <-tick.Done():
-			res, retries, retry, lastErr = c.doTick(req, v, errorHandlers, maxRetries != nil, retries)
-			if lastErr == nil || !retry {
-				return res, lastErr
-			}
+			// continue
 		case <-overall.Done():
 			return nil, errors.Wrap(lastErr, "retry context timed out")
 		}
