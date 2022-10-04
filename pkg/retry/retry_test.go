@@ -136,3 +136,42 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 		t.Errorf("expected do request to return retry context timed out error but got '%v' instead", err)
 	}
 }
+
+func TestClient_DoWithUntil(t *testing.T) {
+	c, mux, teardown, err := client.MockServer()
+	defer teardown()
+	if err != nil {
+		t.Errorf("error from mock.AuthServer: %s", err.Error())
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	mux.HandleFunc("/2s", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		if ctx.Err() != nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, response_after_2s)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, response_before_2s)
+		}
+	})
+
+	var got struct {
+		Status bool `json:"status"`
+	}
+
+	c = c.WithRetry(retry.New().SetThrottle(1 * time.Second).Until(func(r *http.Response) bool {
+		return got.Status
+	}))
+
+	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
+
+	if _, err := c.Do(req, &got); err != nil {
+		t.Errorf("do request: %v", err)
+	}
+
+	if !got.Status {
+		t.Errorf("received status = %v", got.Status)
+	}
+}
