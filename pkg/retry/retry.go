@@ -2,7 +2,6 @@ package retry
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -66,7 +65,6 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 	}
 
 	for {
-		fmt.Printf("in: %v\n", maxRetries)
 		res, maxRetries, retry, lastErr = r.doIteration(newReq, do, maxRetries)
 		if lastErr == nil || !retry {
 			return res, lastErr
