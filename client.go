@@ -180,6 +180,7 @@ func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...
 			return res, lastErr
 		}
 
+		// context timeout was chosen in order to support throttle = 0
 		tick, cancelTick := context.WithTimeout(context.Background(), c.retry.Throttle)
 		defer cancelTick()
 
