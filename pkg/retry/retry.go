@@ -1,7 +1,12 @@
 package retry
 
 import (
+	"context"
+	"fmt"
+	"net/http"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type Retry struct {
@@ -40,4 +45,72 @@ func (c *Retry) withConfig(cfgs ...Config) *Retry {
 		}
 	}
 	return c
+}
+
+// Do runs a given do function with a given request -> do(req)
+func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, error)) (*http.Response, error) {
+	var lastErr error
+	var res *http.Response
+	var retry bool
+
+	overall, cancel := context.WithTimeout(req.Context(), r.Timeout)
+	defer cancel()
+
+	// set overall ctx in request
+	newReq := req.WithContext(overall)
+
+	// clone max retries
+	maxRetries := -1
+	if r.MaxRetries != nil {
+		maxRetries = *r.MaxRetries
+	}
+
+	for {
+		fmt.Printf("in: %v\n", maxRetries)
+		res, maxRetries, retry, lastErr = r.doIteration(newReq, do, maxRetries)
+		if lastErr == nil || !retry {
+			return res, lastErr
+		}
+
+		// context timeout was chosen in order to support throttle = 0
+		tick, cancelTick := context.WithTimeout(context.Background(), r.Throttle)
+		defer cancelTick()
+
+		select {
+		case <-tick.Done():
+			// continue
+		case <-overall.Done():
+			return nil, errors.Wrap(lastErr, "retry context timed out")
+		}
+	}
+}
+
+func (r *Retry) doIteration(req *http.Request, do func(*http.Request) (*http.Response, error), retries int) (res *http.Response, retriesLeft int, retry bool, err error) {
+	retriesLeft = retries
+	retry = true
+
+	res, err = do(req)
+	if err == nil {
+		retry = false
+		return
+	}
+
+	// check if error is retryable
+	for _, f := range r.IsRetryableFns {
+		if !f(err) {
+			retry = false
+			return
+		}
+	}
+
+	if retries != -1 {
+		if retries == 0 {
+			err = errors.Wrap(err, "reached max retries")
+			retry = false
+			return
+		}
+		retriesLeft = retries - 1
+	}
+
+	return
 }

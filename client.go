@@ -27,7 +27,6 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 )
 
@@ -157,70 +156,9 @@ func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 }
 
 func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	var lastErr error
-	var res *http.Response
-	var retry bool
-
-	overall, cancel := context.WithTimeout(req.Context(), c.retry.Timeout)
-	defer cancel()
-
-	// set overall ctx in request
-	req = req.WithContext(overall)
-
-	// clone max retries
-	maxRetries := c.retry.MaxRetries
-	retries := 0
-	if maxRetries != nil {
-		retries = *maxRetries
-	}
-
-	for {
-		res, retries, retry, lastErr = c.doTick(req, v, errorHandlers, maxRetries != nil, retries)
-		if lastErr == nil || !retry {
-			return res, lastErr
-		}
-
-		// context timeout was chosen in order to support throttle = 0
-		tick, cancelTick := context.WithTimeout(context.Background(), c.retry.Throttle)
-		defer cancelTick()
-
-		select {
-		case <-tick.Done():
-			// continue
-		case <-overall.Done():
-			return nil, errors.Wrap(lastErr, "retry context timed out")
-		}
-	}
-}
-
-func (c *Client) doTick(req *http.Request, v interface{}, errorHandlers []func(*http.Response) error, withMaxRetries bool, retries int) (res *http.Response, retriesLeft int, retry bool, err error) {
-	retry = true
-
-	res, err = c.do(req, v, errorHandlers...)
-	if err == nil {
-		retry = false
-		return
-	}
-
-	// check if error is retryable
-	for _, f := range c.retry.IsRetryableFns {
-		if !f(err) {
-			retry = false
-			return
-		}
-	}
-
-	retriesLeft = retries
-	if withMaxRetries {
-		if retries <= 0 {
-			err = errors.Wrap(err, "reached max retries")
-			retry = false
-			return
-		}
-		retriesLeft = retriesLeft - 1
-	}
-
-	return
+	return c.retry.Do(req, func(r *http.Request) (*http.Response, error) {
+		return c.do(r, v, errorHandlers...)
+	})
 }
 
 // Do performs the request and decodes the response if given interface != nil
