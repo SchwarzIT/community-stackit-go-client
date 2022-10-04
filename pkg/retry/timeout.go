@@ -14,7 +14,7 @@ type Timeout struct {
 
 // Helper function
 func (c *Retry) SetTimeout(d time.Duration) *Retry {
-	return c.WithConfig(&Timeout{
+	return c.withConfig(&Timeout{
 		Duration: d,
 	})
 }

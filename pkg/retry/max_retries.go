@@ -11,7 +11,7 @@ type MaxRetries struct {
 
 // Helper function
 func (c *Retry) SetMaxRetries(r int) *Retry {
-	return c.WithConfig(&MaxRetries{
+	return c.withConfig(&MaxRetries{
 		Retries: &r,
 	})
 }

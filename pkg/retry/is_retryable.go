@@ -19,7 +19,7 @@ type IsRetryable struct {
 
 // Helper function
 func (c *Retry) SetIsRetryable(override bool, f ...func(err error) bool) *Retry {
-	return c.WithConfig(&IsRetryable{
+	return c.withConfig(&IsRetryable{
 		fnList: f,
 	})
 }

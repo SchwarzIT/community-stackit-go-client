@@ -153,51 +153,59 @@ func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 	if c.retry == nil {
 		return c.do(req, v, errorHandlers...)
 	}
-	return c.startDoWithRetry(req, v, errorHandlers...)
+	return c.doWithRetry(req, v, errorHandlers...)
 }
 
-func (c *Client) startDoWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	nc, cancel := context.WithTimeout(req.Context(), c.retry.Timeout)
+func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+	var lastErr error
+	var res *http.Response
+
+	overall, cancel := context.WithTimeout(req.Context(), c.retry.Timeout)
 	defer cancel()
-	req = req.WithContext(nc)
-	return c.doWithRetry(req, v, errorHandlers, c.retry.MaxRetries, nil)
-}
 
-func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers []func(*http.Response) error, maxRetries *int, prevError error) (*http.Response, error) {
-	if err := req.Context().Err(); err != nil {
-		if prevError != nil {
-			return nil, errors.Wrap(prevError, err.Error())
-		}
-		return nil, err
-	}
+	// set overall ctx in request
+	req = req.WithContext(overall)
 
+	// clone max retries
+	maxRetries := c.retry.MaxRetries
+	retries := 0
 	if maxRetries != nil {
-		if *maxRetries <= 0 {
-			err := errors.New("reached maximum client retries")
-			if prevError != nil {
-				err = errors.Wrap(prevError, err.Error())
+		retries = *maxRetries
+	}
+
+	for {
+		tick, cancelTick := context.WithTimeout(context.Background(), c.retry.Throttle)
+		defer cancelTick()
+
+		select {
+		case <-tick.Done():
+			res, lastErr = c.do(req, v, errorHandlers...)
+
+			if lastErr == nil {
+				return res, nil
 			}
-			return nil, err
+
+			// check if error is retryable
+			for _, f := range c.retry.IsRetryableFns {
+				if !f(lastErr) {
+					return res, lastErr
+				}
+			}
+
+			if maxRetries != nil {
+				if retries <= 0 {
+					return nil, errors.Wrap(lastErr, "reached max retries")
+				}
+				retries = retries - 1
+			}
+
+		case <-overall.Done():
+			if lastErr != nil {
+				return nil, errors.Wrap(lastErr, "retry context timed out")
+			}
+			return nil, errors.New("retry context timed out")
 		}
-		n := *maxRetries - 1
-		maxRetries = &n
 	}
-
-	res, err := c.do(req, v, errorHandlers...)
-	if err == nil {
-		return res, err
-	}
-
-	agg := true
-	for _, f := range c.retry.IsRetryableFns {
-		agg := agg && f(err)
-		if !agg {
-			return res, err
-		}
-	}
-
-	time.Sleep(c.retry.Interval)
-	return c.doWithRetry(req, v, errorHandlers, maxRetries, err)
 }
 
 // Do performs the request and decodes the response if given interface != nil
