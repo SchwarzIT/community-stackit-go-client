@@ -159,6 +159,7 @@ func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	var lastErr error
 	var res *http.Response
+	var retry bool
 
 	overall, cancel := context.WithTimeout(req.Context(), c.retry.Timeout)
 	defer cancel()
@@ -173,39 +174,55 @@ func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...
 		retries = *maxRetries
 	}
 
+	res, retries, retry, lastErr = c.doTick(req, v, errorHandlers, maxRetries != nil, retries)
+	if lastErr == nil || !retry {
+		return res, lastErr
+	}
+
 	for {
 		tick, cancelTick := context.WithTimeout(context.Background(), c.retry.Throttle)
 		defer cancelTick()
 
 		select {
 		case <-tick.Done():
-			res, lastErr = c.do(req, v, errorHandlers...)
-
-			if lastErr == nil {
-				return res, nil
+			res, retries, retry, lastErr = c.doTick(req, v, errorHandlers, maxRetries != nil, retries)
+			if lastErr == nil || !retry {
+				return res, lastErr
 			}
-
-			// check if error is retryable
-			for _, f := range c.retry.IsRetryableFns {
-				if !f(lastErr) {
-					return res, lastErr
-				}
-			}
-
-			if maxRetries != nil {
-				if retries <= 0 {
-					return nil, errors.Wrap(lastErr, "reached max retries")
-				}
-				retries = retries - 1
-			}
-
 		case <-overall.Done():
-			if lastErr != nil {
-				return nil, errors.Wrap(lastErr, "retry context timed out")
-			}
-			return nil, errors.New("retry context timed out")
+			return nil, errors.Wrap(lastErr, "retry context timed out")
 		}
 	}
+}
+
+func (c *Client) doTick(req *http.Request, v interface{}, errorHandlers []func(*http.Response) error, withMaxRetries bool, retries int) (res *http.Response, retriesLeft int, retry bool, err error) {
+	retry = true
+
+	res, err = c.do(req, v, errorHandlers...)
+	if err == nil {
+		retry = false
+		return
+	}
+
+	// check if error is retryable
+	for _, f := range c.retry.IsRetryableFns {
+		if !f(err) {
+			retry = false
+			return
+		}
+	}
+
+	retriesLeft = retries
+	if withMaxRetries {
+		if retries <= 0 {
+			err = errors.Wrap(err, "reached max retries")
+			retry = false
+			return
+		}
+		retriesLeft = retriesLeft - 1
+	}
+
+	return
 }
 
 // Do performs the request and decodes the response if given interface != nil
