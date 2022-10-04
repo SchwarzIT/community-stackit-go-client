@@ -108,7 +108,7 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 	c = c.WithRetry(retry.New().SetThrottle(1 * time.Second).SetMaxRetries(2))
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "reached max retries") {
-		t.Errorf("expected do request to return max retries error but got '%v' instead", err)
+		t.Errorf("expected do request to return max retries error but got %q instead", err)
 	}
 }
 
