@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 )
 
 func TestNew(t *testing.T) {
@@ -272,5 +273,23 @@ func TestClient_SetToken(t *testing.T) {
 			}
 			c.SetToken(tt.args.token)
 		})
+	}
+}
+
+func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
+	c, mux, teardown, err := MockServer()
+	defer teardown()
+	if err != nil {
+		t.Errorf("error from mock.AuthServer: %s", err.Error())
+	}
+
+	mux.HandleFunc("/err", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+	})
+
+	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
+	if _, err := c.WithRetry(retry.New()).Do(req, nil); err == nil {
+		t.Error("expected do request to return error but got nil instead")
 	}
 }

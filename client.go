@@ -25,6 +25,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
 	resourceManager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
 )
@@ -33,6 +34,7 @@ import (
 type Client struct {
 	client *http.Client
 	config *Config
+	retry  *retry.Retry
 
 	// Productive services - services that are ready to be used in production
 	ProductiveServices
@@ -50,6 +52,14 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 	c := &Client{config: cfg}
 	return c.init(ctx), nil
+}
+
+// WithRetry sets retry.Retry in a shallow copy of the given client
+// and returns the new copy
+func (c *Client) WithRetry(r *retry.Retry) *Client {
+	nc := *c
+	nc.retry = r
+	return &nc
 }
 
 // Service management
@@ -137,8 +147,23 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 	return req, nil
 }
 
-// Do performs the request and decodes the response if given interface != nil
+// Do performs the request, including retry if set
+// To set retry, use WithRetry() which returns a shalow copy of the client
 func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+	if c.retry == nil {
+		return c.do(req, v, errorHandlers...)
+	}
+	return c.doWithRetry(req, v, errorHandlers...)
+}
+
+func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+	return c.retry.Do(req, func(r *http.Request) (*http.Response, error) {
+		return c.do(r, v, errorHandlers...)
+	})
+}
+
+// Do performs the request and decodes the response if given interface != nil
+func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err

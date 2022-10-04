@@ -3,3 +3,6 @@ TEST?=$$(go list ./... | grep -v 'vendor')
 test: 
 	@go test $(TEST) || exit 1                                                   
 	@echo $(TEST) | xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
+
+quality:
+	@goreportcard-cli -v ./...
