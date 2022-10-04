@@ -32,6 +32,7 @@ import (
 
 // Client service for managing interactions with STACKIT API
 type Client struct {
+	ctx    context.Context
 	client *http.Client
 	config *Config
 	retry  *retry.Retry
@@ -50,16 +51,20 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 		return nil, err
 	}
 
-	c := &Client{config: cfg}
-	return c.init(ctx), nil
+	c := &Client{
+		config: cfg,
+		ctx:    ctx,
+	}
+	return c.init(), nil
 }
 
 // WithRetry sets retry.Retry in a shallow copy of the given client
-// and returns the new copy
+// and returns the new copy after init re-run
 func (c *Client) WithRetry(r *retry.Retry) *Client {
 	nc := *c
 	nc.retry = r
-	return &nc
+	p := &nc
+	return p.init()
 }
 
 // Service management
@@ -82,8 +87,8 @@ type IncubatorServices struct {
 }
 
 // init initializes the client and its services and returns the client
-func (c *Client) init(ctx context.Context) *Client {
-	c.setHttpClient(ctx)
+func (c *Client) init() *Client {
+	c.setHttpClient(c.ctx)
 
 	// init productive services
 	c.Argus = argus.New(c)
