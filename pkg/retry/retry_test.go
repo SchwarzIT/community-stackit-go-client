@@ -44,7 +44,7 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
 
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*2))
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
 	defer cancel()
 	mux.HandleFunc("/2s", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
