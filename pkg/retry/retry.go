@@ -9,10 +9,11 @@ import (
 )
 
 type Retry struct {
-	Timeout        time.Duration          // max duration
-	MaxRetries     *int                   // max retries, when nil, there's no retry limit
-	Throttle       time.Duration          // wait duration between calls
-	IsRetryableFns []func(err error) bool // functions to determine if error is retriable
+	Timeout        time.Duration               // max duration
+	MaxRetries     *int                        // max retries, when nil, there's no retry limit
+	Throttle       time.Duration               // wait duration between calls
+	IsRetryableFns []func(err error) bool      // functions to determine if error is retriable
+	UntilFns       []func(*http.Response) bool // functions to the determine if the given response is the expected response
 }
 
 type Config interface {
@@ -42,6 +43,8 @@ func (c *Retry) withConfig(cfgs ...Config) *Retry {
 			c.MaxRetries = cfg.Value().(*int)
 		case CONFIG_IS_RETRYABLE:
 			c.IsRetryableFns = cfg.Value().([]func(err error) bool)
+		case CONFIG_UNTIL:
+			c.UntilFns = cfg.Value().([]func(*http.Response) bool)
 		}
 	}
 	return c
@@ -67,7 +70,11 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 
 	for {
 		res, maxRetries, retry, lastErr = r.doIteration(newReq, do, maxRetries)
-		if lastErr == nil || !retry {
+		if lastErr == nil && r.isFulfilled(res) {
+			return res, nil
+		}
+
+		if !retry {
 			return res, lastErr
 		}
 
@@ -84,13 +91,13 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 	}
 }
 
+// doIteration runs the do function with the given request
 func (r *Retry) doIteration(req *http.Request, do func(*http.Request) (*http.Response, error), retries int) (res *http.Response, retriesLeft int, retry bool, err error) {
 	retriesLeft = retries
 	retry = true
 
 	res, err = do(req)
 	if err == nil {
-		retry = false
 		return
 	}
 
@@ -112,4 +119,14 @@ func (r *Retry) doIteration(req *http.Request, do func(*http.Request) (*http.Res
 	}
 
 	return
+}
+
+// isFulfilled check if Until functions are all fulfilled
+func (r *Retry) isFulfilled(res *http.Response) bool {
+	for _, f := range r.UntilFns {
+		if !f(res) {
+			return false
+		}
+	}
+	return true
 }
