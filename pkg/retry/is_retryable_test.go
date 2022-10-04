@@ -17,20 +17,19 @@ func TestRetry_SetIsRetryable(t *testing.T) {
 	r.IsRetryableFns = []func(err error) bool{IsRetryableNoOp}
 
 	type args struct {
-		override bool
-		f        []func(err error) bool
+		f []func(err error) bool
 	}
 	tests := []struct {
 		name string
 		args args
 		want *Retry
 	}{
-		{"ok", args{true, []func(err error) bool{IsRetryableNoOp}}, r},
+		{"ok", args{[]func(err error) bool{IsRetryableNoOp}}, r},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := New()
-			got := c.SetIsRetryable(tt.args.override, tt.args.f...)
+			got := c.SetIsRetryable(tt.args.f...)
 			if len(got.IsRetryableFns) != len(r.IsRetryableFns) {
 				t.Error("wrong lengths")
 				return

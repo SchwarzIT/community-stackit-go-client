@@ -13,12 +13,13 @@ const (
 	ERR_NO_SUCH_HOST = "dial tcp: lookup"
 )
 
+// IsRetryable is the config struct
 type IsRetryable struct {
 	fnList []func(err error) bool
 }
 
-// Helper function
-func (c *Retry) SetIsRetryable(override bool, f ...func(err error) bool) *Retry {
+// SetIsRetryable sets functions that determin if an error can be retried or not
+func (c *Retry) SetIsRetryable(f ...func(err error) bool) *Retry {
 	return c.withConfig(&IsRetryable{
 		fnList: f,
 	})

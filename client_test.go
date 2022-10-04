@@ -288,9 +288,8 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 		w.WriteHeader(http.StatusBadRequest)
 	})
 
-	c = c.WithRetry(retry.New())
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.Do(req, nil); err == nil {
+	if _, err := c.WithRetry(retry.New()).Do(req, nil); err == nil {
 		t.Error("expected do request to return error but got nil instead")
 	}
 }

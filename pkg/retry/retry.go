@@ -20,6 +20,7 @@ type Config interface {
 	Value() interface{}
 }
 
+// New returns a new instance of Retry with default values
 func New() *Retry {
 	c := &Retry{
 		Timeout:        CONFIG_TIMEOUT_DEFAULT,

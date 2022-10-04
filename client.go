@@ -147,7 +147,8 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 	return req, nil
 }
 
-// Do is a wrapper for do() which also manages retry if set
+// Do performs the request, including retry if set
+// To set retry, use WithRetry() which returns a shalow copy of the client
 func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	if c.retry == nil {
 		return c.do(req, v, errorHandlers...)
