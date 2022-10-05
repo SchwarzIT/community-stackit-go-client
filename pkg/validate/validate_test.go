@@ -218,7 +218,8 @@ func TestSemVer(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"ok", args{"1.2.3"}, false},
+		{"ok 1", args{"1.2.3"}, false},
+		{"ok 2", args{"1.2"}, false},
 		{"not ok 1", args{"ab1.2.3"}, true},
 		{"not ok 2", args{""}, true},
 	}

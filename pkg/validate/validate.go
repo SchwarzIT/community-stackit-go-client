@@ -66,7 +66,7 @@ func SemVer(version string) error {
 	if version == "" {
 		return errors.New("version is empty")
 	}
-	exp := `^\d+\.\d+\.\d+$`
+	exp := `^\d+\.\d+(?:\.\d+)?$`
 	r := regexp.MustCompile(exp)
 	if !r.MatchString(version) {
 		return fmt.Errorf("invalid version. valid version is of: %s", exp)
