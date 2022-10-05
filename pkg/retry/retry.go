@@ -9,11 +9,11 @@ import (
 )
 
 type Retry struct {
-	Timeout        time.Duration               // max duration
-	MaxRetries     *int                        // max retries, when nil, there's no retry limit
-	Throttle       time.Duration               // wait duration between calls
-	IsRetryableFns []func(err error) bool      // functions to determine if error is retriable
-	UntilFns       []func(*http.Response) bool // functions to the determine if the given response is the expected response
+	timeout        time.Duration               // max duration
+	maxRetries     *int                        // max retries, when nil, there's no retry limit
+	throttle       time.Duration               // wait duration between calls
+	isRetryableFns []func(err error) bool      // functions to determine if error is retriable
+	untilFns       []func(*http.Response) bool // functions to the determine if the given response is the expected response
 }
 
 type Config interface {
@@ -24,10 +24,10 @@ type Config interface {
 // New returns a new instance of Retry with default values
 func New() *Retry {
 	c := &Retry{
-		Timeout:        CONFIG_TIMEOUT_DEFAULT,
-		MaxRetries:     nil,
-		Throttle:       CONFIG_THROTTLE_DEFAULT,
-		IsRetryableFns: []func(err error) bool{IsRetryableDefault},
+		timeout:        CONFIG_TIMEOUT_DEFAULT,
+		maxRetries:     nil,
+		throttle:       CONFIG_THROTTLE_DEFAULT,
+		isRetryableFns: []func(err error) bool{IsRetryableDefault},
 	}
 	return c
 }
@@ -36,15 +36,15 @@ func (c *Retry) withConfig(cfgs ...Config) *Retry {
 	for _, cfg := range cfgs {
 		switch cfg.String() {
 		case CONFIG_TIMEOUT:
-			c.Timeout = cfg.Value().(time.Duration)
+			c.timeout = cfg.Value().(time.Duration)
 		case CONFIG_THROTTLE:
-			c.Throttle = cfg.Value().(time.Duration)
+			c.throttle = cfg.Value().(time.Duration)
 		case CONFIG_MAX_RETRIES:
-			c.MaxRetries = cfg.Value().(*int)
+			c.maxRetries = cfg.Value().(*int)
 		case CONFIG_IS_RETRYABLE:
-			c.IsRetryableFns = cfg.Value().([]func(err error) bool)
+			c.isRetryableFns = cfg.Value().([]func(err error) bool)
 		case CONFIG_UNTIL:
-			c.UntilFns = cfg.Value().([]func(*http.Response) bool)
+			c.untilFns = cfg.Value().([]func(*http.Response) bool)
 		}
 	}
 	return c
@@ -56,7 +56,7 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 	var res *http.Response
 	var retry bool
 
-	overall, cancel := context.WithTimeout(req.Context(), r.Timeout)
+	overall, cancel := context.WithTimeout(req.Context(), r.timeout)
 	defer cancel()
 
 	// set overall ctx in request
@@ -64,8 +64,8 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 
 	// clone max retries
 	maxRetries := -1
-	if r.MaxRetries != nil {
-		maxRetries = *r.MaxRetries
+	if r.maxRetries != nil {
+		maxRetries = *r.maxRetries
 	}
 
 	for {
@@ -79,7 +79,7 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 		}
 
 		// context timeout was chosen in order to support throttle = 0
-		tick, cancelTick := context.WithTimeout(context.Background(), r.Throttle)
+		tick, cancelTick := context.WithTimeout(context.Background(), r.throttle)
 		defer cancelTick()
 
 		select {
@@ -102,7 +102,7 @@ func (r *Retry) doIteration(req *http.Request, do func(*http.Request) (*http.Res
 	}
 
 	// check if error is retryable
-	for _, f := range r.IsRetryableFns {
+	for _, f := range r.isRetryableFns {
 		if !f(err) {
 			retry = false
 			return
@@ -123,7 +123,7 @@ func (r *Retry) doIteration(req *http.Request, do func(*http.Request) (*http.Res
 
 // isFulfilled check if Until functions are all fulfilled
 func (r *Retry) isFulfilled(res *http.Response) bool {
-	for _, f := range r.UntilFns {
+	for _, f := range r.untilFns {
 		if !f(res) {
 			return false
 		}

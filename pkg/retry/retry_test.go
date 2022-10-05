@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -22,10 +23,7 @@ func TestNew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := retry.New()
-			if got.MaxRetries != tt.want.MaxRetries ||
-				got.Throttle != tt.want.Throttle ||
-				got.Timeout != tt.want.Timeout ||
-				len(got.IsRetryableFns) != len(tt.want.IsRetryableFns) {
+			if reflect.DeepEqual(got, tt.want) {
 				t.Error("one or more values don't match")
 			}
 		})

@@ -7,7 +7,7 @@ import (
 
 func TestRetry_Until(t *testing.T) {
 	r := New()
-	r.UntilFns = []func(*http.Response) bool{noOp}
+	r.untilFns = []func(*http.Response) bool{noOp}
 
 	type args struct {
 		f []func(*http.Response) bool
@@ -23,13 +23,13 @@ func TestRetry_Until(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := New()
 			got := c.Until(tt.args.f...)
-			if len(got.UntilFns) != len(r.UntilFns) {
+			if len(got.untilFns) != len(r.untilFns) {
 				t.Error("wrong lengths")
 				return
 			}
-			for k, v := range got.UntilFns {
-				if GetFunctionName(r.UntilFns[k]) != GetFunctionName(v) {
-					t.Errorf("%s != %s", GetFunctionName(r.UntilFns[k]), GetFunctionName(v))
+			for k, v := range got.untilFns {
+				if GetFunctionName(r.untilFns[k]) != GetFunctionName(v) {
+					t.Errorf("%s != %s", GetFunctionName(r.untilFns[k]), GetFunctionName(v))
 					return
 				}
 			}
