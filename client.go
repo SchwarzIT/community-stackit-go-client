@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
@@ -60,11 +61,16 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 // WithRetry sets retry.Retry in a shallow copy of the given client
 // and returns the new copy after init re-run
-func (c *Client) WithRetry(r *retry.Retry) *Client {
+func (c *Client) WithRetry(r *retry.Retry) common.Client {
 	nc := *c
 	nc.retry = r
 	p := &nc
 	return p.init()
+}
+
+// GetRetry returns the defined retry
+func (c *Client) GetRetry() *retry.Retry {
+	return c.retry
 }
 
 // Service management

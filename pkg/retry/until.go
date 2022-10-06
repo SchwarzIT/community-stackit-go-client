@@ -3,29 +3,31 @@ package retry
 import "net/http"
 
 const (
-	// Until configuration constants
-	CONFIG_UNTIL = "UntilFns"
+	// Wait configuration constants
+	CONFIG_UNTIL = "Until"
 )
 
-// untilFns is the config struct
-type untilFns struct {
-	fnList []func(*http.Response) bool
+type UntilFn func(*http.Response) (bool, error)
+
+// until is the config struct
+type until struct {
+	fnList []UntilFn
 }
 
-// Until sets functions that determin if the response given is the expected response
+// SetUntil sets functions that determin if the response given is the expected response
 // this functionality is useful, for example, when waiting for an API status to be ready
-func (c *Retry) Until(f ...func(*http.Response) bool) *Retry {
-	return c.withConfig(&untilFns{
+func (c *Retry) SetUntil(f ...UntilFn) *Retry {
+	return c.withConfig(&until{
 		fnList: f,
 	})
 }
 
-var _ = Config(&untilFns{})
+var _ = Config(&until{})
 
-func (c *untilFns) String() string {
+func (c *until) String() string {
 	return CONFIG_UNTIL
 }
 
-func (c *untilFns) Value() interface{} {
+func (c *until) Value() interface{} {
 	return c.fnList
 }

@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/internal/clients"
 	p "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"

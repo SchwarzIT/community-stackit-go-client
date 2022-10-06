@@ -6,12 +6,16 @@ package common
 import (
 	"context"
 	"net/http"
+
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 )
 
 // Client is the client interface
 type Client interface {
 	Request(ctx context.Context, method, path string, body []byte) (*http.Request, error)
 	Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error)
+	WithRetry(r *retry.Retry) Client
+	GetRetry() *retry.Retry
 	OrganizationID() string
 }
 

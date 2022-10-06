@@ -9,11 +9,11 @@ import (
 )
 
 type Retry struct {
-	timeout        time.Duration               // max duration
-	maxRetries     *int                        // max retries, when nil, there's no retry limit
-	throttle       time.Duration               // wait duration between calls
-	isRetryableFns []func(err error) bool      // functions to determine if error is retriable
-	untilFns       []func(*http.Response) bool // functions to the determine if the given response is the expected response
+	timeout        time.Duration          // max duration
+	maxRetries     *int                   // max retries, when nil, there's no retry limit
+	throttle       time.Duration          // wait duration between calls
+	isRetryableFns []func(err error) bool // functions to determine if error is retriable
+	untilFns       []UntilFn              // functions to the determine if the given response is the expected response
 }
 
 type Config interface {
@@ -44,7 +44,7 @@ func (c *Retry) withConfig(cfgs ...Config) *Retry {
 		case CONFIG_IS_RETRYABLE:
 			c.isRetryableFns = cfg.Value().([]func(err error) bool)
 		case CONFIG_UNTIL:
-			c.untilFns = cfg.Value().([]func(*http.Response) bool)
+			c.untilFns = cfg.Value().([]UntilFn)
 		}
 	}
 	return c
@@ -70,8 +70,11 @@ func (r *Retry) Do(req *http.Request, do func(*http.Request) (*http.Response, er
 
 	for {
 		res, maxRetries, retry, lastErr = r.doIteration(newReq, do, maxRetries)
-		if lastErr == nil && r.isFulfilled(res) {
-			return res, nil
+		if lastErr == nil {
+			fulfilled, err := r.isFulfilled(res)
+			if fulfilled || err != nil {
+				return res, err
+			}
 		}
 
 		if !retry {
@@ -121,12 +124,16 @@ func (r *Retry) doIteration(req *http.Request, do func(*http.Request) (*http.Res
 	return
 }
 
-// isFulfilled check if Until functions are all fulfilled
-func (r *Retry) isFulfilled(res *http.Response) bool {
+// isFulfilled check if Wait functions are all fulfilled
+func (r *Retry) isFulfilled(res *http.Response) (bool, error) {
 	for _, f := range r.untilFns {
-		if !f(res) {
-			return false
+		v, err := f(res)
+		if !v {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
 		}
 	}
-	return true
+	return true, nil
 }

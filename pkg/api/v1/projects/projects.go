@@ -13,6 +13,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"github.com/pkg/errors"
 )
 
@@ -148,6 +149,26 @@ func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, 
 		BillingReference: resBody.Labels.BillingReference,
 		OrganizationID:   resBody.Parent.ID,
 	}, nil
+}
+
+func (svc *ProjectService) CreateWithWait(ctx context.Context, name, billingRef string, roles ...ProjectRole) (Project, *wait.Wait, error) {
+	p, err := svc.Create(ctx, name, billingRef, roles...)
+	if err != nil {
+		return p, nil, err
+	}
+
+	w := wait.New(func() (bool, error) {
+		state, err := svc.GetLifecycleState(ctx, p.ID)
+		if err != nil {
+			return false, err
+		}
+		if state != consts.PROJECT_STATUS_ACTIVE {
+			return false, nil
+		}
+		return true, nil
+	})
+
+	return p, w, err
 }
 
 func (svc *ProjectService) buildCreateRequestBody(name, billingRef string, roles ...ProjectRole) ([]byte, error) {
