@@ -9,7 +9,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -153,9 +152,11 @@ func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, 
 	}, nil
 }
 
+// CreateAndWait wraps around `Create` and runs it with retry mechanism (which can be overridden by specifying a retry)
+// it returns a wait service - by running Do() the wait service will wait for the project to be in active state
 func (svc *ProjectService) CreateAndWait(ctx context.Context, name, billingRef string, roles []ProjectRole, r ...*retry.Retry) (Project, *wait.Wait, error) {
 	if len(r) == 0 {
-		r = append(r, retry.New().SetTimeout(20*time.Minute))
+		r = append(r, retry.New())
 	}
 	if svc.Client.GetRetry() == nil {
 		svc.Client = svc.Client.WithRetry(r[0])
@@ -305,6 +306,35 @@ func (svc *ProjectService) buildUpdateRequestBody(name, billingRef string) ([]by
 	})
 }
 
+// UpdateAndWait wraps around `Update` and runs it with retry mechanism (which can be overridden by specifying a retry)
+// it returns a wait service - by running Do() the wait service will wait for the project to be in active state
+func (svc *ProjectService) UpdateAndWait(ctx context.Context, id, name, billingRef string, r ...*retry.Retry) (*wait.Wait, error) {
+	if len(r) == 0 {
+		r = append(r, retry.New())
+	}
+	if svc.Client.GetRetry() == nil {
+		svc.Client = svc.Client.WithRetry(r[0])
+	}
+
+	err := svc.Update(ctx, id, name, billingRef)
+	if err != nil {
+		return nil, err
+	}
+
+	w := wait.New(func() (interface{}, bool, error) {
+		state, err := svc.GetLifecycleState(ctx, id)
+		if err != nil {
+			return state, false, err
+		}
+		if state != consts.PROJECT_STATUS_ACTIVE {
+			return state, false, nil
+		}
+		return state, true, nil
+	})
+
+	return w, err
+}
+
 // Delete deletes a project by ID
 // See also https://api.stackit.schwarz/resource-management/openapi.v1.html#operation/delete-projects-projectId
 func (svc *ProjectService) Delete(ctx context.Context, projectID string) error {
@@ -322,4 +352,30 @@ func (svc *ProjectService) Delete(ctx context.Context, projectID string) error {
 		return err
 	}
 	return nil
+}
+
+// DeleteAndWait wraps around `Delete` and runs it with retry mechanism (which can be overridden by specifying a retry)
+// it returns a wait service - by running Do() the wait service will wait for the project to be deleted
+func (svc *ProjectService) DeleteAndWait(ctx context.Context, projectID string, r ...*retry.Retry) (*wait.Wait, error) {
+	if len(r) == 0 {
+		r = append(r, retry.New())
+	}
+	if svc.Client.GetRetry() == nil {
+		svc.Client = svc.Client.WithRetry(r[0])
+	}
+
+	err := svc.Delete(ctx, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	w := wait.New(func() (interface{}, bool, error) {
+		state, err := svc.GetLifecycleState(ctx, projectID)
+		if err != nil {
+			return state, true, nil
+		}
+		return state, false, nil
+	})
+
+	return w, err
 }

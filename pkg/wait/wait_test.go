@@ -9,7 +9,7 @@ import (
 )
 
 func TestNew(t *testing.T) {
-	simple := func() (done bool, err error) { return true, nil }
+	simple := func() (res interface{}, done bool, err error) { return nil, true, nil }
 	type args struct {
 		f WaitFn
 	}
@@ -30,7 +30,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestWait_SetThrottle(t *testing.T) {
-	simple := func() (done bool, err error) { return true, nil }
+	simple := func() (res interface{}, done bool, err error) { return nil, true, nil }
 	f := &Wait{
 		fn:       simple,
 		throttle: 10 * time.Second,
@@ -73,23 +73,23 @@ func TestWait_Run(t *testing.T) {
 		wantDone bool
 		wantErr  bool
 	}{
-		{"ok", fields{throttle: 1 * time.Second, fn: func() (done bool, err error) {
-			return true, nil
+		{"ok", fields{throttle: 1 * time.Second, fn: func() (res interface{}, done bool, err error) {
+			return nil, true, nil
 		}}, args{1 * time.Hour}, true, false},
 
-		{"ok 2", fields{throttle: 1 * time.Second, fn: func() (done bool, err error) {
+		{"ok 2", fields{throttle: 1 * time.Second, fn: func() (res interface{}, done bool, err error) {
 			if ctx.Err() == nil {
-				return false, nil
+				return nil, false, nil
 			}
-			return true, nil
+			return nil, true, nil
 		}}, args{1 * time.Hour}, true, false},
 
-		{"err", fields{throttle: 1 * time.Second, fn: func() (done bool, err error) {
-			return true, errors.New("something happened")
+		{"err", fields{throttle: 1 * time.Second, fn: func() (res interface{}, done bool, err error) {
+			return nil, true, errors.New("something happened")
 		}}, args{1 * time.Hour}, true, true},
 
-		{"timeout", fields{throttle: 1 * time.Second, fn: func() (done bool, err error) {
-			return false, nil
+		{"timeout", fields{throttle: 1 * time.Second, fn: func() (res interface{}, done bool, err error) {
+			return nil, false, nil
 		}}, args{1 * time.Second}, false, true},
 	}
 	for _, tt := range tests {
@@ -98,7 +98,7 @@ func TestWait_Run(t *testing.T) {
 				fn:       tt.fields.fn,
 				throttle: tt.fields.throttle,
 			}
-			gotDone, err := w.Run(tt.args.timeout)
+			_, gotDone, err := w.Run()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Wait.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
