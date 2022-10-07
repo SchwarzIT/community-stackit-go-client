@@ -5,7 +5,7 @@ import "time"
 const (
 	// timeout configuration constants
 	CONFIG_TIMEOUT         = "Timeout"
-	CONFIG_TIMEOUT_DEFAULT = 10 * time.Minute
+	CONFIG_TIMEOUT_DEFAULT = 2 * time.Minute
 )
 
 // timeout is the config struct

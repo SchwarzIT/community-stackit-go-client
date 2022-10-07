@@ -5,7 +5,7 @@ import "time"
 const (
 	// timeout configuration constants
 	CONFIG_THROTTLE         = "Throttle"
-	CONFIG_THROTTLE_DEFAULT = 5 * time.Second
+	CONFIG_THROTTLE_DEFAULT = 1 * time.Second
 )
 
 // throttle is the config struct
