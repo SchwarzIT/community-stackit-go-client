@@ -37,7 +37,8 @@ func (w *Wait) SetTimeout(d time.Duration) *Wait {
 }
 
 // Do starts the wait until there's an error or wait is done
-func (w *Wait) Run() (res interface{}, done bool, err error) {
+func (w *Wait) Run() (res interface{}, err error) {
+	var done bool
 	ctx, cancel := context.WithTimeout(context.Background(), w.timeout)
 	defer cancel()
 	for {
@@ -54,7 +55,7 @@ func (w *Wait) Run() (res interface{}, done bool, err error) {
 		case <-tick.Done():
 			// continue
 		case <-ctx.Done():
-			return res, false, errors.New("wait.Do() timed out")
+			return res, errors.New("wait.Do() timed out")
 		}
 	}
 }
