@@ -9,9 +9,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"github.com/pkg/errors"
@@ -151,7 +153,14 @@ func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, 
 	}, nil
 }
 
-func (svc *ProjectService) CreateWithWait(ctx context.Context, name, billingRef string, roles ...ProjectRole) (Project, *wait.Wait, error) {
+func (svc *ProjectService) CreateAndWait(ctx context.Context, name, billingRef string, roles []ProjectRole, r ...*retry.Retry) (Project, *wait.Wait, error) {
+	if len(r) == 0 {
+		r = append(r, retry.New().SetTimeout(20*time.Minute))
+	}
+	if svc.Client.GetRetry() == nil {
+		svc.Client = svc.Client.WithRetry(r[0])
+	}
+
 	p, err := svc.Create(ctx, name, billingRef, roles...)
 	if err != nil {
 		return p, nil, err
