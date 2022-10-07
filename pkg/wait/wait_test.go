@@ -17,9 +17,9 @@ func TestNew(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Wait
+		want *Handler
 	}{
-		{"ok", args{simple}, &Wait{fn: simple, throttle: 5 * time.Second}},
+		{"ok", args{simple}, &Handler{fn: simple, throttle: 5 * time.Second}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -32,7 +32,7 @@ func TestNew(t *testing.T) {
 
 func TestWait_SetThrottle(t *testing.T) {
 	simple := func() (res interface{}, done bool, err error) { return nil, true, nil }
-	f := &Wait{
+	f := &Handler{
 		fn:       simple,
 		throttle: 10 * time.Second,
 	}
@@ -42,7 +42,7 @@ func TestWait_SetThrottle(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *Wait
+		want *Handler
 	}{
 		{"ok", args{10 * time.Second}, f},
 	}
@@ -92,12 +92,12 @@ func TestWait_Run(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &Wait{
+			w := &Handler{
 				fn:       tt.fields.fn,
 				throttle: tt.fields.throttle,
 				timeout:  tt.fields.timeout,
 			}
-			_, err := w.Run()
+			_, err := w.Wait()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Wait.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -107,7 +107,7 @@ func TestWait_Run(t *testing.T) {
 }
 
 func TestWait_SetTimeout(t *testing.T) {
-	f := &Wait{
+	f := &Handler{
 		throttle: 5 * time.Second,
 		timeout:  5 * time.Hour,
 	}
@@ -123,13 +123,13 @@ func TestWait_SetTimeout(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   *Wait
+		want   *Handler
 	}{
 		{"ok", fields{timeout: 1 * time.Hour, throttle: 5 * time.Second}, args{d: 5 * time.Hour}, f},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			w := &Wait{
+			w := &Handler{
 				throttle: tt.fields.throttle,
 				timeout:  tt.fields.timeout,
 			}

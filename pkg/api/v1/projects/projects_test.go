@@ -150,7 +150,7 @@ func TestProjectsService_Create(t *testing.T) {
 			},
 		},
 	}
-	got, err := projects.Create(context.Background(), "Fancy-new-project", "T-9876543B", role)
+	got, _, err := projects.Create(context.Background(), "Fancy-new-project", "T-9876543B", role)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -190,7 +190,7 @@ func TestAccProjectsService_Create(t *testing.T) {
 			},
 		},
 	}
-	got, err := projects.Create(context.Background(), want.Name, want.BillingReference, role)
+	got, _, err := projects.Create(context.Background(), want.Name, want.BillingReference, role)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,7 +209,7 @@ func TestProjectsService_Delete(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	if err := projects.Delete(context.Background(), "abc"); err != nil {
+	if _, err := projects.Delete(context.Background(), "abc"); err != nil {
 		t.Errorf("delete project: %v", err)
 	}
 }
@@ -223,7 +223,7 @@ func TestAccProjectsService_Delete(t *testing.T) {
 		t.Error(err)
 	}
 	projects := p.New(c)
-	if err := projects.Delete(context.Background(), "0d3a2fb9-1472-4284-9655-d7aae2cd5bd5"); err != nil {
+	if _, err := projects.Delete(context.Background(), "0d3a2fb9-1472-4284-9655-d7aae2cd5bd5"); err != nil {
 		t.Fatal(err)
 	}
 }
