@@ -46,7 +46,8 @@ func IsRetryableDefault(err error) bool {
 		return strings.Contains(err.Error(), ERR_NO_SUCH_HOST)
 	}
 
-	if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) {
+	if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) ||
+		strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 		return false
 	}
 

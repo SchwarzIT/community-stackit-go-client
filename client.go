@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
@@ -55,22 +54,9 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 	c := &Client{
 		config: cfg,
 		ctx:    ctx,
+		retry:  retry.New(),
 	}
 	return c.init(), nil
-}
-
-// WithRetry sets retry.Retry in a shallow copy of the given client
-// and returns the new copy after init re-run
-func (c *Client) WithRetry(r *retry.Retry) common.Client {
-	nc := *c
-	nc.retry = r
-	p := &nc
-	return p.init()
-}
-
-// GetRetry returns the defined retry
-func (c *Client) GetRetry() *retry.Retry {
-	return c.retry
 }
 
 // Service management
@@ -201,6 +187,16 @@ func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 // OrganizationID returns the organization ID defined in the configuration
 func (c *Client) OrganizationID() string {
 	return c.config.OrganizationID
+}
+
+// Retry returns the defined retry
+func (c *Client) Retry() *retry.Retry {
+	return c.retry
+}
+
+// SetRetry overrides default retry setting
+func (c *Client) SetRetry(r *retry.Retry) {
+	c.retry = r
 }
 
 // MockServer mocks STACKIT api server

@@ -56,15 +56,14 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 		}
 	})
 
-	nc := c.WithRetry(retry.New().SetThrottle(1 * time.Second))
-
-	req, _ := nc.Request(context.Background(), http.MethodGet, "/2s", nil)
+	c.Retry().SetThrottle(1 * time.Second)
+	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
 	var got struct {
 		Status bool `json:"status"`
 	}
 
-	if _, err := nc.Do(req, &got); err != nil {
+	if _, err := c.Do(req, &got); err != nil {
 		t.Errorf("do request: %v", err)
 	}
 
@@ -85,9 +84,8 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 		w.WriteHeader(http.StatusBadRequest)
 	})
 
-	nc := c.WithRetry(retry.New())
-	req, _ := nc.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := nc.Do(req, nil); err == nil {
+	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
+	if _, err := c.Do(req, nil); err == nil {
 		t.Error("expected do request to return error but got nil instead")
 	}
 }
@@ -104,9 +102,9 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 		w.WriteHeader(http.StatusLocked)
 	})
 
-	nc := c.WithRetry(retry.New().SetThrottle(1 * time.Second).SetMaxRetries(2))
-	req, _ := nc.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := nc.Do(req, nil); !strings.Contains(err.Error(), "reached max retries") {
+	c.Retry().SetThrottle(1 * time.Second).SetMaxRetries(2)
+	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
+	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "reached max retries") {
 		t.Errorf("expected do request to return max retries error but got %q instead", err)
 	}
 }
@@ -123,15 +121,15 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 		w.WriteHeader(http.StatusLocked)
 	})
 
-	nc := c.WithRetry(retry.New().SetTimeout(5 * time.Second))
-	req, _ := nc.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := nc.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") && !strings.Contains(err.Error(), http.StatusText(http.StatusLocked)) {
+	c.Retry().SetTimeout(5 * time.Second)
+	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
+	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") && !strings.Contains(err.Error(), http.StatusText(http.StatusLocked)) {
 		t.Errorf("expected do request to return retry context timed out error with locked error status but got '%v' instead", err)
 	}
 
-	nc = c.WithRetry(retry.New().SetTimeout(0 * time.Second))
-	req, _ = nc.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := nc.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") {
+	c.Retry().SetTimeout(0 * time.Second)
+	req, _ = c.Request(context.Background(), http.MethodGet, "/err", nil)
+	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") {
 		t.Errorf("expected do request to return retry context timed out error but got '%v' instead", err)
 	}
 }
@@ -160,13 +158,13 @@ func TestClient_DoWithUntil(t *testing.T) {
 		Status bool `json:"status"`
 	}
 
-	nc := c.WithRetry(retry.New().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
+	c.Retry().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
 		return got.Status, nil
-	}))
+	})
 
-	req, _ := nc.Request(context.Background(), http.MethodGet, "/2s", nil)
+	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
-	if _, err := nc.Do(req, &got); err != nil {
+	if _, err := c.Do(req, &got); err != nil {
 		t.Errorf("do request: %v", err)
 	}
 
@@ -174,13 +172,13 @@ func TestClient_DoWithUntil(t *testing.T) {
 		t.Errorf("received status = %v", got.Status)
 	}
 
-	nc = c.WithRetry(retry.New().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
+	c.Retry().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
 		return got.Status, errors.New("error")
-	}))
+	})
 
-	req, _ = nc.Request(context.Background(), http.MethodGet, "/2s", nil)
+	req, _ = c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
-	if _, err := nc.Do(req, &got); err == nil {
+	if _, err := c.Do(req, &got); err == nil {
 		t.Errorf("expected an error")
 	}
 

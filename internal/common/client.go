@@ -14,8 +14,7 @@ import (
 type Client interface {
 	Request(ctx context.Context, method, path string, body []byte) (*http.Request, error)
 	Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error)
-	WithRetry(r *retry.Retry) Client
-	GetRetry() *retry.Retry
+	Retry() *retry.Retry
 	OrganizationID() string
 }
 
