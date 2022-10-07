@@ -166,15 +166,15 @@ func (svc *ProjectService) CreateAndWait(ctx context.Context, name, billingRef s
 		return p, nil, err
 	}
 
-	w := wait.New(func() (bool, error) {
+	w := wait.New(func() (interface{}, bool, error) {
 		state, err := svc.GetLifecycleState(ctx, p.ID)
 		if err != nil {
-			return false, err
+			return state, false, err
 		}
 		if state != consts.PROJECT_STATUS_ACTIVE {
-			return false, nil
+			return state, false, nil
 		}
-		return true, nil
+		return state, true, nil
 	})
 
 	return p, w, err
