@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -110,7 +110,7 @@ func TestKubernetesProjectsService_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := s.Projects.Create(tt.args.ctx, tt.args.projectID)
+			gotRes, _, err := s.Projects.Create(tt.args.ctx, tt.args.projectID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("KubernetesProjectsService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -156,7 +156,7 @@ func TestKubernetesProjectsService_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := s.Projects.Delete(tt.args.ctx, tt.args.projectID); (err != nil) != tt.wantErr {
+			if _, err := s.Projects.Delete(tt.args.ctx, tt.args.projectID); (err != nil) != tt.wantErr {
 				t.Errorf("KubernetesProjectsService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
