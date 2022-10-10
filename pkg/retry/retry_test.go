@@ -38,6 +38,7 @@ const (
 
 func TestClient_DoWithRetryThrottle(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -74,6 +75,7 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 
 func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -92,6 +94,7 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 
 func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -111,6 +114,7 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 
 func TestClient_DoWithRetryTimeout(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -136,6 +140,7 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 
 func TestClient_DoWithUntil(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
