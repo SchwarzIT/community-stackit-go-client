@@ -24,7 +24,7 @@ func New(f WaitFn) *Handler {
 	}
 }
 
-// SetThrottle sets the duration between func triggerring
+// SetThrottle sets the duration between func triggering
 func (w *Handler) SetThrottle(d time.Duration) *Handler {
 	w.throttle = d
 	return w
