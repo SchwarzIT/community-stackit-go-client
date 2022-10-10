@@ -57,12 +57,12 @@ func (svc *KubernetesProjectsService) Create(ctx context.Context, projectID stri
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	w = wait.New(svc.createWait(ctx, projectID))
+	w = wait.New(svc.waitForCreation(ctx, projectID))
 	return
 }
 
-// createWait returns a wait function to determine if kubernetes project has been created
-func (svc *KubernetesProjectsService) createWait(ctx context.Context, projectID string) wait.WaitFn {
+// waitForCreation returns a wait function to determine if kubernetes project has been created
+func (svc *KubernetesProjectsService) waitForCreation(ctx context.Context, projectID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		res, err = svc.Get(ctx, projectID)
 		if err != nil {
@@ -95,12 +95,12 @@ func (svc *KubernetesProjectsService) Delete(ctx context.Context, projectID stri
 	}
 
 	_, err = svc.Client.Do(req, nil)
-	w = wait.New(svc.deleteWait(ctx, projectID))
+	w = wait.New(svc.waitForDeletion(ctx, projectID))
 	return
 }
 
-// deleteWait returns a wait function to determine if kubernetes project has been deleted
-func (svc *KubernetesProjectsService) deleteWait(ctx context.Context, projectID string) wait.WaitFn {
+// waitForDeletion returns a wait function to determine if kubernetes project has been deleted
+func (svc *KubernetesProjectsService) waitForDeletion(ctx context.Context, projectID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		res, err = svc.Get(ctx, projectID)
 		if err != nil {
