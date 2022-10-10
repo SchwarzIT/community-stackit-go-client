@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 )
 
 func TestNew(t *testing.T) {
@@ -285,6 +286,7 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
 
+	c.SetRetry(retry.New())
 	c.Retry().SetThrottle(1 * time.Second)
 
 	mux.HandleFunc("/err", func(w http.ResponseWriter, r *http.Request) {
