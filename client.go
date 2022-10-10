@@ -54,7 +54,7 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 	c := &Client{
 		config: cfg,
 		ctx:    ctx,
-		retry:  retry.New(),
+		retry:  nil,
 	}
 	return c.init(), nil
 }
