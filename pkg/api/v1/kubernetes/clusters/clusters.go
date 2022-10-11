@@ -235,7 +235,7 @@ func (svc *KubernetesClusterService) waitForCreation(ctx context.Context, projec
 		}
 		status := s.Status.Aggregated
 		if status == consts.SKE_CLUSTER_STATUS_HEALTHY || status == consts.SKE_CLUSTER_STATUS_HIBERNATED {
-			return status, true, nil
+			return s, true, nil
 		}
 		return s, false, nil
 	}
