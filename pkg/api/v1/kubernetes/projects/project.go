@@ -66,6 +66,9 @@ func (svc *KubernetesProjectsService) waitForCreation(ctx context.Context, proje
 	return func() (res interface{}, done bool, err error) {
 		res, err = svc.Get(ctx, projectID)
 		if err != nil {
+			if strings.Contains(err.Error(), "project has no assigned namespace") {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		project := res.(KubernetesProjectsResponse)
