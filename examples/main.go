@@ -21,12 +21,13 @@ func main() {
 	projectID := "1234-56789-101112"
 	bucketName := "example"
 
-	w, err := c.ObjectStorage.Buckets.Create(context.TODO(), projectID, bucketName)
-	if _, err := w.Wait(); err != nil {
+	process, err := c.ObjectStorage.Buckets.Create(context.TODO(), projectID, bucketName)
+	if err != nil {
 		panic(err)
 	}
 
-	if err != nil {
+	// wait for bucket to be created
+	if _, err := process.Wait(); err != nil {
 		panic(err)
 	}
 

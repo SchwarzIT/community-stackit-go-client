@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -86,15 +87,26 @@ func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, b
 	if err != nil {
 		return
 	}
+	_, err = svc.Client.Do(req, nil)
+	if err != nil {
+		return
+	}
 
-	w = wait.New(func() (interface{}, bool, error) {
-		_, err = svc.Client.Do(req, nil)
+	w = wait.New(waitForCreation(ctx, projectID, bucketName, svc))
+	return
+}
+
+func waitForCreation(ctx context.Context, projectID string, bucketName string, svc *ObjectStorageBucketsService) wait.WaitFn {
+	return func() (interface{}, bool, error) {
+		res, err := svc.Get(ctx, projectID, bucketName)
 		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
-		return nil, true, nil
-	})
-	return
+		return res, true, nil
+	}
 }
 
 // Delete deletes a bucket
@@ -104,12 +116,23 @@ func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, b
 	if err != nil {
 		return
 	}
-	w = wait.New(func() (interface{}, bool, error) {
-		_, err = svc.Client.Do(req, nil)
-		if err != nil {
-			return nil, false, err
-		}
-		return nil, true, nil
-	})
+	_, err = svc.Client.Do(req, nil)
+	if err != nil {
+		return
+	}
+	w = wait.New(waitForDeletion(ctx, projectID, bucketName, svc))
 	return w, err
+}
+
+func waitForDeletion(ctx context.Context, projectID string, bucketName string, svc *ObjectStorageBucketsService) wait.WaitFn {
+	return func() (interface{}, bool, error) {
+		res, err := svc.Get(ctx, projectID, bucketName)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return res, true, nil
+			}
+			return res, false, err
+		}
+		return res, false, nil
+	}
 }
