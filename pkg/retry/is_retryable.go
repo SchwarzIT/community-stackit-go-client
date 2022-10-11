@@ -14,24 +14,24 @@ const (
 )
 
 // IsRetryable is the config struct
-type IsRetryable struct {
+type isRetryable struct {
 	fnList []func(err error) bool
 }
 
 // SetIsRetryable sets functions that determin if an error can be retried or not
 func (c *Retry) SetIsRetryable(f ...func(err error) bool) *Retry {
-	return c.withConfig(&IsRetryable{
+	return c.withConfig(&isRetryable{
 		fnList: f,
 	})
 }
 
-var _ = Config(&IsRetryable{})
+var _ = Config(&isRetryable{})
 
-func (c *IsRetryable) String() string {
+func (c *isRetryable) String() string {
 	return CONFIG_IS_RETRYABLE
 }
 
-func (c *IsRetryable) Value() interface{} {
+func (c *isRetryable) Value() interface{} {
 	return c.fnList
 }
 
@@ -46,7 +46,8 @@ func IsRetryableDefault(err error) bool {
 		return strings.Contains(err.Error(), ERR_NO_SUCH_HOST)
 	}
 
-	if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) {
+	if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) ||
+		strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 		return false
 	}
 

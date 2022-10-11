@@ -2,8 +2,10 @@ package retry_test
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 	"testing"
 	"time"
@@ -22,10 +24,7 @@ func TestNew(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := retry.New()
-			if got.MaxRetries != tt.want.MaxRetries ||
-				got.Throttle != tt.want.Throttle ||
-				got.Timeout != tt.want.Timeout ||
-				len(got.IsRetryableFns) != len(tt.want.IsRetryableFns) {
+			if reflect.DeepEqual(got, tt.want) {
 				t.Error("one or more values don't match")
 			}
 		})
@@ -39,6 +38,7 @@ const (
 
 func TestClient_DoWithRetryThrottle(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -57,8 +57,7 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 		}
 	})
 
-	c = c.WithRetry(retry.New().SetThrottle(1 * time.Second))
-
+	c.Retry().SetThrottle(1 * time.Second)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
 	var got struct {
@@ -76,6 +75,7 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 
 func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -86,7 +86,6 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 		w.WriteHeader(http.StatusBadRequest)
 	})
 
-	c = c.WithRetry(retry.New())
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); err == nil {
 		t.Error("expected do request to return error but got nil instead")
@@ -95,6 +94,7 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 
 func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -105,7 +105,7 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 		w.WriteHeader(http.StatusLocked)
 	})
 
-	c = c.WithRetry(retry.New().SetThrottle(1 * time.Second).SetMaxRetries(2))
+	c.Retry().SetThrottle(1 * time.Second).SetMaxRetries(2)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "reached max retries") {
 		t.Errorf("expected do request to return max retries error but got %q instead", err)
@@ -114,6 +114,7 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 
 func TestClient_DoWithRetryTimeout(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -124,13 +125,13 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 		w.WriteHeader(http.StatusLocked)
 	})
 
-	c = c.WithRetry(retry.New().SetTimeout(5 * time.Second))
+	c.Retry().SetTimeout(5 * time.Second)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") && !strings.Contains(err.Error(), http.StatusText(http.StatusLocked)) {
 		t.Errorf("expected do request to return retry context timed out error with locked error status but got '%v' instead", err)
 	}
 
-	c = c.WithRetry(retry.New().SetTimeout(0 * time.Second))
+	c.Retry().SetTimeout(0 * time.Second)
 	req, _ = c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") {
 		t.Errorf("expected do request to return retry context timed out error but got '%v' instead", err)
@@ -139,6 +140,7 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 
 func TestClient_DoWithUntil(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
@@ -161,9 +163,9 @@ func TestClient_DoWithUntil(t *testing.T) {
 		Status bool `json:"status"`
 	}
 
-	c = c.WithRetry(retry.New().SetThrottle(1 * time.Second).Until(func(r *http.Response) bool {
-		return got.Status
-	}))
+	c.Retry().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
+		return got.Status, nil
+	})
 
 	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
@@ -174,4 +176,15 @@ func TestClient_DoWithUntil(t *testing.T) {
 	if !got.Status {
 		t.Errorf("received status = %v", got.Status)
 	}
+
+	c.Retry().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
+		return got.Status, errors.New("error")
+	})
+
+	req, _ = c.Request(context.Background(), http.MethodGet, "/2s", nil)
+
+	if _, err := c.Do(req, &got); err == nil {
+		t.Errorf("expected an error")
+	}
+
 }

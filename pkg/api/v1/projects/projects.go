@@ -13,6 +13,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"github.com/pkg/errors"
 )
 
@@ -109,22 +110,23 @@ type ProjectsParentResBody struct {
 // Implementation
 
 // Create creates a new STACKIT project
+// it returns a wait handler - running Wait() will wait for the project to be active
 // See also https://api.stackit.schwarz/resource-management/openapi.v1.html#operation/post-organizations-organizationId-projects
-func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, roles ...ProjectRole) (Project, error) {
+func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, roles ...ProjectRole) (Project, *wait.Handler, error) {
 	if err := ValidateProjectCreationRoles(roles); err != nil {
-		return Project{}, validate.WrapError(err)
+		return Project{}, nil, validate.WrapError(err)
 	}
 	if err := validate.ProjectName(name); err != nil {
-		return Project{}, validate.WrapError(err)
+		return Project{}, nil, validate.WrapError(err)
 	}
 
 	if err := validate.BillingRef(billingRef); err != nil {
-		return Project{}, validate.WrapError(err)
+		return Project{}, nil, validate.WrapError(err)
 	}
 
 	body, err := svc.buildCreateRequestBody(name, billingRef, roles...)
 	if err != nil {
-		return Project{}, err
+		return Project{}, nil, err
 	}
 
 	req, err := svc.Client.Request(
@@ -134,20 +136,33 @@ func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, 
 		body,
 	)
 	if err != nil {
-		return Project{}, err
+		return Project{}, nil, err
 	}
 
 	resBody := &ProjectsResBody{}
 	if _, err = svc.Client.Do(req, resBody); err != nil {
-		return Project{}, errors.Wrap(err, fmt.Sprintf("request was:\n%s", string(body)))
+		return Project{}, nil, errors.Wrap(err, fmt.Sprintf("request was:\n%s", string(body)))
 	}
 
-	return Project{
+	p := Project{
 		ID:               resBody.ProjectID,
 		Name:             resBody.Name,
 		BillingReference: resBody.Labels.BillingReference,
 		OrganizationID:   resBody.Parent.ID,
-	}, nil
+	}
+
+	w := wait.New(func() (interface{}, bool, error) {
+		state, err := svc.GetLifecycleState(ctx, p.ID)
+		if err != nil {
+			return state, false, err
+		}
+		if state != consts.PROJECT_STATUS_ACTIVE {
+			return state, false, nil
+		}
+		return state, true, nil
+	})
+
+	return p, w, nil
 }
 
 func (svc *ProjectService) buildCreateRequestBody(name, billingRef string, roles ...ProjectRole) ([]byte, error) {
@@ -276,8 +291,9 @@ func (svc *ProjectService) buildUpdateRequestBody(name, billingRef string) ([]by
 }
 
 // Delete deletes a project by ID
+// it returns a wait handler - running Wait() will wait for the project to be deleted
 // See also https://api.stackit.schwarz/resource-management/openapi.v1.html#operation/delete-projects-projectId
-func (svc *ProjectService) Delete(ctx context.Context, projectID string) error {
+func (svc *ProjectService) Delete(ctx context.Context, projectID string) (*wait.Handler, error) {
 	req, err := svc.Client.Request(
 		ctx,
 		http.MethodDelete,
@@ -285,11 +301,20 @@ func (svc *ProjectService) Delete(ctx context.Context, projectID string) error {
 		nil,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if _, err = svc.Client.Do(req, nil); err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+
+	w := wait.New(func() (interface{}, bool, error) {
+		state, err := svc.GetLifecycleState(ctx, projectID)
+		if err != nil {
+			return state, true, nil
+		}
+		return state, false, nil
+	})
+
+	return w, nil
 }

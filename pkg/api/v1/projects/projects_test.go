@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/internal/clients"
 	p "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -142,6 +142,17 @@ func TestProjectsService_Create(t *testing.T) {
 		fmt.Fprint(w, string(b))
 	})
 
+	mux.HandleFunc("/resource-management/v1/projects/123", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, `
+		{
+			"projectId": "123",
+			"lifecycleState": "ACTIVE",
+			"scope": "PUBLIC"
+		}
+		`)
+	})
+
 	role := p.ProjectRole{
 		Name: "project.owner",
 		Users: []p.ProjectRoleMember{
@@ -150,7 +161,7 @@ func TestProjectsService_Create(t *testing.T) {
 			},
 		},
 	}
-	got, err := projects.Create(context.Background(), "Fancy-new-project", "T-9876543B", role)
+	got, w, err := projects.Create(context.Background(), "Fancy-new-project", "T-9876543B", role)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -164,6 +175,10 @@ func TestProjectsService_Create(t *testing.T) {
 
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("got = %v, want %v", got, want)
+	}
+
+	if _, err := w.Wait(); err != nil {
+		t.Error(err)
 	}
 }
 
@@ -190,7 +205,7 @@ func TestAccProjectsService_Create(t *testing.T) {
 			},
 		},
 	}
-	got, err := projects.Create(context.Background(), want.Name, want.BillingReference, role)
+	got, _, err := projects.Create(context.Background(), want.Name, want.BillingReference, role)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -209,9 +224,15 @@ func TestProjectsService_Delete(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	})
 
-	if err := projects.Delete(context.Background(), "abc"); err != nil {
+	w, err := projects.Delete(context.Background(), "abc")
+	if err != nil {
 		t.Errorf("delete project: %v", err)
 	}
+
+	if _, err := w.Wait(); err != nil {
+		t.Error(err)
+	}
+
 }
 
 func TestAccProjectsService_Delete(t *testing.T) {
@@ -223,7 +244,7 @@ func TestAccProjectsService_Delete(t *testing.T) {
 		t.Error(err)
 	}
 	projects := p.New(c)
-	if err := projects.Delete(context.Background(), "0d3a2fb9-1472-4284-9655-d7aae2cd5bd5"); err != nil {
+	if _, err := projects.Delete(context.Background(), "0d3a2fb9-1472-4284-9655-d7aae2cd5bd5"); err != nil {
 		t.Fatal(err)
 	}
 }

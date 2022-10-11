@@ -14,7 +14,7 @@ func GetFunctionName(i interface{}) string {
 
 func TestRetry_SetIsRetryable(t *testing.T) {
 	r := New()
-	r.IsRetryableFns = []func(err error) bool{IsRetryableNoOp}
+	r.isRetryableFns = []func(err error) bool{IsRetryableNoOp}
 
 	type args struct {
 		f []func(err error) bool
@@ -30,13 +30,13 @@ func TestRetry_SetIsRetryable(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := New()
 			got := c.SetIsRetryable(tt.args.f...)
-			if len(got.IsRetryableFns) != len(r.IsRetryableFns) {
+			if len(got.isRetryableFns) != len(r.isRetryableFns) {
 				t.Error("wrong lengths")
 				return
 			}
-			for k, v := range got.IsRetryableFns {
-				if GetFunctionName(r.IsRetryableFns[k]) != GetFunctionName(v) {
-					t.Errorf("%s != %s", GetFunctionName(r.IsRetryableFns[k]), GetFunctionName(v))
+			for k, v := range got.isRetryableFns {
+				if GetFunctionName(r.isRetryableFns[k]) != GetFunctionName(v) {
+					t.Errorf("%s != %s", GetFunctionName(r.isRetryableFns[k]), GetFunctionName(v))
 					return
 				}
 			}
