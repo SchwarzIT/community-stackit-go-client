@@ -164,7 +164,13 @@ func TestObjectStorageBucketsService_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := s.Create(tt.args.ctx, tt.args.projectID, tt.args.bucketName); (err != nil) != tt.wantErr {
+			w, err := s.Create(tt.args.ctx, tt.args.projectID, tt.args.bucketName)
+			hasErr := err != nil
+			if !hasErr {
+				_, err = w.Wait()
+			}
+			hasErr = hasErr || err != nil
+			if hasErr != tt.wantErr {
 				t.Errorf("ObjectStorageBucketsService.Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -206,7 +212,13 @@ func TestObjectStorageBucketsService_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := s.Delete(tt.args.ctx, tt.args.projectID, tt.args.bucketName); (err != nil) != tt.wantErr {
+			w, err := s.Delete(tt.args.ctx, tt.args.projectID, tt.args.bucketName)
+			hasErr := err != nil
+			if !hasErr {
+				_, err = w.Wait()
+			}
+			hasErr = hasErr || err != nil
+			if hasErr != tt.wantErr {
 				t.Errorf("ObjectStorageBucketsService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

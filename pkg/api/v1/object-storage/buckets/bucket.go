@@ -5,6 +5,7 @@ package buckets
 import (
 	"context"
 	"fmt"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"net/http"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
@@ -75,7 +76,7 @@ func (svc *ObjectStorageBucketsService) Get(ctx context.Context, projectID, buck
 
 // Create creates a new bucket
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create_bucket_v1_project__projectId__bucket__bucketName__post
-func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, bucketName string) (err error) {
+func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, bucketName string) (w *wait.Handler, err error) {
 	if err = ValidateBucketName(bucketName); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -86,17 +87,29 @@ func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, b
 		return
 	}
 
-	_, err = svc.Client.Do(req, nil)
+	w = wait.New(func() (interface{}, bool, error) {
+		_, err = svc.Client.Do(req, nil)
+		if err != nil {
+			return nil, false, err
+		}
+		return nil, true, nil
+	})
 	return
 }
 
 // Delete deletes a bucket
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_DeleteBucket
-func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, bucketName string) (err error) {
+func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, bucketName string) (w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPath, projectID, bucketName), nil)
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
-	return err
+	w = wait.New(func() (interface{}, bool, error) {
+		_, err = svc.Client.Do(req, nil)
+		if err != nil {
+			return nil, false, err
+		}
+		return nil, true, nil
+	})
+	return w, err
 }
