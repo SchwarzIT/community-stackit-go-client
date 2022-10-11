@@ -286,9 +286,16 @@ func TestKubernetesClusterService_CreateOrUpdate(t *testing.T) {
 	}
 
 	process.SetThrottle(1 * time.Second)
+
+	// during the initial call, the server is supposed to return an error
+	// that should force the Wait() to exist immediately
 	if _, err := process.Wait(); err == nil {
 		t.Errorf("expected error during first process wait, got nil instead")
 	}
+
+	// after 1s the server should return a retryable error and than
+	// change to the wanted reponse status
+	// meaning - Wait() should exit without any error
 	time.Sleep(1 * time.Second)
 	if _, err := process.Wait(); err != nil {
 		t.Errorf("unexpected error during 2nd process wait: %s", err)
@@ -493,9 +500,15 @@ func TestKubernetesClusterService_Delete(t *testing.T) {
 		})
 	}
 
+	// during the initial call, the server is supposed to return an error
+	// that should force the Wait() to exist immediately
 	if _, err := process.Wait(); err == nil {
 		t.Error("expected error in first attempt, but got nil instead")
 	}
+
+	// after 1s the server should return a status of an active cluster
+	// and after another wait run return status Not Found -> cluster deleted
+	// meaning - Wait() should exit without any error
 	time.Sleep(1 * time.Second)
 	if _, err := process.Wait(); err != nil {
 		t.Errorf("unexpected error during 2nd wait: %v", err)
