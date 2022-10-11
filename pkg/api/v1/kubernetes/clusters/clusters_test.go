@@ -287,7 +287,7 @@ func TestKubernetesClusterService_CreateOrUpdate(t *testing.T) {
 
 	process.SetThrottle(1 * time.Second)
 	if _, err := process.Wait(); err == nil {
-		t.Errorf("unexpected error during first process wait, got nil instead")
+		t.Errorf("expected error during first process wait, got nil instead")
 	}
 	time.Sleep(1 * time.Second)
 	if _, err := process.Wait(); err != nil {
