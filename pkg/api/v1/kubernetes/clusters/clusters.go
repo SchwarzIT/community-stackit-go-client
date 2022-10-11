@@ -11,6 +11,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -175,6 +176,8 @@ func (svc *KubernetesClusterService) Get(ctx context.Context, projectID, cluster
 
 // CreateOrUpdate creates or updates a SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
+// The function also returns a wait functionality in case there's no error
+// trigger wait by running `.Wait()`
 func (svc *KubernetesClusterService) CreateOrUpdate(
 	ctx context.Context,
 	projectID string,
@@ -184,7 +187,7 @@ func (svc *KubernetesClusterService) CreateOrUpdate(
 	maintenance *Maintenance,
 	hibernation *Hibernation,
 	extensions *Extensions,
-) (res Cluster, err error) {
+) (res Cluster, w *wait.Handler, err error) {
 
 	// validate
 	if err = ValidateCluster(
@@ -195,11 +198,10 @@ func (svc *KubernetesClusterService) CreateOrUpdate(
 		hibernation,
 		extensions,
 	); err != nil {
-		err = validate.WrapError(err)
-		return
+		return res, nil, validate.WrapError(err)
 	}
 
-	// build request
+	// build request body
 	body, _ := svc.buildCreateRequest(
 		projectID,
 		clusterName,
@@ -210,14 +212,32 @@ func (svc *KubernetesClusterService) CreateOrUpdate(
 		extensions,
 	)
 
-	// make request
+	// prepare & run request
 	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathCluster, projectID, clusterName), body)
 	if err != nil {
-		return
+		return res, nil, err
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	return
+
+	// prepare wait functionality
+	w = wait.New(svc.waitForCreation(ctx, projectID, clusterName))
+
+	return res, w, err
+}
+
+func (svc *KubernetesClusterService) waitForCreation(ctx context.Context, projectID, clusterName string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, clusterName)
+		if err != nil {
+			return "", false, err
+		}
+		status := s.Status.Aggregated
+		if status == consts.SKE_CLUSTER_STATUS_HEALTHY || status == consts.SKE_CLUSTER_STATUS_HIBERNATED {
+			return status, true, nil
+		}
+		return status, false, nil
+	}
 }
 
 func (svc *KubernetesClusterService) buildCreateRequest(
