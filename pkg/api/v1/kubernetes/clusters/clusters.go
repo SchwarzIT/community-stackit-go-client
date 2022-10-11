@@ -7,10 +7,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -173,9 +175,11 @@ func (svc *KubernetesClusterService) Get(ctx context.Context, projectID, cluster
 	return
 }
 
-// Create creates a new SKE cluster
+// CreateOrUpdate creates or updates a SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
-func (svc *KubernetesClusterService) Create(
+// The function also returns a wait functionality in case there's no error
+// trigger wait by running `.Wait()` which returns the status (string) of the cluster and an error
+func (svc *KubernetesClusterService) CreateOrUpdate(
 	ctx context.Context,
 	projectID string,
 	clusterName string,
@@ -184,7 +188,9 @@ func (svc *KubernetesClusterService) Create(
 	maintenance *Maintenance,
 	hibernation *Hibernation,
 	extensions *Extensions,
-) (res Cluster, err error) {
+) (res Cluster, w *wait.Handler, err error) {
+
+	// validate
 	if err = ValidateCluster(
 		clusterName,
 		clusterConfig,
@@ -193,10 +199,10 @@ func (svc *KubernetesClusterService) Create(
 		hibernation,
 		extensions,
 	); err != nil {
-		err = validate.WrapError(err)
-		return
+		return res, nil, validate.WrapError(err)
 	}
 
+	// build request body
 	body, _ := svc.buildCreateRequest(
 		projectID,
 		clusterName,
@@ -206,13 +212,33 @@ func (svc *KubernetesClusterService) Create(
 		hibernation,
 		extensions,
 	)
+
+	// prepare & run request
 	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathCluster, projectID, clusterName), body)
 	if err != nil {
-		return
+		return res, nil, err
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	return
+
+	// prepare wait functionality
+	w = wait.New(svc.waitForCreation(ctx, projectID, clusterName))
+
+	return res, w, err
+}
+
+func (svc *KubernetesClusterService) waitForCreation(ctx context.Context, projectID, clusterName string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, clusterName)
+		if err != nil {
+			return "", false, err
+		}
+		status := s.Status.Aggregated
+		if status == consts.SKE_CLUSTER_STATUS_HEALTHY || status == consts.SKE_CLUSTER_STATUS_HIBERNATED {
+			return status, true, nil
+		}
+		return status, false, nil
+	}
 }
 
 func (svc *KubernetesClusterService) buildCreateRequest(
@@ -234,39 +260,30 @@ func (svc *KubernetesClusterService) buildCreateRequest(
 	})
 }
 
-// Update updates an SKE cluster or creates a new one if it doesn't exist
-// See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
-func (svc *KubernetesClusterService) Update(
-	ctx context.Context,
-	projectID string,
-	clusterName string,
-	clusterConfig Kubernetes,
-	nodePools []NodePool,
-	maintenance *Maintenance,
-	hibernation *Hibernation,
-	extensions *Extensions,
-) (res Cluster, err error) {
-	return svc.Create(
-		ctx,
-		projectID,
-		clusterName,
-		clusterConfig,
-		nodePools,
-		maintenance,
-		hibernation,
-		extensions,
-	)
-}
-
 // Delete deletes an SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_DeleteCluster
-func (svc *KubernetesClusterService) Delete(ctx context.Context, projectID, clusterName string) (err error) {
+// Wait for deletion to complete by running the returned wait functionality `wait.Wait()`
+func (svc *KubernetesClusterService) Delete(ctx context.Context, projectID, clusterName string) (w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathCluster, projectID, clusterName), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, nil)
-	return err
+
+	w = wait.New(svc.waitForDeletion(ctx, projectID, clusterName))
+	return w, err
+}
+
+func (svc *KubernetesClusterService) waitForDeletion(ctx context.Context, projectID, clusterName string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		if _, err = svc.Get(ctx, projectID, clusterName); err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
+			}
+			return nil, false, err
+		}
+		return nil, false, nil
+	}
 }
 
 // Hibernate triggers cluster hibernation
