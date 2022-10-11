@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -177,7 +178,7 @@ func (svc *KubernetesClusterService) Get(ctx context.Context, projectID, cluster
 // CreateOrUpdate creates or updates a SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
 // The function also returns a wait functionality in case there's no error
-// trigger wait by running `.Wait()`
+// trigger wait by running `.Wait()` which returns the status (string) of the cluster and an error
 func (svc *KubernetesClusterService) CreateOrUpdate(
 	ctx context.Context,
 	projectID string,
@@ -261,13 +262,28 @@ func (svc *KubernetesClusterService) buildCreateRequest(
 
 // Delete deletes an SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_DeleteCluster
-func (svc *KubernetesClusterService) Delete(ctx context.Context, projectID, clusterName string) (err error) {
+// Wait for deletion to complete by running the returned wait functionality `wait.Wait()`
+func (svc *KubernetesClusterService) Delete(ctx context.Context, projectID, clusterName string) (w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathCluster, projectID, clusterName), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, nil)
-	return err
+
+	w = wait.New(svc.waitForDeletion(ctx, projectID, clusterName))
+	return w, err
+}
+
+func (svc *KubernetesClusterService) waitForDeletion(ctx context.Context, projectID, clusterName string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		if _, err = svc.Get(ctx, projectID, clusterName); err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
+			}
+			return nil, false, err
+		}
+		return nil, false, nil
+	}
 }
 
 // Hibernate triggers cluster hibernation

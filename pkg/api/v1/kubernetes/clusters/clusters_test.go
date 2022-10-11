@@ -423,12 +423,41 @@ func TestKubernetesClusterService_Delete(t *testing.T) {
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 	clusterName := "cname"
 
+	get1 := clusters.Cluster{
+		Status: &clusters.Status{
+			Aggregated: consts.SKE_CLUSTER_STATUS_HEALTHY,
+		},
+	}
+
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	defer cancel1()
+
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	defer cancel2()
+
 	mux.HandleFunc("/ske/v1/projects/"+projectID+"/clusters/"+clusterName, func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Error("wrong method")
+		if r.Method == http.MethodDelete {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
+		if r.Method == http.MethodGet {
+			w.Header().Set("Content-Type", "application/json")
+			if ctx1.Err() == nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if ctx2.Err() == nil {
+				w.WriteHeader(http.StatusOK)
+				b, _ := json.Marshal(get1)
+				fmt.Fprint(w, string(b))
+				return
+			}
+
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+		t.Error("wrong method")
 	})
 
 	ctx := context.Background()
@@ -444,18 +473,32 @@ func TestKubernetesClusterService_Delete(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
+		useWait bool
 	}{
-		{"ctx is canceled", args{ctx_bad, projectID, clusterName}, true},
-		{"bad project ID", args{ctx, "something", clusterName}, true},
-		{"bad cluster name", args{ctx, projectID, "something"}, true},
-		{"all ok", args{ctx, projectID, clusterName}, false},
+		{"ctx is canceled", args{ctx_bad, projectID, clusterName}, true, false},
+		{"bad project ID", args{ctx, "something", clusterName}, true, false},
+		{"bad cluster name", args{ctx, projectID, "something"}, true, false},
+		{"all ok", args{ctx, projectID, clusterName}, false, true},
 	}
+	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := s.Clusters.Delete(tt.args.ctx, tt.args.projectID, tt.args.clusterName); (err != nil) != tt.wantErr {
+			w, err := s.Clusters.Delete(tt.args.ctx, tt.args.projectID, tt.args.clusterName)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("KubernetesClusterService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			if tt.useWait {
+				process = w
+			}
 		})
+	}
+
+	if _, err := process.Wait(); err == nil {
+		t.Error("expected error in first attempt, but got nil instead")
+	}
+	time.Sleep(1 * time.Second)
+	if _, err := process.Wait(); err != nil {
+		t.Errorf("unexpected error during 2nd wait: %v", err)
 	}
 }
 
