@@ -151,8 +151,13 @@ func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, 
 		OrganizationID:   resBody.Parent.ID,
 	}
 
-	w := wait.New(func() (interface{}, bool, error) {
-		state, err := svc.GetLifecycleState(ctx, p.ID)
+	w := wait.New(svc.waitForCreation(ctx, p.ID))
+	return p, w, nil
+}
+
+func (svc *ProjectService) waitForCreation(ctx context.Context, projectID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		state, err := svc.GetLifecycleState(ctx, projectID)
 		if err != nil {
 			return state, false, err
 		}
@@ -160,9 +165,7 @@ func (svc *ProjectService) Create(ctx context.Context, name, billingRef string, 
 			return state, false, nil
 		}
 		return state, true, nil
-	})
-
-	return p, w, nil
+	}
 }
 
 func (svc *ProjectService) buildCreateRequestBody(name, billingRef string, roles ...ProjectRole) ([]byte, error) {
@@ -308,13 +311,17 @@ func (svc *ProjectService) Delete(ctx context.Context, projectID string) (*wait.
 		return nil, err
 	}
 
-	w := wait.New(func() (interface{}, bool, error) {
+	w := wait.New(svc.waitForDeletion(ctx, projectID))
+
+	return w, nil
+}
+
+func (svc *ProjectService) waitForDeletion(ctx context.Context, projectID string) wait.WaitFn {
+	return func() (interface{}, bool, error) {
 		state, err := svc.GetLifecycleState(ctx, projectID)
 		if err != nil {
 			return state, true, nil
 		}
 		return state, false, nil
-	})
-
-	return w, nil
+	}
 }

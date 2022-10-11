@@ -173,9 +173,9 @@ func (svc *KubernetesClusterService) Get(ctx context.Context, projectID, cluster
 	return
 }
 
-// Create creates a new SKE cluster
+// CreateOrUpdate creates or updates a SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
-func (svc *KubernetesClusterService) Create(
+func (svc *KubernetesClusterService) CreateOrUpdate(
 	ctx context.Context,
 	projectID string,
 	clusterName string,
@@ -185,6 +185,8 @@ func (svc *KubernetesClusterService) Create(
 	hibernation *Hibernation,
 	extensions *Extensions,
 ) (res Cluster, err error) {
+
+	// validate
 	if err = ValidateCluster(
 		clusterName,
 		clusterConfig,
@@ -197,6 +199,7 @@ func (svc *KubernetesClusterService) Create(
 		return
 	}
 
+	// build request
 	body, _ := svc.buildCreateRequest(
 		projectID,
 		clusterName,
@@ -206,6 +209,8 @@ func (svc *KubernetesClusterService) Create(
 		hibernation,
 		extensions,
 	)
+
+	// make request
 	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathCluster, projectID, clusterName), body)
 	if err != nil {
 		return
@@ -232,30 +237,6 @@ func (svc *KubernetesClusterService) buildCreateRequest(
 		Hibernation: hibernation,
 		Extensions:  extensions,
 	})
-}
-
-// Update updates an SKE cluster or creates a new one if it doesn't exist
-// See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
-func (svc *KubernetesClusterService) Update(
-	ctx context.Context,
-	projectID string,
-	clusterName string,
-	clusterConfig Kubernetes,
-	nodePools []NodePool,
-	maintenance *Maintenance,
-	hibernation *Hibernation,
-	extensions *Extensions,
-) (res Cluster, err error) {
-	return svc.Create(
-		ctx,
-		projectID,
-		clusterName,
-		clusterConfig,
-		nodePools,
-		maintenance,
-		hibernation,
-		extensions,
-	)
 }
 
 // Delete deletes an SKE cluster

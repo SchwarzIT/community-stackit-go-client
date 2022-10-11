@@ -225,18 +225,7 @@ func TestKubernetesClusterService_CreateOrUpdate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// test create
 			{
-				gotRes, err := s.Clusters.Create(tt.args.ctx, tt.args.projectID, tt.args.clusterName, tt.args.clusterConfig, tt.args.nodePools, tt.args.maintenance, tt.args.hibernation, tt.args.extensions)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("KubernetesClusterService.Create() error = %v, wantErr %v", err, tt.wantErr)
-					return
-				}
-				if !reflect.DeepEqual(gotRes, tt.wantRes) && !tt.wantErr {
-					t.Errorf("KubernetesClusterService.Create() = %v, want %v", gotRes, tt.wantRes)
-				}
-			}
-			// test update
-			{
-				gotRes, err := s.Clusters.Update(tt.args.ctx, tt.args.projectID, tt.args.clusterName, tt.args.clusterConfig, tt.args.nodePools, tt.args.maintenance, tt.args.hibernation, tt.args.extensions)
+				gotRes, err := s.Clusters.CreateOrUpdate(tt.args.ctx, tt.args.projectID, tt.args.clusterName, tt.args.clusterConfig, tt.args.nodePools, tt.args.maintenance, tt.args.hibernation, tt.args.extensions)
 				if (err != nil) != tt.wantErr {
 					t.Errorf("KubernetesClusterService.Create() error = %v, wantErr %v", err, tt.wantErr)
 					return
