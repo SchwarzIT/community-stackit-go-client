@@ -88,6 +88,9 @@ func TestKubernetesProjectsService_Create(t *testing.T) {
 	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
 	defer cancel3()
 
+	ctx4, cancel4 := context.WithTimeout(context.TODO(), 2*time.Second)
+	defer cancel4()
+
 	state1 := projects.KubernetesProjectsResponse{
 		ProjectID: projectID,
 		State:     consts.SKE_PROJECT_STATUS_UNSPECIFIED,
@@ -114,19 +117,28 @@ func TestKubernetesProjectsService_Create(t *testing.T) {
 		}
 		if r.Method == http.MethodGet {
 			w.Header().Set("Content-Type", "application/json")
-			w.WriteHeader(http.StatusOK)
 
 			if ctx2.Err() == nil {
+				w.WriteHeader(http.StatusOK)
 				b, _ := json.Marshal(state1)
 				fmt.Fprint(w, string(b))
 				return
 			}
+
+			if ctx4.Err() == nil {
+				w.WriteHeader(http.StatusBadRequest)
+				fmt.Fprint(w, `{"code":"InvalidArgument", "message":"project has no assigned namespace", "details":""}`)
+				return
+			}
+
 			if ctx3.Err() == nil {
+				w.WriteHeader(http.StatusOK)
 				b, _ := json.Marshal(state2)
 				fmt.Fprint(w, string(b))
 				return
 			}
 
+			w.WriteHeader(http.StatusOK)
 			b, _ := json.Marshal(state3)
 			fmt.Fprint(w, string(b))
 			return
@@ -253,7 +265,7 @@ func TestKubernetesProjectsService_Delete(t *testing.T) {
 		{"project not found", args{context.Background(), "my-project"}, true, false},
 	}
 
-	var goodWait, badWait *wait.Handler
+	var goodWait *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w, err := s.Projects.Delete(tt.args.ctx, tt.args.projectID)
@@ -262,15 +274,12 @@ func TestKubernetesProjectsService_Delete(t *testing.T) {
 			}
 			if tt.goodWait {
 				goodWait = w
-			} else {
-				badWait = w
 			}
 		})
 	}
 
 	c.SetRetry(nil)
 	goodWait.SetThrottle(20 * time.Millisecond)
-	badWait.SetThrottle(20 * time.Millisecond)
 
 	if _, err := goodWait.Wait(); err != nil {
 		t.Errorf("returned: %v", err)
