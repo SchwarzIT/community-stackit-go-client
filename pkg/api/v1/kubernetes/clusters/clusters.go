@@ -178,7 +178,7 @@ func (svc *KubernetesClusterService) Get(ctx context.Context, projectID, cluster
 // CreateOrUpdate creates or updates a SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_CreateOrUpdateCluster
 // The function also returns a wait functionality in case there's no error
-// trigger wait by running `.Wait()` which returns the status (string) of the cluster and an error
+// trigger wait by running `.Wait()` which returns the cluster information (clusters.Cluster struct)
 func (svc *KubernetesClusterService) CreateOrUpdate(
 	ctx context.Context,
 	projectID string,
@@ -231,13 +231,13 @@ func (svc *KubernetesClusterService) waitForCreation(ctx context.Context, projec
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, clusterName)
 		if err != nil {
-			return "", false, err
+			return nil, false, err
 		}
 		status := s.Status.Aggregated
 		if status == consts.SKE_CLUSTER_STATUS_HEALTHY || status == consts.SKE_CLUSTER_STATUS_HIBERNATED {
 			return status, true, nil
 		}
-		return status, false, nil
+		return s, false, nil
 	}
 }
 
