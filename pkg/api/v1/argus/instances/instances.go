@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/plans"
@@ -183,12 +184,33 @@ func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, 
 }
 
 // Delete deleted an instance by project and instance IDs
+// Delete returns the instance information (Instance), wait handler to wait for the full deletion, and an error
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_delete
-func (svc *InstancesService) Delete(ctx context.Context, projectID, instanceID string) (res Instance, err error) {
+func (svc *InstancesService) Delete(ctx context.Context, projectID, instanceID string) (res Instance, w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathWithInstanceID, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID))
 	return
+}
+
+func (svc *InstancesService) waitForDeletion(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
+			}
+			return nil, false, err
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_DELETE_SUCCEEDED {
+			return nil, true, nil
+		}
+		if s.Status != consts.ARGUS_INSTANCE_STATUS_DELETING {
+			return nil, false, fmt.Errorf("expected instance to be in state 'DELETING', but got %s instead", s.Status)
+		}
+		return nil, false, nil
+	}
 }
