@@ -167,7 +167,8 @@ func (svc *InstancesService) waitForCreation(ctx context.Context, projectID, ins
 
 // Update updates a new Argus instance
 // returns API response [CreateOrUpdateResponse], wait handler and error
-// The wait handler will wait for the instance status to be set to "UPDATE_SUCCEEDED"
+// The wait handler will wait for the instance status to be set to "UPDATE_SUCCEEDED" or "CREATE_SUCCEEDED"
+// Wait() returns the instance (Instance struct) and error if failed
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_update
 func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, w *wait.Handler, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
@@ -192,7 +193,8 @@ func (svc *InstancesService) waitForUpdate(ctx context.Context, projectID, insta
 		if err != nil {
 			return nil, false, err
 		}
-		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED {
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED ||
+			s.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
 			return s, true, nil
 		}
 		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_FAILED {
