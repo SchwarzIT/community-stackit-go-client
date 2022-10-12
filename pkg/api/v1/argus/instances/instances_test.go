@@ -396,6 +396,7 @@ func TestInstancesService_Delete(t *testing.T) {
 
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
+			return
 		}
 
 		if ctx1.Err() == nil {
