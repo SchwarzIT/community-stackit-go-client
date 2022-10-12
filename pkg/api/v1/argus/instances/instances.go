@@ -132,7 +132,7 @@ func (svc *InstancesService) buildRequest(name, planID string, params map[string
 
 // Create creates a new Argus instance and returns the server response (CreateOrUpdateResponse) and a wait handler
 // which upon call to `Wait()` will wait until the instance is successfully created
-// Wait() returns the full instance details (Instance) and error if it occured
+// Wait() returns the full instance details (Instance) and error if it occurred
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_create
 func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, w *wait.Handler, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {

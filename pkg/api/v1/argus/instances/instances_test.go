@@ -197,8 +197,8 @@ const (
 		"instanceId": "597976c4-d4c1-44d6-9f43-213df3da1799",
 		"dashboardUrl": "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview"
 	  }`
-	get_creating_reponse = `{"status":"CREATING"}`
-	get_created_reponse  = `{"status":"CREATE_SUCCEEDED"}`
+	get_creating_response = `{"status":"CREATING"}`
+	get_created_response  = `{"status":"CREATE_SUCCEEDED"}`
 )
 
 func TestInstancesService_Create(t *testing.T) {
@@ -274,11 +274,11 @@ func TestInstancesService_Create(t *testing.T) {
 
 		w.WriteHeader(http.StatusOK)
 		if ctx2.Err() == nil {
-			fmt.Fprint(w, get_creating_reponse)
+			fmt.Fprint(w, get_creating_response)
 			return
 		}
 
-		fmt.Fprint(w, get_created_reponse)
+		fmt.Fprint(w, get_created_response)
 	})
 
 	w.SetThrottle(1 * time.Second)
@@ -352,25 +352,13 @@ func TestInstancesService_Update(t *testing.T) {
 }
 
 const (
-	delete_deleting_reponse     = `{"status":"DELETING"}`
-	delete_created_reponse      = `{"status":"CREATED_SUCCESSFULLY"}`
+	delete_deleting_response    = `{"status":"DELETING"}`
+	delete_created_response     = `{"status":"CREATED_SUCCESSFULLY"}`
 	delete_deleted_successfully = `{"status":"DELETE_SUCCEEDED"}`
 )
 
-func TestInstancesService_Delete(t *testing.T) {
-	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
-	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
-	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
-	want := []byte(`{
-		"message": "Successfully deleted instance"
-	  }`)
-
-	wantRes := instances.Instance{
-		Message: "Successfully deleted instance",
-	}
-
+func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, func()) {
 	c, mux, teardown, _ := client.MockServer()
-	defer teardown()
 	svc := argus.New(c)
 
 	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
@@ -390,7 +378,9 @@ func TestInstancesService_Delete(t *testing.T) {
 
 		if r.Method == http.MethodDelete {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, string(want))
+			fmt.Fprint(w, `{
+				"message": "Successfully deleted instance"
+			  }`)
 			return
 		}
 
@@ -406,13 +396,13 @@ func TestInstancesService_Delete(t *testing.T) {
 
 		if ctx2.Err() == nil {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, delete_created_reponse)
+			fmt.Fprint(w, delete_created_response)
 			return
 		}
 
 		if ctx3.Err() == nil {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, delete_deleting_reponse)
+			fmt.Fprint(w, delete_deleting_response)
 			return
 		}
 
@@ -424,6 +414,20 @@ func TestInstancesService_Delete(t *testing.T) {
 
 		w.WriteHeader(http.StatusNotFound)
 	})
+
+	return svc, teardown
+}
+func TestInstancesService_Delete(t *testing.T) {
+	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
+	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
+	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
+
+	svc, teardown := setDeletionTestServer(t, projectID, instanceID)
+	defer teardown()
+
+	wantRes := instances.Instance{
+		Message: "Successfully deleted instance",
+	}
 
 	type args struct {
 		ctx        context.Context

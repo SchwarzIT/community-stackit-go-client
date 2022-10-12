@@ -294,7 +294,7 @@ func TestKubernetesClusterService_CreateOrUpdate(t *testing.T) {
 	}
 
 	// after 1s the server should return a retryable error and than
-	// change to the wanted reponse status
+	// change to the wanted response status
 	// meaning - Wait() should exit without any error
 	time.Sleep(1 * time.Second)
 	if _, err := process.Wait(); err != nil {
