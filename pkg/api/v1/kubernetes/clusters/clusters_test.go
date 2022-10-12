@@ -288,7 +288,7 @@ func TestKubernetesClusterService_CreateOrUpdate(t *testing.T) {
 	process.SetThrottle(1 * time.Second)
 
 	// during the initial call, the server is supposed to return an error
-	// that should force the Wait() to exist immediately
+	// that should force the Wait() to exit immediately
 	if _, err := process.Wait(); err == nil {
 		t.Errorf("expected error during first process wait, got nil instead")
 	}

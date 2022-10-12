@@ -12,6 +12,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/plans"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -128,9 +129,11 @@ func (svc *InstancesService) buildRequest(name, planID string, params map[string
 	})
 }
 
-// Create creates a new Argus instance
+// Create creates a new Argus instance and returns the server response (CreateOrUpdateResponse) and a wait handler
+// which upon call to `Wait()` will wait until the instance is successfully created
+// Wait() returns the full instance details (Instance) and error if it occured
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_create
-func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, err error) {
+func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, w *wait.Handler, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -143,7 +146,22 @@ func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	return
+	w = wait.New(svc.waitForCreation(ctx, projectID, res.InstanceID))
+
+	return res, w, err
+}
+
+func (svc *InstancesService) waitForCreation(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID)
+		if err != nil {
+			return nil, false, err
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
+			return s, true, nil
+		}
+		return s, false, nil
+	}
 }
 
 // Update updates a new Argus instance
