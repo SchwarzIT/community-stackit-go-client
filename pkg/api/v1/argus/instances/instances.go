@@ -7,11 +7,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/plans"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -128,9 +130,11 @@ func (svc *InstancesService) buildRequest(name, planID string, params map[string
 	})
 }
 
-// Create creates a new Argus instance
+// Create creates a new Argus instance and returns the server response (CreateOrUpdateResponse) and a wait handler
+// which upon call to `Wait()` will wait until the instance is successfully created
+// Wait() returns the full instance details (Instance) and error if it occurred
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_create
-func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, err error) {
+func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, w *wait.Handler, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -143,12 +147,29 @@ func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	return
+	w = wait.New(svc.waitForCreation(ctx, projectID, res.InstanceID))
+
+	return res, w, err
+}
+
+func (svc *InstancesService) waitForCreation(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID)
+		if err != nil {
+			return nil, false, err
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
+			return s, true, nil
+		}
+		return s, false, nil
+	}
 }
 
 // Update updates a new Argus instance
+// returns API response [CreateOrUpdateResponse], wait handler and error
+// The wait handler will wait for the instance status to be set to "UPDATE_SUCCEEDED"
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_update
-func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, err error) {
+func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, w *wait.Handler, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -161,16 +182,54 @@ func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, 
 	}
 
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID))
 	return
 }
 
+func (svc *InstancesService) waitForUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID)
+		if err != nil {
+			return nil, false, err
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED {
+			return s, true, nil
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_FAILED {
+			return s, true, fmt.Errorf("update failed for instance %s", instanceID)
+		}
+		return s, false, nil
+	}
+}
+
 // Delete deleted an instance by project and instance IDs
+// Delete returns the instance information (Instance), wait handler to wait for the full deletion, and an error
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_delete
-func (svc *InstancesService) Delete(ctx context.Context, projectID, instanceID string) (res Instance, err error) {
+func (svc *InstancesService) Delete(ctx context.Context, projectID, instanceID string) (res Instance, w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathWithInstanceID, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID))
 	return
+}
+
+func (svc *InstancesService) waitForDeletion(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
+			}
+			return nil, false, err
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_DELETE_SUCCEEDED {
+			return nil, true, nil
+		}
+		if s.Status != consts.ARGUS_INSTANCE_STATUS_DELETING {
+			return nil, false, fmt.Errorf("expected instance to be in state 'DELETING', but got %s instead", s.Status)
+		}
+		return nil, false, nil
+	}
 }

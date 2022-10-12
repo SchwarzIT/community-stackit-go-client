@@ -7,11 +7,13 @@ import (
 	"net/http"
 	"reflect"
 	"testing"
+	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -20,7 +22,7 @@ const (
 	apiPathWithInstanceID = "/%s"
 )
 
-func prep(t *testing.T, path, projectID string, want []byte, method string) (*argus.ArgusService, func()) {
+func prep(t *testing.T, path, projectID string, want []byte, method string) (*argus.ArgusService, func(), *http.ServeMux) {
 	c, mux, teardown, _ := client.MockServer()
 	a := argus.New(c)
 
@@ -33,7 +35,7 @@ func prep(t *testing.T, path, projectID string, want []byte, method string) (*ar
 		fmt.Fprint(w, string(want))
 	})
 
-	return a, teardown
+	return a, teardown, mux
 }
 
 func TestInstancesService_List(t *testing.T) {
@@ -56,7 +58,7 @@ func TestInstancesService_List(t *testing.T) {
 	if err := json.Unmarshal(want, &wantRes); err != nil {
 		t.Error(err)
 	}
-	svc, teardown := prep(t, "", projectID, want, http.MethodGet)
+	svc, teardown, _ := prep(t, "", projectID, want, http.MethodGet)
 	defer teardown()
 
 	type args struct {
@@ -156,7 +158,7 @@ func TestInstancesService_Get(t *testing.T) {
 	if err := json.Unmarshal(want, &wantRes); err != nil {
 		t.Error(err)
 	}
-	svc, teardown := prep(t, fmt.Sprintf(apiPathWithInstanceID, instanceID), projectID, want, http.MethodGet)
+	svc, teardown, _ := prep(t, fmt.Sprintf(apiPathWithInstanceID, instanceID), projectID, want, http.MethodGet)
 	defer teardown()
 
 	type args struct {
@@ -189,23 +191,28 @@ func TestInstancesService_Get(t *testing.T) {
 	}
 }
 
-func TestInstancesService_Create(t *testing.T) {
-	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
-	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
-	want := []byte(`{
+const (
+	create_response = `{
 		"message": "Successfully created instance",
 		"instanceId": "597976c4-d4c1-44d6-9f43-213df3da1799",
 		"dashboardUrl": "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview"
-	  }`)
+	  }`
+	get_creating_response = `{"status":"CREATING"}`
+	get_created_response  = `{"status":"CREATE_SUCCEEDED"}`
+)
+
+func TestInstancesService_Create(t *testing.T) {
+	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
+	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
+
+	svc, teardown, mux := prep(t, "", projectID, []byte(create_response), http.MethodPost)
+	defer teardown()
 
 	wantRes := instances.CreateOrUpdateResponse{
 		Message:      "Successfully created instance",
 		InstanceID:   "597976c4-d4c1-44d6-9f43-213df3da1799",
 		DashboardURL: "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview",
 	}
-
-	svc, teardown := prep(t, "", projectID, want, http.MethodPost)
-	defer teardown()
 
 	type args struct {
 		ctx          context.Context
@@ -220,15 +227,18 @@ func TestInstancesService_Create(t *testing.T) {
 		wantRes instances.CreateOrUpdateResponse
 		wantErr bool
 		compare bool
+		useWant bool
 	}{
-		{"all ok", args{context.Background(), projectID, "name-123", "plan-123", map[string]string{}}, wantRes, false, true},
-		{"nil ctx", args{nil, projectID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"wrong project uuid", args{context.Background(), "random", "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"project not found", args{context.Background(), projectID2, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
+		{"all ok", args{context.Background(), projectID, "name-123", "plan-123", map[string]string{}}, wantRes, false, true, true},
+		{"nil ctx", args{nil, projectID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"wrong project uuid", args{context.Background(), "random", "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"project not found", args{context.Background(), projectID2, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
 	}
+
+	var w *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := svc.Instances.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceName, tt.args.planID, tt.args.params)
+			gotRes, process, err := svc.Instances.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceName, tt.args.planID, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InstancesService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -236,19 +246,123 @@ func TestInstancesService_Create(t *testing.T) {
 			if !reflect.DeepEqual(gotRes, tt.wantRes) && tt.compare {
 				t.Errorf("InstancesService.Create() = %v, want %v", gotRes, tt.wantRes)
 			}
+			if tt.useWant {
+				w = process
+			}
 		})
 	}
+
+	// Test wait functionality
+
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	defer cancel1()
+
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	defer cancel2()
+
+	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, wantRes.InstanceID), func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Error("wrong method")
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+
+		if ctx1.Err() == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		if ctx2.Err() == nil {
+			fmt.Fprint(w, get_creating_response)
+			return
+		}
+
+		fmt.Fprint(w, get_created_response)
+	})
+
+	w.SetThrottle(1 * time.Second)
+
+	// on first attempt where ctx1 still didn't time out, the server should return an error
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on initial call but got nil instead")
+	}
+
+	// on 2nd attempt, ctx1 timed out and ctx2
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error on 2nd try: %v", err)
+	}
+
+}
+
+const (
+	update_failed_response    = `{"status":"UPDATE_FAILED"}`
+	update_success_response   = `{"status":"UPDATE_SUCCEEDED"}`
+	update_updating_resposnse = `{"status":"UPDATING"}`
+)
+
+func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
+	c, mux, teardown, _ := client.MockServer()
+	svc := argus.New(c)
+
+	defers := []func(){teardown}
+
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	defers = append(defers, cancel1)
+
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	defers = append(defers, cancel2)
+
+	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
+	defers = append(defers, cancel3)
+
+	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.Method == http.MethodPut {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, `{
+				"message": "Successfully created instance",
+				"instanceId": "597976c4-d4c1-44d6-9f43-213df3da1799",
+				"dashboardUrl": "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview"
+			  }`)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			t.Error("wrong method")
+			return
+		}
+
+		if ctx1.Err() == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if ctx2.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_failed_response)
+			return
+		}
+
+		if ctx3.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_updating_resposnse)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, update_success_response)
+	})
+
+	return svc, defers
 }
 
 func TestInstancesService_Update(t *testing.T) {
 	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
-	want := []byte(`{
-		"message": "Successfully created instance",
-		"instanceId": "597976c4-d4c1-44d6-9f43-213df3da1799",
-		"dashboardUrl": "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview"
-	  }`)
 
 	wantRes := instances.CreateOrUpdateResponse{
 		Message:      "Successfully created instance",
@@ -256,8 +370,10 @@ func TestInstancesService_Update(t *testing.T) {
 		DashboardURL: "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview",
 	}
 
-	svc, teardown := prep(t, fmt.Sprintf(apiPathWithInstanceID, instanceID), projectID, want, http.MethodPut)
-	defer teardown()
+	svc, defers := setUpdateTestServer(t, projectID, instanceID)
+	for _, f := range defers {
+		defer f()
+	}
 
 	type args struct {
 		ctx          context.Context
@@ -273,17 +389,20 @@ func TestInstancesService_Update(t *testing.T) {
 		wantRes instances.CreateOrUpdateResponse
 		wantErr bool
 		compare bool
+		useWait bool
 	}{
-		{"all ok", args{context.Background(), projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, false, true},
-		{"nil ctx", args{nil, projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"wrong project uuid", args{context.Background(), "random", instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"bad name", args{context.Background(), projectID, instanceID, "", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"bad plan", args{context.Background(), projectID, instanceID, "name-123", "", map[string]string{}}, wantRes, true, false},
-		{"project not found", args{context.Background(), projectID2, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
+		{"all ok", args{context.Background(), projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, false, true, true},
+		{"nil ctx", args{nil, projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"wrong project uuid", args{context.Background(), "random", instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"bad name", args{context.Background(), projectID, instanceID, "", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"bad plan", args{context.Background(), projectID, instanceID, "name-123", "", map[string]string{}}, wantRes, true, false, false},
+		{"project not found", args{context.Background(), projectID2, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
 	}
+
+	var w *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := svc.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.instanceName, tt.args.planID, tt.args.params)
+			gotRes, process, err := svc.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.instanceName, tt.args.planID, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InstancesService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -291,24 +410,117 @@ func TestInstancesService_Update(t *testing.T) {
 			if !reflect.DeepEqual(gotRes, tt.wantRes) && tt.compare {
 				t.Errorf("InstancesService.Update() = %v, want %v", gotRes, tt.wantRes)
 			}
+			if tt.useWait {
+				w = process
+			}
 		})
 	}
+
+	// Test wait functionality
+
+	w.SetThrottle(1 * time.Second)
+
+	// on first attempt where ctx1 still didn't time out, the server should return an error
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on initial call but got nil instead")
+	}
+
+	time.Sleep(1 * time.Second)
+	// on 2nd attempt where ctx2 still didn't time out, the server should return status UPDATE_FAIL
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on 2nd call but got nil instead")
+	}
+
+	// on 3rd attempt wait should succeed after 1 retry
+	// first for 'updating' status and in the 2nd complete with 'UPDATE_SUCCEEDED' status
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
 }
 
+const (
+	delete_deleting_response    = `{"status":"DELETING"}`
+	delete_created_response     = `{"status":"CREATED_SUCCESSFULLY"}`
+	delete_deleted_successfully = `{"status":"DELETE_SUCCEEDED"}`
+)
+
+func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
+	c, mux, teardown, _ := client.MockServer()
+	svc := argus.New(c)
+
+	defers := []func(){teardown}
+
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	defers = append(defers, cancel1)
+
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	defers = append(defers, cancel2)
+
+	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
+	defers = append(defers, cancel3)
+
+	ctx4, cancel4 := context.WithTimeout(context.TODO(), 4*time.Second)
+	defers = append(defers, cancel4)
+
+	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.Method == http.MethodDelete {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, `{
+				"message": "Successfully deleted instance"
+			  }`)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			t.Error("wrong method")
+			return
+		}
+
+		if ctx1.Err() == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if ctx2.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, delete_created_response)
+			return
+		}
+
+		if ctx3.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, delete_deleting_response)
+			return
+		}
+
+		if ctx4.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, delete_deleted_successfully)
+			return
+		}
+
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	return svc, defers
+}
 func TestInstancesService_Delete(t *testing.T) {
 	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
-	want := []byte(`{
-		"message": "Successfully deleted instance"
-	  }`)
+
+	svc, defers := setDeletionTestServer(t, projectID, instanceID)
+	for _, f := range defers {
+		defer f()
+	}
 
 	wantRes := instances.Instance{
 		Message: "Successfully deleted instance",
 	}
-
-	svc, teardown := prep(t, fmt.Sprintf(apiPathWithInstanceID, instanceID), projectID, want, http.MethodDelete)
-	defer teardown()
 
 	type args struct {
 		ctx        context.Context
@@ -321,15 +533,17 @@ func TestInstancesService_Delete(t *testing.T) {
 		wantRes instances.Instance
 		wantErr bool
 		compare bool
+		useWait bool
 	}{
-		{"all ok", args{context.Background(), projectID, instanceID}, wantRes, false, true},
-		{"nil ctx", args{nil, projectID, instanceID}, wantRes, true, false},
-		{"wrong project uuid", args{context.Background(), "random", instanceID}, wantRes, true, false},
-		{"project not found", args{context.Background(), projectID2, instanceID}, wantRes, true, false},
+		{"all ok", args{context.Background(), projectID, instanceID}, wantRes, false, true, true},
+		{"nil ctx", args{nil, projectID, instanceID}, wantRes, true, false, false},
+		{"wrong project uuid", args{context.Background(), "random", instanceID}, wantRes, true, false, false},
+		{"project not found", args{context.Background(), projectID2, instanceID}, wantRes, true, false, false},
 	}
+	var w *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := svc.Instances.Delete(tt.args.ctx, tt.args.projectID, tt.args.instanceID)
+			gotRes, process, err := svc.Instances.Delete(tt.args.ctx, tt.args.projectID, tt.args.instanceID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InstancesService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -337,6 +551,38 @@ func TestInstancesService_Delete(t *testing.T) {
 			if !reflect.DeepEqual(gotRes, tt.wantRes) && tt.compare {
 				t.Errorf("InstancesService.Delete() = %v, want %v", gotRes, tt.wantRes)
 			}
+			if tt.useWait {
+				w = process
+			}
 		})
+	}
+
+	// Test wait functionality
+
+	w.SetThrottle(1 * time.Second)
+
+	// on first attempt where ctx1 still didn't time out, the server should return an error
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on initial call but got nil instead")
+	}
+
+	// on 2nd attempt where ctx2 still didn't time out, the server should return status created successfully
+	// which will result in wait error
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on 2nd call but got nil instead")
+	}
+
+	// on 3rd attempt, ctx3 timed out and ctx2
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error on 3rd try: %v", err)
+	}
+
+	// on 4th attempt, the servere should return not found
+	// meaning resource was deleted and wait should return without error
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error on 4th try: %v", err)
 	}
 }
