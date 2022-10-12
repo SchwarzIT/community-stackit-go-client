@@ -166,8 +166,10 @@ func (svc *InstancesService) waitForCreation(ctx context.Context, projectID, ins
 }
 
 // Update updates a new Argus instance
+// returns API response [CreateOrUpdateResponse], wait handler and error
+// The wait handler will wait for the instance status to be set to "UPDATE_SUCCEEDED"
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_update
-func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, err error) {
+func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, planID string, params map[string]string) (res CreateOrUpdateResponse, w *wait.Handler, err error) {
 	if err = Validate(projectID, instanceName, planID); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -180,7 +182,24 @@ func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, 
 	}
 
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID))
 	return
+}
+
+func (svc *InstancesService) waitForUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID)
+		if err != nil {
+			return nil, false, err
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED {
+			return s, true, nil
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_FAILED {
+			return s, true, fmt.Errorf("update failed for instance %s", instanceID)
+		}
+		return s, false, nil
+	}
 }
 
 // Delete deleted an instance by project and instance IDs

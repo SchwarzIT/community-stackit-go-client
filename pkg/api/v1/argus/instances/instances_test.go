@@ -296,15 +296,73 @@ func TestInstancesService_Create(t *testing.T) {
 
 }
 
+const (
+	update_failed_response    = `{"status":"UPDATE_FAILED"}`
+	update_success_response   = `{"status":"UPDATE_SUCCEEDED"}`
+	update_updating_resposnse = `{"status":"UPDATING"}`
+)
+
+func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
+	c, mux, teardown, _ := client.MockServer()
+	svc := argus.New(c)
+
+	defers := []func(){teardown}
+
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	defers = append(defers, cancel1)
+
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	defers = append(defers, cancel2)
+
+	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
+	defers = append(defers, cancel3)
+
+	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+
+		if r.Method == http.MethodPut {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, `{
+				"message": "Successfully created instance",
+				"instanceId": "597976c4-d4c1-44d6-9f43-213df3da1799",
+				"dashboardUrl": "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview"
+			  }`)
+			return
+		}
+
+		if r.Method != http.MethodGet {
+			t.Error("wrong method")
+			return
+		}
+
+		if ctx1.Err() == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if ctx2.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_failed_response)
+			return
+		}
+
+		if ctx3.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_updating_resposnse)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, update_success_response)
+	})
+
+	return svc, defers
+}
+
 func TestInstancesService_Update(t *testing.T) {
 	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
-	want := []byte(`{
-		"message": "Successfully created instance",
-		"instanceId": "597976c4-d4c1-44d6-9f43-213df3da1799",
-		"dashboardUrl": "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview"
-	  }`)
 
 	wantRes := instances.CreateOrUpdateResponse{
 		Message:      "Successfully created instance",
@@ -312,8 +370,10 @@ func TestInstancesService_Update(t *testing.T) {
 		DashboardURL: "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview",
 	}
 
-	svc, teardown, _ := prep(t, fmt.Sprintf(apiPathWithInstanceID, instanceID), projectID, want, http.MethodPut)
-	defer teardown()
+	svc, defers := setUpdateTestServer(t, projectID, instanceID)
+	for _, f := range defers {
+		defer f()
+	}
 
 	type args struct {
 		ctx          context.Context
@@ -329,17 +389,20 @@ func TestInstancesService_Update(t *testing.T) {
 		wantRes instances.CreateOrUpdateResponse
 		wantErr bool
 		compare bool
+		useWait bool
 	}{
-		{"all ok", args{context.Background(), projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, false, true},
-		{"nil ctx", args{nil, projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"wrong project uuid", args{context.Background(), "random", instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"bad name", args{context.Background(), projectID, instanceID, "", "plan-123", map[string]string{}}, wantRes, true, false},
-		{"bad plan", args{context.Background(), projectID, instanceID, "name-123", "", map[string]string{}}, wantRes, true, false},
-		{"project not found", args{context.Background(), projectID2, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false},
+		{"all ok", args{context.Background(), projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, false, true, true},
+		{"nil ctx", args{nil, projectID, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"wrong project uuid", args{context.Background(), "random", instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"bad name", args{context.Background(), projectID, instanceID, "", "plan-123", map[string]string{}}, wantRes, true, false, false},
+		{"bad plan", args{context.Background(), projectID, instanceID, "name-123", "", map[string]string{}}, wantRes, true, false, false},
+		{"project not found", args{context.Background(), projectID2, instanceID, "name-123", "plan-123", map[string]string{}}, wantRes, true, false, false},
 	}
+
+	var w *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := svc.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.instanceName, tt.args.planID, tt.args.params)
+			gotRes, process, err := svc.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.instanceName, tt.args.planID, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InstancesService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -347,8 +410,34 @@ func TestInstancesService_Update(t *testing.T) {
 			if !reflect.DeepEqual(gotRes, tt.wantRes) && tt.compare {
 				t.Errorf("InstancesService.Update() = %v, want %v", gotRes, tt.wantRes)
 			}
+			if tt.useWait {
+				w = process
+			}
 		})
 	}
+
+	// Test wait functionality
+
+	w.SetThrottle(1 * time.Second)
+
+	// on first attempt where ctx1 still didn't time out, the server should return an error
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on initial call but got nil instead")
+	}
+
+	time.Sleep(1 * time.Second)
+	// on 2nd attempt where ctx2 still didn't time out, the server should return status UPDATE_FAIL
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on 2nd call but got nil instead")
+	}
+
+	// on 3rd attempt wait should succeed after 1 retry
+	// first for 'updating' status and in the 2nd complete with 'UPDATE_SUCCEEDED' status
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
 }
 
 const (
