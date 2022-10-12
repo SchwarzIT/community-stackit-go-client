@@ -357,21 +357,23 @@ const (
 	delete_deleted_successfully = `{"status":"DELETE_SUCCEEDED"}`
 )
 
-func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, func()) {
+func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
 	c, mux, teardown, _ := client.MockServer()
 	svc := argus.New(c)
 
+	defers := []func(){teardown}
+
 	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
-	defer cancel1()
+	defers = append(defers, cancel1)
 
 	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
-	defer cancel2()
+	defers = append(defers, cancel2)
 
 	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
-	defer cancel3()
+	defers = append(defers, cancel3)
 
 	ctx4, cancel4 := context.WithTimeout(context.TODO(), 4*time.Second)
-	defer cancel4()
+	defers = append(defers, cancel4)
 
 	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -415,15 +417,17 @@ func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.A
 		w.WriteHeader(http.StatusNotFound)
 	})
 
-	return svc, teardown
+	return svc, defers
 }
 func TestInstancesService_Delete(t *testing.T) {
 	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
 
-	svc, teardown := setDeletionTestServer(t, projectID, instanceID)
-	defer teardown()
+	svc, defers := setDeletionTestServer(t, projectID, instanceID)
+	for _, f := range defers {
+		defer f()
+	}
 
 	wantRes := instances.Instance{
 		Message: "Successfully deleted instance",
