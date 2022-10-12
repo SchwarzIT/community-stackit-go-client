@@ -138,10 +138,6 @@ func TestObjectStorageBucketsService_Get(t *testing.T) {
 }
 
 func TestObjectStorageBucketsService_Create(t *testing.T) {
-	c, mux, teardown, _ := client.MockServer()
-	defer teardown()
-	s := objectstorage.New(c).Buckets
-
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 	bucketName := "my-bucket"
 	ctx1, cancel1 := context.WithTimeout(context.Background(), 1*time.Second)
@@ -170,6 +166,10 @@ func TestObjectStorageBucketsService_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c, mux, teardown, _ := client.MockServer()
+			defer teardown()
+			s := objectstorage.New(c).Buckets
+
 			mux.HandleFunc(fmt.Sprintf(apiPath, projectID, bucketName), func(w http.ResponseWriter, r *http.Request) {
 				switch r.Method {
 				case http.MethodGet:
@@ -209,10 +209,6 @@ func TestObjectStorageBucketsService_Create(t *testing.T) {
 }
 
 func TestObjectStorageBucketsService_Delete(t *testing.T) {
-	c, mux, teardown, _ := client.MockServer()
-	defer teardown()
-	s := objectstorage.New(c).Buckets
-
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 	bucketName := "my-bucket"
 	ctx1, cancel1 := context.WithTimeout(context.Background(), 1*time.Second)
@@ -240,6 +236,9 @@ func TestObjectStorageBucketsService_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			c, mux, teardown, _ := client.MockServer()
+			defer teardown()
+			s := objectstorage.New(c).Buckets
 			mux.HandleFunc(fmt.Sprintf(apiPath, projectID, bucketName), func(w http.ResponseWriter, r *http.Request) {
 				switch r.Method {
 				case http.MethodGet:
