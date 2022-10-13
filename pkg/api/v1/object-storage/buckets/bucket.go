@@ -5,7 +5,9 @@ package buckets
 import (
 	"context"
 	"fmt"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -73,9 +75,11 @@ func (svc *ObjectStorageBucketsService) Get(ctx context.Context, projectID, buck
 	return
 }
 
-// Create creates a new bucket
+// Create creates a new bucket and returns a wait handler
+// which upon call to `Wait()` will wait until the bucket is successfully created
+// Wait() returns the created Bucket and error if it occurred
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create_bucket_v1_project__projectId__bucket__bucketName__post
-func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, bucketName string) (err error) {
+func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, bucketName string) (w *wait.Handler, err error) {
 	if err = ValidateBucketName(bucketName); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -85,18 +89,54 @@ func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, b
 	if err != nil {
 		return
 	}
-
 	_, err = svc.Client.Do(req, nil)
+	if err != nil {
+		return
+	}
+
+	w = wait.New(svc.waitForCreation(ctx, projectID, bucketName))
 	return
 }
 
+func (svc *ObjectStorageBucketsService) waitForCreation(ctx context.Context, projectID string, bucketName string) wait.WaitFn {
+	return func() (interface{}, bool, error) {
+		res, err := svc.Get(ctx, projectID, bucketName)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, false, nil
+			}
+			return nil, false, err
+		}
+		return res, true, nil
+	}
+}
+
 // Delete deletes a bucket
+// which upon call to `Wait()` will wait until the bucket is successfully deleted
+// Wait() returns an error if it occurred
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_DeleteBucket
-func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, bucketName string) (err error) {
+func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, bucketName string) (w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPath, projectID, bucketName), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, nil)
-	return err
+	if err != nil {
+		return
+	}
+	w = wait.New(svc.waitForDeletion(ctx, projectID, bucketName))
+	return w, err
+}
+
+func (svc *ObjectStorageBucketsService) waitForDeletion(ctx context.Context, projectID string, bucketName string) wait.WaitFn {
+	return func() (interface{}, bool, error) {
+		res, err := svc.Get(ctx, projectID, bucketName)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return res, true, nil
+			}
+			return res, false, err
+		}
+		return res, false, nil
+	}
 }
