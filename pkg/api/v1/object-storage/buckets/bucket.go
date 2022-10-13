@@ -92,11 +92,11 @@ func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, b
 		return
 	}
 
-	w = wait.New(waitForCreation(ctx, projectID, bucketName, svc))
+	w = wait.New(svc.waitForCreation(ctx, projectID, bucketName))
 	return
 }
 
-func waitForCreation(ctx context.Context, projectID string, bucketName string, svc *ObjectStorageBucketsService) wait.WaitFn {
+func (svc *ObjectStorageBucketsService) waitForCreation(ctx context.Context, projectID string, bucketName string) wait.WaitFn {
 	return func() (interface{}, bool, error) {
 		res, err := svc.Get(ctx, projectID, bucketName)
 		if err != nil {
@@ -120,11 +120,11 @@ func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, b
 	if err != nil {
 		return
 	}
-	w = wait.New(waitForDeletion(ctx, projectID, bucketName, svc))
+	w = wait.New(svc.waitForDeletion(ctx, projectID, bucketName))
 	return w, err
 }
 
-func waitForDeletion(ctx context.Context, projectID string, bucketName string, svc *ObjectStorageBucketsService) wait.WaitFn {
+func (svc *ObjectStorageBucketsService) waitForDeletion(ctx context.Context, projectID string, bucketName string) wait.WaitFn {
 	return func() (interface{}, bool, error) {
 		res, err := svc.Get(ctx, projectID, bucketName)
 		if err != nil {
