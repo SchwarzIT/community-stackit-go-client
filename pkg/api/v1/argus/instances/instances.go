@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/plans"
@@ -193,12 +194,29 @@ func (svc *InstancesService) waitForUpdate(ctx context.Context, projectID, insta
 		if err != nil {
 			return nil, false, err
 		}
-		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED ||
-			s.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED {
 			return s, true, nil
 		}
 		if s.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_FAILED {
 			return s, true, fmt.Errorf("update failed for instance %s", instanceID)
+		}
+		if s.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
+			// in some cases it takes a long time for the server to change the instance status
+			// from CREATE_SUCCEEDED to updating
+			// the following code will wait for the status change for 5 minutes
+			// and continue the outer wait on change or fail
+			w := wait.New(func() (res interface{}, done bool, err error) {
+				si, err := svc.Get(ctx, projectID, instanceID)
+				if err != nil {
+					return nil, false, err
+				}
+				if si.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
+					return nil, false, nil
+				}
+				return nil, true, nil
+			})
+			_, err := w.SetTimeout(5 * time.Minute).Wait()
+			return nil, false, err
 		}
 		return s, false, nil
 	}

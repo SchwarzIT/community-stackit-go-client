@@ -297,9 +297,10 @@ func TestInstancesService_Create(t *testing.T) {
 }
 
 const (
-	update_failed_response    = `{"status":"UPDATE_FAILED"}`
-	update_success_response   = `{"status":"UPDATE_SUCCEEDED"}`
-	update_updating_resposnse = `{"status":"UPDATING"}`
+	update_failed_response         = `{"status":"UPDATE_FAILED"}`
+	update_success_response        = `{"status":"UPDATE_SUCCEEDED"}`
+	update_create_success_response = `{"status":"CREATE_SUCCEEDED"}`
+	update_updating_resposnse      = `{"status":"UPDATING"}`
 )
 
 func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
@@ -316,6 +317,19 @@ func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.Arg
 
 	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
 	defers = append(defers, cancel3)
+
+	ctx4, cancel4 := context.WithTimeout(context.TODO(), 4*time.Second)
+	defers = append(defers, cancel4)
+
+	ctx5, cancel5 := context.WithTimeout(context.TODO(), 5*time.Second)
+	defers = append(defers, cancel5)
+
+	// inner wait takes 5s between calls
+	ctx6, cancel6 := context.WithTimeout(context.TODO(), 11*time.Second)
+	defers = append(defers, cancel6)
+
+	ctx7, cancel7 := context.WithTimeout(context.TODO(), 12*time.Second)
+	defers = append(defers, cancel7)
 
 	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -352,8 +366,32 @@ func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.Arg
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, update_success_response)
+		if ctx4.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_success_response)
+			return
+		}
+
+		if ctx5.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_create_success_response)
+			return
+		}
+
+		if ctx6.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_success_response)
+			return
+		}
+
+		if ctx7.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_create_success_response)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
+
 	})
 
 	return svc, defers
@@ -438,6 +476,18 @@ func TestInstancesService_Update(t *testing.T) {
 		t.Errorf("unexpected error: %v", err)
 	}
 
+	// on 4th attempt wait should succeed after waiting for status to change
+	// from CREATE_SUCCEEDED
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// on final attempt wait should fail after inner wait is triggered
+	time.Sleep(1 * time.Second)
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on final call but got nil instead")
+	}
 }
 
 const (
