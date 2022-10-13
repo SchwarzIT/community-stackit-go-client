@@ -201,8 +201,8 @@ func (svc *InstancesService) waitForUpdate(ctx context.Context, projectID, insta
 			return s, true, fmt.Errorf("update failed for instance %s", instanceID)
 		}
 		if s.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
-			// in some cases it takes a long time for the server to change the instance status
-			// from CREATE_SUCCEEDED to updating
+			// in some cases it takes a long time for the server to change the
+			// instance status to UPDATING
 			// the following code will wait for the status change for 5 minutes
 			// and continue the outer wait on change or fail
 			w := wait.New(func() (res interface{}, done bool, err error) {
@@ -210,10 +210,12 @@ func (svc *InstancesService) waitForUpdate(ctx context.Context, projectID, insta
 				if err != nil {
 					return nil, false, err
 				}
-				if si.Status == consts.ARGUS_INSTANCE_STATUS_CREATE_SUCCEEDED {
-					return nil, false, nil
+				if si.Status == consts.ARGUS_INSTANCE_STATUS_UPDATING ||
+					si.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_SUCCEEDED ||
+					si.Status == consts.ARGUS_INSTANCE_STATUS_UPDATE_FAILED {
+					return nil, true, nil
 				}
-				return nil, true, nil
+				return nil, false, nil
 			})
 			_, err := w.SetTimeout(5 * time.Minute).Wait()
 			return nil, false, err
@@ -248,7 +250,24 @@ func (svc *InstancesService) waitForDeletion(ctx context.Context, projectID, ins
 			return nil, true, nil
 		}
 		if s.Status != consts.ARGUS_INSTANCE_STATUS_DELETING {
-			return nil, false, fmt.Errorf("expected instance to be in state 'DELETING', but got %s instead", s.Status)
+			// in some cases it takes a long time for the server to change the
+			// instance status to status DELETING
+			// the following code will wait for the status change for 5 minutes
+			// and continue the outer wait on change or fail
+			w := wait.New(func() (res interface{}, done bool, err error) {
+				si, err := svc.Get(ctx, projectID, instanceID)
+				if err != nil {
+					return nil, false, err
+				}
+				if si.Status == consts.ARGUS_INSTANCE_STATUS_DELETING ||
+					si.Status == consts.ARGUS_INSTANCE_STATUS_DELETE_FAILED ||
+					si.Status == consts.ARGUS_INSTANCE_STATUS_DELETE_SUCCEEDED {
+					return nil, true, nil
+				}
+				return nil, false, nil
+			})
+			_, err := w.SetTimeout(5 * time.Minute).Wait()
+			return nil, false, err
 		}
 		return nil, false, nil
 	}
