@@ -184,7 +184,7 @@ func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, 
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID))
+	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID)).SetTimeout(1 * time.Hour)
 	return
 }
 
@@ -233,7 +233,7 @@ func (svc *InstancesService) Delete(ctx context.Context, projectID, instanceID s
 		return
 	}
 	_, err = svc.Client.Do(req, &res)
-	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID))
+	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID)).SetTimeout(1 * time.Hour)
 	return
 }
 
