@@ -253,11 +253,11 @@ func TestInstancesService_Create(t *testing.T) {
 	}
 
 	// Test wait functionality
-
-	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	baseTime := 200 * time.Millisecond
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), baseTime)
 	defer cancel1()
 
-	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*baseTime)
 	defer cancel2()
 
 	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, wantRes.InstanceID), func(w http.ResponseWriter, r *http.Request) {
@@ -281,7 +281,7 @@ func TestInstancesService_Create(t *testing.T) {
 		fmt.Fprint(w, get_created_response)
 	})
 
-	w.SetThrottle(1 * time.Second)
+	w.SetThrottle(baseTime)
 
 	// on first attempt where ctx1 still didn't time out, the server should return an error
 	if _, err := w.Wait(); err == nil {
@@ -289,7 +289,7 @@ func TestInstancesService_Create(t *testing.T) {
 	}
 
 	// on 2nd attempt, ctx1 timed out and ctx2
-	time.Sleep(1 * time.Second)
+	time.Sleep(baseTime)
 	if _, err := w.Wait(); err != nil {
 		t.Errorf("unexpected error on 2nd try: %v", err)
 	}
@@ -297,25 +297,38 @@ func TestInstancesService_Create(t *testing.T) {
 }
 
 const (
-	update_failed_response    = `{"status":"UPDATE_FAILED"}`
-	update_success_response   = `{"status":"UPDATE_SUCCEEDED"}`
-	update_updating_resposnse = `{"status":"UPDATING"}`
+	update_failed_response         = `{"status":"UPDATE_FAILED"}`
+	update_success_response        = `{"status":"UPDATE_SUCCEEDED"}`
+	update_create_success_response = `{"status":"CREATE_SUCCEEDED"}`
+	update_updating_resposnse      = `{"status":"UPDATING"}`
 )
 
-func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
+func setUpdateTestServer(t *testing.T, baseTime time.Duration, projectID, instanceID string) (*argus.ArgusService, []func()) {
 	c, mux, teardown, _ := client.MockServer()
 	svc := argus.New(c)
 
 	defers := []func(){teardown}
 
-	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*baseTime)
 	defers = append(defers, cancel1)
 
-	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*baseTime)
 	defers = append(defers, cancel2)
 
-	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
+	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*baseTime)
 	defers = append(defers, cancel3)
+
+	ctx4, cancel4 := context.WithTimeout(context.TODO(), 4*baseTime)
+	defers = append(defers, cancel4)
+
+	ctx5, cancel5 := context.WithTimeout(context.TODO(), 5*baseTime)
+	defers = append(defers, cancel5)
+
+	ctx6, cancel6 := context.WithTimeout(context.TODO(), (6*baseTime + 5*time.Second))
+	defers = append(defers, cancel6)
+
+	ctx7, cancel7 := context.WithTimeout(context.TODO(), (7*baseTime + 5*time.Second))
+	defers = append(defers, cancel7)
 
 	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -352,8 +365,35 @@ func setUpdateTestServer(t *testing.T, projectID, instanceID string) (*argus.Arg
 			return
 		}
 
-		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, update_success_response)
+		if ctx4.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_success_response)
+			return
+		}
+
+		// 4th response
+
+		if ctx5.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_create_success_response)
+			return
+		}
+
+		if ctx6.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_success_response)
+			return
+		}
+
+		// final response
+
+		if ctx7.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, update_create_success_response)
+			return
+		}
+
+		w.WriteHeader(http.StatusBadRequest)
 	})
 
 	return svc, defers
@@ -370,7 +410,8 @@ func TestInstancesService_Update(t *testing.T) {
 		DashboardURL: "https://portal-dev.stackit.cloud/projects/775eee9d-8565-48ab-9dcc-64a6ca55043a/service/597976c4-d4c1-44d6-9f43-213df3da1799/argus-dashboard/instances/597976c4-d4c1-44d6-9f43-213df3da1799/overview",
 	}
 
-	svc, defers := setUpdateTestServer(t, projectID, instanceID)
+	baseTime := 200 * time.Millisecond
+	svc, defers := setUpdateTestServer(t, baseTime, projectID, instanceID)
 	for _, f := range defers {
 		defer f()
 	}
@@ -418,14 +459,14 @@ func TestInstancesService_Update(t *testing.T) {
 
 	// Test wait functionality
 
-	w.SetThrottle(1 * time.Second)
+	w.SetThrottle(baseTime)
 
 	// on first attempt where ctx1 still didn't time out, the server should return an error
 	if _, err := w.Wait(); err == nil {
 		t.Error("expected an error on initial call but got nil instead")
 	}
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(baseTime)
 	// on 2nd attempt where ctx2 still didn't time out, the server should return status UPDATE_FAIL
 	if _, err := w.Wait(); err == nil {
 		t.Error("expected an error on 2nd call but got nil instead")
@@ -433,11 +474,23 @@ func TestInstancesService_Update(t *testing.T) {
 
 	// on 3rd attempt wait should succeed after 1 retry
 	// first for 'updating' status and in the 2nd complete with 'UPDATE_SUCCEEDED' status
-	time.Sleep(1 * time.Second)
+	time.Sleep(baseTime)
 	if _, err := w.Wait(); err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}
 
+	// on 4th attempt wait should succeed after waiting for status to change
+	// from CREATE_SUCCEEDED
+	time.Sleep(baseTime)
+	if _, err := w.Wait(); err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+
+	// on final attempt wait should fail after inner wait is triggered
+	time.Sleep(baseTime)
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on final call but got nil instead")
+	}
 }
 
 const (
@@ -446,23 +499,29 @@ const (
 	delete_deleted_successfully = `{"status":"DELETE_SUCCEEDED"}`
 )
 
-func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.ArgusService, []func()) {
+func setDeletionTestServer(t *testing.T, baseTime time.Duration, projectID, instanceID string) (*argus.ArgusService, []func()) {
 	c, mux, teardown, _ := client.MockServer()
 	svc := argus.New(c)
 
 	defers := []func(){teardown}
 
-	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*time.Second)
+	ctx1, cancel1 := context.WithTimeout(context.TODO(), 1*baseTime)
 	defers = append(defers, cancel1)
 
-	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*time.Second)
+	ctx2, cancel2 := context.WithTimeout(context.TODO(), 2*baseTime)
 	defers = append(defers, cancel2)
 
-	ctx3, cancel3 := context.WithTimeout(context.TODO(), 3*time.Second)
+	ctx3, cancel3 := context.WithTimeout(context.TODO(), (3*baseTime + 5*time.Second))
 	defers = append(defers, cancel3)
 
-	ctx4, cancel4 := context.WithTimeout(context.TODO(), 4*time.Second)
+	ctx4, cancel4 := context.WithTimeout(context.TODO(), (4*baseTime + 5*time.Second))
 	defers = append(defers, cancel4)
+
+	ctx5, cancel5 := context.WithTimeout(context.TODO(), (5*baseTime + 5*time.Second))
+	defers = append(defers, cancel5)
+
+	ctx6, cancel6 := context.WithTimeout(context.TODO(), (6*baseTime + 5*time.Second))
+	defers = append(defers, cancel6)
 
 	mux.HandleFunc(fmt.Sprintf(apiPath+"/%s", projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -503,6 +562,17 @@ func setDeletionTestServer(t *testing.T, projectID, instanceID string) (*argus.A
 			return
 		}
 
+		if ctx5.Err() == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
+		}
+
+		if ctx6.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, delete_created_response)
+			return
+		}
+
 		w.WriteHeader(http.StatusNotFound)
 	})
 
@@ -512,8 +582,9 @@ func TestInstancesService_Delete(t *testing.T) {
 	projectID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	instanceID := "597976c4-d4c1-44d6-9f43-213df3da1799"
 	projectID2 := "697976c4-d4c1-44d6-9f43-213df3da1799"
+	baseTime := 200 * time.Millisecond
 
-	svc, defers := setDeletionTestServer(t, projectID, instanceID)
+	svc, defers := setDeletionTestServer(t, baseTime, projectID, instanceID)
 	for _, f := range defers {
 		defer f()
 	}
@@ -559,30 +630,30 @@ func TestInstancesService_Delete(t *testing.T) {
 
 	// Test wait functionality
 
-	w.SetThrottle(1 * time.Second)
+	w.SetThrottle(baseTime)
 
 	// on first attempt where ctx1 still didn't time out, the server should return an error
 	if _, err := w.Wait(); err == nil {
 		t.Error("expected an error on initial call but got nil instead")
 	}
 
-	// on 2nd attempt where ctx2 still didn't time out, the server should return status created successfully
-	// which will result in wait error
-	time.Sleep(1 * time.Second)
-	if _, err := w.Wait(); err == nil {
-		t.Error("expected an error on 2nd call but got nil instead")
-	}
-
-	// on 3rd attempt, ctx3 timed out and ctx2
-	time.Sleep(1 * time.Second)
+	// on 2nd attempt, expected inner wait for a 'deleting' related status
+	// and than final successful deletion status
+	time.Sleep(baseTime)
 	if _, err := w.Wait(); err != nil {
-		t.Errorf("unexpected error on 3rd try: %v", err)
+		t.Errorf("unexpected error on 2nd try: %v", err)
 	}
 
-	// on 4th attempt, the servere should return not found
+	// on 3rd attempt, the servere should return not found
 	// meaning resource was deleted and wait should return without error
-	time.Sleep(1 * time.Second)
+	time.Sleep(baseTime)
 	if _, err := w.Wait(); err != nil {
 		t.Errorf("unexpected error on 4th try: %v", err)
+	}
+
+	// on 4th attempt, testing inner wait error
+	time.Sleep(baseTime)
+	if _, err := w.Wait(); err == nil {
+		t.Error("expected an error on 4th call but got nil instead")
 	}
 }
