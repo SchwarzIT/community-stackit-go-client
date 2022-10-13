@@ -75,7 +75,9 @@ func (svc *ObjectStorageBucketsService) Get(ctx context.Context, projectID, buck
 	return
 }
 
-// Create creates a new bucket
+// Create creates a new bucket and returns a wait handler
+// which upon call to `Wait()` will wait until the bucket is successfully created
+// Wait() returns the created Bucket and error if it occurred
 // See also https://api.stackit.schwarz/object-storage-service/openapi.v1.html#operation/create_bucket_v1_project__projectId__bucket__bucketName__post
 func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, bucketName string) (w *wait.Handler, err error) {
 	if err = ValidateBucketName(bucketName); err != nil {
@@ -110,6 +112,8 @@ func (svc *ObjectStorageBucketsService) waitForCreation(ctx context.Context, pro
 }
 
 // Delete deletes a bucket
+// which upon call to `Wait()` will wait until the bucket is successfully deleted
+// Wait() returns an error if it occurred
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_DeleteBucket
 func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, bucketName string) (w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPath, projectID, bucketName), nil)
