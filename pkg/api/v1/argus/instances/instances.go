@@ -149,7 +149,7 @@ func (svc *InstancesService) Create(ctx context.Context, projectID, instanceName
 
 	_, err = svc.Client.Do(req, &res)
 	w = wait.New(svc.waitForCreation(ctx, projectID, res.InstanceID))
-
+	w.SetTimeout(1 * time.Hour)
 	return res, w, err
 }
 
