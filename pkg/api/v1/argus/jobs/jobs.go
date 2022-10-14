@@ -8,10 +8,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -131,9 +134,11 @@ func (svc *JobsService) Get(ctx context.Context, projectID, instanceID, jobName 
 	return
 }
 
-// Create creates an argus scrape job
+// Create creates an argus scrape job and return a list of jobs
+// it also returns a wait service to verify the creation
+// the wait service can be triggered using `Wait()` and it returns the job (GetJobResponse) and an error if occurred
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_scrapeconfigs_create
-func (svc *JobsService) Create(ctx context.Context, projectID, instanceID string, job Job) (res ListJobsResponse, err error) {
+func (svc *JobsService) Create(ctx context.Context, projectID, instanceID string, job Job) (res ListJobsResponse, w *wait.Handler, err error) {
 	if err = job.Validate(); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -145,7 +150,22 @@ func (svc *JobsService) Create(ctx context.Context, projectID, instanceID string
 		return
 	}
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForCreation(ctx, projectID, instanceID, job.JobName))
+	w.SetTimeout(10 * time.Minute)
 	return
+}
+
+func (svc *JobsService) waitForCreation(ctx context.Context, projectID, instanceID, jobName string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		s, err := svc.Get(ctx, projectID, instanceID, jobName)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, false, nil
+			}
+			return nil, false, err
+		}
+		return s, false, nil
+	}
 }
 
 func (svc *JobsService) buildCreateRequest(job Job) ([]byte, error) {
@@ -169,13 +189,28 @@ func (svc *JobsService) Update(ctx context.Context, projectID, instanceID string
 	return
 }
 
-// Delete deletes an argus scrape job
+// Delete deletes an argus scrape job and returns the list of jobs, a wait handler and error
+// the wait service is triggered with `.Wait()` and returns nil and error if occurred
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_scrapeconfigs_delete_configs
-func (svc *JobsService) Delete(ctx context.Context, projectID, instanceID, jobName string) (res ListJobsResponse, err error) {
+func (svc *JobsService) Delete(ctx context.Context, projectID, instanceID, jobName string) (res ListJobsResponse, w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathJob, projectID, instanceID, jobName), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID, jobName))
+	w.SetTimeout(10 * time.Minute)
 	return
+}
+
+func (svc *JobsService) waitForDeletion(ctx context.Context, projectID, instanceID, jobName string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		if _, err = svc.Get(ctx, projectID, instanceID, jobName); err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
+			}
+			return nil, false, err
+		}
+		return nil, false, nil
+	}
 }

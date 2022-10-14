@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus/jobs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
@@ -204,7 +204,7 @@ func TestJobsService_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := a.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.job)
+			gotRes, _, err := a.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.job)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JobsService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -327,7 +327,7 @@ func TestJobsService_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := a.Delete(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.jobName)
+			gotRes, _, err := a.Delete(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.jobName)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("JobsService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
