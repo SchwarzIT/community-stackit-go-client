@@ -62,9 +62,9 @@ func main() {
 
 ## Auto retry
 
-The client has an option to automatically retry calls that failed (for example, if the API returned a temporary internal server error)
+The client can automatically retry failed calls using `pkg/retry`
 
-The following code is the simplest way to enable retry in the client, using default settings:
+To enable retry in the client, use `SetRetry`:
 
 ```
 package main
@@ -90,9 +90,6 @@ func main() {
 	c.SetRetry(retry.New())
 }
 ```
-
-
-Refer to `pkg/retry` for further information
 
 
 
