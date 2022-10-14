@@ -64,7 +64,7 @@ func main() {
 
 The client can automatically retry failed calls using `pkg/retry`
 
-To enable retry in the client, use `SetRetry`:
+To enable retry in the client, use `SetRetry` in the following way:
 
 ```
 package main
