@@ -184,7 +184,7 @@ func (svc *InstancesService) Update(ctx context.Context, projectID, instanceID, 
 	}
 
 	_, err = svc.Client.Do(req, &res)
-	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID)).SetTimeout(1 * time.Hour)
+	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID)).SetTimeout(90 * time.Minute)
 	return
 }
 
