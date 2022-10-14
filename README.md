@@ -4,9 +4,15 @@
 
 <br />
 
-This repo's goal is to create a go-based http client for consuming STACKIT APIs
-
 The client is community-supported and not an official STACKIT release, it is maintained by internal Schwarz IT teams integrating with STACKIT
+
+## Install
+
+To install the latest stable release, run:
+
+```
+go get github.com/SchwarzIT/community-stackit-go-client@latest
+```
 
 
 ## Usage example
@@ -28,9 +34,9 @@ import (
 
 func main() {
 	c, err := client.New(context.Background(), &client.Config{
-		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"), 
+		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
 		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:   os.Getenv("STACKIT_CUSTOMER_ACCOUNT_ID"), 
+		OrganizationID:   os.Getenv("STACKIT_ORGANIZATION_ID"),
 	})
 	if err != nil {
 		panic(err)
@@ -39,8 +45,13 @@ func main() {
 	projectID := "1234-56789-101112"
 	bucketName := "example"
 
-	err = c.ObjectStorage.Buckets.Create(context.TODO(), projectID, bucketName)
+	process, err := c.ObjectStorage.Buckets.Create(context.TODO(), projectID, bucketName)
 	if err != nil {
+		panic(err)
+	}
+
+	// wait for bucket to be created
+	if _, err := process.Wait(); err != nil {
 		panic(err)
 	}
 
@@ -49,7 +60,7 @@ func main() {
 
 ```
 
-Another usage example can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) which is built using the community client
+Further examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) which is built using the community client
 
 [^1]: In order to use the client, a Service Account and Token must be created using [Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
 After creation, assign roles to the Service Account using [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)<br />
