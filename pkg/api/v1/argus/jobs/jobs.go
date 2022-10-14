@@ -164,7 +164,7 @@ func (svc *JobsService) waitForCreation(ctx context.Context, projectID, instance
 			}
 			return nil, false, err
 		}
-		return s, false, nil
+		return s, true, nil
 	}
 }
 
