@@ -60,6 +60,9 @@ func main() {
 
 ```
 
+Further usage examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) 
+
+
 ## Auto retry
 
 The client can automatically retry failed calls using `pkg/retry`
@@ -91,9 +94,6 @@ func main() {
 }
 ```
 
-
-
-Further examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) 
 
 [^1]: In order to use the client, a Service Account and Token must be created using [Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
 After creation, assign roles to the Service Account using [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)<br />
