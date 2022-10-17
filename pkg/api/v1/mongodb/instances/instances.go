@@ -148,7 +148,7 @@ func (svc *MongoDBInstancesService) buildRequest(instanceName, flavorID string, 
 // Create creates a new MongoDB instance and returns the server response (CreateResponse) and a wait handler
 // which upon call to `Wait()` will wait until the instance is successfully created
 // Wait() returns the full instance details (Instance) and error if it occurred
-// See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_create
+// See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances/post
 func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, instanceName, flavorID string,
 	storage Storage, version string, replicas int,
 	backupSchedule string, labels, options map[string]string, acl ACL,
