@@ -16,6 +16,7 @@ import (
 const (
 	apiPathVersions = consts.API_PATH_MONGO_DB_FLEX_VERSIONS
 	apiPathStorage  = consts.API_PATH_MONGO_DB_FLEX_STORAGE
+	apiPathFlavors  = consts.API_PATH_MONGO_DB_FLEX_FLAVORS
 )
 
 // New returns a new handler for the service
@@ -28,8 +29,8 @@ func New(c common.Client) *MongoDBOptionsService {
 // MongoDBOptionsService is the service that retrieves the provider options
 type MongoDBOptionsService common.Service
 
-// ListVersionsResponse is the APIs response for available versions
-type ListVersionsResponse struct {
+// VersionsResponse is the APIs response for available versions
+type VersionsResponse struct {
 	Versions []string `json:"versions,omitempty"`
 }
 
@@ -42,10 +43,36 @@ type GetStorageResponse struct {
 	} `json:"storageRange,omitempty"`
 }
 
-// ListVersions returns all available MongoDB Flex versions
+// GetFlavorsResponse is the server response to GetFlavors call
+type GetFlavorsResponse struct {
+	Flavors []Flavor `json:"flavors,omitempty"`
+}
+
+// Flavor represents a single flavor
+type Flavor struct {
+	ID          string   `json:"id,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Categories  []string `json:"categories,omitempty"`
+	CPU         int      `json:"cpu,omitempty"`
+	Memory      int      `json:"memory,omitempty"`
+}
+
+// GetVersions returns all available MongoDB Flex versions
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#/paths/~1projects~1{projectId}~1versions/get
-func (svc *MongoDBOptionsService) ListVersions(ctx context.Context, projectID string) (res ListVersionsResponse, err error) {
+func (svc *MongoDBOptionsService) GetVersions(ctx context.Context, projectID string) (res VersionsResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathVersions, projectID), nil)
+	if err != nil {
+		return
+	}
+
+	_, err = svc.Client.Do(req, &res)
+	return
+}
+
+// GetFlavors returns available flavors
+// See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#/paths/~1projects~1{projectId}~1flavors/get
+func (svc *MongoDBOptionsService) GetFlavors(ctx context.Context, projectID string) (res GetFlavorsResponse, err error) {
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathFlavors, projectID), nil)
 	if err != nil {
 		return
 	}
