@@ -1,4 +1,4 @@
-// package options is used to retrieve various options used for configuring an SKE cluster
+// package options is used to retrieve various options used for configuring a SKE cluster
 // Such as available Kubernetes versions, machine types and more
 
 package options
