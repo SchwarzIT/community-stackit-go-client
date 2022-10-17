@@ -4,6 +4,7 @@ package instances
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"time"
@@ -30,6 +31,7 @@ func New(c common.Client) *MongoDBInstancesService {
 // MongoDBInstancesService is the service that manages MongoDB Flex instances
 type MongoDBInstancesService common.Service
 
+// ListResponse represents a list of instances returned from the server
 type ListResponse struct {
 	Count int `json:"count,omitempty"`
 	Items []struct {
@@ -39,28 +41,30 @@ type ListResponse struct {
 	} `json:"items,omitempty"`
 }
 
-type Instance struct {
+// Flavor is a signle falvor struct
+type Flavor struct {
+	ID          string   `json:"id,omitempty"`
+	Description string   `json:"description,omitempty"`
+	Categories  []string `json:"categories,omitempty"`
+	CPU         int      `json:"cpu,omitempty"`
+	Memory      int      `json:"memory,omitempty"`
+}
+
+// InstanceResponse is the server response for Get call
+type InstanceResponse struct {
 	Item struct {
 		ACL struct {
 			Items []string `json:"items,omitempty"`
 		} `json:"acl,omitempty"`
-		BackupSchedule string `json:"backupSchedule,omitempty"`
-		Flavor         struct {
-			CPU         int    `json:"cpu,omitempty"`
-			Description string `json:"description,omitempty"`
-			ID          string `json:"id,omitempty"`
-			Memory      int    `json:"memory,omitempty"`
-		} `json:"flavor,omitempty"`
-		ID        string `json:"id,omitempty"`
-		Name      string `json:"name,omitempty"`
-		ProjectID string `json:"projectId,omitempty"`
-		Replicas  int    `json:"replicas,omitempty"`
-		Status    string `json:"status,omitempty"`
-		Storage   struct {
-			Class string `json:"class,omitempty"`
-			Size  int    `json:"size,omitempty"`
-		} `json:"storage,omitempty"`
-		Users []struct {
+		BackupSchedule string  `json:"backupSchedule,omitempty"`
+		Flavor         Flavor  `json:"flavor,omitempty"`
+		ID             string  `json:"id,omitempty"`
+		Name           string  `json:"name,omitempty"`
+		ProjectID      string  `json:"projectId,omitempty"`
+		Replicas       int     `json:"replicas,omitempty"`
+		Status         string  `json:"status,omitempty"`
+		Storage        Storage `json:"storage,omitempty"`
+		Users          []struct {
 			Database string   `json:"database,omitempty"`
 			Hostname string   `json:"hostname,omitempty"`
 			ID       string   `json:"id,omitempty"`
@@ -72,6 +76,32 @@ type Instance struct {
 		} `json:"users,omitempty"`
 		Version string `json:"version,omitempty"`
 	} `json:"item,omitempty"`
+}
+
+// CreateRequest holds data for requesting new instance
+type CreateRequest struct {
+	ACL struct {
+		Items []string `json:"items"`
+	} `json:"acl"`
+	BackupSchedule string            `json:"backupSchedule"`
+	FlavorID       string            `json:"flavorId"`
+	Labels         map[string]string `json:"labels"`
+	Name           string            `json:"name"`
+	Options        map[string]string `json:"options"`
+	Replicas       int               `json:"replicas"`
+	Storage        Storage           `json:"storage"`
+	Version        string            `json:"version"`
+}
+
+// ACL is the access list
+type ACL struct {
+	Items []string `json:"items"`
+}
+
+// Storage represents the instance storage configuration
+type Storage struct {
+	Class string `json:"class"`
+	Size  int    `json:"size"`
 }
 
 // CreateResponse is the server response when creating a new Instance
@@ -92,7 +122,7 @@ func (svc *MongoDBInstancesService) List(ctx context.Context, projectID string) 
 
 // Get returns the instance information by project and instance IDs
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/get
-func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instanceID string) (res Instance, err error) {
+func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instanceID string) (res InstanceResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathWithInstanceID, projectID, instanceID), nil)
 	if err != nil {
 		return
@@ -101,17 +131,42 @@ func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instance
 	return
 }
 
+func (svc *MongoDBInstancesService) buildRequest(instanceName, flavorID string, storage Storage, version string, replicas int, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
+	return json.Marshal(CreateRequest{
+		Name:           instanceName,
+		FlavorID:       flavorID,
+		Storage:        storage,
+		BackupSchedule: backupSchedule,
+		Version:        version,
+		Replicas:       replicas,
+		Labels:         labels,
+		Options:        options,
+		ACL:            acl,
+	})
+}
+
 // Create creates a new MongoDB instance and returns the server response (CreateResponse) and a wait handler
 // which upon call to `Wait()` will wait until the instance is successfully created
 // Wait() returns the full instance details (Instance) and error if it occurred
 // See also https://api.stackit.schwarz/argus-monitoring-service/openapi.v1.html#operation/v1_projects_instances_create
-func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, instanceName, planID string, params map[string]string) (res CreateResponse, w *wait.Handler, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID), nil)
+func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, instanceName, flavorID string,
+	storage Storage, version string, replicas int,
+	backupSchedule string, labels, options map[string]string, acl ACL,
+) (res CreateResponse, w *wait.Handler, err error) {
+
+	// build body
+	data, _ := svc.buildRequest(instanceName, flavorID, storage, version, replicas, backupSchedule, labels, options, acl)
+
+	// prepare request
+	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID), data)
 	if err != nil {
 		return
 	}
 
+	// do request
 	_, err = svc.Client.Do(req, &res)
+
+	// create Wait service
 	w = wait.New(svc.waitForCreation(ctx, projectID, res.ID))
 	w.SetTimeout(1 * time.Hour)
 	return res, w, err
@@ -123,9 +178,9 @@ func (svc *MongoDBInstancesService) waitForCreation(ctx context.Context, project
 		if err != nil {
 			return nil, false, err
 		}
-		if s.Item.Status == "" {
-			return s, true, nil
+		if s.Item.Status == consts.MONGODB_STATUS_READY {
+			return s.Item, true, nil
 		}
-		return s, false, nil
+		return s.Item, false, nil
 	}
 }
