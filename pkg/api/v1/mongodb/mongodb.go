@@ -7,6 +7,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/users"
 )
 
 // New returns a new handler for the service
@@ -14,6 +15,7 @@ func New(c common.Client) *MongoDBService {
 	return &MongoDBService{
 		Instances: instances.New(c),
 		Options:   options.New(c),
+		Users:     users.New(c),
 	}
 }
 
@@ -22,4 +24,5 @@ func New(c common.Client) *MongoDBService {
 type MongoDBService struct {
 	Instances *instances.MongoDBInstancesService
 	Options   *options.MongoDBOptionsService
+	Users     *users.MongoDBUsersService
 }
