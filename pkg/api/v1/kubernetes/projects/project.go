@@ -48,7 +48,7 @@ func (svc *KubernetesProjectsService) Get(ctx context.Context, projectID string)
 	return
 }
 
-// Create creates an SKE project
+// Create creates a SKE project
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_GetProject
 func (svc *KubernetesProjectsService) Create(ctx context.Context, projectID string) (res KubernetesProjectsResponse, w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPath, projectID), nil)
@@ -88,7 +88,7 @@ func (svc *KubernetesProjectsService) waitForCreation(ctx context.Context, proje
 	}
 }
 
-// Delete deletes an SKE project
+// Delete deletes a SKE project
 // IMPORTANT: existing clusters to be automatically deleted
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_GetProject
 func (svc *KubernetesProjectsService) Delete(ctx context.Context, projectID string) (w *wait.Handler, err error) {

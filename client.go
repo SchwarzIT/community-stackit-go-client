@@ -18,6 +18,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/roles"
@@ -75,6 +76,7 @@ type ProductiveServices struct {
 // IncubatorServices is the struct representing all services that are under development
 type IncubatorServices struct {
 	Membership      *membership.MembershipService
+	MongoDB         *mongodb.MongoDBService
 	ResourceManager *resourceManager.ResourceManagerService
 }
 
@@ -94,6 +96,7 @@ func (c *Client) init() *Client {
 	// init incubator services
 	c.Incubator = IncubatorServices{
 		Membership:      membership.New(c),
+		MongoDB:         mongodb.New(c),
 		ResourceManager: resourceManager.New(c),
 	}
 	return c

@@ -260,7 +260,7 @@ func (svc *KubernetesClusterService) buildCreateRequest(
 	})
 }
 
-// Delete deletes an SKE cluster
+// Delete deletes a SKE cluster
 // See also https://api.stackit.schwarz/ske-service/openapi.v1.html#operation/SkeService_DeleteCluster
 // Wait for deletion to complete by running the returned wait functionality `wait.Wait()`
 func (svc *KubernetesClusterService) Delete(ctx context.Context, projectID, clusterName string) (w *wait.Handler, err error) {
