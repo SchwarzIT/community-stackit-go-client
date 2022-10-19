@@ -246,7 +246,7 @@ func (svc *MongoDBInstancesService) buildUpdateRequest(flavorID string, backupSc
 	})
 }
 
-// Delete deletes a MongoDB instance and returns a wait handler and error if occured
+// Delete deletes a MongoDB instance and returns a wait handler and error if occurred
 // `Wait()` will wait until the instance is successfully deleted
 // Wait() returns nil (empty response from server) and error if it occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/put

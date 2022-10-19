@@ -102,7 +102,7 @@ func (svc *MongoDBUsersService) Get(ctx context.Context, projectID, instanceID, 
 	return
 }
 
-// Create adds a new MongoDB user and returns the server response (CreateResponse) and error if ocurred
+// Create adds a new MongoDB user and returns the server response (CreateResponse) and error if occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/user/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/post
 func (svc *MongoDBUsersService) Create(ctx context.Context, projectID, instanceID, userID, username, database string, roles []string) (res CreateResponse, err error) {
 
