@@ -36,11 +36,14 @@ type VersionsResponse struct {
 
 // GetStorageResponse is the API response for the storage range for a StorageClass
 type GetStorageResponse struct {
-	StorageClasses []string `json:"storageClasses,omitempty"`
-	StorageRange   struct {
-		Max int `json:"max,omitempty"`
-		Min int `json:"min,omitempty"`
-	} `json:"storageRange,omitempty"`
+	StorageClasses []string     `json:"storageClasses,omitempty"`
+	StorageRange   StorageRange `json:"storageRange,omitempty"`
+}
+
+// StorageRange represents the storage size range
+type StorageRange struct {
+	Max int `json:"max,omitempty"`
+	Min int `json:"min,omitempty"`
 }
 
 // GetFlavorsResponse is the server response to GetFlavors call
@@ -83,8 +86,8 @@ func (svc *MongoDBOptionsService) GetFlavors(ctx context.Context, projectID stri
 
 // GetStorage returns available storage reange for a given flavor
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#/paths/~1projects~1{projectId}~1versions/get
-func (svc *MongoDBOptionsService) GetStorage(ctx context.Context, projectID, flavor string) (res GetStorageResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathStorage, projectID, flavor), nil)
+func (svc *MongoDBOptionsService) GetStorage(ctx context.Context, projectID, flavorID string) (res GetStorageResponse, err error) {
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathStorage, projectID, flavorID), nil)
 	if err != nil {
 		return
 	}
