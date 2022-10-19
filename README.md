@@ -21,7 +21,7 @@ To get started, a Service Account[^1] and a Customer Account[^2] must be in plac
 
 If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
 
-```
+```Go
 package main
 
 import (
@@ -69,29 +69,9 @@ The client can automatically retry failed calls using `pkg/retry`
 
 To enable retry in the client, use `SetRetry` in the following way:
 
-```
-package main
-
-import (
-	"context"
-	"os"
-
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
-)
-
-func main() {
-	c, err := client.New(context.Background(), &client.Config{
-		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
-		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:   os.Getenv("STACKIT_ORGANIZATION_ID"),
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	c.SetRetry(retry.New())
-}
+```Go
+c, _ := client.New(context.Background(), &client.Config{})
+c.SetRetry(retry.New())
 ```
 
 
