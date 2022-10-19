@@ -5,6 +5,7 @@ package instances
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -35,12 +36,15 @@ type MongoDBInstancesService common.Service
 
 // ListResponse represents a list of instances returned from the server
 type ListResponse struct {
-	Count int `json:"count,omitempty"`
-	Items []struct {
-		ID        string `json:"id,omitempty"`
-		Name      string `json:"name,omitempty"`
-		ProjectID string `json:"projectId,omitempty"`
-	} `json:"items,omitempty"`
+	Count int                `json:"count,omitempty"`
+	Items []ListResponseItem `json:"items,omitempty"`
+}
+
+// ListResponseItem is an item in the response item list
+type ListResponseItem struct {
+	ID        string `json:"id,omitempty"`
+	Name      string `json:"name,omitempty"`
+	ProjectID string `json:"projectId,omitempty"`
 }
 
 // Flavor is a signle falvor struct
@@ -52,8 +56,13 @@ type Flavor struct {
 	Memory      int      `json:"memory,omitempty"`
 }
 
-// InstanceResponse is the server response for Get call
-type InstanceResponse struct {
+// GetResponse is the server response for Get call
+type GetResponse struct {
+	Item Instance `json:"item,omitempty"`
+}
+
+// UpdateResponse is the server response for an Update call
+type UpdateResponse struct {
 	Item Instance `json:"item,omitempty"`
 }
 
@@ -135,7 +144,7 @@ func (svc *MongoDBInstancesService) List(ctx context.Context, projectID string) 
 
 // Get returns the instance information by project and instance IDs
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/get
-func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instanceID string) (res InstanceResponse, err error) {
+func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instanceID string) (res GetResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, projectID, instanceID), nil)
 	if err != nil {
 		return
@@ -194,6 +203,9 @@ func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, p
 		if s.Item.Status == consts.MONGODB_STATUS_READY {
 			return s.Item, true, nil
 		}
+		if s.Item.Status == consts.MONGODB_STATUS_FAILED {
+			return s.Item, false, errors.New("received status FAILED from server")
+		}
 		return s.Item, false, nil
 	}
 }
@@ -204,7 +216,7 @@ func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, p
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/put
 func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, instanceID, flavorID string,
 	backupSchedule string, labels, options map[string]string, acl ACL,
-) (res CreateResponse, w *wait.Handler, err error) {
+) (res UpdateResponse, w *wait.Handler, err error) {
 
 	// build body
 	data, _ := svc.buildUpdateRequest(flavorID, backupSchedule, labels, options, acl)
