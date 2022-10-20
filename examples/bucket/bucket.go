@@ -9,7 +9,8 @@ import (
 )
 
 func main() {
-	c, err := client.New(context.Background(), &client.Config{
+	ctx := context.Background()
+	c, err := client.New(ctx, &client.Config{
 		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
 		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
 		OrganizationID:   os.Getenv("STACKIT_ORGANIZATION_ID"),
@@ -18,10 +19,10 @@ func main() {
 		panic(err)
 	}
 
-	projectID := "1234-56789-101112"
+	projectID := "1234"
 	bucketName := "example"
 
-	process, err := c.ObjectStorage.Buckets.Create(context.TODO(), projectID, bucketName)
+	process, err := c.ObjectStorage.Buckets.Create(ctx, projectID, bucketName)
 	if err != nil {
 		panic(err)
 	}

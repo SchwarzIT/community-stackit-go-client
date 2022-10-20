@@ -20,6 +20,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/roles"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/users"
@@ -77,6 +78,7 @@ type ProductiveServices struct {
 type IncubatorServices struct {
 	Membership      *membership.MembershipService
 	MongoDB         *mongodb.MongoDBService
+	Postgres        *postgres.PostgresService
 	ResourceManager *resourceManager.ResourceManagerService
 }
 
@@ -97,6 +99,7 @@ func (c *Client) init() *Client {
 	c.Incubator = IncubatorServices{
 		Membership:      membership.New(c),
 		MongoDB:         mongodb.New(c),
+		Postgres:        postgres.New(c),
 		ResourceManager: resourceManager.New(c),
 	}
 	return c

@@ -1,4 +1,4 @@
-// package users is used to manange MongoDB Flex users
+// package users is used to manange Postgres Flex users
 
 package users
 
@@ -14,20 +14,20 @@ import (
 
 // constants
 const (
-	apiPathList   = consts.API_PATH_MONGO_DB_FLEX_USERS
-	apiPathCreate = consts.API_PATH_MONGO_DB_FLEX_USER
-	apiPathGet    = consts.API_PATH_MONGO_DB_FLEX_USER
+	apiPathList   = consts.API_PATH_POSTGRES_FLEX_USERS
+	apiPathCreate = consts.API_PATH_POSTGRES_FLEX_USER
+	apiPathGet    = consts.API_PATH_POSTGRES_FLEX_USER
 )
 
 // New returns a new handler for the service
-func New(c common.Client) *MongoDBUsersService {
-	return &MongoDBUsersService{
+func New(c common.Client) *PostgresUsersService {
+	return &PostgresUsersService{
 		Client: c,
 	}
 }
 
-// MongoDBUsersService is the service that manages MongoDB Flex instances
-type MongoDBUsersService common.Service
+// PostgresUsersService is the service that manages Postgres Flex instances
+type PostgresUsersService common.Service
 
 // ListResponse represents a list of users returned from the server
 type ListResponse struct {
@@ -80,9 +80,9 @@ type CreateResponse struct {
 	Item User `json:"item,omitempty"`
 }
 
-// List returns a list of MongoDB Flex users
-// See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/user/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users/get
-func (svc *MongoDBUsersService) List(ctx context.Context, projectID, instanceID string) (res ListResponse, err error) {
+// List returns a list of Postgres Flex users
+// See also https://api.stackit.schwarz/postgres-flex-service/openapi.html#tag/users/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users/get
+func (svc *PostgresUsersService) List(ctx context.Context, projectID, instanceID string) (res ListResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID, instanceID), nil)
 	if err != nil {
 		return
@@ -92,8 +92,8 @@ func (svc *MongoDBUsersService) List(ctx context.Context, projectID, instanceID 
 }
 
 // Get returns the user information by project, instance ID and user ID
-// See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/user/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/get
-func (svc *MongoDBUsersService) Get(ctx context.Context, projectID, instanceID, userID string) (res GetResponse, err error) {
+// See also https://api.stackit.schwarz/postgres-flex-service/openapi.html#tag/users/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/get
+func (svc *PostgresUsersService) Get(ctx context.Context, projectID, instanceID, userID string) (res GetResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, projectID, instanceID, userID), nil)
 	if err != nil {
 		return
@@ -102,9 +102,9 @@ func (svc *MongoDBUsersService) Get(ctx context.Context, projectID, instanceID, 
 	return
 }
 
-// Create adds a new MongoDB user and returns the server response (CreateResponse) and error if occurred
-// See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/user/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/post
-func (svc *MongoDBUsersService) Create(ctx context.Context, projectID, instanceID, userID, username, database string, roles []string) (res CreateResponse, err error) {
+// Create adds a new Postgres user and returns the server response (CreateResponse) and error if occurred
+// See also https://api.stackit.schwarz/postgres-flex-service/openapi.html#tag/users/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/post
+func (svc *PostgresUsersService) Create(ctx context.Context, projectID, instanceID, userID, username, database string, roles []string) (res CreateResponse, err error) {
 
 	// build body
 	data, _ := svc.buildCreateRequest(username, database, roles)
@@ -120,7 +120,7 @@ func (svc *MongoDBUsersService) Create(ctx context.Context, projectID, instanceI
 	return
 }
 
-func (svc *MongoDBUsersService) buildCreateRequest(username, database string, roles []string) ([]byte, error) {
+func (svc *PostgresUsersService) buildCreateRequest(username, database string, roles []string) ([]byte, error) {
 	return json.Marshal(CreateRequest{
 		Username: username,
 		Database: database,
