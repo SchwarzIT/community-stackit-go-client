@@ -76,7 +76,7 @@ const (
 	API_PATH_MONGO_DB_FLEX_USERS     = API_PATH_MONGO_DB_FLEX_INSTANCE + "/users"
 	API_PATH_MONGO_DB_FLEX_USER      = API_PATH_MONGO_DB_FLEX_USERS + "/%s"
 
-	// PostgresDB Flex
+	// Postgres Flex
 	API_PATH_POSTGRES_FLEX                  = "/postgres/v1/projects/%s"
 	API_PATH_POSTGRES_FLEX_VERSIONS         = API_PATH_POSTGRES_FLEX + "/versions"
 	API_PATH_POSTGRES_FLEX_STORAGES         = API_PATH_MONGO_DB_FLEX + "/storages/%s"

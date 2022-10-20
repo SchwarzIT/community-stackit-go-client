@@ -78,7 +78,7 @@ type ProductiveServices struct {
 type IncubatorServices struct {
 	Membership      *membership.MembershipService
 	MongoDB         *mongodb.MongoDBService
-	PostgresDB      *postgres.PostgresService
+	Postgres        *postgres.PostgresService
 	ResourceManager *resourceManager.ResourceManagerService
 }
 
@@ -99,7 +99,7 @@ func (c *Client) init() *Client {
 	c.Incubator = IncubatorServices{
 		Membership:      membership.New(c),
 		MongoDB:         mongodb.New(c),
-		PostgresDB:      postgres.New(c),
+		Postgres:        postgres.New(c),
 		ResourceManager: resourceManager.New(c),
 	}
 	return c

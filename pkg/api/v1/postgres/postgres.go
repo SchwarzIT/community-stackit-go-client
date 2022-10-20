@@ -5,6 +5,7 @@ package postgres
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/users"
 )
@@ -12,14 +13,16 @@ import (
 // New returns a new handler for the service
 func New(c common.Client) *PostgresService {
 	return &PostgresService{
-		Options: options.New(c),
-		Users:   users.New(c),
+		Instances: instances.New(c),
+		Options:   options.New(c),
+		Users:     users.New(c),
 	}
 }
 
 // PostgresService is the service that handles
 // Postgres Flex related services, such as instances & users
 type PostgresService struct {
-	Options *options.PostgresOptionsService
-	Users   *users.PostgresUsersService
+	Instances *instances.PostgresInstancesService
+	Options   *options.PostgresOptionsService
+	Users     *users.PostgresUsersService
 }

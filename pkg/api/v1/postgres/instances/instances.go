@@ -1,4 +1,4 @@
-// package instances is used to manange MongoDB Flex instances
+// package instances is used to manange Postgres Flex instances
 
 package instances
 
@@ -18,21 +18,21 @@ import (
 
 // constants
 const (
-	apiPathList   = consts.API_PATH_MONGO_DB_FLEX_INSTANCES
-	apiPathCreate = consts.API_PATH_MONGO_DB_FLEX_INSTANCES
-	apiPathGet    = consts.API_PATH_MONGO_DB_FLEX_INSTANCE
-	apiPathUpdate = consts.API_PATH_MONGO_DB_FLEX_INSTANCE
+	apiPathList   = consts.API_PATH_POSTGRES_FLEX_INSTANCES
+	apiPathCreate = consts.API_PATH_POSTGRES_FLEX_INSTANCES
+	apiPathGet    = consts.API_PATH_POSTGRES_FLEX_INSTANCE
+	apiPathUpdate = consts.API_PATH_POSTGRES_FLEX_INSTANCE
 )
 
 // New returns a new handler for the service
-func New(c common.Client) *MongoDBInstancesService {
-	return &MongoDBInstancesService{
+func New(c common.Client) *PostgresInstancesService {
+	return &PostgresInstancesService{
 		Client: c,
 	}
 }
 
-// MongoDBInstancesService is the service that manages MongoDB Flex instances
-type MongoDBInstancesService common.Service
+// PostgresInstancesService is the service that manages Postgres Flex instances
+type PostgresInstancesService common.Service
 
 // ListResponse represents a list of instances returned from the server
 type ListResponse struct {
@@ -131,9 +131,9 @@ type UpdateRequest struct {
 	Options        map[string]string `json:"options"`
 }
 
-// List returns a list of MongoDB Flex instances in project
-// See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances/get
-func (svc *MongoDBInstancesService) List(ctx context.Context, projectID string) (res ListResponse, err error) {
+// List returns a list of Postgres Flex instances in project
+// See also https://api.stackit.schwarz/postgres-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances/get
+func (svc *PostgresInstancesService) List(ctx context.Context, projectID string) (res ListResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID), nil)
 	if err != nil {
 		return
@@ -144,7 +144,7 @@ func (svc *MongoDBInstancesService) List(ctx context.Context, projectID string) 
 
 // Get returns the instance information by project and instance IDs
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/get
-func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instanceID string) (res GetResponse, err error) {
+func (svc *PostgresInstancesService) Get(ctx context.Context, projectID, instanceID string) (res GetResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, projectID, instanceID), nil)
 	if err != nil {
 		return
@@ -153,11 +153,11 @@ func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instance
 	return
 }
 
-// Create creates a new MongoDB instance and returns the server response (CreateResponse) and a wait handler
+// Create creates a new Postgres instance and returns the server response (CreateResponse) and a wait handler
 // which upon call to `Wait()` will wait until the instance is successfully created
 // Wait() returns the full instance details (Instance) and error if it occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances/post
-func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, instanceName, flavorID string,
+func (svc *PostgresInstancesService) Create(ctx context.Context, projectID, instanceName, flavorID string,
 	storage Storage, version string, replicas int,
 	backupSchedule string, labels, options map[string]string, acl ACL,
 ) (res CreateResponse, w *wait.Handler, err error) {
@@ -180,7 +180,7 @@ func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, insta
 	return res, w, err
 }
 
-func (svc *MongoDBInstancesService) buildCreateRequest(instanceName, flavorID string, storage Storage, version string, replicas int, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
+func (svc *PostgresInstancesService) buildCreateRequest(instanceName, flavorID string, storage Storage, version string, replicas int, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
 	return json.Marshal(CreateRequest{
 		Name:           instanceName,
 		FlavorID:       flavorID,
@@ -194,27 +194,28 @@ func (svc *MongoDBInstancesService) buildCreateRequest(instanceName, flavorID st
 	})
 }
 
-func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+// seems like status isn't part of the API (yet?) needs to be clarified
+func (svc *PostgresInstancesService) waitForCreateOrUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
 		}
-		if s.Item.Status == consts.MONGO_DB_STATUS_READY {
+		if s.Item.Status == consts.POSTGRES_STATUS_READY || s.Item.Status == "" {
 			return s.Item, true, nil
 		}
-		if s.Item.Status == consts.MONGO_DB_STATUS_FAILED {
+		if s.Item.Status == consts.POSTGRES_STATUS_FAILED {
 			return s.Item, false, errors.New("received status FAILED from server")
 		}
 		return s.Item, false, nil
 	}
 }
 
-// Update updates a MongoDB instance and returns the server response (UpdateResponse) and a wait handler
+// Update updates a Postgres instance and returns the server response (UpdateResponse) and a wait handler
 // which upon call to `Wait()` will wait until the instance is successfully updated
 // Wait() returns the full instance details (Instance) and error if it occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/put
-func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, instanceID, flavorID string,
+func (svc *PostgresInstancesService) Update(ctx context.Context, projectID, instanceID, flavorID string,
 	backupSchedule string, labels, options map[string]string, acl ACL,
 ) (res UpdateResponse, w *wait.Handler, err error) {
 
@@ -236,7 +237,7 @@ func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, insta
 	return res, w, err
 }
 
-func (svc *MongoDBInstancesService) buildUpdateRequest(flavorID string, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
+func (svc *PostgresInstancesService) buildUpdateRequest(flavorID string, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
 	return json.Marshal(UpdateRequest{
 		FlavorID:       flavorID,
 		BackupSchedule: backupSchedule,
@@ -246,11 +247,11 @@ func (svc *MongoDBInstancesService) buildUpdateRequest(flavorID string, backupSc
 	})
 }
 
-// Delete deletes a MongoDB instance and returns a wait handler and error if occurred
+// Delete deletes a Postgres instance and returns a wait handler and error if occurred
 // `Wait()` will wait until the instance is successfully deleted
 // Wait() returns nil (empty response from server) and error if it occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/put
-func (svc *MongoDBInstancesService) Delete(ctx context.Context, projectID, instanceID string) (w *wait.Handler, err error) {
+func (svc *PostgresInstancesService) Delete(ctx context.Context, projectID, instanceID string) (w *wait.Handler, err error) {
 	// prepare request
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathUpdate, projectID, instanceID), nil)
 	if err != nil {
@@ -266,7 +267,7 @@ func (svc *MongoDBInstancesService) Delete(ctx context.Context, projectID, insta
 	return w, err
 }
 
-func (svc *MongoDBInstancesService) waitForDeletion(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+func (svc *PostgresInstancesService) waitForDeletion(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		if _, err := svc.Get(ctx, projectID, instanceID); err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
