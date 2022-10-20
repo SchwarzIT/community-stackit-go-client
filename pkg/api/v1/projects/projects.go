@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -159,6 +160,9 @@ func (svc *ProjectService) waitForCreation(ctx context.Context, projectID string
 	return func() (res interface{}, done bool, err error) {
 		state, err := svc.GetLifecycleState(ctx, projectID)
 		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
+				return state, false, nil
+			}
 			return state, false, err
 		}
 		if state != consts.PROJECT_STATUS_ACTIVE {
