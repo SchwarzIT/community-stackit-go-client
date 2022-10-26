@@ -8,10 +8,12 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 // constants
@@ -92,7 +94,7 @@ type ProjectsResponse struct {
 
 // Create creates a new STACKIT project
 // See also https://api.stackit.schwarz/resource-management/openapi.v2.html#operation/post-projects
-func (svc *ProjectsService) Create(ctx context.Context, name string, labels map[string]string, members ...ProjectMember) (res ProjectResponse, err error) {
+func (svc *ProjectsService) Create(ctx context.Context, name string, labels map[string]string, members ...ProjectMember) (res ProjectResponse, w *wait.Handler, err error) {
 	if err = svc.ValidateCreateData(name, labels, members); err != nil {
 		err = validate.WrapError(err)
 		return
@@ -105,6 +107,7 @@ func (svc *ProjectsService) Create(ctx context.Context, name string, labels map[
 	}
 
 	_, err = svc.Client.Do(req, &res)
+	w = wait.New(svc.waitForCreation(ctx, res.ContainerID))
 	return
 }
 
@@ -115,6 +118,25 @@ func (svc *ProjectsService) buildCreateRequest(name string, labels map[string]st
 		Members:  members,
 		Labels:   labels,
 	})
+}
+
+func (svc *ProjectsService) waitForCreation(ctx context.Context, containerID string) wait.WaitFn {
+	return func() (res interface{}, done bool, err error) {
+		state, err := svc.GetLifecycleState(ctx, containerID)
+		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
+				return state, false, nil
+			}
+			return state, false, err
+		}
+		switch state {
+		case consts.PROJECT_STATUS_ACTIVE:
+			return state, true, nil
+		case consts.PROJECT_STATUS_CREATING:
+			return state, false, nil
+		}
+		return state, false, fmt.Errorf("received project state '%s'. aborting", state)
+	}
 }
 
 // Get returns the project by id
@@ -213,11 +235,22 @@ func (svc *ProjectsService) buildUpdateRequest(name, containerParentID string, l
 
 // Delete deletes a project by ID
 // See also https://api.stackit.schwarz/resource-management/openapi.v2.html#operation/delete-projects-containerId
-func (svc *ProjectsService) Delete(ctx context.Context, containerID string) (err error) {
+func (svc *ProjectsService) Delete(ctx context.Context, containerID string) (w *wait.Handler, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathProject, containerID), nil)
 	if err != nil {
 		return
 	}
 	_, err = svc.Client.Do(req, nil)
-	return err
+	w = wait.New(svc.waitForDeletion(ctx, containerID))
+	return
+}
+
+func (svc *ProjectsService) waitForDeletion(ctx context.Context, containerID string) wait.WaitFn {
+	return func() (interface{}, bool, error) {
+		state, err := svc.GetLifecycleState(ctx, containerID)
+		if err != nil {
+			return state, true, nil
+		}
+		return state, false, nil
+	}
 }
