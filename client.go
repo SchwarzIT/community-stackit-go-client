@@ -114,13 +114,13 @@ func (c *Client) GetConfig() *Config {
 }
 
 func (c *Client) SetToken(token string) {
-	c.config.Token = token
+	c.config.ServiceAccountToken = token
 }
 
 // setHttpClient creates the client's oauth client
 func (c *Client) setHttpClient(ctx context.Context) {
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: c.config.Token},
+		&oauth2.Token{AccessToken: c.config.ServiceAccountToken},
 	)
 	hcl := oauth2.NewClient(ctx, ts)
 	hcl.Timeout = time.Second * 10
@@ -215,10 +215,10 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 	u, _ := url.Parse(server.URL)
 
 	c, err = New(context.Background(), &Config{
-		BaseUrl:          u,
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		BaseUrl:             u,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
+		OrganizationID:      consts.SCHWARZ_ORGANIZATION_ID,
 	})
 
 	return

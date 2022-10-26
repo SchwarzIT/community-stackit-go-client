@@ -5,7 +5,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
 
@@ -24,9 +24,9 @@ func LocalClient() (*client.Client, error) {
 	}
 
 	return client.New(context.Background(), &client.Config{
-		ServiceAccountID: aid,
-		Token:            ato,
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		ServiceAccountEmail: aid,
+		ServiceAccountToken: ato,
+		OrganizationID:      consts.SCHWARZ_ORGANIZATION_ID,
 	})
 }
 

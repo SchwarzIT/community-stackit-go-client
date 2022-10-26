@@ -9,10 +9,10 @@ import (
 
 func TestConfig_Validate(t *testing.T) {
 	type fields struct {
-		BaseUrl          *url.URL
-		Token            string
-		ServiceAccountID string
-		OrganizationID   string
+		BaseUrl             *url.URL
+		Token               string
+		ServiceAccountEmail string
+		OrganizationID      string
 	}
 	tests := []struct {
 		name    string
@@ -21,16 +21,16 @@ func TestConfig_Validate(t *testing.T) {
 	}{
 		{"empty token", fields{}, true},
 		{"empty service account id", fields{Token: "a"}, true},
-		{"empty org id", fields{Token: "a", ServiceAccountID: consts.SCHWARZ_ORGANIZATION_ID}, true},
-		{"all ok", fields{Token: "a", ServiceAccountID: consts.SCHWARZ_ORGANIZATION_ID, OrganizationID: consts.SCHWARZ_ORGANIZATION_ID}, false},
+		{"empty org id", fields{Token: "a", ServiceAccountEmail: consts.SCHWARZ_ORGANIZATION_ID}, true},
+		{"all ok", fields{Token: "a", ServiceAccountEmail: consts.SCHWARZ_ORGANIZATION_ID, OrganizationID: consts.SCHWARZ_ORGANIZATION_ID}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Config{
-				BaseUrl:          tt.fields.BaseUrl,
-				Token:            tt.fields.Token,
-				ServiceAccountID: tt.fields.ServiceAccountID,
-				OrganizationID:   tt.fields.OrganizationID,
+				BaseUrl:             tt.fields.BaseUrl,
+				ServiceAccountToken: tt.fields.Token,
+				ServiceAccountEmail: tt.fields.ServiceAccountEmail,
+				OrganizationID:      tt.fields.OrganizationID,
 			}
 			if err := c.Validate(); (err != nil) != tt.wantErr {
 				t.Errorf("Config.Validate() error = %v, wantErr %v", err, tt.wantErr)
@@ -41,10 +41,10 @@ func TestConfig_Validate(t *testing.T) {
 
 func TestConfig_SetURL(t *testing.T) {
 	type fields struct {
-		BaseUrl          *url.URL
-		Token            string
-		ServiceAccountID string
-		OrganizationID   string
+		BaseUrl             *url.URL
+		Token               string
+		ServiceAccountEmail string
+		OrganizationID      string
 	}
 	type args struct {
 		value string
@@ -60,10 +60,10 @@ func TestConfig_SetURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Config{
-				BaseUrl:          tt.fields.BaseUrl,
-				Token:            tt.fields.Token,
-				ServiceAccountID: tt.fields.ServiceAccountID,
-				OrganizationID:   tt.fields.OrganizationID,
+				BaseUrl:             tt.fields.BaseUrl,
+				ServiceAccountToken: tt.fields.Token,
+				ServiceAccountEmail: tt.fields.ServiceAccountEmail,
+				OrganizationID:      tt.fields.OrganizationID,
 			}
 			if err := c.SetURL(tt.args.value); (err != nil) != tt.wantErr {
 				t.Errorf("Config.SetURL() error = %v, wantErr %v", err, tt.wantErr)

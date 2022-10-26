@@ -17,9 +17,9 @@ import (
 
 func TestNew(t *testing.T) {
 	cfg := &Config{
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
+		OrganizationID:      consts.SCHWARZ_ORGANIZATION_ID,
 	}
 	type args struct {
 		ctx context.Context
@@ -32,8 +32,8 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{"no token", args{context.Background(), &Config{}}, &Client{}, true},
-		{"no sa id", args{context.Background(), &Config{Token: "token"}}, &Client{}, true},
-		{"no org id", args{context.Background(), &Config{Token: "token", ServiceAccountID: "sa-id"}}, &Client{}, true},
+		{"no sa id", args{context.Background(), &Config{ServiceAccountToken: "token"}}, &Client{}, true},
+		{"no org id", args{context.Background(), &Config{ServiceAccountToken: "token", ServiceAccountEmail: "sa-id"}}, &Client{}, true},
 		{"all ok", args{context.Background(), cfg}, &Client{config: cfg}, false},
 	}
 	for _, tt := range tests {
@@ -52,9 +52,9 @@ func TestNew(t *testing.T) {
 
 func TestClient_Request(t *testing.T) {
 	cfg := &Config{
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
+		OrganizationID:      consts.SCHWARZ_ORGANIZATION_ID,
 	}
 	c, err := New(context.Background(), cfg)
 	if err != nil {
@@ -164,9 +164,9 @@ func TestClient_Do(t *testing.T) {
 
 func TestClient_OrganizationID(t *testing.T) {
 	cfg := &Config{
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
+		OrganizationID:      consts.SCHWARZ_ORGANIZATION_ID,
 	}
 	type fields struct {
 		config *Config
@@ -258,13 +258,13 @@ func TestClient_SetToken(t *testing.T) {
 	type args struct {
 		token string
 	}
-	c := &Config{Token: "abc"}
+	c := &Config{ServiceAccountToken: "abc"}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
 	}{
-		{"all ok", fields{config: c}, args{token: c.Token}},
+		{"all ok", fields{config: c}, args{token: c.ServiceAccountToken}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

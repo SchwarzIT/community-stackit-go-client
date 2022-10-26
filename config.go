@@ -13,10 +13,10 @@ import (
 
 // Config is the STACKIT client configuration
 type Config struct {
-	BaseUrl          *url.URL
-	Token            string
-	ServiceAccountID string
-	OrganizationID   string
+	BaseUrl             *url.URL
+	ServiceAccountToken string
+	ServiceAccountEmail string
+	OrganizationID      string
 }
 
 // Validate verifies that the given config is valid
@@ -25,12 +25,12 @@ func (c *Config) Validate() error {
 		c.SetURL("") // set default
 	}
 
-	if c.Token == "" {
-		return errors.New("STACKIT API: access token is empty")
+	if c.ServiceAccountToken == "" {
+		return errors.New("STACKIT API: Service Account Access Token is empty")
 	}
 
-	if c.ServiceAccountID == "" {
-		return errors.New("STACKIT API: service account ID cannot be empty")
+	if c.ServiceAccountEmail == "" {
+		return errors.New("STACKIT API: Service Account Email cannot be empty")
 	}
 
 	if err := validate.OrganizationID(c.OrganizationID); err != nil {
