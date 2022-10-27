@@ -225,7 +225,7 @@ func TestProjectsService_Create(t *testing.T) {
 	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, w, err := p.Create(tt.args.ctx, tt.args.name, tt.args.labels, tt.args.members...)
+			gotRes, w, err := p.Create(tt.args.ctx, "54066bf4-1aff-4f7b-9f83-fb23c348fee3", tt.args.name, tt.args.labels, tt.args.members...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ProjectsService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -238,6 +238,11 @@ func TestProjectsService_Create(t *testing.T) {
 			}
 		})
 	}
+
+	testCreationWait(t, mux, process, want)
+}
+
+func testCreationWait(t *testing.T, mux *http.ServeMux, process *wait.Handler, want projects.ProjectResponse) {
 
 	baseDuration := 200 * time.Millisecond
 	ctx1, td1 := context.WithTimeout(context.Background(), 1*baseDuration)

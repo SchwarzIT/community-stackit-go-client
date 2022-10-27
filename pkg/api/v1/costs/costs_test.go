@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
@@ -64,7 +64,7 @@ func TestCostsService_GetCustomerAccountCosts(t *testing.T) {
 
 		from := time.Date(int(2022), time.May, int(22), int(0), int(0), int(0), int(0), time.UTC)
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
-		resp, err := costsSvc.GetCustomerAccountCosts(context.Background(), from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
+		resp, err := costsSvc.GetCustomerAccountCosts(context.Background(), "07a1ed91-2efb-42c2-9d00-e84ae71bce0d", from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
 
 		if err != nil {
 			t.Errorf("wanted no error, got %v", err)
@@ -88,7 +88,7 @@ func TestCostsService_GetCustomerAccountCosts(t *testing.T) {
 
 		from := time.Date(int(2022), time.May, int(22), int(0), int(0), int(0), int(0), time.UTC)
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
-		_, err := costsSvc.GetCustomerAccountCosts(context.Background(), from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
+		_, err := costsSvc.GetCustomerAccountCosts(context.Background(), "07a1ed91-2efb-42c2-9d00-e84ae71bce0d", from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
 
 		if err == nil {
 			t.Errorf("wanted error, got nil")
@@ -108,7 +108,7 @@ func TestCostsService_GetCustomerAccountCosts(t *testing.T) {
 
 		from := time.Date(int(2022), time.May, int(22), int(0), int(0), int(0), int(0), time.UTC)
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
-		_, err := costsSvc.GetCustomerAccountCosts(context.Background(), from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
+		_, err := costsSvc.GetCustomerAccountCosts(context.Background(), "07a1ed91-2efb-42c2-9d00-e84ae71bce0d", from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
 
 		if err == nil {
 			t.Errorf("wanted error, got nil")
@@ -132,7 +132,7 @@ func TestCostsService_GetCustomerAccountCosts(t *testing.T) {
 
 		from := time.Date(int(2022), time.May, int(22), int(0), int(0), int(0), int(0), time.UTC)
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
-		_, err := costsSvc.GetCustomerAccountCosts(ctx, from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
+		_, err := costsSvc.GetCustomerAccountCosts(ctx, "07a1ed91-2efb-42c2-9d00-e84ae71bce0d", from, to, consts.COSTS_GRANULARITY_DAILY, consts.COSTS_DEPTH_AUTO)
 
 		if err == nil {
 			t.Error("wanted error, got nil")
@@ -179,6 +179,7 @@ func TestCostsService_GetProjectCosts(t *testing.T) {
 		costsSvc := costs.New(client)
 		_, err := costsSvc.GetProjectCosts(
 			context.Background(),
+			"07a1ed91-2efb-42c2-9d00-e84ae71bce0d",
 			"invalid-id",
 			time.Now().AddDate(0, 0, -30),
 			time.Now(),
@@ -207,6 +208,7 @@ func TestCostsService_GetProjectCosts(t *testing.T) {
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
 		resp, err := costsSvc.GetProjectCosts(
 			context.Background(),
+			"07a1ed91-2efb-42c2-9d00-e84ae71bce0d",
 			"ba04b091-ec32-4423-81e6-976f1b8a8363",
 			from,
 			to,
@@ -247,6 +249,7 @@ func TestCostsService_GetProjectCosts(t *testing.T) {
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
 		_, err := costsSvc.GetProjectCosts(
 			ctx,
+			"07a1ed91-2efb-42c2-9d00-e84ae71bce0d",
 			"ba04b091-ec32-4423-81e6-976f1b8a8363",
 			from,
 			to,
@@ -270,6 +273,7 @@ func TestCostsService_GetProjectCosts(t *testing.T) {
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
 		_, err := costsSvc.GetProjectCosts(
 			context.Background(),
+			"07a1ed91-2efb-42c2-9d00-e84ae71bce0d",
 			"ba04b091-ec32-4423-81e6-976f1b8a8363",
 			from,
 			to,
@@ -297,6 +301,7 @@ func TestCostsService_GetProjectCosts(t *testing.T) {
 		to := time.Date(int(2022), time.June, int(21), int(0), int(0), int(0), int(0), time.UTC)
 		_, err := costsSvc.GetProjectCosts(
 			context.Background(),
+			"07a1ed91-2efb-42c2-9d00-e84ae71bce0d",
 			"ba04b091-ec32-4423-81e6-976f1b8a8363",
 			from,
 			to,

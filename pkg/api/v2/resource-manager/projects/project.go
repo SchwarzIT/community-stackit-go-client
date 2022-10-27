@@ -94,13 +94,13 @@ type ProjectsResponse struct {
 
 // Create creates a new STACKIT project
 // See also https://api.stackit.schwarz/resource-management/openapi.v2.html#operation/post-projects
-func (svc *ProjectsService) Create(ctx context.Context, name string, labels map[string]string, members ...ProjectMember) (res ProjectResponse, w *wait.Handler, err error) {
-	if err = svc.ValidateCreateData(name, labels, members); err != nil {
+func (svc *ProjectsService) Create(ctx context.Context, parentContainerID, projectName string, labels map[string]string, members ...ProjectMember) (res ProjectResponse, w *wait.Handler, err error) {
+	if err = svc.ValidateCreateData(projectName, labels, members); err != nil {
 		err = validate.WrapError(err)
 		return
 	}
 
-	body, _ := svc.buildCreateRequest(name, labels, members)
+	body, _ := svc.buildCreateRequest(parentContainerID, projectName, labels, members)
 	req, err := svc.Client.Request(ctx, http.MethodPost, apiPath, body)
 	if err != nil {
 		return
@@ -111,10 +111,10 @@ func (svc *ProjectsService) Create(ctx context.Context, name string, labels map[
 	return
 }
 
-func (svc *ProjectsService) buildCreateRequest(name string, labels map[string]string, members []ProjectMember) ([]byte, error) {
+func (svc *ProjectsService) buildCreateRequest(parentContainerID, projectName string, labels map[string]string, members []ProjectMember) ([]byte, error) {
 	return json.Marshal(CreateProjectRequest{
-		Name:     name,
-		ParentID: svc.Client.OrganizationID(),
+		Name:     projectName,
+		ParentID: parentContainerID,
 		Members:  members,
 		Labels:   labels,
 	})

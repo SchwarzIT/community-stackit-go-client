@@ -21,12 +21,8 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/roles"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
 	resourceManager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
@@ -65,21 +61,18 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 // ProductiveServices is the struct representing all productive services
 type ProductiveServices struct {
-	Argus         *argus.ArgusService
-	Costs         *costs.CostsService
-	Kubernetes    *kubernetes.KubernetesService
-	ObjectStorage *objectstorage.ObjectStorageService
-	Projects      *projects.ProjectService
-	Roles         *roles.RolesService
-	Users         *users.UsersService
+	Argus           *argus.ArgusService
+	Costs           *costs.CostsService
+	Kubernetes      *kubernetes.KubernetesService
+	Membership      *membership.MembershipService
+	ObjectStorage   *objectstorage.ObjectStorageService
+	ResourceManager *resourceManager.ResourceManagerService
 }
 
 // IncubatorServices is the struct representing all services that are under development
 type IncubatorServices struct {
-	Membership      *membership.MembershipService
-	MongoDB         *mongodb.MongoDBService
-	Postgres        *postgres.PostgresService
-	ResourceManager *resourceManager.ResourceManagerService
+	MongoDB  *mongodb.MongoDBService
+	Postgres *postgres.PostgresService
 }
 
 // init initializes the client and its services and returns the client
@@ -90,17 +83,14 @@ func (c *Client) init() *Client {
 	c.Argus = argus.New(c)
 	c.Costs = costs.New(c)
 	c.Kubernetes = kubernetes.New(c)
+	c.Membership = membership.New(c)
 	c.ObjectStorage = objectstorage.New(c)
-	c.Projects = projects.New(c)
-	c.Roles = roles.New(c)
-	c.Users = users.New(c)
+	c.ResourceManager = resourceManager.New(c)
 
 	// init incubator services
 	c.Incubator = IncubatorServices{
-		Membership:      membership.New(c),
-		MongoDB:         mongodb.New(c),
-		Postgres:        postgres.New(c),
-		ResourceManager: resourceManager.New(c),
+		MongoDB:  mongodb.New(c),
+		Postgres: postgres.New(c),
 	}
 	return c
 }
@@ -190,11 +180,6 @@ func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 	return resp, err
 }
 
-// OrganizationID returns the organization ID defined in the configuration
-func (c *Client) OrganizationID() string {
-	return c.config.OrganizationID
-}
-
 // Retry returns the defined retry
 func (c *Client) Retry() *retry.Retry {
 	return c.retry
@@ -218,7 +203,6 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 		BaseUrl:             u,
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
-		OrganizationID:      consts.SCHWARZ_ORGANIZATION_ID,
 	})
 
 	return

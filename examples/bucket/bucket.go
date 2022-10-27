@@ -13,7 +13,6 @@ func main() {
 	c, err := client.New(ctx, &client.Config{
 		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
 		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:      os.Getenv("STACKIT_ORGANIZATION_ID"),
 	})
 	if err != nil {
 		panic(err)

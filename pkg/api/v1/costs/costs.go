@@ -82,11 +82,12 @@ type ProjectDetailResponse struct {
 // See https://api.stackit.schwarz/costs-service/openapi.v1.html#operation/get-costs-reports-customer-account
 func (svc *CostsService) GetCustomerAccountCosts(
 	ctx context.Context,
+	customerAccountID string,
 	from, to time.Time,
 	granularity, depth string,
 ) (*CustomerAccountResponse, error) {
 	path := fmt.Sprintf(apiPath,
-		svc.Client.OrganizationID(),
+		customerAccountID,
 		from.Format(timeFormat),
 		to.Format(timeFormat),
 		granularity,
@@ -113,6 +114,7 @@ func (svc *CostsService) GetCustomerAccountCosts(
 // See https://api.stackit.schwarz/costs-service/openapi.v1.html#operation/get-costs-project
 func (svc *CostsService) GetProjectCosts(
 	ctx context.Context,
+	customerAccountID,
 	projectID string,
 	from, to time.Time,
 	granularity, depth string,
@@ -123,7 +125,7 @@ func (svc *CostsService) GetProjectCosts(
 	}
 
 	path := fmt.Sprintf(apiPathProjects,
-		svc.Client.OrganizationID(),
+		customerAccountID,
 		projectID,
 		from.Format(timeFormat),
 		to.Format(timeFormat),

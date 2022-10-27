@@ -14,12 +14,21 @@ To install the latest stable release, run:
 go get github.com/SchwarzIT/community-stackit-go-client@latest
 ```
 
+## Usage 
 
-## Usage example
+### Pre-conditions
 
-To get started, a Service Account[^1] and a Customer Account[^2] must be in place
 
-If you're not sure how to get this information, please contact [STACKIT support](https://support.stackit.cloud)
+In order to use the client, a Service Account must be created using [Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
+After creation, assign roles to the Service Account using [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)<br />
+If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
+
+
+For further assistance, please contact [STACKIT support](https://support.stackit.cloud)
+
+
+## Code example
+
 
 ```Go
 package main
@@ -36,8 +45,7 @@ func main() {
 	ctx := context.Background()
 	c, err := client.New(ctx, &client.Config{
 		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
-		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:   os.Getenv("STACKIT_ORGANIZATION_ID"),
+		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
 	})
 	if err != nil {
 		panic(err)
@@ -64,7 +72,7 @@ func main() {
 Further usage examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) 
 
 
-## Auto retry
+### Enabling auto-retry
 
 The client can automatically retry failed calls using `pkg/retry`
 
@@ -75,11 +83,3 @@ c, _ := client.New(context.Background(), &client.Config{})
 c.SetRetry(retry.New())
 ```
 
-
-[^1]: In order to use the client, a Service Account and Token must be created using [Service Account API](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2)<br />
-After creation, assign roles to the Service Account using [Membership API](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts)<br />
-If your Service Account needs to operate outside the scope of your project, you may need to contact STACKIT to assign further permissions
-
-<br />
-
-[^2]: The Customer Account ID is also referred to as Organization ID
