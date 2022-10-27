@@ -7,6 +7,7 @@ const (
 
 	// schwarz specific constants
 	SCHWARZ_ORGANIZATION_ID = "07a1ed91-2efb-42c2-9d00-e84ae71bce0d"
+	SCHWARZ_CONTAINER_ID    = "schwarz-it-kg-WJACUK1"
 	SCHWARZ_AUTH_ORIGIN     = "schwarz-federation"
 
 	// resource types
