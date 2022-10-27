@@ -22,7 +22,7 @@ import (
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
-	resourceManager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
+	resourceManagement "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
@@ -61,12 +61,12 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 // ProductiveServices is the struct representing all productive services
 type ProductiveServices struct {
-	Argus           *argus.ArgusService
-	Costs           *costs.CostsService
-	Kubernetes      *kubernetes.KubernetesService
-	Membership      *membership.MembershipService
-	ObjectStorage   *objectstorage.ObjectStorageService
-	ResourceManager *resourceManager.ResourceManagerService
+	Argus              *argus.ArgusService
+	Costs              *costs.CostsService
+	Kubernetes         *kubernetes.KubernetesService
+	Membership         *membership.MembershipService
+	ObjectStorage      *objectstorage.ObjectStorageService
+	ResourceManagement *resourceManagement.ResourceManagementService
 }
 
 // IncubatorServices is the struct representing all services that are under development
@@ -85,7 +85,7 @@ func (c *Client) init() *Client {
 	c.Kubernetes = kubernetes.New(c)
 	c.Membership = membership.New(c)
 	c.ObjectStorage = objectstorage.New(c)
-	c.ResourceManager = resourceManager.New(c)
+	c.ResourceManagement = resourceManagement.New(c)
 
 	// init incubator services
 	c.Incubator = IncubatorServices{

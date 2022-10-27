@@ -11,8 +11,8 @@ import (
 	"time"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	resourcemanager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager/projects"
+	resourcemanager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
@@ -28,7 +28,7 @@ func TestProjectsService_Get(t *testing.T) {
 		ContainerID: containerID,
 	}
 
-	mux.HandleFunc(fmt.Sprintf("/resource-manager/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/resource-management/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -80,7 +80,7 @@ func TestProjectsService_GetLifecycleState(t *testing.T) {
 		LifecycleState: "CREATED",
 	}
 
-	mux.HandleFunc(fmt.Sprintf("/resource-manager/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/resource-management/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -167,7 +167,7 @@ func TestProjectsService_Create(t *testing.T) {
 		CreationTime:   "2021-08-24T14:15:22Z",
 	}
 
-	mux.HandleFunc("/resource-manager/v2/projects", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Error("wrong method")
 		}
@@ -257,7 +257,7 @@ func testCreationWait(t *testing.T, mux *http.ServeMux, process *wait.Handler, w
 	ctx4, td4 := context.WithTimeout(context.Background(), 4*baseDuration)
 	defer td4()
 
-	mux.HandleFunc(fmt.Sprintf("/resource-manager/v2/projects/%s", want.ContainerID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/resource-management/v2/projects/%s", want.ContainerID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Errorf("wrong method %s", r.Method)
 			return
@@ -319,7 +319,7 @@ func TestProjectsService_Update(t *testing.T) {
 		ContainerID: containerID,
 	}
 
-	mux.HandleFunc("/resource-manager/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Error("wrong method")
 		}
@@ -387,7 +387,7 @@ func TestProjectsService_Delete(t *testing.T) {
 	ctx1, td1 := context.WithTimeout(context.Background(), 1*baseDuration)
 	defer td1()
 
-	mux.HandleFunc("/resource-manager/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusAccepted)
@@ -465,7 +465,7 @@ func TestProjectsService_List(t *testing.T) {
 		Limit:  50,
 	}
 
-	mux.HandleFunc("/resource-manager/v2/projects", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -476,14 +476,14 @@ func TestProjectsService_List(t *testing.T) {
 		fmt.Fprint(w, string(b))
 	})
 
-	mux.HandleFunc("/resource-manager/v2/projects?offset=2&limit=50", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects?offset=2&limit=50", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
 		b, _ := json.Marshal(want2)
 		fmt.Fprint(w, string(b))
 	})
-	mux.HandleFunc("/resource-manager/v2/projects?offset=0&limit=50&containerIds=my-container-123", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects?offset=0&limit=50&containerIds=my-container-123", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
