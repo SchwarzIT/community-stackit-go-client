@@ -31,7 +31,6 @@ func TestNew(t *testing.T) {
 	}{
 		{"no token", args{context.Background(), &Config{}}, &Client{}, true},
 		{"no sa id", args{context.Background(), &Config{ServiceAccountToken: "token"}}, &Client{}, true},
-		{"no org id", args{context.Background(), &Config{ServiceAccountToken: "token", ServiceAccountEmail: "sa-id"}}, &Client{}, true},
 		{"all ok", args{context.Background(), cfg}, &Client{config: cfg}, false},
 	}
 	for _, tt := range tests {
