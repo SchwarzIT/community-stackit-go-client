@@ -14,7 +14,7 @@ To install the latest stable release, run:
 go get github.com/SchwarzIT/community-stackit-go-client@latest
 ```
 
-## Code example
+## Usage Example
 
 
 In order to use the client, a STACKIT Service Account [must be created](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2) and have relevant roles [assigned to it](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts).<br />
