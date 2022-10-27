@@ -209,7 +209,7 @@ type UpdateProjectRequest struct {
 
 // Update updates an existing STACKIT project
 // See also https://api.stackit.schwarz/resource-management/openapi.v2.html#operation/patch-projects-containerId
-func (svc *ProjectsService) Update(ctx context.Context, containerID, name, containerParentID string, labels map[string]string) (res ProjectResponse, err error) {
+func (svc *ProjectsService) Update(ctx context.Context, containerParentID, containerID, name string, labels map[string]string) (res ProjectResponse, err error) {
 	if err = svc.ValidateUpdateData(containerID, containerParentID, name, labels); err != nil {
 		err = validate.WrapError(err)
 		return

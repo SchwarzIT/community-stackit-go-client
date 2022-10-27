@@ -354,13 +354,13 @@ func TestProjectsService_Update(t *testing.T) {
 		wantRes projects.ProjectResponse
 		wantErr bool
 	}{
-		{"no billing", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{}}, want, true},
-		{"bad project name", args{context.Background(), containerID, "my project!", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{}}, want, true},
-		{"all ok", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, false},
-		{"no scope", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B"}}, want, true},
-		{"bad billing", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T#$%0123456B", "scope": "PUBLIC"}}, want, true},
-		{"ctx is canceled", args{ctx, containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
-		{"project not found", args{context.Background(), "something", "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
+		{"no billing", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{}}, want, true},
+		{"bad project name", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my project!", map[string]string{}}, want, true},
+		{"all ok", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, false},
+		{"no scope", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T-0123456B"}}, want, true},
+		{"bad billing", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T#$%0123456B", "scope": "PUBLIC"}}, want, true},
+		{"ctx is canceled", args{ctx, consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
+		{"project not found", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, "something", "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
