@@ -41,7 +41,7 @@ type Member struct {
 	Condition *Condition `json:"condition,omitempty"`
 }
 
-// Condition struct for memeber
+// Condition struct for member
 type Condition struct {
 	ExpiresAt string `json:"expiresAt"`
 }
