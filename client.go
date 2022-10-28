@@ -21,6 +21,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
+	resourceManagementV1 "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/resource-management"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
 	resourceManagement "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
@@ -41,6 +42,9 @@ type Client struct {
 	// Incubator - services under development or currently being tested
 	// not ready for production usage
 	Incubator IncubatorServices
+
+	// Archived - for services that are phased out
+	Archived ArchivedServices
 }
 
 // New returns a new client
@@ -73,6 +77,11 @@ type ProductiveServices struct {
 type IncubatorServices struct {
 	MongoDB  *mongodb.MongoDBService
 	Postgres *postgres.PostgresService
+}
+
+// ArchivedServices is used for services that are being phased out
+type ArchivedServices struct {
+	ResourceManagementV1 *resourceManagementV1.ResourceManagementV1Service
 }
 
 // init initializes the client and its services and returns the client
