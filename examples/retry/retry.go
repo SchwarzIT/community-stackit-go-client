@@ -10,9 +10,8 @@ import (
 
 func main() {
 	c, err := client.New(context.Background(), &client.Config{
-		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
-		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:   os.Getenv("STACKIT_ORGANIZATION_ID"),
+		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
+		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
 	})
 	if err != nil {
 		panic(err)

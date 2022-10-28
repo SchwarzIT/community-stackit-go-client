@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership/members"
 )
@@ -25,7 +25,7 @@ func TestNew(t *testing.T) {
 		want *members.MembersService
 	}{
 		{"test directly", args{c}, members.New(c)},
-		{"test through client", args{c}, &c.Incubator.Membership.Members},
+		{"test through client", args{c}, &c.Membership.Members},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

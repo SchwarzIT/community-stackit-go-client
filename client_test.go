@@ -11,15 +11,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 )
 
 func TestNew(t *testing.T) {
 	cfg := &Config{
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
 	}
 	type args struct {
 		ctx context.Context
@@ -32,8 +30,7 @@ func TestNew(t *testing.T) {
 		wantErr bool
 	}{
 		{"no token", args{context.Background(), &Config{}}, &Client{}, true},
-		{"no sa id", args{context.Background(), &Config{Token: "token"}}, &Client{}, true},
-		{"no org id", args{context.Background(), &Config{Token: "token", ServiceAccountID: "sa-id"}}, &Client{}, true},
+		{"no sa id", args{context.Background(), &Config{ServiceAccountToken: "token"}}, &Client{}, true},
 		{"all ok", args{context.Background(), cfg}, &Client{config: cfg}, false},
 	}
 	for _, tt := range tests {
@@ -52,9 +49,8 @@ func TestNew(t *testing.T) {
 
 func TestClient_Request(t *testing.T) {
 	cfg := &Config{
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
 	}
 	c, err := New(context.Background(), cfg)
 	if err != nil {
@@ -162,34 +158,6 @@ func TestClient_Do(t *testing.T) {
 
 }
 
-func TestClient_OrganizationID(t *testing.T) {
-	cfg := &Config{
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
-	}
-	type fields struct {
-		config *Config
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   string
-	}{
-		{"test-1", fields{config: cfg}, cfg.OrganizationID},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				config: tt.fields.config,
-			}
-			if got := c.OrganizationID(); got != tt.want {
-				t.Errorf("OrganizationID() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestClient_GetHTTPClient(t *testing.T) {
 	type fields struct {
 		client             *http.Client
@@ -258,13 +226,13 @@ func TestClient_SetToken(t *testing.T) {
 	type args struct {
 		token string
 	}
-	c := &Config{Token: "abc"}
+	c := &Config{ServiceAccountToken: "abc"}
 	tests := []struct {
 		name   string
 		fields fields
 		args   args
 	}{
-		{"all ok", fields{config: c}, args{token: c.Token}},
+		{"all ok", fields{config: c}, args{token: c.ServiceAccountToken}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

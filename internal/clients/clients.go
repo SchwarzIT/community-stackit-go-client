@@ -5,8 +5,7 @@ import (
 	"errors"
 	"os"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 )
 
 // LocalClient is an implementation of the client
@@ -24,28 +23,7 @@ func LocalClient() (*client.Client, error) {
 	}
 
 	return client.New(context.Background(), &client.Config{
-		ServiceAccountID: aid,
-		Token:            ato,
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
-	})
-}
-
-// LocalAuthClient is an implementation of the auth client
-// relying on env variables for initialization
-// the env vars are: STACKIT_AUTH_CLIENT_ID, STACKIT_AUTH_CLIENT_SECRET
-func LocalAuthClient() (*client.AuthClient, error) {
-	aci := os.Getenv("STACKIT_AUTH_CLIENT_ID")
-	if aci == "" {
-		return nil, errors.New("STACKIT_AUTH_CLIENT_ID is missing from env variables")
-	}
-
-	acs := os.Getenv("STACKIT_AUTH_CLIENT_SECRET")
-	if acs == "" {
-		return nil, errors.New("STACKIT_AUTH_CLIENT_SECRET is missing from env variables")
-	}
-
-	return client.NewAuth(context.Background(), &client.AuthConfig{
-		ClientID:     aci,
-		ClientSecret: acs,
+		ServiceAccountEmail: aid,
+		ServiceAccountToken: ato,
 	})
 }

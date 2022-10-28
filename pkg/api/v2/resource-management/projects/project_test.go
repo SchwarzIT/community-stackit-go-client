@@ -8,11 +8,13 @@ import (
 	"reflect"
 	"strconv"
 	"testing"
+	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
-	resourcemanager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager/projects"
+	client "github.com/SchwarzIT/community-stackit-go-client"
+	resourcemanager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 func TestProjectsService_Get(t *testing.T) {
@@ -26,7 +28,7 @@ func TestProjectsService_Get(t *testing.T) {
 		ContainerID: containerID,
 	}
 
-	mux.HandleFunc(fmt.Sprintf("/resource-manager/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/resource-management/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -78,7 +80,7 @@ func TestProjectsService_GetLifecycleState(t *testing.T) {
 		LifecycleState: "CREATED",
 	}
 
-	mux.HandleFunc(fmt.Sprintf("/resource-manager/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf("/resource-management/v2/projects/%s", containerID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -165,7 +167,7 @@ func TestProjectsService_Create(t *testing.T) {
 		CreationTime:   "2021-08-24T14:15:22Z",
 	}
 
-	mux.HandleFunc("/resource-manager/v2/projects", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Error("wrong method")
 		}
@@ -208,19 +210,22 @@ func TestProjectsService_Create(t *testing.T) {
 		args    args
 		wantRes projects.ProjectResponse
 		wantErr bool
+		useWait bool
 	}{
-		{"no owner", args{context.Background(), "my-project", map[string]string{}, []projects.ProjectMember{}}, want, true},
-		{"no billing", args{context.Background(), "my-project", map[string]string{}, member}, want, true},
-		{"bad project name", args{context.Background(), "my project!", map[string]string{}, member}, want, true},
-		{"all ok", args{context.Background(), "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}, member}, want, false},
-		{"too many labels", args{context.Background(), "my-project", longLabels, member}, want, true},
-		{"no scope label", args{context.Background(), "my-project", map[string]string{"billingReference": "T-0123456B"}, member}, want, true},
-		{"ctx is canceled", args{ctx, "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}, member}, want, true},
-		{"user not found", args{context.Background(), "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}, memberNotFound}, want, true},
+		{"no owner", args{context.Background(), "my-project", map[string]string{}, []projects.ProjectMember{}}, want, true, false},
+		{"no billing", args{context.Background(), "my-project", map[string]string{}, member}, want, true, false},
+		{"bad project name", args{context.Background(), "my project!", map[string]string{}, member}, want, true, false},
+		{"all ok", args{context.Background(), "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}, member}, want, false, true},
+		{"too many labels", args{context.Background(), "my-project", longLabels, member}, want, true, false},
+		{"no scope label", args{context.Background(), "my-project", map[string]string{"billingReference": "T-0123456B"}, member}, want, true, false},
+		{"ctx is canceled", args{ctx, "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}, member}, want, true, false},
+		{"user not found", args{context.Background(), "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}, memberNotFound}, want, true, false},
 	}
+
+	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := p.Create(tt.args.ctx, tt.args.name, tt.args.labels, tt.args.members...)
+			gotRes, w, err := p.Create(tt.args.ctx, "54066bf4-1aff-4f7b-9f83-fb23c348fee3", tt.args.name, tt.args.labels, tt.args.members...)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("ProjectsService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -228,7 +233,78 @@ func TestProjectsService_Create(t *testing.T) {
 			if !reflect.DeepEqual(gotRes, tt.wantRes) && !tt.wantErr {
 				t.Errorf("ProjectsService.Create() = %v, want %v", gotRes, tt.wantRes)
 			}
+			if tt.useWait {
+				process = w
+			}
 		})
+	}
+
+	testCreationWait(t, mux, process, want)
+}
+
+func testCreationWait(t *testing.T, mux *http.ServeMux, process *wait.Handler, want projects.ProjectResponse) {
+
+	baseDuration := 200 * time.Millisecond
+	ctx1, td1 := context.WithTimeout(context.Background(), 1*baseDuration)
+	defer td1()
+
+	ctx2, td2 := context.WithTimeout(context.Background(), 2*baseDuration)
+	defer td2()
+
+	ctx3, td3 := context.WithTimeout(context.Background(), 3*baseDuration)
+	defer td3()
+
+	ctx4, td4 := context.WithTimeout(context.Background(), 4*baseDuration)
+	defer td4()
+
+	mux.HandleFunc(fmt.Sprintf("/resource-management/v2/projects/%s", want.ContainerID), func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			t.Errorf("wrong method %s", r.Method)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		if ctx1.Err() == nil {
+			w.WriteHeader(http.StatusBadRequest)
+			return
+		}
+
+		if ctx2.Err() == nil {
+			w.WriteHeader(http.StatusForbidden)
+			return
+		}
+
+		if ctx3.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, `{"lifecycleState": "CREATING"}`)
+			return
+		}
+
+		if ctx4.Err() == nil {
+			w.WriteHeader(http.StatusOK)
+			fmt.Fprint(w, `{"lifecycleState": "ACTIVE"}`)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, `{"lifecycleState": "DELETING"}`)
+	})
+
+	process.SetThrottle(baseDuration)
+	// first test run: expect Wait to exit with an error
+	if _, err := process.Wait(); err == nil {
+		t.Error("expected error but got nil")
+	}
+
+	time.Sleep(baseDuration)
+	// 2nd test: expect Forbidden, creating, and exit with success after retry
+	if _, err := process.Wait(); err != nil {
+		t.Errorf("expected no error but got: %v", err)
+	}
+
+	time.Sleep(baseDuration)
+	// last test run: expect error because of DELETING status
+	if _, err := process.Wait(); err == nil {
+		t.Error("expected error but got nil")
 	}
 }
 
@@ -243,7 +319,7 @@ func TestProjectsService_Update(t *testing.T) {
 		ContainerID: containerID,
 	}
 
-	mux.HandleFunc("/resource-manager/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPatch {
 			t.Error("wrong method")
 		}
@@ -278,14 +354,13 @@ func TestProjectsService_Update(t *testing.T) {
 		wantRes projects.ProjectResponse
 		wantErr bool
 	}{
-		{"no billing", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{}}, want, true},
-		{"bad project name", args{context.Background(), containerID, "my project!", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{}}, want, true},
-		// {"bad org uuid", args{context.Background(), containerID, "my-project", "test", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
-		{"all ok", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, false},
-		{"no scope", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B"}}, want, true},
-		{"bad billing", args{context.Background(), containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T#$%0123456B", "scope": "PUBLIC"}}, want, true},
-		{"ctx is canceled", args{ctx, containerID, "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
-		{"project not found", args{context.Background(), "something", "my-project", consts.SCHWARZ_ORGANIZATION_ID, map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
+		{"no billing", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{}}, want, true},
+		{"bad project name", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my project!", map[string]string{}}, want, true},
+		{"all ok", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, false},
+		{"no scope", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T-0123456B"}}, want, true},
+		{"bad billing", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T#$%0123456B", "scope": "PUBLIC"}}, want, true},
+		{"ctx is canceled", args{ctx, consts.SCHWARZ_ORGANIZATION_ID, containerID, "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
+		{"project not found", args{context.Background(), consts.SCHWARZ_ORGANIZATION_ID, "something", "my-project", map[string]string{"billingReference": "T-0123456B", "scope": "PUBLIC"}}, want, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -308,12 +383,32 @@ func TestProjectsService_Delete(t *testing.T) {
 
 	containerID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 
-	mux.HandleFunc("/resource-manager/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodDelete {
-			t.Error("wrong method")
+	baseDuration := 200 * time.Millisecond
+	ctx1, td1 := context.WithTimeout(context.Background(), 1*baseDuration)
+	defer td1()
+
+	mux.HandleFunc("/resource-management/v2/projects/"+containerID, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodDelete {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusAccepted)
+			return
 		}
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusAccepted)
+
+		if r.Method == http.MethodGet {
+
+			w.Header().Set("Content-Type", "application/json")
+
+			if ctx1.Err() == nil {
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprint(w, `{"lifecycleState": "DELETING"}`)
+				return
+			}
+
+			w.WriteHeader(http.StatusNotFound)
+			return
+
+		}
+		t.Error("wrong method")
 	})
 
 	ctx, cancel := context.WithCancel(context.TODO())
@@ -327,16 +422,29 @@ func TestProjectsService_Delete(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
+		useWait bool
 	}{
-		{"all ok", args{context.Background(), containerID}, false},
-		{"ctx is canceled", args{ctx, containerID}, true},
+		{"all ok", args{context.Background(), containerID}, false, true},
+		{"ctx is canceled", args{ctx, containerID}, true, false},
 	}
+
+	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := p.Delete(tt.args.ctx, tt.args.containerID); (err != nil) != tt.wantErr {
+			w, err := p.Delete(tt.args.ctx, tt.args.containerID)
+			if (err != nil) != tt.wantErr {
 				t.Errorf("ProjectsService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			if tt.useWait {
+				process = w
+			}
 		})
+	}
+
+	process.SetThrottle(baseDuration)
+	// 1nd test: expect success after retry
+	if _, err := process.Wait(); err != nil {
+		t.Errorf("expected no error but got: %v", err)
 	}
 }
 
@@ -357,7 +465,7 @@ func TestProjectsService_List(t *testing.T) {
 		Limit:  50,
 	}
 
-	mux.HandleFunc("/resource-manager/v2/projects", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -368,14 +476,14 @@ func TestProjectsService_List(t *testing.T) {
 		fmt.Fprint(w, string(b))
 	})
 
-	mux.HandleFunc("/resource-manager/v2/projects?offset=2&limit=50", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects?offset=2&limit=50", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 
 		b, _ := json.Marshal(want2)
 		fmt.Fprint(w, string(b))
 	})
-	mux.HandleFunc("/resource-manager/v2/projects?offset=0&limit=50&containerIds=my-container-123", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/resource-management/v2/projects?offset=0&limit=50&containerIds=my-container-123", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 

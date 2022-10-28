@@ -21,12 +21,9 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/projects"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/roles"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/users"
+	resourceManagementV1 "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/resource-management"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
-	resourceManager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	resourceManagement "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
@@ -45,6 +42,9 @@ type Client struct {
 	// Incubator - services under development or currently being tested
 	// not ready for production usage
 	Incubator IncubatorServices
+
+	// Archived - for services that are phased out
+	Archived ArchivedServices
 }
 
 // New returns a new client
@@ -65,21 +65,23 @@ func New(ctx context.Context, cfg *Config) (*Client, error) {
 
 // ProductiveServices is the struct representing all productive services
 type ProductiveServices struct {
-	Argus         *argus.ArgusService
-	Costs         *costs.CostsService
-	Kubernetes    *kubernetes.KubernetesService
-	ObjectStorage *objectstorage.ObjectStorageService
-	Projects      *projects.ProjectService
-	Roles         *roles.RolesService
-	Users         *users.UsersService
+	Argus              *argus.ArgusService
+	Costs              *costs.CostsService
+	Kubernetes         *kubernetes.KubernetesService
+	Membership         *membership.MembershipService
+	ObjectStorage      *objectstorage.ObjectStorageService
+	ResourceManagement *resourceManagement.ResourceManagementService
 }
 
 // IncubatorServices is the struct representing all services that are under development
 type IncubatorServices struct {
-	Membership      *membership.MembershipService
-	MongoDB         *mongodb.MongoDBService
-	Postgres        *postgres.PostgresService
-	ResourceManager *resourceManager.ResourceManagerService
+	MongoDB  *mongodb.MongoDBService
+	Postgres *postgres.PostgresService
+}
+
+// ArchivedServices is used for services that are being phased out
+type ArchivedServices struct {
+	ResourceManagementV1 *resourceManagementV1.ResourceManagementV1Service
 }
 
 // init initializes the client and its services and returns the client
@@ -90,17 +92,14 @@ func (c *Client) init() *Client {
 	c.Argus = argus.New(c)
 	c.Costs = costs.New(c)
 	c.Kubernetes = kubernetes.New(c)
+	c.Membership = membership.New(c)
 	c.ObjectStorage = objectstorage.New(c)
-	c.Projects = projects.New(c)
-	c.Roles = roles.New(c)
-	c.Users = users.New(c)
+	c.ResourceManagement = resourceManagement.New(c)
 
 	// init incubator services
 	c.Incubator = IncubatorServices{
-		Membership:      membership.New(c),
-		MongoDB:         mongodb.New(c),
-		Postgres:        postgres.New(c),
-		ResourceManager: resourceManager.New(c),
+		MongoDB:  mongodb.New(c),
+		Postgres: postgres.New(c),
 	}
 	return c
 }
@@ -114,13 +113,13 @@ func (c *Client) GetConfig() *Config {
 }
 
 func (c *Client) SetToken(token string) {
-	c.config.Token = token
+	c.config.ServiceAccountToken = token
 }
 
 // setHttpClient creates the client's oauth client
 func (c *Client) setHttpClient(ctx context.Context) {
 	ts := oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: c.config.Token},
+		&oauth2.Token{AccessToken: c.config.ServiceAccountToken},
 	)
 	hcl := oauth2.NewClient(ctx, ts)
 	hcl.Timeout = time.Second * 10
@@ -190,11 +189,6 @@ func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 	return resp, err
 }
 
-// OrganizationID returns the organization ID defined in the configuration
-func (c *Client) OrganizationID() string {
-	return c.config.OrganizationID
-}
-
 // Retry returns the defined retry
 func (c *Client) Retry() *retry.Retry {
 	return c.retry
@@ -215,10 +209,9 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 	u, _ := url.Parse(server.URL)
 
 	c, err = New(context.Background(), &Config{
-		BaseUrl:          u,
-		Token:            "token",
-		ServiceAccountID: "sa-id",
-		OrganizationID:   consts.SCHWARZ_ORGANIZATION_ID,
+		BaseUrl:             u,
+		ServiceAccountToken: "token",
+		ServiceAccountEmail: "sa-id",
 	})
 
 	return

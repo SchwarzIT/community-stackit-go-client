@@ -8,19 +8,19 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
-	resourceManager "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-manager/organizations"
+	client "github.com/SchwarzIT/community-stackit-go-client"
+	resourceManagement "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management/organizations"
 )
 
 const (
-	apiPath = "/resource-manager/v2/organizations/%s"
+	apiPath = "/resource-management/v2/organizations/%s"
 )
 
 func TestOrganizationsService_Get(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	p := resourceManager.New(c).Organizations
+	p := resourceManagement.New(c).Organizations
 
 	containerID := "my-container-id-b18796aa7e78"
 	want := organizations.OrganizationResponse{

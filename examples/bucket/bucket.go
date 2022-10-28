@@ -11,9 +11,8 @@ import (
 func main() {
 	ctx := context.Background()
 	c, err := client.New(ctx, &client.Config{
-		ServiceAccountID: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
-		Token:            os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-		OrganizationID:   os.Getenv("STACKIT_ORGANIZATION_ID"),
+		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
+		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
 	})
 	if err != nil {
 		panic(err)

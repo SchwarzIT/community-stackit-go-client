@@ -13,7 +13,7 @@ import (
 
 // constants
 const (
-	apiPath = consts.API_PATH_RESOURCE_MANAGER_V2_ORG
+	apiPath = consts.API_PATH_RESOURCE_MANAGEMENT_V2_ORG
 )
 
 // New returns a new handler for the service
