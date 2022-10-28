@@ -29,6 +29,7 @@ type ProjectService common.Service
 // ProjectGetResponse is the generic api response struct
 type ProjectGetResponse struct {
 	ProjectID      string         `json:"projectId"`
+	ContainerID    string         `json:"containerId"`
 	LifecycleState string         `json:"lifecycleState"`
 	Scope          string         `json:"scope"`
 	Name           string         `json:"name"`
