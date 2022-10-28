@@ -36,11 +36,14 @@ type MembersService common.Service
 
 // Member struct represents a single member
 type Member struct {
-	Subject   string `json:"subject"`
-	Role      string `json:"role"`
-	Condition struct {
-		ExpiresAt string `json:"expiresAt"`
-	} `json:"condition,omitempty"`
+	Subject   string     `json:"subject"`
+	Role      string     `json:"role"`
+	Condition *Condition `json:"condition,omitempty"`
+}
+
+// Condition struct for memeber
+type Condition struct {
+	ExpiresAt string `json:"expiresAt"`
 }
 
 // ResourceMembers struct represents member in a resource
@@ -95,7 +98,7 @@ func (svc *MembersService) Add(ctx context.Context, resourceID, resourceType str
 
 	params := url.Values{}
 	params.Add("resourceType", resourceType)
-	req, err := svc.Client.Request(ctx, http.MethodPatch, fmt.Sprintf(apiPath+"?"+params.Encode(), resourceID), body)
+	req, err := svc.Client.Request(ctx, http.MethodPatch, fmt.Sprintf(apiPath, resourceID), body)
 	if err != nil {
 		return
 	}
