@@ -101,6 +101,12 @@ func (c *Client) init() *Client {
 		MongoDB:  mongodb.New(c),
 		Postgres: postgres.New(c),
 	}
+
+	// init archived
+	c.Archived = ArchivedServices{
+		ResourceManagementV1: resourceManagementV1.New(c),
+	}
+
 	return c
 }
 
