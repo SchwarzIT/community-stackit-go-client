@@ -15,7 +15,7 @@ import (
 // constants
 const (
 	apiPathVersions = consts.API_PATH_POSTGRES_FLEX_VERSIONS
-	apiPathStorage  = consts.API_PATH_MONGO_DB_FLEX_STORAGES
+	apiPathStorage  = consts.API_PATH_POSTGRES_FLEX_STORAGES
 	apiPathFlavors  = consts.API_PATH_POSTGRES_FLEX_FLAVORS
 )
 
