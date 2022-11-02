@@ -6,6 +6,7 @@ package dataservices
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/options"
 )
 
 // New returns a new handler for the service
@@ -13,6 +14,7 @@ import (
 func New(c common.Client, broker string) *DataServicesService {
 	return &DataServicesService{
 		Instances: *instances.New(c, broker),
+		Options:   *options.New(c, broker),
 	}
 }
 
@@ -20,4 +22,5 @@ func New(c common.Client, broker string) *DataServicesService {
 // DSA instances, credentials and offerings
 type DataServicesService struct {
 	Instances instances.DSAInstancesService
+	Options   options.DSAOptionsService
 }
