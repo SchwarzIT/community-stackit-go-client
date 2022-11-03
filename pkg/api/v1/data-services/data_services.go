@@ -5,6 +5,7 @@ package dataservices
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/credentials"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services/options"
 )
@@ -13,14 +14,16 @@ import (
 // broker is the dsa broker (i.e. ElasticSearch or RabbitMQ broker)
 func New(c common.Client, broker string) *DataServicesService {
 	return &DataServicesService{
-		Instances: *instances.New(c, broker),
-		Options:   *options.New(c, broker),
+		Credentials: *credentials.New(c, broker),
+		Instances:   *instances.New(c, broker),
+		Options:     *options.New(c, broker),
 	}
 }
 
 // DataServicesService is the service that handles
 // DSA instances, credentials and offerings
 type DataServicesService struct {
-	Instances instances.DSAInstancesService
-	Options   options.DSAOptionsService
+	Credentials credentials.DSACredentialsService
+	Instances   instances.DSAInstancesService
+	Options     options.DSAOptionsService
 }

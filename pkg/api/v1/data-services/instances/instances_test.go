@@ -1,4 +1,4 @@
-// package instances is used to manange MongoDB Flex instances
+// package instances is used to manange dsaDB Flex instances
 
 package instances_test
 
@@ -53,7 +53,7 @@ const (
 func TestDSAInstancesService_List(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	mongo := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker)
 
 	projectID := "abc"
 
@@ -100,7 +100,7 @@ func TestDSAInstancesService_List(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := mongo.Instances.List(tt.args.ctx, tt.args.projectID)
+			gotRes, err := dsa.Instances.List(tt.args.ctx, tt.args.projectID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.List() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -136,7 +136,7 @@ func buildInstance(projectID, instanceID string) instances.Instance {
 func TestDSAInstancesService_Get(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	mongo := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker)
 
 	projectID := "abc"
 	instanceID := "string"
@@ -180,7 +180,7 @@ func TestDSAInstancesService_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := mongo.Instances.Get(tt.args.ctx, tt.args.projectID, tt.args.instanceID)
+			gotRes, err := dsa.Instances.Get(tt.args.ctx, tt.args.projectID, tt.args.instanceID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.Get() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -195,7 +195,7 @@ func TestDSAInstancesService_Get(t *testing.T) {
 func TestDSAInstancesService_Create(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	mongo := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker)
 
 	projectID := "abc"
 
@@ -231,7 +231,7 @@ func TestDSAInstancesService_Create(t *testing.T) {
 	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, gotW, err := mongo.Instances.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceName, tt.args.planID, tt.args.parametes)
+			gotRes, gotW, err := dsa.Instances.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceName, tt.args.planID, tt.args.parametes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -307,7 +307,7 @@ func TestDSAInstancesService_Create(t *testing.T) {
 func TestDSAInstancesService_Update(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	mongo := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker)
 
 	projectID := "abc"
 	instaceID := "string"
@@ -391,7 +391,7 @@ func TestDSAInstancesService_Update(t *testing.T) {
 	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, w, err := mongo.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.planID, tt.args.parametes)
+			gotRes, w, err := dsa.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.planID, tt.args.parametes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -426,7 +426,7 @@ func TestDSAInstancesService_Update(t *testing.T) {
 func TestDSAInstancesService_Delete(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	mongo := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker)
 
 	projectID := "abc"
 	instaceID := "def"
@@ -507,7 +507,7 @@ func TestDSAInstancesService_Delete(t *testing.T) {
 	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotW, err := mongo.Instances.Delete(tt.args.ctx, tt.args.projectID, tt.args.instanceID)
+			gotW, err := dsa.Instances.Delete(tt.args.ctx, tt.args.projectID, tt.args.instanceID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.Delete() error = %v, wantErr %v", err, tt.wantErr)
 				return
