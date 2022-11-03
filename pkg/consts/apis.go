@@ -100,6 +100,11 @@ const (
 	API_PATH_RESOURCE_MANAGEMENT_V2_PROJECT  = API_PATH_RESOURCE_MANAGEMENT_V2_PROJECTS + "/%s"
 	API_PATH_RESOURCE_MANAGEMENT_V2_ORG      = API_PATH_RESOURCE_MANAGEMENT_V2 + "/organizations/%s"
 
-	// Shadow Users
-	API_PATH_SHADOW_USERS = "/ucp-shadow-user-management/v1/createcuaashadowuser/user"
+	// Data Services Access (DSA)
+	API_PATH_DSA             = "/%s/v1/projects/%s"
+	API_PATH_DSA_INSTANCES   = API_PATH_DSA + "/instances"
+	API_PATH_DSA_INSTANCE    = API_PATH_DSA_INSTANCES + "/%s"
+	API_PATH_DSA_OFFERINGS   = API_PATH_DSA + "/offerings"
+	API_PATH_DSA_CREDENTIALS = API_PATH_DSA_INSTANCE + "/credentials"
+	API_PATH_DSA_CREDENTIAL  = API_PATH_DSA_CREDENTIALS + "/%s"
 )
