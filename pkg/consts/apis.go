@@ -101,10 +101,17 @@ const (
 	API_PATH_RESOURCE_MANAGEMENT_V2_ORG      = API_PATH_RESOURCE_MANAGEMENT_V2 + "/organizations/%s"
 
 	// Data Services Access (DSA)
-	API_PATH_DSA             = "/%s/v1/projects/%s"
+	API_PATH_DSA             = "/v1/projects/%s"
 	API_PATH_DSA_INSTANCES   = API_PATH_DSA + "/instances"
 	API_PATH_DSA_INSTANCE    = API_PATH_DSA_INSTANCES + "/%s"
 	API_PATH_DSA_OFFERINGS   = API_PATH_DSA + "/offerings"
 	API_PATH_DSA_CREDENTIALS = API_PATH_DSA_INSTANCE + "/credentials"
 	API_PATH_DSA_CREDENTIAL  = API_PATH_DSA_CREDENTIALS + "/%s"
+
+	API_BASEURL_DSA_ELASTICSEARCH = "https://dsa-elasticsearch.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_LOGME         = "https://dsa-logme.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_MARIADB       = "https://dsa-mariadb.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_POSTGRES      = "https://dsa-postgres.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_RABBITMQ      = "https://dsa-rabbitmq.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_REDIS         = "https://dsa-redis.api.eu01.stackit.cloud"
 )

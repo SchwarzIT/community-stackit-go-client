@@ -15,6 +15,7 @@ type Client interface {
 	Request(ctx context.Context, method, path string, body []byte) (*http.Request, error)
 	Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error)
 	Retry() *retry.Retry
+	SetBaseURL(url string) error
 }
 
 // Service is the struct every extending service is built on

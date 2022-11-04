@@ -17,6 +17,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
+	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
@@ -71,6 +72,16 @@ type ProductiveServices struct {
 	Membership         *membership.MembershipService
 	ObjectStorage      *objectstorage.ObjectStorageService
 	ResourceManagement *resourceManagement.ResourceManagementService
+	DataServices       DataServices
+}
+
+type DataServices struct {
+	ElasticSearch *dataservices.DataServicesService
+	LogMe         *dataservices.DataServicesService
+	MariaDB       *dataservices.DataServicesService
+	PostgresDB    *dataservices.DataServicesService
+	RabbitMQ      *dataservices.DataServicesService
+	Redis         *dataservices.DataServicesService
 }
 
 // IncubatorServices is the struct representing all services that are under development
@@ -95,6 +106,15 @@ func (c *Client) init() *Client {
 	c.Membership = membership.New(c.clone())
 	c.ObjectStorage = objectstorage.New(c.clone())
 	c.ResourceManagement = resourceManagement.New(c.clone())
+
+	c.DataServices = DataServices{
+		ElasticSearch: dataservices.New(c.clone(), dataservices.SERVICE_ELASTICSEARCH, ""),
+		LogMe:         dataservices.New(c.clone(), dataservices.SERVICE_LOGME, ""),
+		MariaDB:       dataservices.New(c.clone(), dataservices.SERVICE_MARIADB, ""),
+		PostgresDB:    dataservices.New(c.clone(), dataservices.SERVICE_POSTGRES, ""),
+		RabbitMQ:      dataservices.New(c.clone(), dataservices.SERVICE_RABBITMQ, ""),
+		Redis:         dataservices.New(c.clone(), dataservices.SERVICE_REDIS, ""),
+	}
 
 	// init incubator services
 	c.Incubator = IncubatorServices{
