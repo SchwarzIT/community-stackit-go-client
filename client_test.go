@@ -11,17 +11,18 @@ import (
 	"testing"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 )
 
 func TestNew(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
 	}
 	type args struct {
 		ctx context.Context
-		cfg *Config
+		cfg Config
 	}
 	tests := []struct {
 		name    string
@@ -29,8 +30,8 @@ func TestNew(t *testing.T) {
 		want    *Client
 		wantErr bool
 	}{
-		{"no token", args{context.Background(), &Config{}}, &Client{}, true},
-		{"no sa id", args{context.Background(), &Config{ServiceAccountToken: "token"}}, &Client{}, true},
+		{"no token", args{context.Background(), Config{}}, &Client{}, true},
+		{"no sa id", args{context.Background(), Config{ServiceAccountToken: "token"}}, &Client{}, true},
 		{"all ok", args{context.Background(), cfg}, &Client{config: cfg}, false},
 	}
 	for _, tt := range tests {
@@ -40,7 +41,7 @@ func TestNew(t *testing.T) {
 				t.Errorf("NewAuth() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !tt.wantErr && !reflect.DeepEqual(got.config, tt.want.config) {
+			if !tt.wantErr && (!reflect.DeepEqual(got.config.ServiceAccountEmail, tt.want.config.ServiceAccountEmail) || !reflect.DeepEqual(got.config.ServiceAccountToken, tt.want.config.ServiceAccountToken)) {
 				t.Errorf("NewAuth() = %v, want %v", got, tt.want)
 			}
 		})
@@ -48,7 +49,7 @@ func TestNew(t *testing.T) {
 }
 
 func TestClient_Request(t *testing.T) {
-	cfg := &Config{
+	cfg := Config{
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
 	}
@@ -161,7 +162,7 @@ func TestClient_Do(t *testing.T) {
 func TestClient_GetHTTPClient(t *testing.T) {
 	type fields struct {
 		client             *http.Client
-		config             *Config
+		config             Config
 		ProductiveServices ProductiveServices
 		Incubator          IncubatorServices
 	}
@@ -190,16 +191,16 @@ func TestClient_GetHTTPClient(t *testing.T) {
 func TestClient_GetConfig(t *testing.T) {
 	type fields struct {
 		client             *http.Client
-		config             *Config
+		config             Config
 		ProductiveServices ProductiveServices
 		Incubator          IncubatorServices
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   *Config
+		want   Config
 	}{
-		{"all ok", fields{config: &Config{}}, &Config{}},
+		{"all ok", fields{config: Config{}}, Config{}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -219,14 +220,14 @@ func TestClient_GetConfig(t *testing.T) {
 func TestClient_SetToken(t *testing.T) {
 	type fields struct {
 		client             *http.Client
-		config             *Config
+		config             Config
 		ProductiveServices ProductiveServices
 		Incubator          IncubatorServices
 	}
 	type args struct {
 		token string
 	}
-	c := &Config{ServiceAccountToken: "abc"}
+	c := Config{ServiceAccountToken: "abc"}
 	tests := []struct {
 		name   string
 		fields fields
@@ -247,7 +248,7 @@ func TestClient_SetToken(t *testing.T) {
 	}
 }
 
-func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
+func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	c, mux, teardown, err := MockServer()
 	defer teardown()
 	if err != nil {
@@ -265,5 +266,11 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); err == nil {
 		t.Error("expected do request to return error but got nil instead")
+	}
+
+	c.SetBaseURL(consts.DEFAULT_BASE_URL)
+	cfg := c.GetConfig()
+	if cfg.BaseUrl.String() != consts.DEFAULT_BASE_URL {
+		t.Errorf("expected base URL to be %s, got %s instead", consts.DEFAULT_BASE_URL, cfg.BaseUrl.String())
 	}
 }

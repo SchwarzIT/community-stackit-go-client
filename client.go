@@ -33,7 +33,7 @@ import (
 type Client struct {
 	ctx    context.Context
 	client *http.Client
-	config *Config
+	config Config
 	retry  *retry.Retry
 
 	// Productive services - services that are ready to be used in production
@@ -48,7 +48,7 @@ type Client struct {
 }
 
 // New returns a new client
-func New(ctx context.Context, cfg *Config) (*Client, error) {
+func New(ctx context.Context, cfg Config) (*Client, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
@@ -89,33 +89,43 @@ func (c *Client) init() *Client {
 	c.setHttpClient(c.ctx)
 
 	// init productive services
-	c.Argus = argus.New(c)
-	c.Costs = costs.New(c)
-	c.Kubernetes = kubernetes.New(c)
-	c.Membership = membership.New(c)
-	c.ObjectStorage = objectstorage.New(c)
-	c.ResourceManagement = resourceManagement.New(c)
+	c.Argus = argus.New(c.clone())
+	c.Costs = costs.New(c.clone())
+	c.Kubernetes = kubernetes.New(c.clone())
+	c.Membership = membership.New(c.clone())
+	c.ObjectStorage = objectstorage.New(c.clone())
+	c.ResourceManagement = resourceManagement.New(c.clone())
 
 	// init incubator services
 	c.Incubator = IncubatorServices{
-		MongoDB:  mongodb.New(c),
-		Postgres: postgres.New(c),
+		MongoDB:  mongodb.New(c.clone()),
+		Postgres: postgres.New(c.clone()),
 	}
 
 	// init archived
 	c.Archived = ArchivedServices{
-		ResourceManagementV1: resourceManagementV1.New(c),
+		ResourceManagementV1: resourceManagementV1.New(c.clone()),
 	}
 
 	return c
+}
+
+// clone creates a shallow clone of the client
+func (c *Client) clone() *Client {
+	nc := *c
+	return &nc
 }
 
 func (c *Client) GetHTTPClient() *http.Client {
 	return c.client
 }
 
-func (c *Client) GetConfig() *Config {
+func (c *Client) GetConfig() Config {
 	return c.config
+}
+
+func (c *Client) SetBaseURL(url string) error {
+	return c.config.SetURL(url)
 }
 
 func (c *Client) SetToken(token string) {
@@ -214,7 +224,7 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 
 	u, _ := url.Parse(server.URL)
 
-	c, err = New(context.Background(), &Config{
+	c, err = New(context.Background(), Config{
 		BaseUrl:             u,
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
