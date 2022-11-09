@@ -33,7 +33,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := client.New(ctx, &client.Config{
+	c, err := client.New(ctx, client.Config{
 		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
 		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
 	})
@@ -69,7 +69,7 @@ The client can automatically retry failed calls using `pkg/retry`
 To enable retry in the client, use `SetRetry` in the following way:
 
 ```Go
-c, _ := client.New(context.Background(), &client.Config{})
+c, _ := client.New(context.Background(), client.Config{})
 c.SetRetry(retry.New())
 ```
 
