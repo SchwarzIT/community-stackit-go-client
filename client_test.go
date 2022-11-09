@@ -269,6 +269,9 @@ func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	}
 
 	c.SetBaseURL(consts.DEFAULT_BASE_URL)
+	if c.GetBaseURL() != consts.DEFAULT_BASE_URL {
+		t.Error("bad url")
+	}
 	cfg := c.GetConfig()
 	if cfg.BaseUrl.String() != consts.DEFAULT_BASE_URL {
 		t.Errorf("expected base URL to be %s, got %s instead", consts.DEFAULT_BASE_URL, cfg.BaseUrl.String())
