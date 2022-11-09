@@ -21,7 +21,7 @@ const (
 	apiPathGet    = consts.API_PATH_DSA_CREDENTIAL
 	apiPathDelete = consts.API_PATH_DSA_CREDENTIAL
 
-	broker     = "example"
+	broker     = 0
 	projectID  = "example"
 	instanceID = "example"
 	credID     = "example"
@@ -40,9 +40,9 @@ const (
 func TestDSACredentialsService_List(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
-	mux.HandleFunc(fmt.Sprintf(apiPathList, broker, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathList, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -112,9 +112,9 @@ const (
 func TestDSACredentialsService_Get(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
-	mux.HandleFunc(fmt.Sprintf(apiPathGet, broker, projectID, instanceID, credID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathGet, projectID, instanceID, credID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -172,9 +172,9 @@ func TestDSACredentialsService_Get(t *testing.T) {
 func TestDSACredentialsService_Create(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
-	mux.HandleFunc(fmt.Sprintf(apiPathCreate, broker, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathCreate, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Error("wrong method")
 		}
@@ -238,9 +238,9 @@ const (
 func TestDSACredentialsService_Delete(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
-	mux.HandleFunc(fmt.Sprintf(apiPathDelete, broker, projectID, instanceID, credID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathDelete, projectID, instanceID, credID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodDelete {
 			t.Error("wrong method")
 		}

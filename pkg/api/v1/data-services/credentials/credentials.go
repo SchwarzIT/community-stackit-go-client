@@ -20,18 +20,14 @@ const (
 )
 
 // New returns a new handler for the service
-func New(c common.Client, broker string) *DSACredentialsService {
+func New(c common.Client) *DSACredentialsService {
 	return &DSACredentialsService{
 		Client: c,
-		broker: broker,
 	}
 }
 
 // DSACredentialsService is the service that retrieves the DSA options
-type DSACredentialsService struct {
-	broker string
-	Client common.Client
-}
+type DSACredentialsService common.Service
 
 // ListResponse is the APIs response for listing all instance credentials
 type ListResponse struct {
@@ -80,7 +76,7 @@ type DeleteResponse struct {
 // List returns all instance credentials
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Credentials.get
 func (svc *DSACredentialsService) List(ctx context.Context, projectID, instanceID string) (res ListResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, svc.broker, projectID, instanceID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}
@@ -92,7 +88,7 @@ func (svc *DSACredentialsService) List(ctx context.Context, projectID, instanceI
 // Get returns a signle instance credential
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Credentials.get
 func (svc *DSACredentialsService) Get(ctx context.Context, projectID, instanceID, credentialID string) (res GetResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, svc.broker, projectID, instanceID, credentialID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, projectID, instanceID, credentialID), nil)
 	if err != nil {
 		return
 	}
@@ -104,7 +100,7 @@ func (svc *DSACredentialsService) Get(ctx context.Context, projectID, instanceID
 // Create creates a new instance credential
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Credentials.Post
 func (svc *DSACredentialsService) Create(ctx context.Context, projectID, instanceID string) (res CreateResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, svc.broker, projectID, instanceID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}
@@ -116,7 +112,7 @@ func (svc *DSACredentialsService) Create(ctx context.Context, projectID, instanc
 // Delete deletes an instance credential
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Credentials.delete
 func (svc *DSACredentialsService) Delete(ctx context.Context, projectID, instanceID, credentialID string) (res DeleteResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathDelete, svc.broker, projectID, instanceID, credentialID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathDelete, projectID, instanceID, credentialID), nil)
 	if err != nil {
 		return
 	}

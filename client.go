@@ -15,8 +15,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
+	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
@@ -33,7 +35,7 @@ import (
 type Client struct {
 	ctx    context.Context
 	client *http.Client
-	config *Config
+	config Config
 	retry  *retry.Retry
 
 	// Productive services - services that are ready to be used in production
@@ -48,7 +50,7 @@ type Client struct {
 }
 
 // New returns a new client
-func New(ctx context.Context, cfg *Config) (*Client, error) {
+func New(ctx context.Context, cfg Config) (*Client, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
@@ -71,6 +73,16 @@ type ProductiveServices struct {
 	Membership         *membership.MembershipService
 	ObjectStorage      *objectstorage.ObjectStorageService
 	ResourceManagement *resourceManagement.ResourceManagementService
+	DataServices       DataServices
+}
+
+type DataServices struct {
+	ElasticSearch *dataservices.DataServicesService
+	LogMe         *dataservices.DataServicesService
+	MariaDB       *dataservices.DataServicesService
+	PostgresDB    *dataservices.DataServicesService
+	RabbitMQ      *dataservices.DataServicesService
+	Redis         *dataservices.DataServicesService
 }
 
 // IncubatorServices is the struct representing all services that are under development
@@ -96,6 +108,15 @@ func (c *Client) init() *Client {
 	c.ObjectStorage = objectstorage.New(c)
 	c.ResourceManagement = resourceManagement.New(c)
 
+	c.DataServices = DataServices{
+		ElasticSearch: dataservices.New(c, dataservices.SERVICE_ELASTICSEARCH, ""),
+		LogMe:         dataservices.New(c, dataservices.SERVICE_LOGME, ""),
+		MariaDB:       dataservices.New(c, dataservices.SERVICE_MARIADB, ""),
+		PostgresDB:    dataservices.New(c, dataservices.SERVICE_POSTGRES, ""),
+		RabbitMQ:      dataservices.New(c, dataservices.SERVICE_RABBITMQ, ""),
+		Redis:         dataservices.New(c, dataservices.SERVICE_REDIS, ""),
+	}
+
 	// init incubator services
 	c.Incubator = IncubatorServices{
 		MongoDB:  mongodb.New(c),
@@ -110,11 +131,29 @@ func (c *Client) init() *Client {
 	return c
 }
 
+// Clone creates a shallow clone of the client
+func (c *Client) Clone() common.Client {
+	nc := *c
+	return &nc
+}
+
+// GetHTTPClient returns the HTTP client
 func (c *Client) GetHTTPClient() *http.Client {
 	return c.client
 }
 
-func (c *Client) GetConfig() *Config {
+// GetBaseURL returns the base url string
+func (c *Client) GetBaseURL() string {
+	return c.config.BaseUrl.String()
+}
+
+// SetBaseURL sets the base url
+func (c *Client) SetBaseURL(url string) error {
+	return c.config.SetURL(url)
+}
+
+// GetConfig returns the client config
+func (c *Client) GetConfig() Config {
 	return c.config
 }
 
@@ -214,7 +253,7 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 
 	u, _ := url.Parse(server.URL)
 
-	c, err = New(context.Background(), &Config{
+	c, err = New(context.Background(), Config{
 		BaseUrl:             u,
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",

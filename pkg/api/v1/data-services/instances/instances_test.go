@@ -24,7 +24,7 @@ const (
 	apiPathCreate = consts.API_PATH_DSA_INSTANCES
 	apiPathGet    = consts.API_PATH_DSA_INSTANCE
 	apiPathUpdate = consts.API_PATH_DSA_INSTANCE
-	broker        = "example"
+	broker        = 0
 )
 
 const (
@@ -53,11 +53,11 @@ const (
 func TestDSAInstancesService_List(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
 	projectID := "abc"
 
-	mux.HandleFunc(fmt.Sprintf(apiPathList, broker, projectID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathList, projectID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -136,12 +136,12 @@ func buildInstance(projectID, instanceID string) instances.Instance {
 func TestDSAInstancesService_Get(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
 	projectID := "abc"
 	instanceID := "string"
 
-	mux.HandleFunc(fmt.Sprintf(apiPathGet, broker, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathGet, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -195,11 +195,11 @@ func TestDSAInstancesService_Get(t *testing.T) {
 func TestDSAInstancesService_Create(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
 	projectID := "abc"
 
-	mux.HandleFunc(fmt.Sprintf(apiPathCreate, broker, projectID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathCreate, projectID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Error("wrong method")
 		}
@@ -256,7 +256,7 @@ func TestDSAInstancesService_Create(t *testing.T) {
 	ctx3, td3 := context.WithTimeout(context.Background(), 3*baseDuration)
 	defer td3()
 
-	mux.HandleFunc(fmt.Sprintf(apiPathGet, broker, projectID, "string"), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathGet, projectID, "string"), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}
@@ -307,7 +307,7 @@ func TestDSAInstancesService_Create(t *testing.T) {
 func TestDSAInstancesService_Update(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
 	projectID := "abc"
 	instaceID := "string"
@@ -328,7 +328,7 @@ func TestDSAInstancesService_Update(t *testing.T) {
 	ctx4, td4 := context.WithTimeout(context.Background(), 4*baseDuration)
 	defer td4()
 
-	mux.HandleFunc(fmt.Sprintf(apiPathUpdate, broker, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathUpdate, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPut {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
@@ -426,7 +426,7 @@ func TestDSAInstancesService_Update(t *testing.T) {
 func TestDSAInstancesService_Delete(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
 	projectID := "abc"
 	instaceID := "def"
@@ -448,7 +448,7 @@ func TestDSAInstancesService_Delete(t *testing.T) {
 	ctx5, td5 := context.WithTimeout(context.Background(), 5*baseDuration)
 	defer td5()
 
-	mux.HandleFunc(fmt.Sprintf(apiPathUpdate, broker, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathUpdate, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)

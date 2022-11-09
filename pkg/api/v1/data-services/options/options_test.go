@@ -18,17 +18,17 @@ import (
 // constants
 const (
 	apiPathOfferings = consts.API_PATH_DSA_OFFERINGS
-	broker           = "example"
+	broker           = 0
 )
 
 func TestMongoDBOptionsService_GetOfferings(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	dsa := dataservices.New(c, broker)
+	dsa := dataservices.New(c, broker, c.GetConfig().BaseUrl.String())
 
 	projectID := "abc"
 
-	mux.HandleFunc(fmt.Sprintf(apiPathOfferings, broker, projectID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathOfferings, projectID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
 		}

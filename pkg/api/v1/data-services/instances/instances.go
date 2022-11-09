@@ -25,18 +25,14 @@ const (
 )
 
 // New returns a new handler for the service
-func New(c common.Client, broker string) *DSAInstancesService {
+func New(c common.Client) *DSAInstancesService {
 	return &DSAInstancesService{
-		broker: broker,
 		Client: c,
 	}
 }
 
 // DSAInstancesService is the service that manages DSA instances
-type DSAInstancesService struct {
-	broker string
-	Client common.Client
-}
+type DSAInstancesService common.Service
 
 // ListResponse represents a list of instances returned from the server
 type ListResponse struct {
@@ -94,7 +90,7 @@ type UpdateResponse struct {
 // List returns a list of DSA instances in project
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Instance.list
 func (svc *DSAInstancesService) List(ctx context.Context, projectID string) (res ListResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, svc.broker, projectID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathList, projectID), nil)
 	if err != nil {
 		return
 	}
@@ -105,7 +101,7 @@ func (svc *DSAInstancesService) List(ctx context.Context, projectID string) (res
 // Get returns the instance information by project and instance IDs
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Instance.get
 func (svc *DSAInstancesService) Get(ctx context.Context, projectID, instanceID string) (res GetResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, svc.broker, projectID, instanceID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}
@@ -123,7 +119,7 @@ func (svc *DSAInstancesService) Create(ctx context.Context, projectID, instanceN
 	data, _ := svc.buildCreateRequest(instanceName, planID, parameters)
 
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, svc.broker, projectID), data)
+	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID), data)
 	if err != nil {
 		return
 	}
@@ -171,7 +167,7 @@ func (svc *DSAInstancesService) Update(ctx context.Context, projectID, instanceI
 	data, _ := svc.buildUpdateRequest(planID, parameters)
 
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathUpdate, svc.broker, projectID, instanceID), data)
+	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
 	if err != nil {
 		return
 	}
@@ -217,7 +213,7 @@ func (svc *DSAInstancesService) waitForUpdate(ctx context.Context, projectID, in
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Instance.deprovision
 func (svc *DSAInstancesService) Delete(ctx context.Context, projectID, instanceID string) (w *wait.Handler, err error) {
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathUpdate, svc.broker, projectID, instanceID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathUpdate, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}

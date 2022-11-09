@@ -17,18 +17,14 @@ const (
 )
 
 // New returns a new handler for the service
-func New(c common.Client, broker string) *DSAOptionsService {
+func New(c common.Client) *DSAOptionsService {
 	return &DSAOptionsService{
 		Client: c,
-		broker: broker,
 	}
 }
 
 // DSAOptionsService is the service that retrieves the DSA options
-type DSAOptionsService struct {
-	broker string
-	Client common.Client
-}
+type DSAOptionsService common.Service
 
 // OfferingsResponse is the APIs response for available offerings
 type OfferingsResponse struct {
@@ -70,7 +66,7 @@ type Plan struct {
 // GetVersions returns all available DSA offerings
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#tag/Offerings
 func (svc *DSAOptionsService) GetOfferings(ctx context.Context, projectID string) (res OfferingsResponse, err error) {
-	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathOfferings, svc.broker, projectID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathOfferings, projectID), nil)
 	if err != nil {
 		return
 	}

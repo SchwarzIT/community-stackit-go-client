@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	c, err := client.New(context.Background(), &client.Config{
+	c, err := client.New(context.Background(), client.Config{
 		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_ID"),
 		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
 	})
