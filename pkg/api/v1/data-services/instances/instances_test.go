@@ -37,7 +37,7 @@ const (
 			"dashboardUrl": "string",
 			"cfGuid": "string",
 			"cfSpaceGuid": "string",
-			"organizationGuid": "string",
+			"cfOrganizationGuid": "string",
 			"imageUrl": "string",
 			"parameters": {},
 			"lastOperation": {
@@ -80,15 +80,15 @@ func TestDSAInstancesService_List(t *testing.T) {
 		{"ok", args{context.Background(), projectID}, instances.ListResponse{
 			Instances: []instances.Instance{
 				{
-					InstanceID:       "string",
-					Name:             "string",
-					PlanID:           "string",
-					DashboardURL:     "string",
-					CFGUID:           "string",
-					CFSpaceGUID:      "string",
-					OrganizationGUID: "string",
-					ImageURL:         "string",
-					Parameters:       map[string]string{},
+					InstanceID:         "string",
+					Name:               "string",
+					PlanID:             "string",
+					DashboardURL:       "string",
+					CFGUID:             "string",
+					CFSpaceGUID:        "string",
+					CFOrganizationGUID: "string",
+					ImageURL:           "string",
+					Parameters:         map[string]string{},
 					LastOperation: instances.LastOperation{
 						Type:        "create",
 						State:       "in progress",
@@ -119,7 +119,7 @@ const get_response = `{
 	"dashboardUrl": "string",
 	"cfGuid": "string",
 	"cfSpaceGuid": "string",
-	"organizationGuid": "string",
+	"cfOrganizationGuid": "string",
 	"imageUrl": "string",
 	"parameters": {},
 	"lastOperation": {
@@ -163,15 +163,15 @@ func TestDSAInstancesService_Get(t *testing.T) {
 	}{
 		{"nil ctx", args{ctx: nil}, instances.GetResponse{}, true},
 		{"ok", args{context.Background(), projectID, "string"}, instances.GetResponse{
-			InstanceID:       "string",
-			Name:             "string",
-			PlanID:           "string",
-			DashboardURL:     "string",
-			CFGUID:           "string",
-			CFSpaceGUID:      "string",
-			OrganizationGUID: "string",
-			ImageURL:         "string",
-			Parameters:       map[string]string{},
+			InstanceID:         "string",
+			Name:               "string",
+			PlanID:             "string",
+			DashboardURL:       "string",
+			CFGUID:             "string",
+			CFSpaceGUID:        "string",
+			CFOrganizationGUID: "string",
+			ImageURL:           "string",
+			Parameters:         map[string]string{},
 			LastOperation: instances.LastOperation{
 				Type:        "create",
 				State:       "in progress",
