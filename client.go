@@ -15,6 +15,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services"
@@ -100,52 +101,60 @@ func (c *Client) init() *Client {
 	c.setHttpClient(c.ctx)
 
 	// init productive services
-	c.Argus = argus.New(c.clone())
-	c.Costs = costs.New(c.clone())
-	c.Kubernetes = kubernetes.New(c.clone())
-	c.Membership = membership.New(c.clone())
-	c.ObjectStorage = objectstorage.New(c.clone())
-	c.ResourceManagement = resourceManagement.New(c.clone())
+	c.Argus = argus.New(c)
+	c.Costs = costs.New(c)
+	c.Kubernetes = kubernetes.New(c)
+	c.Membership = membership.New(c)
+	c.ObjectStorage = objectstorage.New(c)
+	c.ResourceManagement = resourceManagement.New(c)
 
 	c.DataServices = DataServices{
-		ElasticSearch: dataservices.New(c.clone(), dataservices.SERVICE_ELASTICSEARCH, ""),
-		LogMe:         dataservices.New(c.clone(), dataservices.SERVICE_LOGME, ""),
-		MariaDB:       dataservices.New(c.clone(), dataservices.SERVICE_MARIADB, ""),
-		PostgresDB:    dataservices.New(c.clone(), dataservices.SERVICE_POSTGRES, ""),
-		RabbitMQ:      dataservices.New(c.clone(), dataservices.SERVICE_RABBITMQ, ""),
-		Redis:         dataservices.New(c.clone(), dataservices.SERVICE_REDIS, ""),
+		ElasticSearch: dataservices.New(c, dataservices.SERVICE_ELASTICSEARCH, ""),
+		LogMe:         dataservices.New(c, dataservices.SERVICE_LOGME, ""),
+		MariaDB:       dataservices.New(c, dataservices.SERVICE_MARIADB, ""),
+		PostgresDB:    dataservices.New(c, dataservices.SERVICE_POSTGRES, ""),
+		RabbitMQ:      dataservices.New(c, dataservices.SERVICE_RABBITMQ, ""),
+		Redis:         dataservices.New(c, dataservices.SERVICE_REDIS, ""),
 	}
 
 	// init incubator services
 	c.Incubator = IncubatorServices{
-		MongoDB:  mongodb.New(c.clone()),
-		Postgres: postgres.New(c.clone()),
+		MongoDB:  mongodb.New(c),
+		Postgres: postgres.New(c),
 	}
 
 	// init archived
 	c.Archived = ArchivedServices{
-		ResourceManagementV1: resourceManagementV1.New(c.clone()),
+		ResourceManagementV1: resourceManagementV1.New(c),
 	}
 
 	return c
 }
 
-// clone creates a shallow clone of the client
-func (c *Client) clone() *Client {
+// Clone creates a shallow clone of the client
+func (c *Client) Clone() common.Client {
 	nc := *c
 	return &nc
 }
 
+// GetHTTPClient returns the HTTP client
 func (c *Client) GetHTTPClient() *http.Client {
 	return c.client
 }
 
-func (c *Client) GetConfig() Config {
-	return c.config
+// GetBaseURL returns the base url string
+func (c *Client) GetBaseURL() string {
+	return c.config.BaseUrl.String()
 }
 
+// SetBaseURL sets the base url
 func (c *Client) SetBaseURL(url string) error {
 	return c.config.SetURL(url)
+}
+
+// GetConfig returns the client config
+func (c *Client) GetConfig() Config {
+	return c.config
 }
 
 func (c *Client) SetToken(token string) {

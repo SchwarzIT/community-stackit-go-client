@@ -25,13 +25,14 @@ const (
 // broker is the dsa broker (i.e. ElasticSearch or RabbitMQ broker)
 func New(c common.Client, service int, overrideBaseURL string) *DataServicesService {
 	// modify client base url
-	setBaseURL(c, service, overrideBaseURL)
+	nc := c.Clone()
+	setBaseURL(nc, service, overrideBaseURL)
 
 	// retur an initialized data services service
 	return &DataServicesService{
-		Credentials: *credentials.New(c),
-		Instances:   *instances.New(c),
-		Options:     *options.New(c),
+		Credentials: *credentials.New(nc),
+		Instances:   *instances.New(nc),
+		Options:     *options.New(nc),
 	}
 }
 
@@ -46,6 +47,7 @@ type DataServicesService struct {
 func setBaseURL(c common.Client, service int, overrideBaseURL string) {
 	if overrideBaseURL != "" {
 		_ = c.SetBaseURL(overrideBaseURL)
+		return
 	}
 	switch service {
 	case SERVICE_ELASTICSEARCH:
