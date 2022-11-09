@@ -87,10 +87,10 @@ func TestMongoDBOptionsService_GetOfferings(t *testing.T) {
 					ImageURL:         "string",
 					Schema: options.Schema{
 						Create: options.ActionSetup{
-							Parameters: map[string]string{},
+							Parameters: map[string]interface{}{},
 						},
 						Update: options.ActionSetup{
-							Parameters: map[string]string{},
+							Parameters: map[string]interface{}{},
 						},
 					},
 					Plans: []options.Plan{
