@@ -52,7 +52,7 @@ type Schema struct {
 
 // ActionSetup is the setup of action such as create or update
 type ActionSetup struct {
-	Parameters map[string]string `json:"parameters"`
+	Parameters map[string]interface{} `json:"parameters"`
 }
 
 // Plan is a single plan an offer provides
