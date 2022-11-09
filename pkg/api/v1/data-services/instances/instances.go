@@ -41,16 +41,16 @@ type ListResponse struct {
 
 // Instance is a struct representing an instance
 type Instance struct {
-	InstanceID       string            `json:"instanceId,omitempty"`
-	Name             string            `json:"name,omitempty"`
-	PlanID           string            `json:"planId,omitempty"`
-	DashboardURL     string            `json:"dashboardUrl,omitempty"`
-	CFGUID           string            `json:"cfGuid,omitempty"`
-	CFSpaceGUID      string            `json:"cfSpaceGuid,omitempty"`
-	OrganizationGUID string            `json:"organizationGuid,omitempty"`
-	ImageURL         string            `json:"imageUrl,omitempty"`
-	Parameters       map[string]string `json:"parameters,omitempty"`
-	LastOperation    LastOperation     `json:"lastOperation,omitempty"`
+	InstanceID         string            `json:"instanceId,omitempty"`
+	Name               string            `json:"name,omitempty"`
+	PlanID             string            `json:"planId,omitempty"`
+	DashboardURL       string            `json:"dashboardUrl,omitempty"`
+	CFGUID             string            `json:"cfGuid,omitempty"`
+	CFSpaceGUID        string            `json:"cfSpaceGuid,omitempty"`
+	CFOrganizationGUID string            `json:"cfOrganizationGuid,omitempty"`
+	ImageURL           string            `json:"imageUrl,omitempty"`
+	Parameters         map[string]string `json:"parameters,omitempty"`
+	LastOperation      LastOperation     `json:"lastOperation,omitempty"`
 }
 
 // LastOperation is a struct representing instance last operation
