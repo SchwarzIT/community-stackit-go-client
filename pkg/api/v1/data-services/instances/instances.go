@@ -231,7 +231,8 @@ func (svc *DSAInstancesService) waitForDeletion(ctx context.Context, projectID, 
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
 		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) ||
+				strings.Contains(err.Error(), http.StatusText(http.StatusGone)) {
 				return nil, true, nil
 			}
 			return nil, false, err
