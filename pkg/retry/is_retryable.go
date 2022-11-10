@@ -10,7 +10,8 @@ const (
 	CONFIG_IS_RETRYABLE = "IsRetryable"
 
 	// requesrt errors
-	ERR_NO_SUCH_HOST = "dial tcp: lookup"
+	ERR_NO_SUCH_HOST   = "dial tcp: lookup"
+	ERR_CLIENT_TIMEOUT = "Client.Timeout"
 )
 
 // IsRetryable is the config struct
@@ -43,7 +44,7 @@ func IsRetryableNoOp(err error) bool {
 // IsRetryableDefault
 func IsRetryableDefault(err error) bool {
 	if strings.Contains(err.Error(), http.StatusText(http.StatusBadRequest)) {
-		return strings.Contains(err.Error(), ERR_NO_SUCH_HOST)
+		return strings.Contains(err.Error(), ERR_NO_SUCH_HOST) || strings.Contains(err.Error(), ERR_CLIENT_TIMEOUT)
 	}
 
 	if strings.Contains(err.Error(), http.StatusText(http.StatusUnauthorized)) ||
