@@ -2,9 +2,8 @@ package wait
 
 import (
 	"context"
+	"fmt"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 type WaitFn func() (res interface{}, done bool, err error)
@@ -55,7 +54,7 @@ func (w *Handler) Wait() (res interface{}, err error) {
 		case <-tick.Done():
 			// continue
 		case <-ctx.Done():
-			return res, errors.New("wait.Do() timed out")
+			return res, fmt.Errorf("Wait() has timed out.\n- latest response: %v", res)
 		}
 	}
 }
