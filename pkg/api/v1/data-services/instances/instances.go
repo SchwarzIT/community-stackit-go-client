@@ -167,7 +167,7 @@ func (svc *DSAInstancesService) Update(ctx context.Context, projectID, instanceI
 	data, _ := svc.buildUpdateRequest(planID, parameters)
 
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
+	req, err := svc.Client.Request(ctx, http.MethodPatch, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
 	if err != nil {
 		return
 	}
