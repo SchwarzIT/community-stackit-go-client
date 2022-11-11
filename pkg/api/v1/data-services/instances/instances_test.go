@@ -158,11 +158,11 @@ func TestDSAInstancesService_Get(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes instances.GetResponse
+		wantRes instances.Instance
 		wantErr bool
 	}{
-		{"nil ctx", args{ctx: nil}, instances.GetResponse{}, true},
-		{"ok", args{context.Background(), projectID, "string"}, instances.GetResponse{
+		{"nil ctx", args{ctx: nil}, instances.Instance{}, true},
+		{"ok", args{context.Background(), projectID, "string"}, instances.Instance{
 			InstanceID:         "string",
 			Name:               "string",
 			PlanID:             "string",
