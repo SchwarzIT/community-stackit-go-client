@@ -5,7 +5,6 @@ package instances
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
+	"github.com/pkg/errors"
 )
 
 // constants
@@ -168,6 +168,7 @@ func (svc *DSAInstancesService) Update(ctx context.Context, projectID, instanceI
 	// prepare request
 	req, err := svc.Client.Request(ctx, http.MethodPatch, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
 	if err != nil && strings.Contains(err.Error(), "EOF") {
+		err = errors.Wrapf(err, "body: %s", string(data))
 		return
 	}
 
