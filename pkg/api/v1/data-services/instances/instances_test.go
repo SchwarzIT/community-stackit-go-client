@@ -332,10 +332,7 @@ func TestDSAInstancesService_Update(t *testing.T) {
 		if r.Method == http.MethodPatch {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, `{
-			"error": "string",
-			"description": "string"
-		  }`)
+			fmt.Fprint(w, ``)
 			return
 		}
 
@@ -391,13 +388,10 @@ func TestDSAInstancesService_Update(t *testing.T) {
 	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, w, err := dsa.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.planID, tt.args.parametes)
+			_, w, err := dsa.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.planID, tt.args.parametes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("DSAInstancesService.Update() gotRes = %v, want %v", gotRes, tt.wantRes)
 			}
 			if tt.wantWait {
 				process = w

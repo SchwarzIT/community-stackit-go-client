@@ -167,13 +167,15 @@ func (svc *DSAInstancesService) Update(ctx context.Context, projectID, instanceI
 
 	// prepare request
 	req, err := svc.Client.Request(ctx, http.MethodPatch, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
-	if err != nil && strings.Contains(err.Error(), "EOF") {
+	if err != nil {
 		return
 	}
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
-	err = errors.Wrapf(err, "body: %s", string(data))
+	if err != nil && strings.Contains(err.Error(), "EOF") {
+		err = nil
+	}
 
 	// create Wait service
 	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID))
