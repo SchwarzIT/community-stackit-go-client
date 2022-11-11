@@ -22,6 +22,8 @@ const (
 	apiPathCreate = consts.API_PATH_DSA_INSTANCES
 	apiPathGet    = consts.API_PATH_DSA_INSTANCE
 	apiPathUpdate = consts.API_PATH_DSA_INSTANCE
+
+	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
 )
 
 // New returns a new handler for the service
@@ -191,7 +193,7 @@ func (svc *DSAInstancesService) buildUpdateRequest(planID string, parameters map
 func (svc *DSAInstancesService) waitForUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
 			return nil, false, err
 		}
 		if s.LastOperation.Type != consts.DSA_OPERATION_TYPE_UPDATE {
@@ -230,7 +232,7 @@ func (svc *DSAInstancesService) Delete(ctx context.Context, projectID, instanceI
 func (svc *DSAInstancesService) waitForDeletion(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) ||
 				strings.Contains(err.Error(), http.StatusText(http.StatusGone)) {
 				return nil, true, nil
