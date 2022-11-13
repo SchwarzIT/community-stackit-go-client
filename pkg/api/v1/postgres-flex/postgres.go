@@ -5,9 +5,9 @@ package postgres
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/options"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/users"
 )
 
 // New returns a new handler for the service

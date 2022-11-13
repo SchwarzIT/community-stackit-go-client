@@ -283,6 +283,7 @@ func testCreationWait(t *testing.T, mux *http.ServeMux, process *wait.Handler, w
 		if ctx4.Err() == nil {
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, `{"lifecycleState": "ACTIVE"}`)
+			return
 		}
 
 		w.WriteHeader(http.StatusOK)
