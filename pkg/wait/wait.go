@@ -54,9 +54,7 @@ func (w *Handler) Wait() (res interface{}, err error) {
 		case <-tick.Done():
 			// continue
 		case <-ctx.Done():
-			if err != nil {
-				return res, errors.New("Wait() has timed out")
-			}
+			return res, errors.New("Wait() has timed out")
 		}
 	}
 }

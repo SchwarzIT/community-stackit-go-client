@@ -256,7 +256,7 @@ func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	}
 
 	c.SetRetry(retry.New())
-	c.Retry().SetThrottle(1 * time.Second)
+	c.Retry().SetThrottle(1 * time.Microsecond)
 
 	mux.HandleFunc("/err", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
