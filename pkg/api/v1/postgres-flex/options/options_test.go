@@ -11,8 +11,8 @@ import (
 	"testing"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/options"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
 

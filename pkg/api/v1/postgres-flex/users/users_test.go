@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
 

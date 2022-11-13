@@ -22,8 +22,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres"
-	resourceManagementV1 "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/resource-management"
+	postgresFlex "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
 	resourceManagement "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/resource-management"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
@@ -44,9 +43,6 @@ type Client struct {
 	// Incubator - services under development or currently being tested
 	// not ready for production usage
 	Incubator IncubatorServices
-
-	// Archived - for services that are phased out
-	Archived ArchivedServices
 }
 
 // New returns a new client
@@ -69,11 +65,12 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 type ProductiveServices struct {
 	Argus              *argus.ArgusService
 	Costs              *costs.CostsService
+	DataServices       DataServices
 	Kubernetes         *kubernetes.KubernetesService
 	Membership         *membership.MembershipService
 	ObjectStorage      *objectstorage.ObjectStorageService
+	PostgresFlex       *postgresFlex.PostgresService
 	ResourceManagement *resourceManagement.ResourceManagementService
-	DataServices       DataServices
 }
 
 type DataServices struct {
@@ -87,13 +84,7 @@ type DataServices struct {
 
 // IncubatorServices is the struct representing all services that are under development
 type IncubatorServices struct {
-	MongoDB  *mongodb.MongoDBService
-	Postgres *postgres.PostgresService
-}
-
-// ArchivedServices is used for services that are being phased out
-type ArchivedServices struct {
-	ResourceManagementV1 *resourceManagementV1.ResourceManagementV1Service
+	MongoDB *mongodb.MongoDBService
 }
 
 // init initializes the client and its services and returns the client
@@ -107,6 +98,7 @@ func (c *Client) init() *Client {
 	c.Membership = membership.New(c)
 	c.ObjectStorage = objectstorage.New(c)
 	c.ResourceManagement = resourceManagement.New(c)
+	c.PostgresFlex = postgresFlex.New(c)
 
 	c.DataServices = DataServices{
 		ElasticSearch: dataservices.New(c, dataservices.SERVICE_ELASTICSEARCH, ""),
@@ -119,13 +111,7 @@ func (c *Client) init() *Client {
 
 	// init incubator services
 	c.Incubator = IncubatorServices{
-		MongoDB:  mongodb.New(c),
-		Postgres: postgres.New(c),
-	}
-
-	// init archived
-	c.Archived = ArchivedServices{
-		ResourceManagementV1: resourceManagementV1.New(c),
+		MongoDB: mongodb.New(c),
 	}
 
 	return c
