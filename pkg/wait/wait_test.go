@@ -2,11 +2,10 @@ package wait
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"testing"
 	"time"
-
-	"github.com/pkg/errors"
 )
 
 func TestNew(t *testing.T) {
@@ -57,7 +56,7 @@ func TestWait_SetThrottle(t *testing.T) {
 }
 
 func TestWait_Run(t *testing.T) {
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
 	defer cancel()
 
 	type fields struct {
@@ -75,18 +74,18 @@ func TestWait_Run(t *testing.T) {
 			return nil, true, nil
 		}}, true, false},
 
-		{"ok 2", fields{throttle: 1 * time.Second, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
+		{"ok 2", fields{throttle: 200 * time.Millisecond, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
 			if ctx.Err() == nil {
 				return nil, false, nil
 			}
 			return nil, true, nil
 		}}, true, false},
 
-		{"err", fields{throttle: 1 * time.Second, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
+		{"err", fields{throttle: 1 * time.Millisecond, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
 			return nil, true, errors.New("something happened")
 		}}, true, true},
 
-		{"timeout", fields{throttle: 1 * time.Second, timeout: 1 * time.Second, fn: func() (res interface{}, done bool, err error) {
+		{"timeout", fields{throttle: 1 * time.Millisecond, timeout: 1 * time.Millisecond, fn: func() (res interface{}, done bool, err error) {
 			return nil, false, nil
 		}}, false, true},
 	}

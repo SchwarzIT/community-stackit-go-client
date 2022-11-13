@@ -38,13 +38,14 @@ const (
 
 func TestClient_DoWithRetryThrottle(t *testing.T) {
 	c, mux, teardown, err := client.MockServer()
+	baseTime := 200 * time.Millisecond
 	c.SetRetry(retry.New())
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	ctx, cancel := context.WithTimeout(context.Background(), baseTime*2)
 	defer cancel()
 	mux.HandleFunc("/2s", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -57,7 +58,7 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 		}
 	})
 
-	c.Retry().SetThrottle(1 * time.Second)
+	c.Retry().SetThrottle(1 * baseTime)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
 	var got struct {
@@ -105,7 +106,8 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 		w.WriteHeader(http.StatusLocked)
 	})
 
-	c.Retry().SetThrottle(1 * time.Second).SetMaxRetries(2)
+	baseTime := 200 * time.Millisecond
+	c.Retry().SetThrottle(baseTime).SetMaxRetries(2)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "reached max retries") {
 		t.Errorf("expected do request to return max retries error but got %q instead", err)
@@ -125,13 +127,14 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 		w.WriteHeader(http.StatusLocked)
 	})
 
-	c.Retry().SetTimeout(5 * time.Second)
+	baseTime := 200 * time.Millisecond
+	c.Retry().SetTimeout(baseTime)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") && !strings.Contains(err.Error(), http.StatusText(http.StatusLocked)) {
 		t.Errorf("expected do request to return retry context timed out error with locked error status but got '%v' instead", err)
 	}
 
-	c.Retry().SetTimeout(0 * time.Second)
+	c.Retry().SetTimeout(baseTime)
 	req, _ = c.Request(context.Background(), http.MethodGet, "/err", nil)
 	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") {
 		t.Errorf("expected do request to return retry context timed out error but got '%v' instead", err)
@@ -145,8 +148,8 @@ func TestClient_DoWithUntil(t *testing.T) {
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	baseTime := 200 * time.Millisecond
+	ctx, cancel := context.WithTimeout(context.Background(), baseTime*2)
 	defer cancel()
 	mux.HandleFunc("/2s", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -163,7 +166,7 @@ func TestClient_DoWithUntil(t *testing.T) {
 		Status bool `json:"status"`
 	}
 
-	c.Retry().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
+	c.Retry().SetThrottle(1 * baseTime).SetUntil(func(r *http.Response) (bool, error) {
 		return got.Status, nil
 	})
 
@@ -177,7 +180,7 @@ func TestClient_DoWithUntil(t *testing.T) {
 		t.Errorf("received status = %v", got.Status)
 	}
 
-	c.Retry().SetThrottle(1 * time.Second).SetUntil(func(r *http.Response) (bool, error) {
+	c.Retry().SetThrottle(1 * baseTime).SetUntil(func(r *http.Response) (bool, error) {
 		return got.Status, errors.New("error")
 	})
 

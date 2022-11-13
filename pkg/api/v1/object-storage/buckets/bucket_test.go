@@ -4,14 +4,15 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/SchwarzIT/community-stackit-go-client"
-	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"net/http"
 	"reflect"
 	"testing"
 	"time"
+
+	client "github.com/SchwarzIT/community-stackit-go-client"
+	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
 
 // constants
@@ -140,7 +141,8 @@ func TestObjectStorageBucketsService_Get(t *testing.T) {
 func TestObjectStorageBucketsService_Create(t *testing.T) {
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 	bucketName := "my-bucket"
-	ctx1, cancel1 := context.WithTimeout(context.Background(), 1*time.Second)
+	baseTime := 200 * time.Millisecond
+	ctx1, cancel1 := context.WithTimeout(context.Background(), baseTime)
 	defer cancel1()
 	cancelledCtx, cancelTmp := context.WithCancel(context.TODO())
 	cancelTmp()
@@ -197,7 +199,7 @@ func TestObjectStorageBucketsService_Create(t *testing.T) {
 			process, err := s.Create(tt.args.ctx, tt.args.projectID, tt.args.bucketName)
 			hasErr := err != nil
 			if !hasErr {
-				process.SetThrottle(1 * time.Second)
+				process.SetThrottle(1 * baseTime)
 				_, err = process.Wait()
 			}
 			hasErr = hasErr || err != nil
@@ -211,7 +213,8 @@ func TestObjectStorageBucketsService_Create(t *testing.T) {
 func TestObjectStorageBucketsService_Delete(t *testing.T) {
 	projectID := "5dae0612-f5b1-4615-b7ca-b18796aa7e78"
 	bucketName := "my-bucket"
-	ctx1, cancel1 := context.WithTimeout(context.Background(), 1*time.Second)
+	baseTime := 200 * time.Millisecond
+	ctx1, cancel1 := context.WithTimeout(context.Background(), baseTime)
 	defer cancel1()
 	cancelledCtx, cancelTmp := context.WithCancel(context.TODO())
 	cancelTmp()
@@ -265,7 +268,7 @@ func TestObjectStorageBucketsService_Delete(t *testing.T) {
 			process, err := s.Delete(tt.args.ctx, tt.args.projectID, tt.args.bucketName)
 			hasErr := err != nil
 			if !hasErr {
-				process.SetThrottle(1 * time.Second)
+				process.SetThrottle(baseTime)
 				_, err = process.Wait()
 			}
 			hasErr = hasErr || err != nil
