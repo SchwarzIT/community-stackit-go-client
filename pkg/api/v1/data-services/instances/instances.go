@@ -5,7 +5,6 @@ package instances
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
+	"github.com/pkg/errors"
 )
 
 // constants
@@ -22,6 +22,8 @@ const (
 	apiPathCreate = consts.API_PATH_DSA_INSTANCES
 	apiPathGet    = consts.API_PATH_DSA_INSTANCE
 	apiPathUpdate = consts.API_PATH_DSA_INSTANCE
+
+	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
 )
 
 // New returns a new handler for the service
@@ -60,9 +62,6 @@ type LastOperation struct {
 	Description string `json:"description,omitempty"`
 }
 
-// GetResponse is the server response for Get call
-type GetResponse Instance
-
 // CreateRequest holds data for creating instance
 type CreateRequest struct {
 	PlanID       string            `json:"planId,omitempty"`
@@ -100,7 +99,7 @@ func (svc *DSAInstancesService) List(ctx context.Context, projectID string) (res
 
 // Get returns the instance information by project and instance IDs
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Instance.get
-func (svc *DSAInstancesService) Get(ctx context.Context, projectID, instanceID string) (res GetResponse, err error) {
+func (svc *DSAInstancesService) Get(ctx context.Context, projectID, instanceID string) (res Instance, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathGet, projectID, instanceID), nil)
 	if err != nil {
 		return
@@ -144,7 +143,7 @@ func (svc *DSAInstancesService) buildCreateRequest(instanceName, planID string, 
 func (svc *DSAInstancesService) waitForCreation(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
 			return nil, false, err
 		}
 		if s.LastOperation.State == consts.DSA_STATE_SUCCEEDED {
@@ -167,13 +166,16 @@ func (svc *DSAInstancesService) Update(ctx context.Context, projectID, instanceI
 	data, _ := svc.buildUpdateRequest(planID, parameters)
 
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
+	req, err := svc.Client.Request(ctx, http.MethodPatch, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
 	if err != nil {
 		return
 	}
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
+	if err != nil && strings.Contains(err.Error(), "EOF") {
+		err = nil
+	}
 
 	// create Wait service
 	w = wait.New(svc.waitForUpdate(ctx, projectID, instanceID))
@@ -191,7 +193,7 @@ func (svc *DSAInstancesService) buildUpdateRequest(planID string, parameters map
 func (svc *DSAInstancesService) waitForUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
-		if err != nil {
+		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
 			return nil, false, err
 		}
 		if s.LastOperation.Type != consts.DSA_OPERATION_TYPE_UPDATE {
@@ -209,7 +211,7 @@ func (svc *DSAInstancesService) waitForUpdate(ctx context.Context, projectID, in
 
 // Delete deletes a DSA instance and returns a wait handler and error if occurred
 // `Wait()` will wait until the instance is successfully deleted
-// Wait() returns nil (empty response from server) and error if it occurred
+// Wait() returns nil on success or Instance if failed and error if it occurred
 // See also https://api.stackit.schwarz/data-services/openapi.v1.html#operation/Instance.deprovision
 func (svc *DSAInstancesService) Delete(ctx context.Context, projectID, instanceID string) (w *wait.Handler, err error) {
 	// prepare request
@@ -230,11 +232,12 @@ func (svc *DSAInstancesService) Delete(ctx context.Context, projectID, instanceI
 func (svc *DSAInstancesService) waitForDeletion(ctx context.Context, projectID, instanceID string) wait.WaitFn {
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
-		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) ||
+				strings.Contains(err.Error(), http.StatusText(http.StatusGone)) {
 				return nil, true, nil
 			}
-			return nil, false, err
+			return s, false, err
 		}
 		if s.LastOperation.Type != consts.DSA_OPERATION_TYPE_DELETE {
 			return s, false, nil
@@ -245,6 +248,6 @@ func (svc *DSAInstancesService) waitForDeletion(ctx context.Context, projectID, 
 		if s.LastOperation.State == consts.DSA_STATE_FAILED {
 			return s, false, errors.New("received failed status for DSA instance deletion")
 		}
-		return nil, false, nil
+		return s, false, nil
 	}
 }

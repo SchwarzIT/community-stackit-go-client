@@ -158,11 +158,11 @@ func TestDSAInstancesService_Get(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes instances.GetResponse
+		wantRes instances.Instance
 		wantErr bool
 	}{
-		{"nil ctx", args{ctx: nil}, instances.GetResponse{}, true},
-		{"ok", args{context.Background(), projectID, "string"}, instances.GetResponse{
+		{"nil ctx", args{ctx: nil}, instances.Instance{}, true},
+		{"ok", args{context.Background(), projectID, "string"}, instances.Instance{
 			InstanceID:         "string",
 			Name:               "string",
 			PlanID:             "string",
@@ -329,13 +329,10 @@ func TestDSAInstancesService_Update(t *testing.T) {
 	defer td4()
 
 	mux.HandleFunc(fmt.Sprintf(apiPathUpdate, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPut {
+		if r.Method == http.MethodPatch {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, `{
-			"error": "string",
-			"description": "string"
-		  }`)
+			fmt.Fprint(w, ``)
 			return
 		}
 
@@ -391,13 +388,10 @@ func TestDSAInstancesService_Update(t *testing.T) {
 	var process *wait.Handler
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, w, err := dsa.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.planID, tt.args.parametes)
+			_, w, err := dsa.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.planID, tt.args.parametes)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("DSAInstancesService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return
-			}
-			if !reflect.DeepEqual(gotRes, tt.wantRes) {
-				t.Errorf("DSAInstancesService.Update() gotRes = %v, want %v", gotRes, tt.wantRes)
 			}
 			if tt.wantWait {
 				process = w
