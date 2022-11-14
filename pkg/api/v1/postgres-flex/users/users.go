@@ -113,12 +113,12 @@ func (svc *PostgresUsersService) Create(ctx context.Context, projectID, instance
 	// prepare request
 	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, instanceID), data)
 	if err != nil {
-		err = errors.Wrapf(err, "request body:\n%s", data)
 		return
 	}
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
+	err = errors.Wrapf(err, "request body:\n%s", string(data))
 	return
 }
 
