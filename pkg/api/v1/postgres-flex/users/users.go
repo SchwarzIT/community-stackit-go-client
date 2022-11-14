@@ -15,7 +15,7 @@ import (
 // constants
 const (
 	apiPathList   = consts.API_PATH_POSTGRES_FLEX_USERS
-	apiPathCreate = consts.API_PATH_POSTGRES_FLEX_USER
+	apiPathCreate = consts.API_PATH_POSTGRES_FLEX_USERS
 	apiPathGet    = consts.API_PATH_POSTGRES_FLEX_USER
 )
 
@@ -104,13 +104,13 @@ func (svc *PostgresUsersService) Get(ctx context.Context, projectID, instanceID,
 
 // Create adds a new Postgres user and returns the server response (CreateResponse) and error if occurred
 // See also https://api.stackit.schwarz/postgres-flex-service/openapi.html#tag/users/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/post
-func (svc *PostgresUsersService) Create(ctx context.Context, projectID, instanceID, userID, username, database string, roles []string) (res CreateResponse, err error) {
+func (svc *PostgresUsersService) Create(ctx context.Context, projectID, instanceID, username, database string, roles []string) (res CreateResponse, err error) {
 
 	// build body
 	data, _ := svc.buildCreateRequest(username, database, roles)
 
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, instanceID, userID), data)
+	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, instanceID), data)
 	if err != nil {
 		return
 	}
