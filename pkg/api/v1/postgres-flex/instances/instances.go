@@ -22,6 +22,7 @@ const (
 	apiPathCreate = consts.API_PATH_POSTGRES_FLEX_INSTANCES
 	apiPathGet    = consts.API_PATH_POSTGRES_FLEX_INSTANCE
 	apiPathUpdate = consts.API_PATH_POSTGRES_FLEX_INSTANCE
+	apiPathDelete = consts.API_PATH_POSTGRES_FLEX_INSTANCE
 )
 
 // New returns a new handler for the service
@@ -253,7 +254,7 @@ func (svc *PostgresInstancesService) buildUpdateRequest(flavorID string, backupS
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/put
 func (svc *PostgresInstancesService) Delete(ctx context.Context, projectID, instanceID string) (w *wait.Handler, err error) {
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathUpdate, projectID, instanceID), nil)
+	req, err := svc.Client.Request(ctx, http.MethodDelete, fmt.Sprintf(apiPathDelete, projectID, instanceID), nil)
 	if err != nil {
 		return
 	}

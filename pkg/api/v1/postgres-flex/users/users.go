@@ -10,6 +10,7 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/pkg/errors"
 )
 
 // constants
@@ -117,6 +118,7 @@ func (svc *PostgresUsersService) Create(ctx context.Context, projectID, instance
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
+	err = errors.Wrapf(err, "request body:\n%s", string(data))
 	return
 }
 

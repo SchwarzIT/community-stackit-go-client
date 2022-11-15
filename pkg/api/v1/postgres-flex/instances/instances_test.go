@@ -24,6 +24,7 @@ const (
 	apiPathCreate = consts.API_PATH_POSTGRES_FLEX_INSTANCES
 	apiPathGet    = consts.API_PATH_POSTGRES_FLEX_INSTANCE
 	apiPathUpdate = consts.API_PATH_POSTGRES_FLEX_INSTANCE
+	apiPathDelete = consts.API_PATH_POSTGRES_FLEX_INSTANCE
 )
 
 func TestPostgresInstancesService_List(t *testing.T) {
@@ -410,7 +411,7 @@ func TestPostgresInstancesService_Delete(t *testing.T) {
 	ctx2, td2 := context.WithTimeout(context.Background(), 2*baseDuration)
 	defer td2()
 
-	mux.HandleFunc(fmt.Sprintf(apiPathUpdate, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathDelete, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusOK)
