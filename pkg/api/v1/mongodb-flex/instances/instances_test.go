@@ -12,8 +12,8 @@ import (
 	"time"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )

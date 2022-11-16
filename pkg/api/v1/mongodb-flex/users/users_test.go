@@ -10,8 +10,8 @@ import (
 	"testing"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
 
