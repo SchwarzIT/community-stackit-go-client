@@ -68,7 +68,7 @@ type ProductiveServices struct {
 	DataServices       DataServices
 	Kubernetes         *kubernetes.KubernetesService
 	Membership         *membership.MembershipService
-	MongoDB            *mongodbFlex.MongoDBService
+	MongoDBFlex        *mongodbFlex.MongoDBService
 	ObjectStorage      *objectstorage.ObjectStorageService
 	PostgresFlex       *postgresFlex.PostgresService
 	ResourceManagement *resourceManagement.ResourceManagementService
@@ -96,7 +96,7 @@ func (c *Client) init() *Client {
 	c.Costs = costs.New(c)
 	c.Kubernetes = kubernetes.New(c)
 	c.Membership = membership.New(c)
-	c.MongoDB = mongodbFlex.New(c)
+	c.MongoDBFlex = mongodbFlex.New(c)
 	c.ObjectStorage = objectstorage.New(c)
 	c.ResourceManagement = resourceManagement.New(c)
 	c.PostgresFlex = postgresFlex.New(c)
