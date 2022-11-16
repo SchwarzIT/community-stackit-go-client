@@ -5,9 +5,9 @@ package mongodb
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/options"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/users"
 )
 
 // New returns a new handler for the service

@@ -10,12 +10,13 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/pkg/errors"
 )
 
 // constants
 const (
 	apiPathList   = consts.API_PATH_MONGO_DB_FLEX_USERS
-	apiPathCreate = consts.API_PATH_MONGO_DB_FLEX_USER
+	apiPathCreate = consts.API_PATH_MONGO_DB_FLEX_USERS
 	apiPathGet    = consts.API_PATH_MONGO_DB_FLEX_USER
 )
 
@@ -104,19 +105,20 @@ func (svc *MongoDBUsersService) Get(ctx context.Context, projectID, instanceID, 
 
 // Create adds a new MongoDB user and returns the server response (CreateResponse) and error if occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/user/paths/~1projects~1{projectId}~1instances~1{instanceId}~1users~1{userId}/post
-func (svc *MongoDBUsersService) Create(ctx context.Context, projectID, instanceID, userID, username, database string, roles []string) (res CreateResponse, err error) {
+func (svc *MongoDBUsersService) Create(ctx context.Context, projectID, instanceID, username, database string, roles []string) (res CreateResponse, err error) {
 
 	// build body
 	data, _ := svc.buildCreateRequest(username, database, roles)
 
 	// prepare request
-	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, instanceID, userID), data)
+	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID, instanceID), data)
 	if err != nil {
 		return
 	}
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
+	err = errors.Wrapf(err, "body: %s", string(data))
 	return
 }
 

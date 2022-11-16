@@ -10,15 +10,15 @@ import (
 	"testing"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
 
 // constants
 const (
 	apiPathList   = consts.API_PATH_MONGO_DB_FLEX_USERS
-	apiPathCreate = consts.API_PATH_MONGO_DB_FLEX_USER
+	apiPathCreate = consts.API_PATH_MONGO_DB_FLEX_USERS
 	apiPathGet    = consts.API_PATH_MONGO_DB_FLEX_USER
 )
 
@@ -148,7 +148,7 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 	instanceID := "efg"
 	userID := "123"
 
-	mux.HandleFunc(fmt.Sprintf(apiPathGet, projectID, instanceID, userID), func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc(fmt.Sprintf(apiPathCreate, projectID, instanceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			t.Error("wrong method")
 		}
@@ -174,7 +174,6 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 		ctx        context.Context
 		projectID  string
 		instanceID string
-		userID     string
 		username   string
 		database   string
 		roles      []string
@@ -189,7 +188,6 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 			context.Background(),
 			projectID,
 			instanceID,
-			userID,
 			"string",
 			"string",
 			[]string{"string"},
@@ -210,7 +208,7 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := mongo.Users.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.userID, tt.args.username, tt.args.database, tt.args.roles)
+			gotRes, err := mongo.Users.Create(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.username, tt.args.database, tt.args.roles)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MongoDBUsersService.Create() error = %v, wantErr %v", err, tt.wantErr)
 				return

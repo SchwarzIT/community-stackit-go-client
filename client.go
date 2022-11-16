@@ -20,7 +20,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb"
+	mongodbFlex "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	postgresFlex "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v2/membership"
@@ -68,6 +68,7 @@ type ProductiveServices struct {
 	DataServices       DataServices
 	Kubernetes         *kubernetes.KubernetesService
 	Membership         *membership.MembershipService
+	MongoDBFlex        *mongodbFlex.MongoDBService
 	ObjectStorage      *objectstorage.ObjectStorageService
 	PostgresFlex       *postgresFlex.PostgresService
 	ResourceManagement *resourceManagement.ResourceManagementService
@@ -84,7 +85,6 @@ type DataServices struct {
 
 // IncubatorServices is the struct representing all services that are under development
 type IncubatorServices struct {
-	MongoDB *mongodb.MongoDBService
 }
 
 // init initializes the client and its services and returns the client
@@ -96,6 +96,7 @@ func (c *Client) init() *Client {
 	c.Costs = costs.New(c)
 	c.Kubernetes = kubernetes.New(c)
 	c.Membership = membership.New(c)
+	c.MongoDBFlex = mongodbFlex.New(c)
 	c.ObjectStorage = objectstorage.New(c)
 	c.ResourceManagement = resourceManagement.New(c)
 	c.PostgresFlex = postgresFlex.New(c)
@@ -110,9 +111,7 @@ func (c *Client) init() *Client {
 	}
 
 	// init incubator services
-	c.Incubator = IncubatorServices{
-		MongoDB: mongodb.New(c),
-	}
+	c.Incubator = IncubatorServices{}
 
 	return c
 }
