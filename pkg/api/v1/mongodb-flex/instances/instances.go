@@ -5,7 +5,6 @@ package instances
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
+	"github.com/pkg/errors"
 )
 
 // constants
@@ -173,6 +173,7 @@ func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, insta
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
+	err = errors.Wrapf(err, "body: %s", string(data))
 
 	// create Wait service
 	w = wait.New(svc.waitForCreateOrUpdate(ctx, projectID, res.ID))
@@ -229,6 +230,7 @@ func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, insta
 
 	// do request
 	_, err = svc.Client.Do(req, &res)
+	err = errors.Wrapf(err, "body: %s", string(data))
 
 	// create Wait service
 	w = wait.New(svc.waitForCreateOrUpdate(ctx, projectID, instanceID))
