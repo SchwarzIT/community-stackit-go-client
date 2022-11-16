@@ -94,7 +94,9 @@ func ValidateNodePool(np NodePool) error {
 func ValidateTaint(t Taint) error {
 	switch t.Effect {
 	case consts.SKE_CLUSTERS_TAINT_EFFECT_NO_EXEC:
+		fallthrough
 	case consts.SKE_CLUSTERS_TAINT_EFFECT_NO_SCHED:
+		fallthrough
 	case consts.SKE_CLUSTERS_TAINT_EFFECT_PREF_NO_SCHED:
 	default:
 		return fmt.Errorf("invalid taint effect '%s'", t.Effect)
@@ -110,6 +112,7 @@ func ValidateTaint(t Taint) error {
 func ValidateCRI(c CRI) error {
 	switch c.Name {
 	case consts.SKE_CLUSTERS_CRI_CONTAINERD:
+		fallthrough
 	case consts.SKE_CLUSTERS_CRI_DOCKER:
 	default:
 		return fmt.Errorf("invalid CRI name '%s'", c.Name)
