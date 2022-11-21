@@ -200,6 +200,9 @@ func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, p
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
 		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.Item.Status == consts.MONGO_DB_STATUS_READY {

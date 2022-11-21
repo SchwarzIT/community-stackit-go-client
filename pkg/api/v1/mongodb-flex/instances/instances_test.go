@@ -281,18 +281,26 @@ func TestMongoDBInstancesService_Create(t *testing.T) {
 
 	baseDuration := time.Millisecond * 200
 
-	ctx1, td1 := context.WithTimeout(context.Background(), 1*baseDuration)
+	ctx0, td0 := context.WithTimeout(context.Background(), 1*baseDuration)
+	defer td0()
+
+	ctx1, td1 := context.WithTimeout(context.Background(), 2*baseDuration)
 	defer td1()
 
-	ctx2, td2 := context.WithTimeout(context.Background(), 2*baseDuration)
+	ctx2, td2 := context.WithTimeout(context.Background(), 3*baseDuration)
 	defer td2()
 
-	ctx3, td3 := context.WithTimeout(context.Background(), 3*baseDuration)
+	ctx3, td3 := context.WithTimeout(context.Background(), 4*baseDuration)
 	defer td3()
 
 	mux.HandleFunc(fmt.Sprintf(apiPathGet, projectID, instaceID), func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			t.Error("wrong method")
+		}
+
+		if ctx0.Err() == nil {
+			w.WriteHeader(http.StatusNotFound)
+			return
 		}
 
 		if ctx1.Err() == nil {
