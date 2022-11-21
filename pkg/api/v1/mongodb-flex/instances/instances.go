@@ -196,6 +196,7 @@ func (svc *MongoDBInstancesService) buildCreateRequest(instanceName, flavorID st
 }
 
 func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, projectID, instanceID string) wait.WaitFn {
+	preProcessing := true
 	return func() (res interface{}, done bool, err error) {
 		s, err := svc.Get(ctx, projectID, instanceID)
 		if err != nil {
@@ -204,7 +205,10 @@ func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, p
 		if s.Item.Status == consts.MONGO_DB_STATUS_READY {
 			return s.Item, true, nil
 		}
-		if s.Item.Status == consts.MONGO_DB_STATUS_FAILED {
+		if s.Item.Status == consts.MONGO_DB_STATUS_PROCESSING {
+			preProcessing = false
+		}
+		if s.Item.Status == consts.MONGO_DB_STATUS_FAILED && !preProcessing {
 			return s.Item, false, errors.New("received status FAILED from server")
 		}
 		return s.Item, false, nil
