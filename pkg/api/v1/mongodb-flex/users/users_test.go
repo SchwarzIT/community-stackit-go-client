@@ -157,7 +157,7 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 		fmt.Fprint(w, `{
 			"item": {
 			  "database": "string",
-			  "hostname": "string",
+			  "host": "string",
 			  "id": "123",
 			  "password": "string",
 			  "port": 0,
@@ -194,7 +194,7 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 		}, users.CreateResponse{
 			Item: users.User{
 				Database: "string",
-				Hostname: "string",
+				Host:     "string",
 				ID:       userID,
 				Password: "string",
 				Port:     0,

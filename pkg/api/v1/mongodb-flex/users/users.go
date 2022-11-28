@@ -60,7 +60,7 @@ type UserGetItem struct {
 // User represents a user with access to the database
 type User struct {
 	Database string   `json:"database,omitempty"`
-	Hostname string   `json:"hostname,omitempty"`
+	Host     string   `json:"host,omitempty"`
 	ID       string   `json:"id,omitempty"`
 	Password string   `json:"password,omitempty"`
 	Port     int      `json:"port,omitempty"`
