@@ -93,8 +93,8 @@ type User struct {
 	Username string   `json:"username,omitempty"`
 }
 
-// CreateRequest holds data for requesting new instance
-type CreateRequest struct {
+// CreateOrUpdateRequest holds payload data for requesting instance creation/update
+type CreateOrUpdateRequest struct {
 	ACL            ACL               `json:"acl"`
 	BackupSchedule string            `json:"backupSchedule"`
 	FlavorID       string            `json:"flavorId"`
@@ -128,7 +128,11 @@ type UpdateRequest struct {
 	BackupSchedule string            `json:"backupSchedule"`
 	FlavorID       string            `json:"flavorId"`
 	Labels         map[string]string `json:"labels"`
+	Name           string            `json:"name"`
 	Options        map[string]string `json:"options"`
+	Replicas       int               `json:"replicas"`
+	Storage        Storage           `json:"storage"`
+	Version        string            `json:"version"`
 }
 
 // List returns a list of MongoDB Flex instances in project
@@ -163,7 +167,7 @@ func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, insta
 ) (res CreateResponse, w *wait.Handler, err error) {
 
 	// build body
-	data, _ := svc.buildCreateRequest(instanceName, flavorID, storage, version, replicas, backupSchedule, labels, options, acl)
+	data, _ := svc.buildCreateOrUpdateRequest(instanceName, flavorID, storage, version, replicas, backupSchedule, labels, options, acl)
 
 	// prepare request
 	req, err := svc.Client.Request(ctx, http.MethodPost, fmt.Sprintf(apiPathCreate, projectID), data)
@@ -181,8 +185,8 @@ func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, insta
 	return res, w, err
 }
 
-func (svc *MongoDBInstancesService) buildCreateRequest(instanceName, flavorID string, storage Storage, version string, replicas int, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
-	return json.Marshal(CreateRequest{
+func (svc *MongoDBInstancesService) buildCreateOrUpdateRequest(instanceName, flavorID string, storage Storage, version string, replicas int, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
+	return json.Marshal(CreateOrUpdateRequest{
 		Name:           instanceName,
 		FlavorID:       flavorID,
 		Storage:        storage,
@@ -222,12 +226,13 @@ func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, p
 // which upon call to `Wait()` will wait until the instance is successfully updated
 // Wait() returns the full instance details (Instance) and error if it occurred
 // See also https://api.stackit.schwarz/mongo-flex-service/openapi.html#tag/instance/paths/~1projects~1{projectId}~1instances~1{instanceId}/put
-func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, instanceID, flavorID string,
+func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, instanceID, instanceName, flavorID string,
+	storage Storage, version string, replicas int,
 	backupSchedule string, labels, options map[string]string, acl ACL,
 ) (res UpdateResponse, w *wait.Handler, err error) {
 
 	// build body
-	data, _ := svc.buildUpdateRequest(flavorID, backupSchedule, labels, options, acl)
+	data, _ := svc.buildCreateOrUpdateRequest(instanceName, flavorID, storage, version, replicas, backupSchedule, labels, options, acl)
 
 	// prepare request
 	req, err := svc.Client.Request(ctx, http.MethodPut, fmt.Sprintf(apiPathUpdate, projectID, instanceID), data)
@@ -243,16 +248,6 @@ func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, insta
 	w = wait.New(svc.waitForCreateOrUpdate(ctx, projectID, instanceID))
 	w.SetTimeout(1 * time.Hour)
 	return res, w, err
-}
-
-func (svc *MongoDBInstancesService) buildUpdateRequest(flavorID string, backupSchedule string, labels, options map[string]string, acl ACL) ([]byte, error) {
-	return json.Marshal(UpdateRequest{
-		FlavorID:       flavorID,
-		BackupSchedule: backupSchedule,
-		Labels:         labels,
-		Options:        options,
-		ACL:            acl,
-	})
 }
 
 // Delete deletes a MongoDB instance and returns a wait handler and error if occurred

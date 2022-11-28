@@ -369,7 +369,11 @@ func TestMongoDBInstancesService_Update(t *testing.T) {
 		ctx            context.Context
 		projectID      string
 		instanceID     string
+		name           string
 		flavorID       string
+		storage        instances.Storage
+		varsion        string
+		replicas       int
 		backupSchedule string
 		labels         map[string]string
 		options        map[string]string
@@ -383,14 +387,14 @@ func TestMongoDBInstancesService_Update(t *testing.T) {
 	}{
 		{"nil ctx", args{ctx: nil}, instances.UpdateResponse{}, true},
 		{"ok", args{
-			context.Background(), projectID, instaceID,
-			instance.Flavor.ID, instance.BackupSchedule, map[string]string{},
+			context.Background(), projectID, instaceID, "string",
+			instance.Flavor.ID, instances.Storage{Class: "string", Size: 0}, "string", 0, instance.BackupSchedule, map[string]string{},
 			map[string]string{}, instance.ACL,
 		}, instances.UpdateResponse{Item: instance}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, _, err := mongo.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.flavorID, tt.args.backupSchedule, tt.args.labels, tt.args.options, tt.args.acl)
+			gotRes, _, err := mongo.Instances.Update(tt.args.ctx, tt.args.projectID, tt.args.instanceID, tt.args.name, tt.args.flavorID, tt.args.storage, tt.args.varsion, tt.args.replicas, tt.args.backupSchedule, tt.args.labels, tt.args.options, tt.args.acl)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("MongoDBInstancesService.Update() error = %v, wantErr %v", err, tt.wantErr)
 				return

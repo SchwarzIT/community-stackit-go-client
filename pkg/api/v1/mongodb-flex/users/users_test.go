@@ -93,7 +93,7 @@ func TestMongoDBUsersService_Get(t *testing.T) {
 		fmt.Fprint(w, `{
 			"item": {
 			  "database": "string",
-			  "hostname": "string",
+			  "host": "string",
 			  "id": "123",
 			  "port": 0,
 			  "roles": [
@@ -118,7 +118,7 @@ func TestMongoDBUsersService_Get(t *testing.T) {
 	}{
 		{"ok", args{context.Background(), projectID, instanceID, userID}, users.GetResponse{Item: users.UserGetItem{
 			Database: "string",
-			Hostname: "string",
+			Host:     "string",
 			Username: "string",
 			ID:       userID,
 			Roles:    []string{"string"},
@@ -157,7 +157,7 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 		fmt.Fprint(w, `{
 			"item": {
 			  "database": "string",
-			  "hostname": "string",
+			  "host": "string",
 			  "id": "123",
 			  "password": "string",
 			  "port": 0,
@@ -194,7 +194,7 @@ func TestMongoDBUsersService_Create(t *testing.T) {
 		}, users.CreateResponse{
 			Item: users.User{
 				Database: "string",
-				Hostname: "string",
+				Host:     "string",
 				ID:       userID,
 				Password: "string",
 				Port:     0,
