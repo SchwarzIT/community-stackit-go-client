@@ -50,7 +50,7 @@ type GetResponse struct {
 // UserGetItem is an item in GetResponse
 type UserGetItem struct {
 	Database string   `json:"database,omitempty"`
-	Hostname string   `json:"hostname,omitempty"`
+	Host     string   `json:"host,omitempty"`
 	ID       string   `json:"id,omitempty"`
 	Port     int      `json:"port,omitempty"`
 	Roles    []string `json:"roles,omitempty"`
