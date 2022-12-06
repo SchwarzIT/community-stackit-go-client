@@ -96,15 +96,14 @@ const (
 			"hosts": [
 			  "string"
 			],
-			"name": "string",
+			"username": "string",
 			"password": "string",
-			"protocols": {}
+			"cacrt": "string",
+			"scheme": "string",
+			"uri": "string"
 		  },
 		  "syslogDrainUrl": "string",
-		  "routeServiceUrl": "string",
-		  "volumeMounts": [
-			{}
-		  ]
+		  "routeServiceUrl": "string"
 		}
 	  }`
 )
@@ -141,17 +140,16 @@ func TestDSACredentialsService_Get(t *testing.T) {
 			URI: "string",
 			Raw: credentials.RawCredential{
 				Credential: credentials.Credential{
-					Host:      "string",
-					Hosts:     []string{"string"},
-					Name:      "string",
-					Password:  "string",
-					Protocols: map[string]string{},
+					Host:     "string",
+					Hosts:    []string{"string"},
+					Username: "string",
+					Password: "string",
+					Cacrt:    "string",
+					Scheme:   "string",
+					URI:      "string",
 				},
 				SyslogDrainURL:  "string",
 				RouteServiceURL: "string",
-				VolumeMounts: []map[string]string{
-					{},
-				},
 			},
 		}, false},
 	}
@@ -200,17 +198,16 @@ func TestDSACredentialsService_Create(t *testing.T) {
 			URI: "string",
 			Raw: credentials.RawCredential{
 				Credential: credentials.Credential{
-					Host:      "string",
-					Hosts:     []string{"string"},
-					Name:      "string",
-					Password:  "string",
-					Protocols: map[string]string{},
+					Host:     "string",
+					Hosts:    []string{"string"},
+					Username: "string",
+					Password: "string",
+					Cacrt:    "string",
+					Scheme:   "string",
+					URI:      "string",
 				},
 				SyslogDrainURL:  "string",
 				RouteServiceURL: "string",
-				VolumeMounts: []map[string]string{
-					{},
-				},
 			},
 		}, false},
 	}

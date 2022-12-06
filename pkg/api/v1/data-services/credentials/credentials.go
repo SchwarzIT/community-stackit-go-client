@@ -51,20 +51,21 @@ type CreateResponse GetResponse
 
 // RawCredential contains the full credential information
 type RawCredential struct {
-	Credential      Credential          `json:"credentials,omitempty"`
-	SyslogDrainURL  string              `json:"syslogDrainUrl,omitempty"`
-	RouteServiceURL string              `json:"routeServiceUrl,omitempty"`
-	VolumeMounts    []map[string]string `json:"volumeMounts,omitempty"`
+	Credential      Credential `json:"credentials,omitempty"`
+	SyslogDrainURL  string     `json:"syslogDrainUrl,omitempty"`
+	RouteServiceURL string     `json:"routeServiceUrl,omitempty"`
 }
 
 // Credential holds the credential information
 type Credential struct {
-	Host      string            `json:"host,omitempty"`
-	Port      int               `json:"port,omitempty"`
-	Hosts     []string          `json:"hosts,omitempty"`
-	Name      string            `json:"name,omitempty"`
-	Password  string            `json:"password,omitempty"`
-	Protocols map[string]string `json:"protocols,omitempty"`
+	Port     int      `json:"port,omitempty"`
+	Username string   `json:"username,omitempty"`
+	Password string   `json:"password,omitempty"`
+	Hosts    []string `json:"hosts,omitempty"`
+	Host     string   `json:"host,omitempty"`
+	URI      string   `json:"uri,omitempty"`
+	Cacrt    string   `json:"cacrt,omitempty"`
+	Scheme   string   `json:"scheme,omitempty"`
 }
 
 // DeleteResponse is the delete request response struct
