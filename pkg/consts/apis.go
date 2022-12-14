@@ -111,7 +111,7 @@ const (
 	API_BASEURL_DSA_ELASTICSEARCH = "https://elasticsearch.api.eu01.stackit.cloud"
 	API_BASEURL_DSA_LOGME         = "https://logme.api.eu01.stackit.cloud"
 	API_BASEURL_DSA_MARIADB       = "https://mariadb.api.eu01.stackit.cloud"
-	API_BASEURL_DSA_POSTGRES      = "https://postgres.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_POSTGRES      = "https://postgresql.api.eu01.stackit.cloud"
 	API_BASEURL_DSA_RABBITMQ      = "https://rabbitmq.api.eu01.stackit.cloud"
 	API_BASEURL_DSA_REDIS         = "https://redis.api.eu01.stackit.cloud"
 )
