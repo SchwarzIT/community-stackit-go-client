@@ -1,4 +1,4 @@
-TEST?=$$(go list ./... | grep -v 'vendor')
+TEST?=$$(go list ./... | grep -v -E 'generated|vendor' )
 
 test: 
 	@go test $(TEST) || exit 1                                                   
