@@ -142,7 +142,7 @@ func (svc *MongoDBInstancesService) List(ctx context.Context, projectID string) 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -153,7 +153,7 @@ func (svc *MongoDBInstancesService) Get(ctx context.Context, projectID, instance
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -176,7 +176,7 @@ func (svc *MongoDBInstancesService) Create(ctx context.Context, projectID, insta
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	err = errors.Wrapf(err, "body: %s", string(data))
 
 	// create Wait service
@@ -241,7 +241,7 @@ func (svc *MongoDBInstancesService) Update(ctx context.Context, projectID, insta
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	err = errors.Wrapf(err, "body: %s", string(data))
 
 	// create Wait service
@@ -262,7 +262,7 @@ func (svc *MongoDBInstancesService) Delete(ctx context.Context, projectID, insta
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 
 	// create Wait service
 	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID))

@@ -64,6 +64,6 @@ func (svc *PlansService) List(ctx context.Context, projectID string) (res PlanLi
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

@@ -67,7 +67,7 @@ func (svc *PermissionsService) List(ctx context.Context) (p PermissionList, err 
 		return
 	}
 
-	_, err = svc.Client.Do(req, &p)
+	_, err = svc.Client.LegacyDo(req, &p)
 	return
 }
 
@@ -84,6 +84,6 @@ func (svc *PermissionsService) GetByEmail(ctx context.Context, email string, lim
 		return
 	}
 
-	_, err = svc.Client.Do(req, &up)
+	_, err = svc.Client.LegacyDo(req, &up)
 	return
 }

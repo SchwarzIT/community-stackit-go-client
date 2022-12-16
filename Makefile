@@ -11,3 +11,6 @@ coverage:
 	
 quality:
 	@goreportcard-cli -v ./...
+
+generate:
+	go generate ./pkg/services/...

@@ -88,7 +88,7 @@ func (svc *MongoDBUsersService) List(ctx context.Context, projectID, instanceID 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -99,7 +99,7 @@ func (svc *MongoDBUsersService) Get(ctx context.Context, projectID, instanceID, 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -117,7 +117,7 @@ func (svc *MongoDBUsersService) Create(ctx context.Context, projectID, instanceI
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	err = errors.Wrapf(err, "body: %s", string(data))
 	return
 }

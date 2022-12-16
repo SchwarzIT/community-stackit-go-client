@@ -64,7 +64,7 @@ func (svc *CredentialsService) List(ctx context.Context, projectID, instanceID s
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -75,7 +75,7 @@ func (svc *CredentialsService) Get(ctx context.Context, projectID, instanceID, u
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -86,7 +86,7 @@ func (svc *CredentialsService) Create(ctx context.Context, projectID, instanceID
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -97,6 +97,6 @@ func (svc *CredentialsService) Delete(ctx context.Context, projectID, instanceID
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

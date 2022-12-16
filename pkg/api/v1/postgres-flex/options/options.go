@@ -62,7 +62,7 @@ func (svc *PostgresOptionsService) GetVersions(ctx context.Context, projectID st
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -74,7 +74,7 @@ func (svc *PostgresOptionsService) GetFlavors(ctx context.Context, projectID str
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -86,6 +86,6 @@ func (svc *PostgresOptionsService) GetStorageClasses(ctx context.Context, projec
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

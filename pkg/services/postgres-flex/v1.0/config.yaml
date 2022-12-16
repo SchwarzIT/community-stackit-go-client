@@ -1,0 +1,58 @@
+package: postgresflex
+output: generated/postgres_flex.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+    - backups
+    - users
+    - storage
+    - versions
+    - flavors
+    - instance
+  extend-response:
+  - field: HasError
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["errors"]
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: V1ProjectsProjectId
+    with:
+    all: true
+  - replace: InstancesInstanceId
+    with: Instance
+    all: true
+  - replace: StoragesFlavorID
+    with: Flavor
+    all: true
+  - replace: UsersUserID
+    with: User
+    all: true
+  - replace: InstancesInstanceID
+    with: Instance
+    all: true
+  - replace: BackupsBackupID
+    with: Backup
+    all: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true

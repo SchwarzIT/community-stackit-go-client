@@ -159,7 +159,7 @@ func (svc *KubernetesClusterService) List(ctx context.Context, projectID string)
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -171,7 +171,7 @@ func (svc *KubernetesClusterService) Get(ctx context.Context, projectID, cluster
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -219,7 +219,7 @@ func (svc *KubernetesClusterService) CreateOrUpdate(
 		return res, nil, err
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 
 	// prepare wait functionality
 	w = wait.New(svc.waitForCreation(ctx, projectID, clusterName))
@@ -268,7 +268,7 @@ func (svc *KubernetesClusterService) Delete(ctx context.Context, projectID, clus
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 
 	w = wait.New(svc.waitForDeletion(ctx, projectID, clusterName))
 	return w, err
@@ -294,7 +294,7 @@ func (svc *KubernetesClusterService) Hibernate(ctx context.Context, projectID, c
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -306,7 +306,7 @@ func (svc *KubernetesClusterService) Maintenance(ctx context.Context, projectID,
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -318,7 +318,7 @@ func (svc *KubernetesClusterService) Reconcile(ctx context.Context, projectID, c
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -330,7 +330,7 @@ func (svc *KubernetesClusterService) Wakeup(ctx context.Context, projectID, clus
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -350,7 +350,7 @@ func (svc *KubernetesClusterService) GetCredential(ctx context.Context, projectI
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -362,6 +362,6 @@ func (svc *KubernetesClusterService) RotateCredentials(ctx context.Context, proj
 		return
 	}
 
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	return
 }

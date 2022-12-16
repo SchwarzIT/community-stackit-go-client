@@ -57,7 +57,7 @@ func (svc *ObjectStorageCredentialsGroupService) List(ctx context.Context, proje
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -76,7 +76,7 @@ func (svc *ObjectStorageCredentialsGroupService) Create(ctx context.Context, pro
 		return
 	}
 
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	return
 }
 
@@ -87,6 +87,6 @@ func (svc *ObjectStorageCredentialsGroupService) Delete(ctx context.Context, pro
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	return err
 }

@@ -1,0 +1,38 @@
+package: kubernetes
+output: generated/kubernetes.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  split-by-tags:
+    verbose: false
+    enabled: true
+  extend-response:
+  - field: HasError
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["errors"]
+tidy:
+  verbose: false
+  functions:
+  - replace: SkeService
+    with: 
+    prefix: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: v1
+    with:
+    prefix: true
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Cri
+    with: CRI
+    match: true
+  - replace: Cpu
+    with: CPU
+    match: true

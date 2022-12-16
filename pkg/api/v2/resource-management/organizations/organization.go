@@ -50,6 +50,6 @@ func (svc *OrganizationsService) Get(ctx context.Context, containerID string) (r
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

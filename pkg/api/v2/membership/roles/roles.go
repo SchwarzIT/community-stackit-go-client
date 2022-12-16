@@ -54,7 +54,7 @@ func (svc *RolesService) AddCustom(ctx context.Context, resourceID, resourceType
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -67,7 +67,7 @@ func (svc *RolesService) RemoveCustom(ctx context.Context, resourceID, resourceT
 		return
 	}
 
-	_, err = svc.Client.Do(req, &r)
+	_, err = svc.Client.LegacyDo(req, &r)
 	return
 }
 
@@ -86,6 +86,6 @@ func (svc *RolesService) GetByResource(ctx context.Context, resourceID, resource
 		return
 	}
 
-	_, err = svc.Client.Do(req, &r)
+	_, err = svc.Client.LegacyDo(req, &r)
 	return
 }

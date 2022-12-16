@@ -53,7 +53,7 @@ func (svc *MetricsService) GetConfig(ctx context.Context, projectID, instanceID 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -69,6 +69,6 @@ func (svc *MetricsService) UpdateConfig(ctx context.Context, projectID, instance
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

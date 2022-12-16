@@ -49,7 +49,7 @@ func (svc *TracesService) GetConfig(ctx context.Context, projectID, instanceID s
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -64,6 +64,6 @@ func (svc *TracesService) UpdateConfig(ctx context.Context, projectID, instanceI
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

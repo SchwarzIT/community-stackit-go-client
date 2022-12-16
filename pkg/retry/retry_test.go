@@ -2,8 +2,10 @@ package retry_test
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"strings"
@@ -64,9 +66,19 @@ func TestClient_DoWithRetryThrottle(t *testing.T) {
 	var got struct {
 		Status bool `json:"status"`
 	}
-
-	if _, err := c.Do(req, &got); err != nil {
+	resp, err := c.Do(req)
+	if err != nil {
 		t.Errorf("do request: %v", err)
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Errorf("reading problem: %v", err)
+	}
+	defer resp.Body.Close()
+	err = json.Unmarshal(body, &got)
+	if err != nil {
+		t.Errorf("decoding problem: %v", err)
 	}
 
 	if !got.Status {
@@ -88,7 +100,7 @@ func TestClient_DoWithRetryNonRetryableError(t *testing.T) {
 	})
 
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.Do(req, nil); err == nil {
+	if _, err := c.Do(req); err == nil {
 		t.Error("expected do request to return error but got nil instead")
 	}
 }
@@ -109,7 +121,7 @@ func TestClient_DoWithRetryMaxRetries(t *testing.T) {
 	baseTime := 200 * time.Millisecond
 	c.Retry().SetThrottle(baseTime).SetMaxRetries(2)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "reached max retries") {
+	if _, err := c.Do(req); !strings.Contains(err.Error(), "reached max retries") {
 		t.Errorf("expected do request to return max retries error but got %q instead", err)
 	}
 }
@@ -130,13 +142,13 @@ func TestClient_DoWithRetryTimeout(t *testing.T) {
 	baseTime := 200 * time.Millisecond
 	c.Retry().SetTimeout(baseTime)
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") && !strings.Contains(err.Error(), http.StatusText(http.StatusLocked)) {
+	if _, err := c.Do(req); !strings.Contains(err.Error(), "retry context timed out") && !strings.Contains(err.Error(), http.StatusText(http.StatusLocked)) {
 		t.Errorf("expected do request to return retry context timed out error with locked error status but got '%v' instead", err)
 	}
 
 	c.Retry().SetTimeout(baseTime)
 	req, _ = c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.Do(req, nil); !strings.Contains(err.Error(), "retry context timed out") {
+	if _, err := c.Do(req); !strings.Contains(err.Error(), "retry context timed out") {
 		t.Errorf("expected do request to return retry context timed out error but got '%v' instead", err)
 	}
 }
@@ -154,39 +166,41 @@ func TestClient_DoWithUntil(t *testing.T) {
 	mux.HandleFunc("/2s", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if ctx.Err() != nil {
-			w.WriteHeader(http.StatusOK)
-			fmt.Fprint(w, response_after_2s)
+			w.WriteHeader(http.StatusBadRequest)
 		} else {
 			w.WriteHeader(http.StatusOK)
 			fmt.Fprint(w, response_before_2s)
 		}
 	})
 
-	var got struct {
-		Status bool `json:"status"`
-	}
-
+	c.SetRetry(retry.New())
 	c.Retry().SetThrottle(1 * baseTime).SetUntil(func(r *http.Response) (bool, error) {
-		return got.Status, nil
-	})
+		return r.StatusCode == 200, nil
+	}).SetTimeout(baseTime * 5)
 
 	req, _ := c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
-	if _, err := c.Do(req, &got); err != nil {
+	if _, err := c.Do(req); err != nil {
 		t.Errorf("do request: %v", err)
 	}
 
-	if !got.Status {
-		t.Errorf("received status = %v", got.Status)
-	}
-
 	c.Retry().SetThrottle(1 * baseTime).SetUntil(func(r *http.Response) (bool, error) {
-		return got.Status, errors.New("error")
+		return true, errors.New("error")
 	})
 
 	req, _ = c.Request(context.Background(), http.MethodGet, "/2s", nil)
 
-	if _, err := c.Do(req, &got); err == nil {
+	if _, err := c.Do(req); err == nil {
+		t.Errorf("expected an error")
+	}
+
+	c.Retry().SetThrottle(1 * baseTime).SetUntil(func(r *http.Response) (bool, error) {
+		return false, errors.New("error")
+	})
+
+	req, _ = c.Request(context.Background(), http.MethodGet, "/2s", nil)
+
+	if _, err := c.Do(req); err == nil {
 		t.Errorf("expected an error")
 	}
 
