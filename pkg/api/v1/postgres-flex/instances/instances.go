@@ -139,7 +139,7 @@ func (svc *PostgresInstancesService) List(ctx context.Context, projectID string)
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -150,7 +150,7 @@ func (svc *PostgresInstancesService) Get(ctx context.Context, projectID, instanc
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -173,7 +173,7 @@ func (svc *PostgresInstancesService) Create(ctx context.Context, projectID, inst
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 
 	// create Wait service
 	w = wait.New(svc.waitForCreateOrUpdate(ctx, projectID, res.ID))
@@ -230,7 +230,7 @@ func (svc *PostgresInstancesService) Update(ctx context.Context, projectID, inst
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 
 	// create Wait service
 	w = wait.New(svc.waitForCreateOrUpdate(ctx, projectID, instanceID))
@@ -260,7 +260,7 @@ func (svc *PostgresInstancesService) Delete(ctx context.Context, projectID, inst
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 
 	// create Wait service
 	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID))

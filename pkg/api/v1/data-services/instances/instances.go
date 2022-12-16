@@ -93,7 +93,7 @@ func (svc *DSAInstancesService) List(ctx context.Context, projectID string) (res
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -104,7 +104,7 @@ func (svc *DSAInstancesService) Get(ctx context.Context, projectID, instanceID s
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -124,7 +124,7 @@ func (svc *DSAInstancesService) Create(ctx context.Context, projectID, instanceN
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 
 	// create Wait service
 	w = wait.New(svc.waitForCreation(ctx, projectID, res.InstanceID))
@@ -172,7 +172,7 @@ func (svc *DSAInstancesService) Update(ctx context.Context, projectID, instanceI
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	if err != nil && strings.Contains(err.Error(), "EOF") {
 		err = nil
 	}
@@ -221,7 +221,7 @@ func (svc *DSAInstancesService) Delete(ctx context.Context, projectID, instanceI
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 
 	// create Wait service
 	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID))

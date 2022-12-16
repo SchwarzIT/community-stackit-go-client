@@ -82,7 +82,7 @@ func (svc *DSACredentialsService) List(ctx context.Context, projectID, instanceI
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -94,7 +94,7 @@ func (svc *DSACredentialsService) Get(ctx context.Context, projectID, instanceID
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -106,7 +106,7 @@ func (svc *DSACredentialsService) Create(ctx context.Context, projectID, instanc
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -118,6 +118,6 @@ func (svc *DSACredentialsService) Delete(ctx context.Context, projectID, instanc
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

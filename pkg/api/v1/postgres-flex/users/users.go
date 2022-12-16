@@ -88,7 +88,7 @@ func (svc *PostgresUsersService) List(ctx context.Context, projectID, instanceID
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -99,7 +99,7 @@ func (svc *PostgresUsersService) Get(ctx context.Context, projectID, instanceID,
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -117,7 +117,7 @@ func (svc *PostgresUsersService) Create(ctx context.Context, projectID, instance
 	}
 
 	// do request
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	err = errors.Wrapf(err, "request body:\n%s", string(data))
 	return
 }

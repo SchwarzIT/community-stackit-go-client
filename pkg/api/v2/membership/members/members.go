@@ -67,7 +67,7 @@ func (svc *MembersService) Get(ctx context.Context, resourceID, resourceType str
 		return
 	}
 
-	_, err = svc.Client.Do(req, &members)
+	_, err = svc.Client.LegacyDo(req, &members)
 	return
 }
 
@@ -103,7 +103,7 @@ func (svc *MembersService) Add(ctx context.Context, resourceID, resourceType str
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -121,7 +121,7 @@ func (svc *MembersService) Remove(ctx context.Context, resourceID, resourceType 
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -139,7 +139,7 @@ func (svc *MembersService) Replace(ctx context.Context, resourceID, resourceType
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -158,6 +158,6 @@ func (svc *MembersService) Validate(ctx context.Context, resourceID, resourceTyp
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

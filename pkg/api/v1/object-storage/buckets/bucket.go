@@ -5,9 +5,10 @@ package buckets
 import (
 	"context"
 	"fmt"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"net/http"
 	"strings"
+
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -59,7 +60,7 @@ func (svc *ObjectStorageBucketsService) List(ctx context.Context, projectID stri
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -71,7 +72,7 @@ func (svc *ObjectStorageBucketsService) Get(ctx context.Context, projectID, buck
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -89,7 +90,7 @@ func (svc *ObjectStorageBucketsService) Create(ctx context.Context, projectID, b
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	if err != nil {
 		return
 	}
@@ -120,7 +121,7 @@ func (svc *ObjectStorageBucketsService) Delete(ctx context.Context, projectID, b
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	if err != nil {
 		return
 	}

@@ -179,9 +179,9 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 	return req, nil
 }
 
-// Do performs the request, including retry if set
+// LegacyDo performs the request, including retry if set
 // To set retry, use WithRetry() which returns a shalow copy of the client
-func (c *Client) Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+func (c *Client) LegacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	if c.retry == nil {
 		return c.do(req, v, errorHandlers...)
 	}
@@ -194,13 +194,16 @@ func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...
 	})
 }
 
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
+	return c.LegacyDo(req, nil)
+}
+
 // Do performs the request and decodes the response if given interface != nil
 func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
 
 	// handle errors in the response
 	if len(errorHandlers) == 0 {
@@ -215,6 +218,7 @@ func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 	// parse response JSON
 	if v != nil {
 		err = json.NewDecoder(resp.Body).Decode(v)
+		defer resp.Body.Close()
 	}
 	return resp, err
 }

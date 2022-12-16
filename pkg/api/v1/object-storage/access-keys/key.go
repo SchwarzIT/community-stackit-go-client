@@ -79,7 +79,7 @@ func (svc *ObjectStorageAccessKeysService) List(ctx context.Context, projectID, 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -102,7 +102,7 @@ func (svc *ObjectStorageAccessKeysService) Create(ctx context.Context, projectID
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -121,6 +121,6 @@ func (svc *ObjectStorageAccessKeysService) Delete(ctx context.Context, projectID
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	return
 }

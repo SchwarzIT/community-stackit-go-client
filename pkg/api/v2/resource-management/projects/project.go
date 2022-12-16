@@ -106,7 +106,7 @@ func (svc *ProjectsService) Create(ctx context.Context, parentContainerID, proje
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	w = wait.New(svc.waitForCreation(ctx, res.ContainerID))
 	return
 }
@@ -147,7 +147,7 @@ func (svc *ProjectsService) Get(ctx context.Context, containerID string) (res Pr
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -187,7 +187,7 @@ func (svc *ProjectsService) List(ctx context.Context, containerParentID string, 
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -221,7 +221,7 @@ func (svc *ProjectsService) Update(ctx context.Context, containerParentID, conta
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -240,7 +240,7 @@ func (svc *ProjectsService) Delete(ctx context.Context, containerID string) (w *
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	w = wait.New(svc.waitForDeletion(ctx, containerID))
 	return
 }

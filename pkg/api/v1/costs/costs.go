@@ -99,7 +99,7 @@ func (svc *CostsService) GetCustomerAccountCosts(
 	}
 
 	var resp CustomerAccountResponse
-	_, err = svc.Client.Do(req, &resp)
+	_, err = svc.Client.LegacyDo(req, &resp)
 
 	if err != nil {
 		return nil, err
@@ -139,7 +139,7 @@ func (svc *CostsService) GetProjectCosts(
 	}
 
 	var resp ProjectDetailResponse
-	_, err = svc.Client.Do(req, &resp)
+	_, err = svc.Client.LegacyDo(req, &resp)
 	if err != nil {
 		return nil, err
 	}

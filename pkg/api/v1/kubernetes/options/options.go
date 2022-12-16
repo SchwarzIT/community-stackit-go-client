@@ -76,6 +76,6 @@ func (svc *KubernetesOptionsService) List(ctx context.Context) (res ProviderOpti
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

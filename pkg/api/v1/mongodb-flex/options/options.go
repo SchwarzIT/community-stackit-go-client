@@ -68,7 +68,7 @@ func (svc *MongoDBOptionsService) GetVersions(ctx context.Context, projectID str
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -80,7 +80,7 @@ func (svc *MongoDBOptionsService) GetFlavors(ctx context.Context, projectID stri
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -92,6 +92,6 @@ func (svc *MongoDBOptionsService) GetStorageClasses(ctx context.Context, project
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

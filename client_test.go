@@ -135,7 +135,7 @@ func TestClient_Do(t *testing.T) {
 	}
 
 	var got Test
-	_, err = c.Do(req, &got)
+	_, err = c.LegacyDo(req, &got)
 	if err != nil {
 		t.Errorf("do request: %v", err)
 	}
@@ -146,14 +146,14 @@ func TestClient_Do(t *testing.T) {
 	}
 
 	req.URL.Path = "/blah"
-	if _, err = c.Do(req, &got); err == nil {
+	if _, err = c.LegacyDo(req, &got); err == nil {
 		t.Error("expected error over path")
 	}
 
 	ctx2, cancel := context.WithTimeout(context.TODO(), 0)
 	defer cancel()
 	req = req.WithContext(ctx2)
-	if _, err = c.Do(req, &got); err == nil {
+	if _, err = c.LegacyDo(req, &got); err == nil {
 		t.Error("expected error over context timeout")
 	}
 
@@ -264,7 +264,7 @@ func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	})
 
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.Do(req, nil); err == nil {
+	if _, err := c.LegacyDo(req, nil); err == nil {
 		t.Error("expected do request to return error but got nil instead")
 	}
 

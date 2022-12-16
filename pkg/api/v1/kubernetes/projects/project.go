@@ -44,7 +44,7 @@ func (svc *KubernetesProjectsService) Get(ctx context.Context, projectID string)
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -56,7 +56,7 @@ func (svc *KubernetesProjectsService) Create(ctx context.Context, projectID stri
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	w = wait.New(svc.waitForCreation(ctx, projectID))
 	return
 }
@@ -97,7 +97,7 @@ func (svc *KubernetesProjectsService) Delete(ctx context.Context, projectID stri
 		return
 	}
 
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	w = wait.New(svc.waitForDeletion(ctx, projectID))
 	return
 }

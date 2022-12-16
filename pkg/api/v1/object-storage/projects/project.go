@@ -42,7 +42,7 @@ func (svc *ObjectStorageProjectsService) Get(ctx context.Context, projectID stri
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -54,7 +54,7 @@ func (svc *ObjectStorageProjectsService) Create(ctx context.Context, projectID s
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -66,7 +66,7 @@ func (svc *ObjectStorageProjectsService) Delete(ctx context.Context, projectID s
 		return
 	}
 
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	return
 }
 
@@ -78,6 +78,6 @@ func (svc *ObjectStorageProjectsService) ForceDelete(ctx context.Context, projec
 		return
 	}
 
-	_, err = svc.Client.Do(req, nil)
+	_, err = svc.Client.LegacyDo(req, nil)
 	return
 }

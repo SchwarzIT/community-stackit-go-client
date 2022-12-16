@@ -119,7 +119,7 @@ func (svc *JobsService) List(ctx context.Context, projectID, instanceID string) 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -130,7 +130,7 @@ func (svc *JobsService) Get(ctx context.Context, projectID, instanceID, jobName 
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -149,7 +149,7 @@ func (svc *JobsService) Create(ctx context.Context, projectID, instanceID string
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	w = wait.New(svc.waitForCreation(ctx, projectID, instanceID, job.JobName))
 	w.SetTimeout(10 * time.Minute)
 	return
@@ -185,7 +185,7 @@ func (svc *JobsService) Update(ctx context.Context, projectID, instanceID string
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }
 
@@ -197,7 +197,7 @@ func (svc *JobsService) Delete(ctx context.Context, projectID, instanceID, jobNa
 	if err != nil {
 		return
 	}
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	w = wait.New(svc.waitForDeletion(ctx, projectID, instanceID, jobName))
 	w.SetTimeout(10 * time.Minute)
 	return

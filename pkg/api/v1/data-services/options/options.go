@@ -71,6 +71,6 @@ func (svc *DSAOptionsService) GetOfferings(ctx context.Context, projectID string
 		return
 	}
 
-	_, err = svc.Client.Do(req, &res)
+	_, err = svc.Client.LegacyDo(req, &res)
 	return
 }

@@ -13,7 +13,8 @@ import (
 // Client is the client interface
 type Client interface {
 	Request(ctx context.Context, method, path string, body []byte) (*http.Request, error)
-	Do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error)
+	LegacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error)
+	Do(req *http.Request) (*http.Response, error)
 	Retry() *retry.Retry
 	SetBaseURL(url string) error
 	GetBaseURL() string
