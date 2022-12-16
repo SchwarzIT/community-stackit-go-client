@@ -264,7 +264,7 @@ func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	})
 
 	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
-	if _, err := c.LegacyDo(req, nil); err == nil {
+	if _, err := c.Do(req); err == nil {
 		t.Error("expected do request to return error but got nil instead")
 	}
 

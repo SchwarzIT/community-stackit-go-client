@@ -8,11 +8,11 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/src/cluster"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/src/credentials"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/src/operation"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/src/project"
-	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/src/provider-options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/credentials"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/operation"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/project"
+	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/provider-options"
 )
 
 // Doer performs HTTP requests.

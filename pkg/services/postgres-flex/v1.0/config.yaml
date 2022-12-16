@@ -1,9 +1,13 @@
 package: postgresflex
-output: src/postgres_flex.gen.go
+output: generated/postgres_flex.gen.go
 generate:
   models: true
   client: true
 output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
   split-by-tags:
     verbose: false
     enabled: true
