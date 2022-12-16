@@ -7,12 +7,12 @@ import (
 )
 
 type services struct {
-	Kubernetes   *kubernetes.Client
-	PostgresFlex *postgresflex.Client
+	Kubernetes   *kubernetes.ClientWithResponses
+	PostgresFlex *postgresflex.ClientWithResponses
 }
 
 func (c *Client) initServices() *Client {
-	c.Services.Kubernetes, _ = kubernetes.NewClient(consts.DEFAULT_BASE_URL, kubernetes.WithHTTPClient(c))
-	c.Services.PostgresFlex, _ = postgresflex.NewClient(consts.DEFAULT_BASE_URL, postgresflex.WithHTTPClient(c))
+	c.Services.Kubernetes, _ = kubernetes.NewClientWithResponses(consts.DEFAULT_BASE_URL, kubernetes.WithHTTPClient(c))
+	c.Services.PostgresFlex, _ = postgresflex.NewClientWithResponses(consts.DEFAULT_BASE_URL, postgresflex.WithHTTPClient(c))
 	return c
 }
