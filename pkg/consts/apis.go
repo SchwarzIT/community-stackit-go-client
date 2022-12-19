@@ -108,10 +108,10 @@ const (
 	API_PATH_DSA_CREDENTIALS = API_PATH_DSA_INSTANCE + "/credentials"
 	API_PATH_DSA_CREDENTIAL  = API_PATH_DSA_CREDENTIALS + "/%s"
 
-	API_BASEURL_DSA_ELASTICSEARCH = "https://dsa-elasticsearch.api.eu01.stackit.cloud"
-	API_BASEURL_DSA_LOGME         = "https://dsa-logme.api.eu01.stackit.cloud"
-	API_BASEURL_DSA_MARIADB       = "https://dsa-mariadb.api.eu01.stackit.cloud"
-	API_BASEURL_DSA_POSTGRES      = "https://dsa-postgres.api.eu01.stackit.cloud"
-	API_BASEURL_DSA_RABBITMQ      = "https://dsa-rabbitmq.api.eu01.stackit.cloud"
-	API_BASEURL_DSA_REDIS         = "https://dsa-redis.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_ELASTICSEARCH = "https://elasticsearch.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_LOGME         = "https://logme.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_MARIADB       = "https://mariadb.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_POSTGRES      = "https://postgresql.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_RABBITMQ      = "https://rabbitmq.api.eu01.stackit.cloud"
+	API_BASEURL_DSA_REDIS         = "https://redis.api.eu01.stackit.cloud"
 )
