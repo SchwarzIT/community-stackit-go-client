@@ -64,8 +64,6 @@ type Credential struct {
 	Hosts    []string `json:"hosts,omitempty"`
 	Host     string   `json:"host,omitempty"`
 	URI      string   `json:"uri,omitempty"`
-	Cacrt    string   `json:"cacrt,omitempty"`
-	Scheme   string   `json:"scheme,omitempty"`
 }
 
 // DeleteResponse is the delete request response struct
