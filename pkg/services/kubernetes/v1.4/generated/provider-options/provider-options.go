@@ -14,6 +14,7 @@ import (
 	"time"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 const (
@@ -283,7 +284,7 @@ func (c *ClientWithResponses) ParseGetProviderOptionsResponse(rsp *http.Response
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = nil
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

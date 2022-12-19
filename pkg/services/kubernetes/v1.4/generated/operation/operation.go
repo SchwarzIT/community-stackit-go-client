@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
 
@@ -613,7 +614,7 @@ func (c *ClientWithResponses) ParseTriggerClusterHibernationResponse(rsp *http.R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = nil
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -661,7 +662,7 @@ func (c *ClientWithResponses) ParseTriggerClusterMaintenanceResponse(rsp *http.R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = nil
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -709,7 +710,7 @@ func (c *ClientWithResponses) ParseTriggerClusterReconciliationResponse(rsp *htt
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = nil
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -757,7 +758,7 @@ func (c *ClientWithResponses) ParseTriggerClusterCredentialRotationResponse(rsp 
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = nil
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -805,7 +806,7 @@ func (c *ClientWithResponses) ParseTriggerClusterWakeupResponse(rsp *http.Respon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = nil
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
