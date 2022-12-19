@@ -9,7 +9,6 @@ import (
 
 func (r CreateOrUpdateClusterResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, clusterName string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-
 		resp, err := c.GetClusterWithResponse(ctx, projectID, clusterName)
 		if err != nil {
 			return nil, false, err
