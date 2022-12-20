@@ -9,10 +9,8 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
-	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 )
 
 func TestNew(t *testing.T) {
@@ -107,8 +105,6 @@ func TestClient_Do(t *testing.T) {
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
-
-	c.SetRetry(nil)
 
 	mux.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
@@ -254,9 +250,6 @@ func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
-
-	c.SetRetry(retry.New())
-	c.Retry().SetThrottle(1 * time.Microsecond)
 
 	mux.HandleFunc("/err", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")

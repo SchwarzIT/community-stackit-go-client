@@ -184,7 +184,6 @@ func TestKubernetesProjectsService_Create(t *testing.T) {
 		})
 	}
 
-	c.SetRetry(nil)
 	goodWait.SetThrottle(20 * time.Millisecond)
 	badWait.SetThrottle(20 * time.Millisecond)
 
@@ -278,7 +277,6 @@ func TestKubernetesProjectsService_Delete(t *testing.T) {
 		})
 	}
 
-	c.SetRetry(nil)
 	goodWait.SetThrottle(20 * time.Millisecond)
 
 	if _, err := goodWait.Wait(); err != nil {
