@@ -1,7 +1,7 @@
 package client
 
 import (
-	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated"
+	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated"
 )
 

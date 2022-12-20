@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/credentials"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/operation"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/project"
-	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/provider-options"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/credentials"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/operation"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/project"
+	provideroptions "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/provider-options"
 )
 
 // Client which conforms to the OpenAPI3 specification for this service.
