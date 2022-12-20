@@ -53,12 +53,8 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 	}
 
 	c.setHttpClient(c.ctx)
-	if err := c.initServices(); err != nil {
-		return nil, err
-	}
-
+	c.initServices()
 	c.initLegacyServices()
-
 	return c, nil
 }
 

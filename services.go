@@ -10,18 +10,7 @@ type services struct {
 	PostgresFlex *postgresflex.ClientWithResponses
 }
 
-func (c *Client) initServices() error {
-	var err error
-
-	c.Services.Kubernetes, err = kubernetes.NewService(c)
-	if err != nil {
-		return err
-	}
-
-	c.Services.PostgresFlex, err = postgresflex.NewService(c)
-	if err != nil {
-		return err
-	}
-
-	return nil
+func (c *Client) initServices() {
+	c.Services.Kubernetes = kubernetes.NewService(c)
+	c.Services.PostgresFlex = postgresflex.NewService(c)
 }
