@@ -51,13 +51,15 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 		ctx:    ctx,
 		retry:  nil,
 	}
-	return c.init(), nil
-}
 
-func (c *Client) init() *Client {
 	c.setHttpClient(c.ctx)
+	if err := c.initServices(); err != nil {
+		return nil, err
+	}
+
 	c.initLegacyServices()
-	return c.initServices()
+
+	return c, nil
 }
 
 // Clone creates a shallow clone of the client

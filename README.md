@@ -41,21 +41,25 @@ func main() {
 		panic(err)
 	}
 
-	projectID := "1234"
-	bucketName := "example"
-
-	process, err := c.ObjectStorage.Buckets.Create(ctx, projectID, bucketName)
+	res, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("preparing request failed: %s", err))
+	}
+	if res.HasError != nil {
+		panic(fmt.Errorf("request failed: %s", res.HasError))
 	}
 
-	// wait for bucket to be created
-	if _, err := process.Wait(); err != nil {
-		panic(err)
+	fmt.Println("Kubernetes availability zones are:")
+	if res.JSON200.AvailabilityZones != nil {
+		for _, zone := range *res.JSON200.AvailabilityZones {
+			if zone.Name == nil {
+				continue
+			}
+			fmt.Printf("- %s\n", *zone.Name)
+		}
 	}
-
-	fmt.Printf("bucket '%s' created successfully", bucketName)
 }
+
 
 ```
 

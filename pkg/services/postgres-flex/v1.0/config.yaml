@@ -24,6 +24,10 @@ output-options:
     description: "Aggregated error"
     apply-to: ["*"]
     imports: ["errors"]
+  copy:
+  - from: include/service.go
+    to: service.go
+    trim: "postgresflex."
 tidy:
   verbose: false
   functions:
