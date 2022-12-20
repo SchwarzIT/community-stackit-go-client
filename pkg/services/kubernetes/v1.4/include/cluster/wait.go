@@ -3,6 +3,7 @@ package cluster
 import (
 	"context"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
@@ -30,6 +31,9 @@ func (r DeleteClusterResponse) WaitHandler(ctx context.Context, c *cluster.Clien
 	return wait.New(func() (res interface{}, done bool, err error) {
 		resp, err := c.GetClusterWithResponse(ctx, projectID, clusterName)
 		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
+			}
 			return nil, false, err
 		}
 		if resp.HasError != nil {

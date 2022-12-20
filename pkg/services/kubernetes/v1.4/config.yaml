@@ -22,6 +22,9 @@ output-options:
   - from: include/cluster/wait.go
     to: cluster/wait.go
     trim: "cluster."
+  - from: include/cluster/validate.go
+    to: cluster/validate.go
+    trim: "cluster."
   - from: include/service.go
     to: service.go
     trim: "kubernetes."
