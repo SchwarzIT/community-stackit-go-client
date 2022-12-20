@@ -2,6 +2,7 @@ package postgresflex
 
 import (
 	"net/url"
+	"path"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -9,9 +10,10 @@ import (
 )
 
 func NewService(c common.Client) (*postgresflex.ClientWithResponses, error) {
-	surl, err := url.JoinPath(consts.DEFAULT_BASE_URL, consts.API_PATH_POSTGRES_FLEX)
+	u, err := url.Parse(consts.DEFAULT_BASE_URL)
 	if err != nil {
 		return nil, err
 	}
-	return postgresflex.NewClientWithResponses(surl, postgresflex.WithHTTPClient(c))
+	u.Path = path.Join(u.Path, consts.API_PATH_POSTGRES_FLEX)
+	return postgresflex.NewClientWithResponses(u.String(), postgresflex.WithHTTPClient(c))
 }
