@@ -1,8 +1,7 @@
 package client
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
-	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.4/generated"
+	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated"
 )
 
@@ -11,8 +10,7 @@ type services struct {
 	PostgresFlex *postgresflex.ClientWithResponses
 }
 
-func (c *Client) initServices() *Client {
-	c.Services.Kubernetes, _ = kubernetes.NewClientWithResponses(consts.DEFAULT_BASE_URL, kubernetes.WithHTTPClient(c))
-	c.Services.PostgresFlex, _ = postgresflex.NewClientWithResponses(consts.DEFAULT_BASE_URL, postgresflex.WithHTTPClient(c))
-	return c
+func (c *Client) initServices() {
+	c.Services.Kubernetes = kubernetes.NewService(c)
+	c.Services.PostgresFlex = postgresflex.NewService(c)
 }
