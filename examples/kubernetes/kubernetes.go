@@ -20,19 +20,23 @@ func main() {
 
 	res, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
 	if err != nil {
-		panic(fmt.Errorf("preparing request failed: %s", err))
+		panic(fmt.Sprintf("preparing request failed: %s", err))
 	}
 	if res.HasError != nil {
-		panic(fmt.Errorf("request failed: %s", res.HasError))
+		panic(fmt.Sprintf("request failed: %s", res.HasError))
 	}
 
-	fmt.Println("Kubernetes availability zones are:")
-	if res.JSON200.AvailabilityZones != nil {
-		for _, zone := range *res.JSON200.AvailabilityZones {
-			if zone.Name == nil {
-				continue
-			}
-			fmt.Printf("- %s\n", *zone.Name)
-		}
+	if res.JSON200.AvailabilityZones == nil || len(*res.JSON200.AvailabilityZones) == 0 {
+		fmt.Println("No Kubernetes availability zones found")
+		return
 	}
+
+	fmt.Println("We found the following Kubernetes availability zones:")
+	for _, zone := range *res.JSON200.AvailabilityZones {
+		if zone.Name == nil {
+			continue
+		}
+		fmt.Printf("- %s\n", *zone.Name)
+	}
+
 }
