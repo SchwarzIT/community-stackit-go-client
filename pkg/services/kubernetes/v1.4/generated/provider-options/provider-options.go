@@ -11,7 +11,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -29,15 +28,16 @@ const (
 
 // Defines values for RuntimeErrorCode.
 const (
-	SKE_API_SERVER_ERROR      RuntimeErrorCode = "SKE_API_SERVER_ERROR"
-	SKE_CONFIGURATION_PROBLEM RuntimeErrorCode = "SKE_CONFIGURATION_PROBLEM"
-	SKE_INFRA_ERROR           RuntimeErrorCode = "SKE_INFRA_ERROR"
-	SKE_QUOTA_EXCEEDED        RuntimeErrorCode = "SKE_QUOTA_EXCEEDED"
-	SKE_RATE_LIMITS           RuntimeErrorCode = "SKE_RATE_LIMITS"
-	SKE_REMAINING_RESOURCES   RuntimeErrorCode = "SKE_REMAINING_RESOURCES"
-	SKE_TMP_AUTH_ERROR        RuntimeErrorCode = "SKE_TMP_AUTH_ERROR"
-	SKE_UNREADY_NODES         RuntimeErrorCode = "SKE_UNREADY_NODES"
-	SKE_UNSPECIFIED           RuntimeErrorCode = "SKE_UNSPECIFIED"
+	SKE_API_SERVER_ERROR         RuntimeErrorCode = "SKE_API_SERVER_ERROR"
+	SKE_ARGUS_INSTANCE_NOT_FOUND RuntimeErrorCode = "SKE_ARGUS_INSTANCE_NOT_FOUND"
+	SKE_CONFIGURATION_PROBLEM    RuntimeErrorCode = "SKE_CONFIGURATION_PROBLEM"
+	SKE_INFRA_ERROR              RuntimeErrorCode = "SKE_INFRA_ERROR"
+	SKE_QUOTA_EXCEEDED           RuntimeErrorCode = "SKE_QUOTA_EXCEEDED"
+	SKE_RATE_LIMITS              RuntimeErrorCode = "SKE_RATE_LIMITS"
+	SKE_REMAINING_RESOURCES      RuntimeErrorCode = "SKE_REMAINING_RESOURCES"
+	SKE_TMP_AUTH_ERROR           RuntimeErrorCode = "SKE_TMP_AUTH_ERROR"
+	SKE_UNREADY_NODES            RuntimeErrorCode = "SKE_UNREADY_NODES"
+	SKE_UNSPECIFIED              RuntimeErrorCode = "SKE_UNSPECIFIED"
 )
 
 // AvailabilityZone defines model for AvailabilityZone.
@@ -55,7 +55,7 @@ type CRIName string
 
 // KubernetesVersion defines model for KubernetesVersion.
 type KubernetesVersion struct {
-	ExpirationDate *time.Time         `json:"expirationDate,omitempty"`
+	ExpirationDate *string            `json:"expirationDate,omitempty"`
 	FeatureGates   *map[string]string `json:"featureGates,omitempty"`
 	State          *string            `json:"state,omitempty"`
 	Version        *string            `json:"version,omitempty"`
@@ -69,16 +69,16 @@ type MachineImage struct {
 
 // MachineImageVersion defines model for MachineImageVersion.
 type MachineImageVersion struct {
-	CRI            *[]CRI     `json:"cri,omitempty"`
-	ExpirationDate *time.Time `json:"expirationDate,omitempty"`
-	State          *string    `json:"state,omitempty"`
-	Version        *string    `json:"version,omitempty"`
+	CRI            *[]CRI  `json:"cri,omitempty"`
+	ExpirationDate *string `json:"expirationDate,omitempty"`
+	State          *string `json:"state,omitempty"`
+	Version        *string `json:"version,omitempty"`
 }
 
 // MachineType defines model for MachineType.
 type MachineType struct {
-	CPU    *int32  `json:"cpu,omitempty"`
-	Memory *int32  `json:"memory,omitempty"`
+	CPU    *int    `json:"cpu,omitempty"`
+	Memory *int    `json:"memory,omitempty"`
 	Name   *string `json:"name,omitempty"`
 }
 
@@ -99,6 +99,8 @@ type RuntimeError struct {
 	//   Message: "Authentication failed. This is a temporary error. Please wait while the system recovers."
 	// - Code:    "SKE_QUOTA_EXCEEDED"
 	//   Message: "Your project's resource quotas are exhausted. Please make sure your quota is sufficient for the ordered cluster."
+	// - Code:    "SKE_ARGUS_INSTANCE_NOT_FOUND"
+	//   Message: "The provided Argus instance could not be found."
 	// - Code:    "SKE_RATE_LIMITS"
 	//   Message: "While provisioning your cluster, request rate limits where incurred. Please wait while the system recovers."
 	// - Code:    "SKE_INFRA_ERROR"
@@ -123,6 +125,8 @@ type RuntimeError struct {
 //	    Message: "Authentication failed. This is a temporary error. Please wait while the system recovers."
 //	  - Code:    "SKE_QUOTA_EXCEEDED"
 //	    Message: "Your project's resource quotas are exhausted. Please make sure your quota is sufficient for the ordered cluster."
+//	  - Code:    "SKE_ARGUS_INSTANCE_NOT_FOUND"
+//	    Message: "The provided Argus instance could not be found."
 //	  - Code:    "SKE_RATE_LIMITS"
 //	    Message: "While provisioning your cluster, request rate limits where incurred. Please wait while the system recovers."
 //	  - Code:    "SKE_INFRA_ERROR"
