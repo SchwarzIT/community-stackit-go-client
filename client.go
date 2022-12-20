@@ -16,7 +16,6 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/retry"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
 )
@@ -26,7 +25,6 @@ type Client struct {
 	ctx    context.Context
 	client *http.Client
 	config Config
-	retry  *retry.Retry
 
 	Services services
 
@@ -49,7 +47,6 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 	c := &Client{
 		config: cfg,
 		ctx:    ctx,
-		retry:  nil,
 	}
 
 	c.setHttpClient(c.ctx)
@@ -124,16 +121,7 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 // LegacyDo performs the request, including retry if set
 // To set retry, use WithRetry() which returns a shalow copy of the client
 func (c *Client) LegacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	if c.retry == nil {
-		return c.do(req, v, errorHandlers...)
-	}
-	return c.doWithRetry(req, v, errorHandlers...)
-}
-
-func (c *Client) doWithRetry(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	return c.retry.Do(req, func(r *http.Request) (*http.Response, error) {
-		return c.do(r, v, errorHandlers...)
-	})
+	return c.do(req, v, errorHandlers...)
 }
 
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
@@ -163,16 +151,6 @@ func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 		defer resp.Body.Close()
 	}
 	return resp, err
-}
-
-// Retry returns the defined retry
-func (c *Client) Retry() *retry.Retry {
-	return c.retry
-}
-
-// SetRetry overrides default retry setting
-func (c *Client) SetRetry(r *retry.Retry) {
-	c.retry = r
 }
 
 // MockServer mocks STACKIT api server

@@ -64,16 +64,3 @@ func main() {
 ```
 
 Further usage examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) 
-
-
-### Enabling auto-retry
-
-The client can automatically retry failed calls using `pkg/retry`
-
-To enable retry in the client, use `SetRetry` in the following way:
-
-```Go
-c, _ := client.New(context.Background(), client.Config{})
-c.SetRetry(retry.New())
-```
-
