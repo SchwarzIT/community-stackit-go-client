@@ -18,6 +18,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
+	waitutil "k8s.io/apimachinery/pkg/util/wait"
 )
 
 // Client service for managing interactions with STACKIT API
@@ -25,6 +26,11 @@ type Client struct {
 	ctx    context.Context
 	client *http.Client
 	config Config
+
+	// when an internal server error is encountered
+	// the call will be retried
+	RetryTimout time.Duration // timeout for retrying a call
+	RetryWait   time.Duration // how long to wait before trying again
 
 	Services services
 
@@ -45,8 +51,10 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 	}
 
 	c := &Client{
-		config: cfg,
-		ctx:    ctx,
+		config:      cfg,
+		ctx:         ctx,
+		RetryTimout: 2 * time.Minute,
+		RetryWait:   30 * time.Second,
 	}
 
 	c.setHttpClient(c.ctx)
@@ -121,15 +129,15 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 // LegacyDo performs the request, including retry if set
 // To set retry, use WithRetry() which returns a shalow copy of the client
 func (c *Client) LegacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	return c.do(req, v, errorHandlers...)
+	return c.legacyDo(req, v, errorHandlers...)
 }
 
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
-	return c.LegacyDo(req, nil)
+	return c.do(req)
 }
 
 // Do performs the request and decodes the response if given interface != nil
-func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
+func (c *Client) legacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
@@ -150,6 +158,26 @@ func (c *Client) do(req *http.Request, v interface{}, errorHandlers ...func(*htt
 		err = json.NewDecoder(resp.Body).Decode(v)
 		defer resp.Body.Close()
 	}
+	return resp, err
+}
+
+// Do performs the request and decodes the response if given interface != nil
+func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
+	if err := waitutil.PollImmediate(c.RetryWait, c.RetryTimout, waitutil.ConditionFunc(
+		func() (bool, error) {
+			resp, err = c.client.Do(req)
+			if err != nil {
+				return false, err
+			}
+			if resp != nil && resp.StatusCode == http.StatusInternalServerError {
+				return false, nil
+			}
+			return true, nil
+		}),
+	); err != nil {
+		return resp, err
+	}
+
 	return resp, err
 }
 
