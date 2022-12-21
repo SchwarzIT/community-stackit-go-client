@@ -16,7 +16,7 @@ output-options:
     type: error
     description: "Aggregated error"
     apply-to: ["*"]
-    imports: ["errors", "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
     set: "validate.DefaultResponseErrorHandler(rsp)"
   copy:
   - from: include/cluster/wait.go
@@ -28,6 +28,9 @@ output-options:
   - from: include/service.go
     to: service.go
     trim: "kubernetes."
+  - from: include/project/wait.go
+    to: project/wait.go
+    trim: "project."
 tidy:
   verbose: false
   functions:
