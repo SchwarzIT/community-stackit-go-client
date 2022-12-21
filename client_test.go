@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 )
@@ -244,21 +245,21 @@ func TestClient_SetToken(t *testing.T) {
 	}
 }
 
-func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
-	c, mux, teardown, err := MockServer()
+func TestClient_GeneralTests(t *testing.T) {
+	c, _, teardown, err := MockServer()
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
 	}
 
-	mux.HandleFunc("/err", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusBadRequest)
-	})
+	basetime := 200 * time.Millisecond
+	c.RetryTimout = 5 * basetime
+	c.RetryWait = basetime
 
-	req, _ := c.Request(context.Background(), http.MethodGet, "/err", nil)
+	c.SetBaseURL("ht#@://aa")
+	req, _ := c.Request(context.Background(), http.MethodGet, "err2", nil)
 	if _, err := c.Do(req); err == nil {
-		t.Error("expected do request to return error but got nil instead")
+		t.Error("expected do request to return error")
 	}
 
 	c.SetBaseURL(consts.DEFAULT_BASE_URL)
@@ -268,5 +269,37 @@ func TestClient_DoWithRetryNonRetryableErrorAndTestBaseURLChange(t *testing.T) {
 	cfg := c.GetConfig()
 	if cfg.BaseUrl.String() != consts.DEFAULT_BASE_URL {
 		t.Errorf("expected base URL to be %s, got %s instead", consts.DEFAULT_BASE_URL, cfg.BaseUrl.String())
+	}
+}
+
+func TestClient_DoWithRetry(t *testing.T) {
+	c, mux, teardown, err := MockServer()
+	defer teardown()
+	if err != nil {
+		t.Errorf("error from mock.AuthServer: %s", err.Error())
+	}
+
+	basetime := 200 * time.Millisecond
+	ctx := context.Background()
+	ctx1, td1 := context.WithTimeout(ctx, 2*basetime)
+	defer td1()
+
+	c.RetryTimout = 5 * basetime
+	c.RetryWait = basetime
+
+	mux.HandleFunc("/ep", func(w http.ResponseWriter, r *http.Request) {
+		if ctx1.Err() == nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusAccepted)
+		w.Write([]byte("{}"))
+	})
+
+	req, _ := c.Request(context.Background(), http.MethodGet, "/ep", nil)
+	if _, err := c.Do(req); err != nil {
+		t.Error(err)
 	}
 }
