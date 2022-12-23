@@ -29,6 +29,11 @@ func New(c common.Client) *PostgresOptionsService {
 // PostgresOptionsService is the service that retrieves the provider options
 type PostgresOptionsService common.Service
 
+// VersionsResponse is the APIs response for available versions
+type VersionsResponse struct {
+	Versions []string `json:"versions,omitempty"`
+}
+
 // GetStorageResponse is the API response for the storage range for a StorageClass
 type GetStorageResponse struct {
 	StorageClasses []string     `json:"storageClasses,omitempty"`
@@ -56,7 +61,7 @@ type Flavor struct {
 
 // GetVersions returns all available Postgres Flex versions
 // See also https://api.stackit.schwarz/postgres-flex-service/openapi.html#tag/versions
-func (svc *PostgresOptionsService) GetVersions(ctx context.Context, projectID string) (res []string, err error) {
+func (svc *PostgresOptionsService) GetVersions(ctx context.Context, projectID string) (res VersionsResponse, err error) {
 	req, err := svc.Client.Request(ctx, http.MethodGet, fmt.Sprintf(apiPathVersions, projectID), nil)
 	if err != nil {
 		return

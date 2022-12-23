@@ -36,9 +36,11 @@ func TestPostgresOptionsService_GetVersions(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, `[
+		fmt.Fprint(w, `{
+			"versions": [
 			  "string"
-			]`)
+			]
+		  }`)
 	})
 
 	type args struct {
@@ -48,11 +50,11 @@ func TestPostgresOptionsService_GetVersions(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes []string
+		wantRes options.VersionsResponse
 		wantErr bool
 	}{
-		{"ok", args{context.Background(), projectID}, []string{"string"}, false},
-		{"nil ctx", args{nil, projectID}, []string{"string"}, true},
+		{"ok", args{context.Background(), projectID}, options.VersionsResponse{Versions: []string{"string"}}, false},
+		{"nil ctx", args{nil, projectID}, options.VersionsResponse{Versions: []string{"string"}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
