@@ -26,7 +26,7 @@ const (
 func TestPostgresOptionsService_GetVersions(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	postgres := postgres.New(c)
+	service := postgres.New(c)
 
 	projectID := "abc"
 
@@ -36,9 +36,11 @@ func TestPostgresOptionsService_GetVersions(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, `[
+		fmt.Fprint(w, `{
+			"versions": [
 			  "string"
-			]`)
+			]
+		  }`)
 	})
 
 	type args struct {
@@ -48,15 +50,15 @@ func TestPostgresOptionsService_GetVersions(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantRes []string
+		wantRes options.VersionsResponse
 		wantErr bool
 	}{
-		{"ok", args{context.Background(), projectID}, []string{"string"}, false},
-		{"nil ctx", args{nil, projectID}, []string{"string"}, true},
+		{"ok", args{context.Background(), projectID}, options.VersionsResponse{Versions: []string{"string"}}, false},
+		{"nil ctx", args{nil, projectID}, options.VersionsResponse{Versions: []string{"string"}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := postgres.Options.GetVersions(tt.args.ctx, tt.args.projectID)
+			gotRes, err := service.Options.GetVersions(tt.args.ctx, tt.args.projectID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PostgresOptionsService.GetVersions() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -71,7 +73,7 @@ func TestPostgresOptionsService_GetVersions(t *testing.T) {
 func TestPostgresOptionsService_GetFlavors(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	postgres := postgres.New(c)
+	service := postgres.New(c)
 
 	projectID := "abc"
 
@@ -115,7 +117,7 @@ func TestPostgresOptionsService_GetFlavors(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := postgres.Options.GetFlavors(tt.args.ctx, tt.args.projectID)
+			gotRes, err := service.Options.GetFlavors(tt.args.ctx, tt.args.projectID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PostgresOptionsService.GetFlavors() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -130,7 +132,7 @@ func TestPostgresOptionsService_GetFlavors(t *testing.T) {
 func TestPostgresOptionsService_GetStorage(t *testing.T) {
 	c, mux, teardown, _ := client.MockServer()
 	defer teardown()
-	postgres := postgres.New(c)
+	service := postgres.New(c)
 
 	projectID := "abc"
 	flavorID := "efd"
@@ -174,7 +176,7 @@ func TestPostgresOptionsService_GetStorage(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotRes, err := postgres.Options.GetStorageClasses(tt.args.ctx, tt.args.projectID, tt.args.flavorID)
+			gotRes, err := service.Options.GetStorageClasses(tt.args.ctx, tt.args.projectID, tt.args.flavorID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("PostgresOptionsService.GetStorage() error = %v, wantErr %v", err, tt.wantErr)
 				return
