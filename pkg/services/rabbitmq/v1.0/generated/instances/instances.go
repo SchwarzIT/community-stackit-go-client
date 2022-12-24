@@ -90,9 +90,6 @@ type LastOperationState string
 // LastOperationType defines model for LastOperation.Type.
 type LastOperationType string
 
-// InstanceId defines model for instanceId.
-type InstanceId = string
-
 // BadRequest defines model for BadRequest.
 type BadRequest = Error
 
@@ -145,7 +142,7 @@ type ClientInterface interface {
 	Deprovision(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Get request
-	Get(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Get(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Update request with any body
 	UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -201,7 +198,7 @@ func (c *Client) Deprovision(ctx context.Context, projectID string, instanceID s
 	return c.Client.Do(req)
 }
 
-func (c *Client) Get(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) Get(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -360,7 +357,7 @@ func NewDeprovisionRequest(ctx context.Context, server string, projectID string,
 }
 
 // NewGetRequest generates requests for Get
-func NewGetRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
+func NewGetRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -488,7 +485,7 @@ type ClientWithResponsesInterface interface {
 	DeprovisionWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeprovisionResponse, error)
 
 	// Get request
-	GetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*GetResponse, error)
+	GetWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 
 	// Update request with any body
 	UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
@@ -654,7 +651,7 @@ func (c *ClientWithResponses) DeprovisionWithResponse(ctx context.Context, proje
 }
 
 // GetWithResponse request returning *GetResponse
-func (c *ClientWithResponses) GetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+func (c *ClientWithResponses) GetWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
 	rsp, err := c.Get(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err

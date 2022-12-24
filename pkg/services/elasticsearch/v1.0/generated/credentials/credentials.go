@@ -60,9 +60,6 @@ type RawCredentials struct {
 	VolumeMounts    *[]Object   `json:"volumeMounts,omitempty"`
 }
 
-// InstanceId defines model for instanceId.
-type InstanceId = string
-
 // BadRequest defines model for BadRequest.
 type BadRequest = Error
 
@@ -98,19 +95,19 @@ func NewClient(server string, httpClient common.Client) *Client {
 // The interface specification for the client above.
 type ClientInterface interface {
 	// List request
-	List(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Post request
-	Post(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Post(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Delete request
 	Delete(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Get request
-	Get(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Get(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) List(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -122,7 +119,7 @@ func (c *Client) List(ctx context.Context, projectID string, instanceID Instance
 	return c.Client.Do(req)
 }
 
-func (c *Client) Post(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) Post(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -146,7 +143,7 @@ func (c *Client) Delete(ctx context.Context, projectID string, instanceID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) Get(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) Get(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID, credentialsID)
 	if err != nil {
 		return nil, err
@@ -159,7 +156,7 @@ func (c *Client) Get(ctx context.Context, projectID string, instanceID InstanceI
 }
 
 // NewListRequest generates requests for List
-func NewListRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
+func NewListRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -200,7 +197,7 @@ func NewListRequest(ctx context.Context, server string, projectID string, instan
 }
 
 // NewPostRequest generates requests for Post
-func NewPostRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
+func NewPostRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -289,7 +286,7 @@ func NewDeleteRequest(ctx context.Context, server string, projectID string, inst
 }
 
 // NewGetRequest generates requests for Get
-func NewGetRequest(ctx context.Context, server string, projectID string, instanceID InstanceId, credentialsID string) (*http.Request, error) {
+func NewGetRequest(ctx context.Context, server string, projectID string, instanceID string, credentialsID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -359,16 +356,16 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 	// List request
-	ListWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*ListResponse, error)
+	ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
 	// Post request
-	PostWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*PostResponse, error)
+	PostWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*PostResponse, error)
 
 	// Delete request
 	DeleteWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
 	// Get request
-	GetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
+	GetWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 }
 
 type ListResponse struct {
@@ -467,7 +464,7 @@ func (r GetResponse) StatusCode() int {
 }
 
 // ListWithResponse request returning *ListResponse
-func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.List(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -476,7 +473,7 @@ func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID st
 }
 
 // PostWithResponse request returning *PostResponse
-func (c *ClientWithResponses) PostWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*PostResponse, error) {
+func (c *ClientWithResponses) PostWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*PostResponse, error) {
 	rsp, err := c.Post(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -494,7 +491,7 @@ func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, projectID 
 }
 
 // GetWithResponse request returning *GetResponse
-func (c *ClientWithResponses) GetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+func (c *ClientWithResponses) GetWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
 	rsp, err := c.Get(ctx, projectID, instanceID, credentialsID, reqEditors...)
 	if err != nil {
 		return nil, err

@@ -570,7 +570,12 @@
             }
           },
           {
-            "$ref": "#/components/parameters/instanceId"
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -659,7 +664,12 @@
             }
           },
           {
-            "$ref": "#/components/parameters/instanceId"
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -774,7 +784,12 @@
             }
           },
           {
-            "$ref": "#/components/parameters/instanceId"
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           },
           {
             "description": "Credentials id of credentials to fetch",

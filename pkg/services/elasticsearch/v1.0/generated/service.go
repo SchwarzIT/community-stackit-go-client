@@ -1,4 +1,4 @@
-package rabbitmq
+package elasticsearch
 
 import (
 	"net/url"
