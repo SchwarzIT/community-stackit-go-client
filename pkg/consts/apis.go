@@ -21,7 +21,6 @@ const (
 	API_PATH_COSTS_PROJECT_WITH_PARAMS = API_PATH_COSTS_PROJECT + "?from=%s&to=%s&granularity=%v&depth=%v"
 
 	// Kubernetes
-	BASE_URL_SKE                 = "https://ske.api.eu01.stackit.cloud/"
 	API_PATH_SKE                 = "/ske/v1"
 	API_PATH_SKE_PROJECTS        = API_PATH_SKE + "/projects/%s"
 	API_PATH_SKE_CLUSTERS        = API_PATH_SKE_PROJECTS + "/clusters"
