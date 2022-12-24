@@ -1,5 +1,5 @@
 package: postgresflex
-output: generated/postgres_flex.gen.go
+output: generated/postgresflex.gen.go
 generate:
   models: true
   client: true
@@ -28,6 +28,9 @@ output-options:
   - from: include/service.go
     to: service.go
     trim: "postgresflex."
+  - from: include/instance/wait.go
+    to: instance/wait.go
+    trim: "instance."
 tidy:
   verbose: false
   functions:
