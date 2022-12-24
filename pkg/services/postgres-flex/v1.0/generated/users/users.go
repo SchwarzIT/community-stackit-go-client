@@ -111,20 +111,20 @@ func NewClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetInstanceUsers request
-	GetInstanceUsers(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetUsers request
+	GetUsers(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PostInstanceUsers request with any body
 	PostInstanceUsersWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PostInstanceUsers(ctx context.Context, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetInstanceUser request
-	GetInstanceUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetUser request
+	GetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetInstanceUsers(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetInstanceUsersRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) GetUsers(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUsersRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -159,8 +159,8 @@ func (c *Client) PostInstanceUsers(ctx context.Context, projectID string, instan
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetInstanceUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetInstanceUserRequest(ctx, c.Server, projectID, instanceID, userID)
+func (c *Client) GetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetUserRequest(ctx, c.Server, projectID, instanceID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -171,8 +171,8 @@ func (c *Client) GetInstanceUser(ctx context.Context, projectID string, instance
 	return c.Client.Do(req)
 }
 
-// NewGetInstanceUsersRequest generates requests for GetInstanceUsers
-func NewGetInstanceUsersRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+// NewGetUsersRequest generates requests for GetUsers
+func NewGetUsersRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -266,8 +266,8 @@ func NewPostInstanceUsersRequestWithBody(ctx context.Context, server string, pro
 	return req, nil
 }
 
-// NewGetInstanceUserRequest generates requests for GetInstanceUser
-func NewGetInstanceUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string) (*http.Request, error) {
+// NewGetUserRequest generates requests for GetUser
+func NewGetUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -336,19 +336,19 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetInstanceUsers request
-	GetInstanceUsersWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetInstanceUsersResponse, error)
+	// GetUsers request
+	GetUsersWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
 
 	// PostInstanceUsers request with any body
 	PostInstanceUsersWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostInstanceUsersResponse, error)
 
 	PostInstanceUsersWithResponse(ctx context.Context, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody, reqEditors ...RequestEditorFn) (*PostInstanceUsersResponse, error)
 
-	// GetInstanceUser request
-	GetInstanceUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetInstanceUserResponse, error)
+	// GetUser request
+	GetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
 }
 
-type GetInstanceUsersResponse struct {
+type GetUsersResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceListUserResponse
@@ -357,7 +357,7 @@ type GetInstanceUsersResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetInstanceUsersResponse) Status() string {
+func (r GetUsersResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -365,7 +365,7 @@ func (r GetInstanceUsersResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetInstanceUsersResponse) StatusCode() int {
+func (r GetUsersResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -396,7 +396,7 @@ func (r PostInstanceUsersResponse) StatusCode() int {
 	return 0
 }
 
-type GetInstanceUserResponse struct {
+type GetUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceGetUserResponse
@@ -405,7 +405,7 @@ type GetInstanceUserResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetInstanceUserResponse) Status() string {
+func (r GetUserResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -413,20 +413,20 @@ func (r GetInstanceUserResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetInstanceUserResponse) StatusCode() int {
+func (r GetUserResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// GetInstanceUsersWithResponse request returning *GetInstanceUsersResponse
-func (c *ClientWithResponses) GetInstanceUsersWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetInstanceUsersResponse, error) {
-	rsp, err := c.GetInstanceUsers(ctx, projectID, instanceID, reqEditors...)
+// GetUsersWithResponse request returning *GetUsersResponse
+func (c *ClientWithResponses) GetUsersWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetUsersResponse, error) {
+	rsp, err := c.GetUsers(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetInstanceUsersResponse(rsp)
+	return c.ParseGetUsersResponse(rsp)
 }
 
 // PostInstanceUsersWithBodyWithResponse request with arbitrary body returning *PostInstanceUsersResponse
@@ -446,24 +446,24 @@ func (c *ClientWithResponses) PostInstanceUsersWithResponse(ctx context.Context,
 	return c.ParsePostInstanceUsersResponse(rsp)
 }
 
-// GetInstanceUserWithResponse request returning *GetInstanceUserResponse
-func (c *ClientWithResponses) GetInstanceUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetInstanceUserResponse, error) {
-	rsp, err := c.GetInstanceUser(ctx, projectID, instanceID, userID, reqEditors...)
+// GetUserWithResponse request returning *GetUserResponse
+func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetUserResponse, error) {
+	rsp, err := c.GetUser(ctx, projectID, instanceID, userID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetInstanceUserResponse(rsp)
+	return c.ParseGetUserResponse(rsp)
 }
 
-// ParseGetInstanceUsersResponse parses an HTTP response from a GetInstanceUsersWithResponse call
-func (c *ClientWithResponses) ParseGetInstanceUsersResponse(rsp *http.Response) (*GetInstanceUsersResponse, error) {
+// ParseGetUsersResponse parses an HTTP response from a GetUsersWithResponse call
+func (c *ClientWithResponses) ParseGetUsersResponse(rsp *http.Response) (*GetUsersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetInstanceUsersResponse{
+	response := &GetUsersResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -521,15 +521,15 @@ func (c *ClientWithResponses) ParsePostInstanceUsersResponse(rsp *http.Response)
 	return response, nil
 }
 
-// ParseGetInstanceUserResponse parses an HTTP response from a GetInstanceUserWithResponse call
-func (c *ClientWithResponses) ParseGetInstanceUserResponse(rsp *http.Response) (*GetInstanceUserResponse, error) {
+// ParseGetUserResponse parses an HTTP response from a GetUserWithResponse call
+func (c *ClientWithResponses) ParseGetUserResponse(rsp *http.Response) (*GetUserResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetInstanceUserResponse{
+	response := &GetUserResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

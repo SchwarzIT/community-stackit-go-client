@@ -3,13 +3,13 @@
 
 package instance
 
-import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
+import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
 
 type CreateResponse struct {
 	instance.ClientWithResponsesInterface
 }
 
-type UpdateResponse struct {
+type PutResponse struct {
 	instance.ClientWithResponsesInterface
 }
 

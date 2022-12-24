@@ -13,13 +13,13 @@ import (
 
 // WaitHandler will wait for instance creation to complete
 // returned interface is of *instance.InstanceSingleInstance
-func (r PostInstancesResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r CreateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
 }
 
 // WaitHandler will wait for instance update to complete
 // returned interface is of *instance.InstanceSingleInstance
-func (r PutInstanceResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r UpdateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
@@ -27,7 +27,7 @@ func (r PutInstanceResponse) WaitHandler(ctx context.Context, c *instance.Client
 
 func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.GetInstanceWithResponse(ctx, projectID, instanceID)
+		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
 		}
@@ -49,9 +49,9 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 
 // WaitHandler will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (r DeleteInstanceResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r DeleteResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		if res, err := c.GetInstanceWithResponse(ctx, projectID, instanceID); err != nil {
+		if res, err := c.GetWithResponse(ctx, projectID, instanceID); err != nil {
 			if err != nil {
 				return nil, false, err
 			}

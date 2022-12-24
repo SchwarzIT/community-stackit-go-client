@@ -56,8 +56,8 @@ type InstanceUpdateBackupScheduleRequest struct {
 	BackupSchedule *string `json:"backupSchedule,omitempty"`
 }
 
-// PutInstanceBackupsJSONRequestBody defines body for PutInstanceBackups for application/json ContentType.
-type PutInstanceBackupsJSONRequestBody = InstanceUpdateBackupScheduleRequest
+// UpdateJSONRequestBody defines body for Update for application/json ContentType.
+type UpdateJSONRequestBody = InstanceUpdateBackupScheduleRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -87,20 +87,20 @@ func NewClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// GetInstanceBackups request
-	GetInstanceBackups(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PutInstanceBackups request with any body
-	PutInstanceBackupsWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Update request with any body
+	UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PutInstanceBackups(ctx context.Context, projectID string, instanceID string, body PutInstanceBackupsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetInstanceBackup request
-	GetInstanceBackup(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Get request
+	Get(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetInstanceBackups(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetInstanceBackupsRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -111,8 +111,8 @@ func (c *Client) GetInstanceBackups(ctx context.Context, projectID string, insta
 	return c.Client.Do(req)
 }
 
-func (c *Client) PutInstanceBackupsWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPutInstanceBackupsRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
+func (c *Client) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -123,8 +123,8 @@ func (c *Client) PutInstanceBackupsWithBody(ctx context.Context, projectID strin
 	return c.Client.Do(req)
 }
 
-func (c *Client) PutInstanceBackups(ctx context.Context, projectID string, instanceID string, body PutInstanceBackupsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPutInstanceBackupsRequest(ctx, c.Server, projectID, instanceID, body)
+func (c *Client) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -135,8 +135,8 @@ func (c *Client) PutInstanceBackups(ctx context.Context, projectID string, insta
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetInstanceBackup(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetInstanceBackupRequest(ctx, c.Server, projectID, instanceID, backupID)
+func (c *Client) Get(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID, backupID)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func (c *Client) GetInstanceBackup(ctx context.Context, projectID string, instan
 	return c.Client.Do(req)
 }
 
-// NewGetInstanceBackupsRequest generates requests for GetInstanceBackups
-func NewGetInstanceBackupsRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -188,19 +188,19 @@ func NewGetInstanceBackupsRequest(ctx context.Context, server string, projectID 
 	return req, nil
 }
 
-// NewPutInstanceBackupsRequest calls the generic PutInstanceBackups builder with application/json body
-func NewPutInstanceBackupsRequest(ctx context.Context, server string, projectID string, instanceID string, body PutInstanceBackupsJSONRequestBody) (*http.Request, error) {
+// NewUpdateRequest calls the generic Update builder with application/json body
+func NewUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, body UpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPutInstanceBackupsRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
+	return NewUpdateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
-// NewPutInstanceBackupsRequestWithBody generates requests for PutInstanceBackups with any type of body
-func NewPutInstanceBackupsRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
+// NewUpdateRequestWithBody generates requests for Update with any type of body
+func NewUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -242,8 +242,8 @@ func NewPutInstanceBackupsRequestWithBody(ctx context.Context, server string, pr
 	return req, nil
 }
 
-// NewGetInstanceBackupRequest generates requests for GetInstanceBackup
-func NewGetInstanceBackupRequest(ctx context.Context, server string, projectID string, instanceID string, backupID string) (*http.Request, error) {
+// NewGetRequest generates requests for Get
+func NewGetRequest(ctx context.Context, server string, projectID string, instanceID string, backupID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -312,19 +312,19 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetInstanceBackups request
-	GetInstanceBackupsWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetInstanceBackupsResponse, error)
+	// List request
+	ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
-	// PutInstanceBackups request with any body
-	PutInstanceBackupsWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutInstanceBackupsResponse, error)
+	// Update request with any body
+	UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
-	PutInstanceBackupsWithResponse(ctx context.Context, projectID string, instanceID string, body PutInstanceBackupsJSONRequestBody, reqEditors ...RequestEditorFn) (*PutInstanceBackupsResponse, error)
+	UpdateWithResponse(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
-	// GetInstanceBackup request
-	GetInstanceBackupWithResponse(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*GetInstanceBackupResponse, error)
+	// Get request
+	GetWithResponse(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 }
 
-type GetInstanceBackupsResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceListBackupResponse
@@ -333,7 +333,7 @@ type GetInstanceBackupsResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetInstanceBackupsResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -341,14 +341,14 @@ func (r GetInstanceBackupsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetInstanceBackupsResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type PutInstanceBackupsResponse struct {
+type UpdateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *InstanceError
@@ -356,7 +356,7 @@ type PutInstanceBackupsResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r PutInstanceBackupsResponse) Status() string {
+func (r UpdateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -364,14 +364,14 @@ func (r PutInstanceBackupsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PutInstanceBackupsResponse) StatusCode() int {
+func (r UpdateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetInstanceBackupResponse struct {
+type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceGetBackupResponse
@@ -380,7 +380,7 @@ type GetInstanceBackupResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetInstanceBackupResponse) Status() string {
+func (r GetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -388,57 +388,57 @@ func (r GetInstanceBackupResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetInstanceBackupResponse) StatusCode() int {
+func (r GetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// GetInstanceBackupsWithResponse request returning *GetInstanceBackupsResponse
-func (c *ClientWithResponses) GetInstanceBackupsWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetInstanceBackupsResponse, error) {
-	rsp, err := c.GetInstanceBackups(ctx, projectID, instanceID, reqEditors...)
+// ListWithResponse request returning *ListResponse
+func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.List(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetInstanceBackupsResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// PutInstanceBackupsWithBodyWithResponse request with arbitrary body returning *PutInstanceBackupsResponse
-func (c *ClientWithResponses) PutInstanceBackupsWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutInstanceBackupsResponse, error) {
-	rsp, err := c.PutInstanceBackupsWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
+// UpdateWithBodyWithResponse request with arbitrary body returning *UpdateResponse
+func (c *ClientWithResponses) UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.UpdateWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParsePutInstanceBackupsResponse(rsp)
+	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) PutInstanceBackupsWithResponse(ctx context.Context, projectID string, instanceID string, body PutInstanceBackupsJSONRequestBody, reqEditors ...RequestEditorFn) (*PutInstanceBackupsResponse, error) {
-	rsp, err := c.PutInstanceBackups(ctx, projectID, instanceID, body, reqEditors...)
+func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.Update(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParsePutInstanceBackupsResponse(rsp)
+	return c.ParseUpdateResponse(rsp)
 }
 
-// GetInstanceBackupWithResponse request returning *GetInstanceBackupResponse
-func (c *ClientWithResponses) GetInstanceBackupWithResponse(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*GetInstanceBackupResponse, error) {
-	rsp, err := c.GetInstanceBackup(ctx, projectID, instanceID, backupID, reqEditors...)
+// GetWithResponse request returning *GetResponse
+func (c *ClientWithResponses) GetWithResponse(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.Get(ctx, projectID, instanceID, backupID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetInstanceBackupResponse(rsp)
+	return c.ParseGetResponse(rsp)
 }
 
-// ParseGetInstanceBackupsResponse parses an HTTP response from a GetInstanceBackupsWithResponse call
-func (c *ClientWithResponses) ParseGetInstanceBackupsResponse(rsp *http.Response) (*GetInstanceBackupsResponse, error) {
+// ParseListResponse parses an HTTP response from a ListWithResponse call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetInstanceBackupsResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -463,15 +463,15 @@ func (c *ClientWithResponses) ParseGetInstanceBackupsResponse(rsp *http.Response
 	return response, nil
 }
 
-// ParsePutInstanceBackupsResponse parses an HTTP response from a PutInstanceBackupsWithResponse call
-func (c *ClientWithResponses) ParsePutInstanceBackupsResponse(rsp *http.Response) (*PutInstanceBackupsResponse, error) {
+// ParseUpdateResponse parses an HTTP response from a UpdateWithResponse call
+func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PutInstanceBackupsResponse{
+	response := &UpdateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -489,15 +489,15 @@ func (c *ClientWithResponses) ParsePutInstanceBackupsResponse(rsp *http.Response
 	return response, nil
 }
 
-// ParseGetInstanceBackupResponse parses an HTTP response from a GetInstanceBackupWithResponse call
-func (c *ClientWithResponses) ParseGetInstanceBackupResponse(rsp *http.Response) (*GetInstanceBackupResponse, error) {
+// ParseGetResponse parses an HTTP response from a GetWithResponse call
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetInstanceBackupResponse{
+	response := &GetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

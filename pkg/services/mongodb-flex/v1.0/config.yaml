@@ -1,5 +1,5 @@
-package: postgresflex
-output: generated/postgresflex.gen.go
+package: mongodbflex
+output: generated/mongodbflex.gen.go
 generate:
   models: true
   client: true
@@ -12,8 +12,8 @@ output-options:
     verbose: false
     enabled: true
     include:
-    - backups
-    - users
+    - backup
+    - user
     - storage
     - versions
     - flavors
@@ -27,7 +27,7 @@ output-options:
   copy:
   - from: include/service.go
     to: service.go
-    trim: "postgresflex."
+    trim: "mongodbflex."
   - from: include/instance/wait.go
     to: instance/wait.go
     trim: "instance."
@@ -37,51 +37,51 @@ tidy:
   - replace: Id
     with: ID
     suffix: true
-  - replace: V1ProjectsProjectId
+  - replace: ProjectsProjectId
     with:
     all: true
-  - replace: InstancesInstanceId
-    with: Instance
-    all: true
-  - replace: StoragesFlavorID
-    with: Flavor
-    all: true
-  - replace: UsersUserID
-    with: User
-    all: true
-  - replace: InstancesInstanceID
-    with: Instance
-    all: true
-  - replace: BackupsBackupID
-    with: Backup
-    all: true
-  - replace: GetInstanceBackups
-    with: List
-    prefix: true
-  - replace: PutInstanceBackups
-    with: Update
-    all: true
-  - replace: InstanceBackup
-    with: 
-    suffix: true
   - replace: PostInstances
     with: Create
     all: true
-  - replace: PutInstance
+  - replace: InstancesInstanceID
+    with: 
+    all: true
+  - replace: InstanceIdBackups
+    with: 
+    all: true
+  - replace: PutInstances
+    with: UpdateInstance
+    prefix: true
+  - replace: CreateInstanceId
+    with: Create
+    prefix: true
+  - replace: UpdateInstance
     with: Update
-    all: true
-  - replace: PatchInstance
-    with: PatchUpdate
-    all: true
+    prefix: true
   - replace: GetInstances
     with: List
     all: true
-  - replace: GetInstance
+  - replace: ListBackupID
     with: Get
+    prefix: true
+  - replace: ListInstanceIdUsers
+    with: List
+    prefix: true
+  - replace: CreateUsers
+    with: Create
+    prefix: true
+  - replace: InstancesInstanceIdUsersUserID
+    with: 
     all: true
-  - replace: DeleteInstance
-    with: Delete
-    all: true
+  - replace: ListUserID
+    with: Get
+    prefix: true
+  - replace: UpdateInstanceIdUsersUserID
+    with: Update
+    prefix: true
+  - replace: CreateUserIdReset
+    with: ResetPassword
+    prefix: true
   params:
   - replace: Id
     with: ID
