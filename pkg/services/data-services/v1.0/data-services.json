@@ -570,7 +570,12 @@
             }
           },
           {
-            "$ref": "#/components/parameters/instanceId"
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {

@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
@@ -13,7 +14,7 @@ const (
 	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
 )
 
-func (r ProvisionResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r ProvisionResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
@@ -25,17 +26,17 @@ func (r ProvisionResponse) WaitHandler(ctx context.Context, c *ClientWithRespons
 		if s.JSON200 == nil {
 			return nil, false, errors.New("bad response, JSON200 is nil")
 		}
-		if s.JSON200.LastOperation.State == SUCCEEDED {
+		if s.JSON200.LastOperation.State == instances.SUCCEEDED {
 			return s, true, nil
 		}
-		if s.JSON200.LastOperation.State == FAILED {
+		if s.JSON200.LastOperation.State == instances.FAILED {
 			return s, false, errors.New("received failed status from DSA instance")
 		}
 		return s, false, nil
 	})
 }
 
-func (r UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r UpdateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
@@ -47,20 +48,20 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 		if s.JSON200 == nil {
 			return nil, false, errors.New("bad response, JSON200 is nil")
 		}
-		if s.JSON200.LastOperation.Type != UPDATE {
+		if s.JSON200.LastOperation.Type != instances.UPDATE {
 			return s, false, nil
 		}
-		if s.JSON200.LastOperation.State == SUCCEEDED {
+		if s.JSON200.LastOperation.State == instances.SUCCEEDED {
 			return s, true, nil
 		}
-		if s.JSON200.LastOperation.State == FAILED {
+		if s.JSON200.LastOperation.State == instances.FAILED {
 			return s, false, errors.New("received failed status from DSA instance")
 		}
 		return s, false, nil
 	})
 }
 
-func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
@@ -73,13 +74,13 @@ func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *ClientWithRespo
 		if s.JSON200 == nil {
 			return nil, false, errors.New("bad response, JSON200 is nil")
 		}
-		if s.JSON200.LastOperation.Type != DELETE {
+		if s.JSON200.LastOperation.Type != instances.DELETE {
 			return s, false, nil
 		}
-		if s.JSON200.LastOperation.State == SUCCEEDED {
+		if s.JSON200.LastOperation.State == instances.SUCCEEDED {
 			return s, true, nil
 		}
-		if s.JSON200.LastOperation.State == FAILED {
+		if s.JSON200.LastOperation.State == instances.FAILED {
 			return s, false, errors.New("received failed status for DSA instance deletion")
 		}
 		return s, false, nil

@@ -1,5 +1,5 @@
-package: elasticsearch
-output: generated/elasticsearch.gen.go
+package: dataservices
+output: generated/dataservices.gen.go
 generate:
   models: true
   client: true
@@ -20,7 +20,7 @@ output-options:
   copy:
   - from: include/service.go
     to: service.go
-    trim: "elasticsearch."
+    trim: "dataservices."
   - from: include/instances/wait.go
     to: instances/wait.go
     trim: "instances."

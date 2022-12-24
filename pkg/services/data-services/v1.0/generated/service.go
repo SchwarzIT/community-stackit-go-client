@@ -1,4 +1,4 @@
-package rabbitmq
+package dataservices
 
 import (
 	"net/url"
