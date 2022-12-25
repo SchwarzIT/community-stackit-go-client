@@ -4,7 +4,6 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/kubernetes"
 	mongodbFlex "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	postgresFlex "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/postgres-flex"
@@ -19,7 +18,6 @@ type ProductiveServices struct {
 	Argus              *argus.ArgusService
 	Costs              *costs.CostsService
 	DataServices       DataServices
-	Kubernetes         *kubernetes.KubernetesService
 	Membership         *membership.MembershipService
 	MongoDBFlex        *mongodbFlex.MongoDBService
 	ObjectStorage      *objectstorage.ObjectStorageService
@@ -47,7 +45,6 @@ func (c *Client) initLegacyServices() *Client {
 	// init productive services
 	c.Argus = argus.New(c)
 	c.Costs = costs.New(c)
-	c.Kubernetes = kubernetes.New(c)
 	c.Membership = membership.New(c)
 	c.MongoDBFlex = mongodbFlex.New(c)
 	c.ObjectStorage = objectstorage.New(c)

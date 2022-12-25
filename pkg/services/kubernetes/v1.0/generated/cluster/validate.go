@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
@@ -97,11 +96,11 @@ func ValidateNodePool(np Nodepool) error {
 // ValidateTaint validates a given node pool taint
 func ValidateTaint(t Taint) error {
 	switch t.Effect {
-	case consts.SKE_CLUSTERS_TAINT_EFFECT_NO_EXEC:
+	case NO_EXECUTE:
 		fallthrough
-	case consts.SKE_CLUSTERS_TAINT_EFFECT_NO_SCHED:
+	case NO_SCHEDULE:
 		fallthrough
-	case consts.SKE_CLUSTERS_TAINT_EFFECT_PREF_NO_SCHED:
+	case PREFER_NO_SCHEDULE:
 	default:
 		return fmt.Errorf("invalid taint effect '%s'", t.Effect)
 	}

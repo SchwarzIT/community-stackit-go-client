@@ -20,13 +20,6 @@ const (
 	API_PATH_COSTS_PROJECT             = "/costs-service/v1/costs/%s/projects/%s"
 	API_PATH_COSTS_PROJECT_WITH_PARAMS = API_PATH_COSTS_PROJECT + "?from=%s&to=%s&granularity=%v&depth=%v"
 
-	// Kubernetes
-	API_PATH_SKE                 = "/ske/v1"
-	API_PATH_SKE_PROJECTS        = API_PATH_SKE + "/projects/%s"
-	API_PATH_SKE_CLUSTERS        = API_PATH_SKE_PROJECTS + "/clusters"
-	API_PATH_SKE_WITH_CLUSTER_ID = API_PATH_SKE_CLUSTERS + "/%s"
-	API_PATH_SKE_OPTIONS         = API_PATH_SKE + "/provider-options"
-
 	// Object Storage
 	API_PATH_OBJECT_STORAGE                         = "/object-storage-api/v1"
 	API_PATH_OBJECT_STORAGE_PROJECT                 = API_PATH_OBJECT_STORAGE + "/project/%s"
