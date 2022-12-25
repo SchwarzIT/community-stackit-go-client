@@ -80,8 +80,8 @@ type InstanceUser struct {
 	Username *string   `json:"username,omitempty"`
 }
 
-// PostInstanceUsersJSONRequestBody defines body for PostInstanceUsers for application/json ContentType.
-type PostInstanceUsersJSONRequestBody = InstanceCreateUserRequest
+// CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
+type CreateUserJSONRequestBody = InstanceCreateUserRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -114,10 +114,10 @@ type ClientInterface interface {
 	// GetUsers request
 	GetUsers(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// PostInstanceUsers request with any body
-	PostInstanceUsersWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateUser request with any body
+	CreateUserWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PostInstanceUsers(ctx context.Context, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateUser(ctx context.Context, projectID string, instanceID string, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetUser request
 	GetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -135,8 +135,8 @@ func (c *Client) GetUsers(ctx context.Context, projectID string, instanceID stri
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostInstanceUsersWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostInstanceUsersRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
+func (c *Client) CreateUserWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateUserRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -147,8 +147,8 @@ func (c *Client) PostInstanceUsersWithBody(ctx context.Context, projectID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) PostInstanceUsers(ctx context.Context, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPostInstanceUsersRequest(ctx, c.Server, projectID, instanceID, body)
+func (c *Client) CreateUser(ctx context.Context, projectID string, instanceID string, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateUserRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -212,19 +212,19 @@ func NewGetUsersRequest(ctx context.Context, server string, projectID string, in
 	return req, nil
 }
 
-// NewPostInstanceUsersRequest calls the generic PostInstanceUsers builder with application/json body
-func NewPostInstanceUsersRequest(ctx context.Context, server string, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody) (*http.Request, error) {
+// NewCreateUserRequest calls the generic CreateUser builder with application/json body
+func NewCreateUserRequest(ctx context.Context, server string, projectID string, instanceID string, body CreateUserJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPostInstanceUsersRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
+	return NewCreateUserRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
-// NewPostInstanceUsersRequestWithBody generates requests for PostInstanceUsers with any type of body
-func NewPostInstanceUsersRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateUserRequestWithBody generates requests for CreateUser with any type of body
+func NewCreateUserRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -339,10 +339,10 @@ type ClientWithResponsesInterface interface {
 	// GetUsers request
 	GetUsersWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetUsersResponse, error)
 
-	// PostInstanceUsers request with any body
-	PostInstanceUsersWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostInstanceUsersResponse, error)
+	// CreateUser request with any body
+	CreateUserWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
 
-	PostInstanceUsersWithResponse(ctx context.Context, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody, reqEditors ...RequestEditorFn) (*PostInstanceUsersResponse, error)
+	CreateUserWithResponse(ctx context.Context, projectID string, instanceID string, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
 
 	// GetUser request
 	GetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
@@ -372,7 +372,7 @@ func (r GetUsersResponse) StatusCode() int {
 	return 0
 }
 
-type PostInstanceUsersResponse struct {
+type CreateUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceCreateUserResponse
@@ -381,7 +381,7 @@ type PostInstanceUsersResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r PostInstanceUsersResponse) Status() string {
+func (r CreateUserResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -389,7 +389,7 @@ func (r PostInstanceUsersResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r PostInstanceUsersResponse) StatusCode() int {
+func (r CreateUserResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -429,21 +429,21 @@ func (c *ClientWithResponses) GetUsersWithResponse(ctx context.Context, projectI
 	return c.ParseGetUsersResponse(rsp)
 }
 
-// PostInstanceUsersWithBodyWithResponse request with arbitrary body returning *PostInstanceUsersResponse
-func (c *ClientWithResponses) PostInstanceUsersWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostInstanceUsersResponse, error) {
-	rsp, err := c.PostInstanceUsersWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
+// CreateUserWithBodyWithResponse request with arbitrary body returning *CreateUserResponse
+func (c *ClientWithResponses) CreateUserWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
+	rsp, err := c.CreateUserWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParsePostInstanceUsersResponse(rsp)
+	return c.ParseCreateUserResponse(rsp)
 }
 
-func (c *ClientWithResponses) PostInstanceUsersWithResponse(ctx context.Context, projectID string, instanceID string, body PostInstanceUsersJSONRequestBody, reqEditors ...RequestEditorFn) (*PostInstanceUsersResponse, error) {
-	rsp, err := c.PostInstanceUsers(ctx, projectID, instanceID, body, reqEditors...)
+func (c *ClientWithResponses) CreateUserWithResponse(ctx context.Context, projectID string, instanceID string, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error) {
+	rsp, err := c.CreateUser(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParsePostInstanceUsersResponse(rsp)
+	return c.ParseCreateUserResponse(rsp)
 }
 
 // GetUserWithResponse request returning *GetUserResponse
@@ -488,15 +488,15 @@ func (c *ClientWithResponses) ParseGetUsersResponse(rsp *http.Response) (*GetUse
 	return response, nil
 }
 
-// ParsePostInstanceUsersResponse parses an HTTP response from a PostInstanceUsersWithResponse call
-func (c *ClientWithResponses) ParsePostInstanceUsersResponse(rsp *http.Response) (*PostInstanceUsersResponse, error) {
+// ParseCreateUserResponse parses an HTTP response from a CreateUserWithResponse call
+func (c *ClientWithResponses) ParseCreateUserResponse(rsp *http.Response) (*CreateUserResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &PostInstanceUsersResponse{
+	response := &CreateUserResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

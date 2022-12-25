@@ -82,6 +82,9 @@ tidy:
   - replace: DeleteInstance
     with: Delete
     all: true
+  - replace: PostInstanceUsers
+    with: CreateUser
+    prefix: true
   params:
   - replace: Id
     with: ID
@@ -89,4 +92,7 @@ tidy:
   schemas:
   - replace: Id
     with: ID
+    suffix: true
+  - replace: Acl
+    with: ACL
     suffix: true
