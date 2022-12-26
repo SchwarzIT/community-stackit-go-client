@@ -122,27 +122,15 @@ type PermissionDenied struct {
 type RestoresCreateParams struct {
 	// RestoreTarget List of restore targets
 	RestoreTarget RestoresCreateParamsRestoreTarget `form:"restoreTarget" json:"restoreTarget"`
-
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // RestoresCreateParamsRestoreTarget defines parameters for RestoresCreate.
 type RestoresCreateParamsRestoreTarget string
 
-// RetentionsListParams defines parameters for RetentionsList.
-type RetentionsListParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // SchedulesListParams defines parameters for SchedulesList.
 type SchedulesListParams struct {
 	// BackupTarget List of backup targets
 	BackupTarget *[]SchedulesListParamsBackupTarget `form:"backupTarget,omitempty" json:"backupTarget,omitempty"`
-
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // SchedulesListParamsBackupTarget defines parameters for SchedulesList.
@@ -161,9 +149,6 @@ type SchedulesCreateJSONBody struct {
 type SchedulesCreateParams struct {
 	// BackupTarget List of backup targets
 	BackupTarget *[]SchedulesCreateParamsBackupTarget `form:"backupTarget,omitempty" json:"backupTarget,omitempty"`
-
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // SchedulesCreateParamsBackupTarget defines parameters for SchedulesCreate.
@@ -173,9 +158,6 @@ type SchedulesCreateParamsBackupTarget string
 type ListParams struct {
 	// BackupTarget List of backup targets
 	BackupTarget *[]ListParamsBackupTarget `form:"backupTarget,omitempty" json:"backupTarget,omitempty"`
-
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // ListParamsBackupTarget defines parameters for List.
@@ -185,9 +167,6 @@ type ListParamsBackupTarget string
 type CreateParams struct {
 	// BackupTarget List of backup targets
 	BackupTarget *[]CreateParamsBackupTarget `form:"backupTarget,omitempty" json:"backupTarget,omitempty"`
-
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // CreateParamsBackupTarget defines parameters for Create.
@@ -228,7 +207,7 @@ type ClientInterface interface {
 	RestoresCreate(ctx context.Context, projectID string, instanceID string, backupDate string, params *RestoresCreateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// RetentionsList request
-	RetentionsList(ctx context.Context, projectID string, instanceID string, params *RetentionsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	RetentionsList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SchedulesList request
 	SchedulesList(ctx context.Context, projectID string, instanceID string, params *SchedulesListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -257,8 +236,8 @@ func (c *Client) RestoresCreate(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) RetentionsList(ctx context.Context, projectID string, instanceID string, params *RetentionsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewRetentionsListRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) RetentionsList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewRetentionsListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -390,20 +369,11 @@ func NewRestoresCreateRequest(ctx context.Context, server string, projectID stri
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewRetentionsListRequest generates requests for RetentionsList
-func NewRetentionsListRequest(ctx context.Context, server string, projectID string, instanceID string, params *RetentionsListParams) (*http.Request, error) {
+func NewRetentionsListRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -439,15 +409,6 @@ func NewRetentionsListRequest(ctx context.Context, server string, projectID stri
 	if err != nil {
 		return nil, err
 	}
-
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
 
 	return req, nil
 }
@@ -509,15 +470,6 @@ func NewSchedulesListRequest(ctx context.Context, server string, projectID strin
 	if err != nil {
 		return nil, err
 	}
-
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
 
 	return req, nil
 }
@@ -593,15 +545,6 @@ func NewSchedulesCreateRequestWithBody(ctx context.Context, server string, proje
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
@@ -662,15 +605,6 @@ func NewListRequest(ctx context.Context, server string, projectID string, instan
 	if err != nil {
 		return nil, err
 	}
-
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
 
 	return req, nil
 }
@@ -733,15 +667,6 @@ func NewCreateRequest(ctx context.Context, server string, projectID string, inst
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
@@ -771,7 +696,7 @@ type ClientWithResponsesInterface interface {
 	RestoresCreateWithResponse(ctx context.Context, projectID string, instanceID string, backupDate string, params *RestoresCreateParams, reqEditors ...RequestEditorFn) (*RestoresCreateResponse, error)
 
 	// RetentionsList request
-	RetentionsListWithResponse(ctx context.Context, projectID string, instanceID string, params *RetentionsListParams, reqEditors ...RequestEditorFn) (*RetentionsListResponse, error)
+	RetentionsListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*RetentionsListResponse, error)
 
 	// SchedulesList request
 	SchedulesListWithResponse(ctx context.Context, projectID string, instanceID string, params *SchedulesListParams, reqEditors ...RequestEditorFn) (*SchedulesListResponse, error)
@@ -946,8 +871,8 @@ func (c *ClientWithResponses) RestoresCreateWithResponse(ctx context.Context, pr
 }
 
 // RetentionsListWithResponse request returning *RetentionsListResponse
-func (c *ClientWithResponses) RetentionsListWithResponse(ctx context.Context, projectID string, instanceID string, params *RetentionsListParams, reqEditors ...RequestEditorFn) (*RetentionsListResponse, error) {
-	rsp, err := c.RetentionsList(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) RetentionsListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*RetentionsListResponse, error) {
+	rsp, err := c.RetentionsList(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

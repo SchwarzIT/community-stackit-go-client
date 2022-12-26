@@ -68,18 +68,6 @@ type PlanModelUI struct {
 	TracesStorage           int                `json:"tracesStorage"`
 }
 
-// ListOfferingsParams defines parameters for ListOfferings.
-type ListOfferingsParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// ListPlansParams defines parameters for ListPlans.
-type ListPlansParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
@@ -109,14 +97,14 @@ func NewClient(server string, httpClient common.Client) *Client {
 // The interface specification for the client above.
 type ClientInterface interface {
 	// ListOfferings request
-	ListOfferings(ctx context.Context, projectID string, params *ListOfferingsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListOfferings(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// ListPlans request
-	ListPlans(ctx context.Context, projectID string, params *ListPlansParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ListPlans(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) ListOfferings(ctx context.Context, projectID string, params *ListOfferingsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListOfferingsRequest(ctx, c.Server, projectID, params)
+func (c *Client) ListOfferings(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListOfferingsRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +115,8 @@ func (c *Client) ListOfferings(ctx context.Context, projectID string, params *Li
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListPlans(ctx context.Context, projectID string, params *ListPlansParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListPlansRequest(ctx, c.Server, projectID, params)
+func (c *Client) ListPlans(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListPlansRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -140,7 +128,7 @@ func (c *Client) ListPlans(ctx context.Context, projectID string, params *ListPl
 }
 
 // NewListOfferingsRequest generates requests for ListOfferings
-func NewListOfferingsRequest(ctx context.Context, server string, projectID string, params *ListOfferingsParams) (*http.Request, error) {
+func NewListOfferingsRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -170,20 +158,11 @@ func NewListOfferingsRequest(ctx context.Context, server string, projectID strin
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewListPlansRequest generates requests for ListPlans
-func NewListPlansRequest(ctx context.Context, server string, projectID string, params *ListPlansParams) (*http.Request, error) {
+func NewListPlansRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -213,15 +192,6 @@ func NewListPlansRequest(ctx context.Context, server string, projectID string, p
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
@@ -248,10 +218,10 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 	// ListOfferings request
-	ListOfferingsWithResponse(ctx context.Context, projectID string, params *ListOfferingsParams, reqEditors ...RequestEditorFn) (*ListOfferingsResponse, error)
+	ListOfferingsWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListOfferingsResponse, error)
 
 	// ListPlans request
-	ListPlansWithResponse(ctx context.Context, projectID string, params *ListPlansParams, reqEditors ...RequestEditorFn) (*ListPlansResponse, error)
+	ListPlansWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListPlansResponse, error)
 }
 
 type ListOfferingsResponse struct {
@@ -303,8 +273,8 @@ func (r ListPlansResponse) StatusCode() int {
 }
 
 // ListOfferingsWithResponse request returning *ListOfferingsResponse
-func (c *ClientWithResponses) ListOfferingsWithResponse(ctx context.Context, projectID string, params *ListOfferingsParams, reqEditors ...RequestEditorFn) (*ListOfferingsResponse, error) {
-	rsp, err := c.ListOfferings(ctx, projectID, params, reqEditors...)
+func (c *ClientWithResponses) ListOfferingsWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListOfferingsResponse, error) {
+	rsp, err := c.ListOfferings(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -312,8 +282,8 @@ func (c *ClientWithResponses) ListOfferingsWithResponse(ctx context.Context, pro
 }
 
 // ListPlansWithResponse request returning *ListPlansResponse
-func (c *ClientWithResponses) ListPlansWithResponse(ctx context.Context, projectID string, params *ListPlansParams, reqEditors ...RequestEditorFn) (*ListPlansResponse, error) {
-	rsp, err := c.ListPlans(ctx, projectID, params, reqEditors...)
+func (c *ClientWithResponses) ListPlansWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListPlansResponse, error) {
+	rsp, err := c.ListPlans(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
