@@ -267,18 +267,6 @@ type InstanceCreateParams struct {
 	Authorization string `json:"Authorization"`
 }
 
-// InstanceDeleteParams defines parameters for InstanceDelete.
-type InstanceDeleteParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceReadParams defines parameters for InstanceRead.
-type InstanceReadParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // InstanceUpdateJSONBody defines parameters for InstanceUpdate.
 type InstanceUpdateJSONBody struct {
 	// Name Name of the service
@@ -291,64 +279,10 @@ type InstanceUpdateJSONBody struct {
 	PlanID string `json:"planId"`
 }
 
-// InstanceUpdateParams defines parameters for InstanceUpdate.
-type InstanceUpdateParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceCredentialsListParams defines parameters for InstanceCredentialsList.
-type InstanceCredentialsListParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceCredentialsCreateParams defines parameters for InstanceCredentialsCreate.
-type InstanceCredentialsCreateParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceCredentialsDeleteParams defines parameters for InstanceCredentialsDelete.
-type InstanceCredentialsDeleteParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceCredentialsReadParams defines parameters for InstanceCredentialsRead.
-type InstanceCredentialsReadParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceCredentialsRemoteWriteLimitsDeleteParams defines parameters for InstanceCredentialsRemoteWriteLimitsDelete.
-type InstanceCredentialsRemoteWriteLimitsDeleteParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// InstanceCredentialsRemoteWriteLimitsListParams defines parameters for InstanceCredentialsRemoteWriteLimitsList.
-type InstanceCredentialsRemoteWriteLimitsListParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // InstanceCredentialsRemoteWriteLimitsUpdateJSONBody defines parameters for InstanceCredentialsRemoteWriteLimitsUpdate.
 type InstanceCredentialsRemoteWriteLimitsUpdateJSONBody struct {
 	// MaxLimit Remote write metric sample limit for credential to push in a single minute.
 	MaxLimit *float32 `json:"maxLimit,omitempty"`
-}
-
-// InstanceCredentialsRemoteWriteLimitsUpdateParams defines parameters for InstanceCredentialsRemoteWriteLimitsUpdate.
-type InstanceCredentialsRemoteWriteLimitsUpdateParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// SystemInstancesReadParams defines parameters for SystemInstancesRead.
-type SystemInstancesReadParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // SystemInstancesCredentialsCreateJSONBody defines parameters for SystemInstancesCredentialsCreate.
@@ -418,41 +352,41 @@ type ClientInterface interface {
 	InstanceCreate(ctx context.Context, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceDelete request
-	InstanceDelete(ctx context.Context, projectID string, instanceID string, params *InstanceDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceDelete(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceRead request
-	InstanceRead(ctx context.Context, projectID string, instanceID string, params *InstanceReadParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceUpdate request with any body
-	InstanceUpdateWithBody(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceUpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	InstanceUpdate(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceUpdate(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsList request
-	InstanceCredentialsList(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsCreate request
-	InstanceCredentialsCreate(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsCreateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsCreate(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsDelete request
-	InstanceCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsRead request
-	InstanceCredentialsRead(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsReadParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsRead(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsRemoteWriteLimitsDelete request
-	InstanceCredentialsRemoteWriteLimitsDelete(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsRemoteWriteLimitsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsRemoteWriteLimitsList request
-	InstanceCredentialsRemoteWriteLimitsList(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsRemoteWriteLimitsList(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCredentialsRemoteWriteLimitsUpdate request with any body
-	InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	InstanceCredentialsRemoteWriteLimitsUpdate(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCredentialsRemoteWriteLimitsUpdate(ctx context.Context, projectID string, instanceID string, username string, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SystemInstancesRead request
-	SystemInstancesRead(ctx context.Context, projectID string, instanceID string, params *SystemInstancesReadParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SystemInstancesRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SystemInstancesCredentialsCreate request with any body
 	SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -499,8 +433,8 @@ func (c *Client) InstanceCreate(ctx context.Context, projectID string, params *I
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceDelete(ctx context.Context, projectID string, instanceID string, params *InstanceDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceDeleteRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) InstanceDelete(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceDeleteRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -511,8 +445,8 @@ func (c *Client) InstanceDelete(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceRead(ctx context.Context, projectID string, instanceID string, params *InstanceReadParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceReadRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) InstanceRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceReadRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -523,8 +457,8 @@ func (c *Client) InstanceRead(ctx context.Context, projectID string, instanceID 
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceUpdateWithBody(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, params, contentType, body)
+func (c *Client) InstanceUpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -535,8 +469,8 @@ func (c *Client) InstanceUpdateWithBody(ctx context.Context, projectID string, i
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceUpdate(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceUpdateRequest(ctx, c.Server, projectID, instanceID, params, body)
+func (c *Client) InstanceUpdate(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -547,8 +481,8 @@ func (c *Client) InstanceUpdate(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsList(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsListRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) InstanceCredentialsList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -559,8 +493,8 @@ func (c *Client) InstanceCredentialsList(ctx context.Context, projectID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsCreate(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsCreateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsCreateRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) InstanceCredentialsCreate(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsCreateRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -571,8 +505,8 @@ func (c *Client) InstanceCredentialsCreate(ctx context.Context, projectID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, username, params)
+func (c *Client) InstanceCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
 	}
@@ -583,8 +517,8 @@ func (c *Client) InstanceCredentialsDelete(ctx context.Context, projectID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsRead(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsReadParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsReadRequest(ctx, c.Server, projectID, instanceID, username, params)
+func (c *Client) InstanceCredentialsRead(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsReadRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
 	}
@@ -595,8 +529,8 @@ func (c *Client) InstanceCredentialsRead(ctx context.Context, projectID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsRemoteWriteLimitsDelete(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsRemoteWriteLimitsDeleteRequest(ctx, c.Server, projectID, instanceID, username, params)
+func (c *Client) InstanceCredentialsRemoteWriteLimitsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsRemoteWriteLimitsDeleteRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
 	}
@@ -607,8 +541,8 @@ func (c *Client) InstanceCredentialsRemoteWriteLimitsDelete(ctx context.Context,
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsRemoteWriteLimitsList(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsRemoteWriteLimitsListRequest(ctx, c.Server, projectID, instanceID, username, params)
+func (c *Client) InstanceCredentialsRemoteWriteLimitsList(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsRemoteWriteLimitsListRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
 	}
@@ -619,8 +553,8 @@ func (c *Client) InstanceCredentialsRemoteWriteLimitsList(ctx context.Context, p
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, username, params, contentType, body)
+func (c *Client) InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, username, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -631,8 +565,8 @@ func (c *Client) InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx context.
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCredentialsRemoteWriteLimitsUpdate(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCredentialsRemoteWriteLimitsUpdateRequest(ctx, c.Server, projectID, instanceID, username, params, body)
+func (c *Client) InstanceCredentialsRemoteWriteLimitsUpdate(ctx context.Context, projectID string, instanceID string, username string, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCredentialsRemoteWriteLimitsUpdateRequest(ctx, c.Server, projectID, instanceID, username, body)
 	if err != nil {
 		return nil, err
 	}
@@ -643,8 +577,8 @@ func (c *Client) InstanceCredentialsRemoteWriteLimitsUpdate(ctx context.Context,
 	return c.Client.Do(req)
 }
 
-func (c *Client) SystemInstancesRead(ctx context.Context, projectID string, instanceID string, params *SystemInstancesReadParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSystemInstancesReadRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) SystemInstancesRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSystemInstancesReadRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -791,7 +725,7 @@ func NewInstanceCreateRequestWithBody(ctx context.Context, server string, projec
 }
 
 // NewInstanceDeleteRequest generates requests for InstanceDelete
-func NewInstanceDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, params *InstanceDeleteParams) (*http.Request, error) {
+func NewInstanceDeleteRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -828,20 +762,11 @@ func NewInstanceDeleteRequest(ctx context.Context, server string, projectID stri
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceReadRequest generates requests for InstanceRead
-func NewInstanceReadRequest(ctx context.Context, server string, projectID string, instanceID string, params *InstanceReadParams) (*http.Request, error) {
+func NewInstanceReadRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -878,31 +803,22 @@ func NewInstanceReadRequest(ctx context.Context, server string, projectID string
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceUpdateRequest calls the generic InstanceUpdate builder with application/json body
-func NewInstanceUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, params *InstanceUpdateParams, body InstanceUpdateJSONRequestBody) (*http.Request, error) {
+func NewInstanceUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, body InstanceUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewInstanceUpdateRequestWithBody(ctx, server, projectID, instanceID, params, "application/json", bodyReader)
+	return NewInstanceUpdateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
 // NewInstanceUpdateRequestWithBody generates requests for InstanceUpdate with any type of body
-func NewInstanceUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, params *InstanceUpdateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewInstanceUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -941,20 +857,11 @@ func NewInstanceUpdateRequestWithBody(ctx context.Context, server string, projec
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCredentialsListRequest generates requests for InstanceCredentialsList
-func NewInstanceCredentialsListRequest(ctx context.Context, server string, projectID string, instanceID string, params *InstanceCredentialsListParams) (*http.Request, error) {
+func NewInstanceCredentialsListRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -991,20 +898,11 @@ func NewInstanceCredentialsListRequest(ctx context.Context, server string, proje
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCredentialsCreateRequest generates requests for InstanceCredentialsCreate
-func NewInstanceCredentialsCreateRequest(ctx context.Context, server string, projectID string, instanceID string, params *InstanceCredentialsCreateParams) (*http.Request, error) {
+func NewInstanceCredentialsCreateRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1041,20 +939,11 @@ func NewInstanceCredentialsCreateRequest(ctx context.Context, server string, pro
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCredentialsDeleteRequest generates requests for InstanceCredentialsDelete
-func NewInstanceCredentialsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, username string, params *InstanceCredentialsDeleteParams) (*http.Request, error) {
+func NewInstanceCredentialsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, username string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1097,21 +986,12 @@ func NewInstanceCredentialsDeleteRequest(ctx context.Context, server string, pro
 	if err != nil {
 		return nil, err
 	}
-
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
 
 	return req, nil
 }
 
 // NewInstanceCredentialsReadRequest generates requests for InstanceCredentialsRead
-func NewInstanceCredentialsReadRequest(ctx context.Context, server string, projectID string, instanceID string, username string, params *InstanceCredentialsReadParams) (*http.Request, error) {
+func NewInstanceCredentialsReadRequest(ctx context.Context, server string, projectID string, instanceID string, username string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1155,20 +1035,11 @@ func NewInstanceCredentialsReadRequest(ctx context.Context, server string, proje
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCredentialsRemoteWriteLimitsDeleteRequest generates requests for InstanceCredentialsRemoteWriteLimitsDelete
-func NewInstanceCredentialsRemoteWriteLimitsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsDeleteParams) (*http.Request, error) {
+func NewInstanceCredentialsRemoteWriteLimitsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, username string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1212,20 +1083,11 @@ func NewInstanceCredentialsRemoteWriteLimitsDeleteRequest(ctx context.Context, s
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCredentialsRemoteWriteLimitsListRequest generates requests for InstanceCredentialsRemoteWriteLimitsList
-func NewInstanceCredentialsRemoteWriteLimitsListRequest(ctx context.Context, server string, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsListParams) (*http.Request, error) {
+func NewInstanceCredentialsRemoteWriteLimitsListRequest(ctx context.Context, server string, projectID string, instanceID string, username string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1269,31 +1131,22 @@ func NewInstanceCredentialsRemoteWriteLimitsListRequest(ctx context.Context, ser
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCredentialsRemoteWriteLimitsUpdateRequest calls the generic InstanceCredentialsRemoteWriteLimitsUpdate builder with application/json body
-func NewInstanceCredentialsRemoteWriteLimitsUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody) (*http.Request, error) {
+func NewInstanceCredentialsRemoteWriteLimitsUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, username string, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx, server, projectID, instanceID, username, params, "application/json", bodyReader)
+	return NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx, server, projectID, instanceID, username, "application/json", bodyReader)
 }
 
 // NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody generates requests for InstanceCredentialsRemoteWriteLimitsUpdate with any type of body
-func NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, username string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1339,20 +1192,11 @@ func NewInstanceCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx context.Co
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewSystemInstancesReadRequest generates requests for SystemInstancesRead
-func NewSystemInstancesReadRequest(ctx context.Context, server string, projectID string, instanceID string, params *SystemInstancesReadParams) (*http.Request, error) {
+func NewSystemInstancesReadRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1388,15 +1232,6 @@ func NewSystemInstancesReadRequest(ctx context.Context, server string, projectID
 	if err != nil {
 		return nil, err
 	}
-
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
 
 	return req, nil
 }
@@ -1552,41 +1387,41 @@ type ClientWithResponsesInterface interface {
 	InstanceCreateWithResponse(ctx context.Context, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error)
 
 	// InstanceDelete request
-	InstanceDeleteWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceDeleteParams, reqEditors ...RequestEditorFn) (*InstanceDeleteResponse, error)
+	InstanceDeleteWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceDeleteResponse, error)
 
 	// InstanceRead request
-	InstanceReadWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceReadParams, reqEditors ...RequestEditorFn) (*InstanceReadResponse, error)
+	InstanceReadWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceReadResponse, error)
 
 	// InstanceUpdate request with any body
-	InstanceUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error)
+	InstanceUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error)
 
-	InstanceUpdateWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error)
+	InstanceUpdateWithResponse(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error)
 
 	// InstanceCredentialsList request
-	InstanceCredentialsListWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsListParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsListResponse, error)
+	InstanceCredentialsListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceCredentialsListResponse, error)
 
 	// InstanceCredentialsCreate request
-	InstanceCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsCreateParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsCreateResponse, error)
+	InstanceCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceCredentialsCreateResponse, error)
 
 	// InstanceCredentialsDelete request
-	InstanceCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsDeleteResponse, error)
+	InstanceCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsDeleteResponse, error)
 
 	// InstanceCredentialsRead request
-	InstanceCredentialsReadWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsReadParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsReadResponse, error)
+	InstanceCredentialsReadWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsReadResponse, error)
 
 	// InstanceCredentialsRemoteWriteLimitsDelete request
-	InstanceCredentialsRemoteWriteLimitsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsDeleteParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsDeleteResponse, error)
+	InstanceCredentialsRemoteWriteLimitsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsDeleteResponse, error)
 
 	// InstanceCredentialsRemoteWriteLimitsList request
-	InstanceCredentialsRemoteWriteLimitsListWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsListParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsListResponse, error)
+	InstanceCredentialsRemoteWriteLimitsListWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsListResponse, error)
 
 	// InstanceCredentialsRemoteWriteLimitsUpdate request with any body
-	InstanceCredentialsRemoteWriteLimitsUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error)
+	InstanceCredentialsRemoteWriteLimitsUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error)
 
-	InstanceCredentialsRemoteWriteLimitsUpdateWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error)
+	InstanceCredentialsRemoteWriteLimitsUpdateWithResponse(ctx context.Context, projectID string, instanceID string, username string, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error)
 
 	// SystemInstancesRead request
-	SystemInstancesReadWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesReadParams, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error)
+	SystemInstancesReadWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error)
 
 	// SystemInstancesCredentialsCreate request with any body
 	SystemInstancesCredentialsCreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error)
@@ -2000,8 +1835,8 @@ func (c *ClientWithResponses) InstanceCreateWithResponse(ctx context.Context, pr
 }
 
 // InstanceDeleteWithResponse request returning *InstanceDeleteResponse
-func (c *ClientWithResponses) InstanceDeleteWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceDeleteParams, reqEditors ...RequestEditorFn) (*InstanceDeleteResponse, error) {
-	rsp, err := c.InstanceDelete(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) InstanceDeleteWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceDeleteResponse, error) {
+	rsp, err := c.InstanceDelete(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2009,8 +1844,8 @@ func (c *ClientWithResponses) InstanceDeleteWithResponse(ctx context.Context, pr
 }
 
 // InstanceReadWithResponse request returning *InstanceReadResponse
-func (c *ClientWithResponses) InstanceReadWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceReadParams, reqEditors ...RequestEditorFn) (*InstanceReadResponse, error) {
-	rsp, err := c.InstanceRead(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) InstanceReadWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceReadResponse, error) {
+	rsp, err := c.InstanceRead(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2018,16 +1853,16 @@ func (c *ClientWithResponses) InstanceReadWithResponse(ctx context.Context, proj
 }
 
 // InstanceUpdateWithBodyWithResponse request with arbitrary body returning *InstanceUpdateResponse
-func (c *ClientWithResponses) InstanceUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error) {
-	rsp, err := c.InstanceUpdateWithBody(ctx, projectID, instanceID, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) InstanceUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error) {
+	rsp, err := c.InstanceUpdateWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseInstanceUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) InstanceUpdateWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceUpdateParams, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error) {
-	rsp, err := c.InstanceUpdate(ctx, projectID, instanceID, params, body, reqEditors...)
+func (c *ClientWithResponses) InstanceUpdateWithResponse(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error) {
+	rsp, err := c.InstanceUpdate(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2035,8 +1870,8 @@ func (c *ClientWithResponses) InstanceUpdateWithResponse(ctx context.Context, pr
 }
 
 // InstanceCredentialsListWithResponse request returning *InstanceCredentialsListResponse
-func (c *ClientWithResponses) InstanceCredentialsListWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsListParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsListResponse, error) {
-	rsp, err := c.InstanceCredentialsList(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceCredentialsListResponse, error) {
+	rsp, err := c.InstanceCredentialsList(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2044,8 +1879,8 @@ func (c *ClientWithResponses) InstanceCredentialsListWithResponse(ctx context.Co
 }
 
 // InstanceCredentialsCreateWithResponse request returning *InstanceCredentialsCreateResponse
-func (c *ClientWithResponses) InstanceCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, params *InstanceCredentialsCreateParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsCreateResponse, error) {
-	rsp, err := c.InstanceCredentialsCreate(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceCredentialsCreateResponse, error) {
+	rsp, err := c.InstanceCredentialsCreate(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2053,8 +1888,8 @@ func (c *ClientWithResponses) InstanceCredentialsCreateWithResponse(ctx context.
 }
 
 // InstanceCredentialsDeleteWithResponse request returning *InstanceCredentialsDeleteResponse
-func (c *ClientWithResponses) InstanceCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsDeleteResponse, error) {
-	rsp, err := c.InstanceCredentialsDelete(ctx, projectID, instanceID, username, params, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsDeleteResponse, error) {
+	rsp, err := c.InstanceCredentialsDelete(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2062,8 +1897,8 @@ func (c *ClientWithResponses) InstanceCredentialsDeleteWithResponse(ctx context.
 }
 
 // InstanceCredentialsReadWithResponse request returning *InstanceCredentialsReadResponse
-func (c *ClientWithResponses) InstanceCredentialsReadWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsReadParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsReadResponse, error) {
-	rsp, err := c.InstanceCredentialsRead(ctx, projectID, instanceID, username, params, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsReadWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsReadResponse, error) {
+	rsp, err := c.InstanceCredentialsRead(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2071,8 +1906,8 @@ func (c *ClientWithResponses) InstanceCredentialsReadWithResponse(ctx context.Co
 }
 
 // InstanceCredentialsRemoteWriteLimitsDeleteWithResponse request returning *InstanceCredentialsRemoteWriteLimitsDeleteResponse
-func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsDeleteParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsDeleteResponse, error) {
-	rsp, err := c.InstanceCredentialsRemoteWriteLimitsDelete(ctx, projectID, instanceID, username, params, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsDeleteResponse, error) {
+	rsp, err := c.InstanceCredentialsRemoteWriteLimitsDelete(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2080,8 +1915,8 @@ func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsDeleteWithResp
 }
 
 // InstanceCredentialsRemoteWriteLimitsListWithResponse request returning *InstanceCredentialsRemoteWriteLimitsListResponse
-func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsListWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsListParams, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsListResponse, error) {
-	rsp, err := c.InstanceCredentialsRemoteWriteLimitsList(ctx, projectID, instanceID, username, params, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsListWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsListResponse, error) {
+	rsp, err := c.InstanceCredentialsRemoteWriteLimitsList(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2089,16 +1924,16 @@ func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsListWithRespon
 }
 
 // InstanceCredentialsRemoteWriteLimitsUpdateWithBodyWithResponse request with arbitrary body returning *InstanceCredentialsRemoteWriteLimitsUpdateResponse
-func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error) {
-	rsp, err := c.InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx, projectID, instanceID, username, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error) {
+	rsp, err := c.InstanceCredentialsRemoteWriteLimitsUpdateWithBody(ctx, projectID, instanceID, username, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseInstanceCredentialsRemoteWriteLimitsUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsUpdateWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *InstanceCredentialsRemoteWriteLimitsUpdateParams, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error) {
-	rsp, err := c.InstanceCredentialsRemoteWriteLimitsUpdate(ctx, projectID, instanceID, username, params, body, reqEditors...)
+func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsUpdateWithResponse(ctx context.Context, projectID string, instanceID string, username string, body InstanceCredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCredentialsRemoteWriteLimitsUpdateResponse, error) {
+	rsp, err := c.InstanceCredentialsRemoteWriteLimitsUpdate(ctx, projectID, instanceID, username, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -2106,8 +1941,8 @@ func (c *ClientWithResponses) InstanceCredentialsRemoteWriteLimitsUpdateWithResp
 }
 
 // SystemInstancesReadWithResponse request returning *SystemInstancesReadResponse
-func (c *ClientWithResponses) SystemInstancesReadWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesReadParams, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error) {
-	rsp, err := c.SystemInstancesRead(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) SystemInstancesReadWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error) {
+	rsp, err := c.SystemInstancesRead(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

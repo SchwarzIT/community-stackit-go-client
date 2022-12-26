@@ -43,28 +43,10 @@ type PermissionDenied struct {
 	Detail string `json:"detail"`
 }
 
-// ListParams defines parameters for List.
-type ListParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // CreateJSONBody defines parameters for Create.
 type CreateJSONBody struct {
 	// Address cert to check
 	Address string `json:"address"`
-}
-
-// CreateParams defines parameters for Create.
-type CreateParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// DeleteParams defines parameters for Delete.
-type DeleteParams struct {
-	// Authorization Accepts api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // CreateJSONRequestBody defines body for Create for application/json ContentType.
@@ -99,19 +81,19 @@ func NewClient(server string, httpClient common.Client) *Client {
 // The interface specification for the client above.
 type ClientInterface interface {
 	// List request
-	List(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Create request with any body
-	CreateWithBody(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Create(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Create(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Delete request
-	Delete(ctx context.Context, projectID string, instanceID string, address string, params *DeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Delete(ctx context.Context, projectID string, instanceID string, address string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) List(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -122,8 +104,8 @@ func (c *Client) List(ctx context.Context, projectID string, instanceID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateWithBody(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, instanceID, params, contentType, body)
+func (c *Client) CreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -134,8 +116,8 @@ func (c *Client) CreateWithBody(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) Create(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequest(ctx, c.Server, projectID, instanceID, params, body)
+func (c *Client) Create(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -146,8 +128,8 @@ func (c *Client) Create(ctx context.Context, projectID string, instanceID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) Delete(ctx context.Context, projectID string, instanceID string, address string, params *DeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRequest(ctx, c.Server, projectID, instanceID, address, params)
+func (c *Client) Delete(ctx context.Context, projectID string, instanceID string, address string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRequest(ctx, c.Server, projectID, instanceID, address)
 	if err != nil {
 		return nil, err
 	}
@@ -159,7 +141,7 @@ func (c *Client) Delete(ctx context.Context, projectID string, instanceID string
 }
 
 // NewListRequest generates requests for List
-func NewListRequest(ctx context.Context, server string, projectID string, instanceID string, params *ListParams) (*http.Request, error) {
+func NewListRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -196,31 +178,22 @@ func NewListRequest(ctx context.Context, server string, projectID string, instan
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewCreateRequest calls the generic Create builder with application/json body
-func NewCreateRequest(ctx context.Context, server string, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody) (*http.Request, error) {
+func NewCreateRequest(ctx context.Context, server string, projectID string, instanceID string, body CreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateRequestWithBody(ctx, server, projectID, instanceID, params, "application/json", bodyReader)
+	return NewCreateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
 // NewCreateRequestWithBody generates requests for Create with any type of body
-func NewCreateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -259,20 +232,11 @@ func NewCreateRequestWithBody(ctx context.Context, server string, projectID stri
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewDeleteRequest generates requests for Delete
-func NewDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, address string, params *DeleteParams) (*http.Request, error) {
+func NewDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, address string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -316,15 +280,6 @@ func NewDeleteRequest(ctx context.Context, server string, projectID string, inst
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
@@ -351,15 +306,15 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 	// List request
-	ListWithResponse(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*ListResponse, error)
+	ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
 	// Create request with any body
-	CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
-	CreateWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	CreateWithResponse(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
 	// Delete request
-	DeleteWithResponse(ctx context.Context, projectID string, instanceID string, address string, params *DeleteParams, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
+	DeleteWithResponse(ctx context.Context, projectID string, instanceID string, address string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 }
 
 type ListResponse struct {
@@ -436,8 +391,8 @@ func (r DeleteResponse) StatusCode() int {
 }
 
 // ListWithResponse request returning *ListResponse
-func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*ListResponse, error) {
-	rsp, err := c.List(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.List(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -445,16 +400,16 @@ func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID st
 }
 
 // CreateWithBodyWithResponse request with arbitrary body returning *CreateResponse
-func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.CreateWithBody(ctx, projectID, instanceID, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.Create(ctx, projectID, instanceID, params, body, reqEditors...)
+func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.Create(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -462,8 +417,8 @@ func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID 
 }
 
 // DeleteWithResponse request returning *DeleteResponse
-func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, projectID string, instanceID string, address string, params *DeleteParams, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
-	rsp, err := c.Delete(ctx, projectID, instanceID, address, params, reqEditors...)
+func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, projectID string, instanceID string, address string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+	rsp, err := c.Delete(ctx, projectID, instanceID, address, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

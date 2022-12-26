@@ -1,0 +1,2 @@
+1.  from the original openAPI config file, Header param for authorization has been 
+    removed as it created duplicity in the generated code for authorization

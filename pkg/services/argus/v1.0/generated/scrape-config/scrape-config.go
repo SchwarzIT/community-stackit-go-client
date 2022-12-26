@@ -206,15 +206,6 @@ type TLSConfig struct {
 type DeleteParams struct {
 	// JobName Name of the jobs that should be deleted
 	JobName []string `form:"jobName" json:"jobName"`
-
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// ListParams defines parameters for List.
-type ListParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // PartialUpdateJSONBody defines parameters for PartialUpdate.
@@ -390,12 +381,6 @@ type PartialUpdateJSONBody = []struct {
 		// InsecureSkipVerify Disable validation of the server certificate.
 		InsecureSkipVerify *bool `json:"insecureSkipVerify,omitempty"`
 	} `json:"tlsConfig,omitempty"`
-}
-
-// PartialUpdateParams defines parameters for PartialUpdate.
-type PartialUpdateParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // PartialUpdateJSONBodyMetricsRelabelConfigsAction defines parameters for PartialUpdate.
@@ -579,29 +564,11 @@ type CreateJSONBody struct {
 	} `json:"tlsConfig,omitempty"`
 }
 
-// CreateParams defines parameters for Create.
-type CreateParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // CreateJSONBodyMetricsRelabelConfigsAction defines parameters for Create.
 type CreateJSONBodyMetricsRelabelConfigsAction string
 
 // CreateJSONBodyScheme defines parameters for Create.
 type CreateJSONBodyScheme string
-
-// DeleteConfigsParams defines parameters for DeleteConfigs.
-type DeleteConfigsParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
-// ReadParams defines parameters for Read.
-type ReadParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
 
 // UpdateJSONBody defines parameters for Update.
 type UpdateJSONBody struct {
@@ -695,12 +662,6 @@ type UpdateJSONBody struct {
 	} `json:"tlsConfig,omitempty"`
 }
 
-// UpdateParams defines parameters for Update.
-type UpdateParams struct {
-	// Authorization Accepts technical credentials and api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // UpdateJSONBodyMetricsRelabelConfigsAction defines parameters for Update.
 type UpdateJSONBodyMetricsRelabelConfigsAction string
 
@@ -748,28 +709,28 @@ type ClientInterface interface {
 	Delete(ctx context.Context, projectID string, instanceID string, params *DeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// List request
-	List(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// PartialUpdate request with any body
-	PartialUpdateWithBody(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PartialUpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	PartialUpdate(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	PartialUpdate(ctx context.Context, projectID string, instanceID string, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Create request with any body
-	CreateWithBody(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Create(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Create(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteConfigs request
-	DeleteConfigs(ctx context.Context, projectID string, instanceID string, jobName string, params *DeleteConfigsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteConfigs(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Read request
-	Read(ctx context.Context, projectID string, instanceID string, jobName string, params *ReadParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Read(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Update request with any body
-	UpdateWithBody(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateWithBody(ctx context.Context, projectID string, instanceID string, jobName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Update(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Update(ctx context.Context, projectID string, instanceID string, jobName string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) Delete(ctx context.Context, projectID string, instanceID string, params *DeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -784,8 +745,8 @@ func (c *Client) Delete(ctx context.Context, projectID string, instanceID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) List(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListRequest(ctx, c.Server, projectID, instanceID, params)
+func (c *Client) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -796,8 +757,8 @@ func (c *Client) List(ctx context.Context, projectID string, instanceID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) PartialUpdateWithBody(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPartialUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, params, contentType, body)
+func (c *Client) PartialUpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPartialUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -808,8 +769,8 @@ func (c *Client) PartialUpdateWithBody(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-func (c *Client) PartialUpdate(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewPartialUpdateRequest(ctx, c.Server, projectID, instanceID, params, body)
+func (c *Client) PartialUpdate(ctx context.Context, projectID string, instanceID string, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPartialUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -820,8 +781,8 @@ func (c *Client) PartialUpdate(ctx context.Context, projectID string, instanceID
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateWithBody(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, instanceID, params, contentType, body)
+func (c *Client) CreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -832,8 +793,8 @@ func (c *Client) CreateWithBody(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) Create(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequest(ctx, c.Server, projectID, instanceID, params, body)
+func (c *Client) Create(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -844,8 +805,8 @@ func (c *Client) Create(ctx context.Context, projectID string, instanceID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteConfigs(ctx context.Context, projectID string, instanceID string, jobName string, params *DeleteConfigsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteConfigsRequest(ctx, c.Server, projectID, instanceID, jobName, params)
+func (c *Client) DeleteConfigs(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteConfigsRequest(ctx, c.Server, projectID, instanceID, jobName)
 	if err != nil {
 		return nil, err
 	}
@@ -856,8 +817,8 @@ func (c *Client) DeleteConfigs(ctx context.Context, projectID string, instanceID
 	return c.Client.Do(req)
 }
 
-func (c *Client) Read(ctx context.Context, projectID string, instanceID string, jobName string, params *ReadParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewReadRequest(ctx, c.Server, projectID, instanceID, jobName, params)
+func (c *Client) Read(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewReadRequest(ctx, c.Server, projectID, instanceID, jobName)
 	if err != nil {
 		return nil, err
 	}
@@ -868,8 +829,8 @@ func (c *Client) Read(ctx context.Context, projectID string, instanceID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateWithBody(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, jobName, params, contentType, body)
+func (c *Client) UpdateWithBody(ctx context.Context, projectID string, instanceID string, jobName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, jobName, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -880,8 +841,8 @@ func (c *Client) UpdateWithBody(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) Update(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, jobName, params, body)
+func (c *Client) Update(ctx context.Context, projectID string, instanceID string, jobName string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, jobName, body)
 	if err != nil {
 		return nil, err
 	}
@@ -946,20 +907,11 @@ func NewDeleteRequest(ctx context.Context, server string, projectID string, inst
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewListRequest generates requests for List
-func NewListRequest(ctx context.Context, server string, projectID string, instanceID string, params *ListParams) (*http.Request, error) {
+func NewListRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -996,31 +948,22 @@ func NewListRequest(ctx context.Context, server string, projectID string, instan
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewPartialUpdateRequest calls the generic PartialUpdate builder with application/json body
-func NewPartialUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, params *PartialUpdateParams, body PartialUpdateJSONRequestBody) (*http.Request, error) {
+func NewPartialUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, body PartialUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewPartialUpdateRequestWithBody(ctx, server, projectID, instanceID, params, "application/json", bodyReader)
+	return NewPartialUpdateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
 // NewPartialUpdateRequestWithBody generates requests for PartialUpdate with any type of body
-func NewPartialUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, params *PartialUpdateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewPartialUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1059,31 +1002,22 @@ func NewPartialUpdateRequestWithBody(ctx context.Context, server string, project
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewCreateRequest calls the generic Create builder with application/json body
-func NewCreateRequest(ctx context.Context, server string, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody) (*http.Request, error) {
+func NewCreateRequest(ctx context.Context, server string, projectID string, instanceID string, body CreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateRequestWithBody(ctx, server, projectID, instanceID, params, "application/json", bodyReader)
+	return NewCreateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
 // NewCreateRequestWithBody generates requests for Create with any type of body
-func NewCreateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewCreateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1122,20 +1056,11 @@ func NewCreateRequestWithBody(ctx context.Context, server string, projectID stri
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewDeleteConfigsRequest generates requests for DeleteConfigs
-func NewDeleteConfigsRequest(ctx context.Context, server string, projectID string, instanceID string, jobName string, params *DeleteConfigsParams) (*http.Request, error) {
+func NewDeleteConfigsRequest(ctx context.Context, server string, projectID string, instanceID string, jobName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1179,20 +1104,11 @@ func NewDeleteConfigsRequest(ctx context.Context, server string, projectID strin
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewReadRequest generates requests for Read
-func NewReadRequest(ctx context.Context, server string, projectID string, instanceID string, jobName string, params *ReadParams) (*http.Request, error) {
+func NewReadRequest(ctx context.Context, server string, projectID string, instanceID string, jobName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1236,31 +1152,22 @@ func NewReadRequest(ctx context.Context, server string, projectID string, instan
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewUpdateRequest calls the generic Update builder with application/json body
-func NewUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, jobName string, params *UpdateParams, body UpdateJSONRequestBody) (*http.Request, error) {
+func NewUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, jobName string, body UpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateRequestWithBody(ctx, server, projectID, instanceID, jobName, params, "application/json", bodyReader)
+	return NewUpdateRequestWithBody(ctx, server, projectID, instanceID, jobName, "application/json", bodyReader)
 }
 
 // NewUpdateRequestWithBody generates requests for Update with any type of body
-func NewUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, jobName string, params *UpdateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, jobName string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1306,15 +1213,6 @@ func NewUpdateRequestWithBody(ctx context.Context, server string, projectID stri
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
@@ -1344,28 +1242,28 @@ type ClientWithResponsesInterface interface {
 	DeleteWithResponse(ctx context.Context, projectID string, instanceID string, params *DeleteParams, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
 	// List request
-	ListWithResponse(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*ListResponse, error)
+	ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
 	// PartialUpdate request with any body
-	PartialUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error)
+	PartialUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error)
 
-	PartialUpdateWithResponse(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error)
+	PartialUpdateWithResponse(ctx context.Context, projectID string, instanceID string, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error)
 
 	// Create request with any body
-	CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
-	CreateWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	CreateWithResponse(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
 	// DeleteConfigs request
-	DeleteConfigsWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *DeleteConfigsParams, reqEditors ...RequestEditorFn) (*DeleteConfigsResponse, error)
+	DeleteConfigsWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*DeleteConfigsResponse, error)
 
 	// Read request
-	ReadWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *ReadParams, reqEditors ...RequestEditorFn) (*ReadResponse, error)
+	ReadWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*ReadResponse, error)
 
 	// Update request with any body
-	UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
+	UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
-	UpdateWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
+	UpdateWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 }
 
 type DeleteResponse struct {
@@ -1551,8 +1449,8 @@ func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, projectID 
 }
 
 // ListWithResponse request returning *ListResponse
-func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID string, params *ListParams, reqEditors ...RequestEditorFn) (*ListResponse, error) {
-	rsp, err := c.List(ctx, projectID, instanceID, params, reqEditors...)
+func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.List(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1560,16 +1458,16 @@ func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID st
 }
 
 // PartialUpdateWithBodyWithResponse request with arbitrary body returning *PartialUpdateResponse
-func (c *ClientWithResponses) PartialUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error) {
-	rsp, err := c.PartialUpdateWithBody(ctx, projectID, instanceID, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) PartialUpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error) {
+	rsp, err := c.PartialUpdateWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParsePartialUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) PartialUpdateWithResponse(ctx context.Context, projectID string, instanceID string, params *PartialUpdateParams, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error) {
-	rsp, err := c.PartialUpdate(ctx, projectID, instanceID, params, body, reqEditors...)
+func (c *ClientWithResponses) PartialUpdateWithResponse(ctx context.Context, projectID string, instanceID string, body PartialUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*PartialUpdateResponse, error) {
+	rsp, err := c.PartialUpdate(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1577,16 +1475,16 @@ func (c *ClientWithResponses) PartialUpdateWithResponse(ctx context.Context, pro
 }
 
 // CreateWithBodyWithResponse request with arbitrary body returning *CreateResponse
-func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.CreateWithBody(ctx, projectID, instanceID, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, instanceID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.Create(ctx, projectID, instanceID, params, body, reqEditors...)
+func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, instanceID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.Create(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1594,8 +1492,8 @@ func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID 
 }
 
 // DeleteConfigsWithResponse request returning *DeleteConfigsResponse
-func (c *ClientWithResponses) DeleteConfigsWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *DeleteConfigsParams, reqEditors ...RequestEditorFn) (*DeleteConfigsResponse, error) {
-	rsp, err := c.DeleteConfigs(ctx, projectID, instanceID, jobName, params, reqEditors...)
+func (c *ClientWithResponses) DeleteConfigsWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*DeleteConfigsResponse, error) {
+	rsp, err := c.DeleteConfigs(ctx, projectID, instanceID, jobName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1603,8 +1501,8 @@ func (c *ClientWithResponses) DeleteConfigsWithResponse(ctx context.Context, pro
 }
 
 // ReadWithResponse request returning *ReadResponse
-func (c *ClientWithResponses) ReadWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *ReadParams, reqEditors ...RequestEditorFn) (*ReadResponse, error) {
-	rsp, err := c.Read(ctx, projectID, instanceID, jobName, params, reqEditors...)
+func (c *ClientWithResponses) ReadWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, reqEditors ...RequestEditorFn) (*ReadResponse, error) {
+	rsp, err := c.Read(ctx, projectID, instanceID, jobName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1612,16 +1510,16 @@ func (c *ClientWithResponses) ReadWithResponse(ctx context.Context, projectID st
 }
 
 // UpdateWithBodyWithResponse request with arbitrary body returning *UpdateResponse
-func (c *ClientWithResponses) UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
-	rsp, err := c.UpdateWithBody(ctx, projectID, instanceID, jobName, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.UpdateWithBody(ctx, projectID, instanceID, jobName, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, params *UpdateParams, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
-	rsp, err := c.Update(ctx, projectID, instanceID, jobName, params, body, reqEditors...)
+func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, projectID string, instanceID string, jobName string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.Update(ctx, projectID, instanceID, jobName, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}

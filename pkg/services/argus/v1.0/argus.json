@@ -3037,15 +3037,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -3095,15 +3086,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -3218,15 +3200,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "requestBody": {
@@ -3325,15 +3298,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -3386,15 +3350,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -3488,15 +3443,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -3653,15 +3599,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -4172,15 +4109,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -4275,15 +4203,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -4522,15 +4441,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -4650,15 +4560,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -4738,15 +4639,6 @@
           {
             "in": "path",
             "name": "receiver",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -4990,15 +4882,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -5082,15 +4965,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -5334,15 +5208,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -5451,15 +5316,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -5551,15 +5407,6 @@
           {
             "in": "path",
             "name": "receiver",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -5810,15 +5657,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "Name of the groups that should be deleted",
             "explode": false,
             "in": "query",
@@ -5904,15 +5742,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -5994,15 +5823,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -6164,15 +5984,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -6344,15 +6155,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -6459,15 +6261,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -6568,15 +6361,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -6755,15 +6539,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "Name of the alert rules that should be deleted",
             "explode": false,
             "in": "query",
@@ -6850,15 +6625,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -6929,15 +6695,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -7073,15 +6830,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -7227,15 +6975,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -7344,15 +7083,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -7442,15 +7172,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -7596,15 +7317,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "Name of the records that should be deleted",
             "explode": false,
             "in": "query",
@@ -7687,15 +7399,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -7762,15 +7465,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -7891,15 +7585,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -8030,15 +7715,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -8126,15 +7802,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -8237,15 +7904,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -8376,15 +8034,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "List of restore targets",
             "in": "query",
             "name": "restoreTarget",
@@ -8466,15 +8115,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -8530,15 +8170,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -8657,15 +8288,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "List of backup targets",
             "explode": false,
             "in": "query",
@@ -8774,15 +8396,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "List of backup targets",
             "explode": false,
             "in": "query",
@@ -8884,15 +8497,6 @@
             }
           },
           {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "description": "List of backup targets",
             "explode": false,
             "in": "query",
@@ -8978,15 +8582,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -9041,15 +8636,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -9143,15 +8729,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -9225,15 +8802,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -9292,15 +8860,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -9368,15 +8927,6 @@
           {
             "in": "path",
             "name": "username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -9468,15 +9018,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -9554,15 +9095,6 @@
           {
             "in": "path",
             "name": "username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -9668,15 +9200,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -9762,15 +9285,6 @@
           {
             "in": "path",
             "name": "username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -9888,15 +9402,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -9947,15 +9452,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -10097,15 +9593,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -10160,15 +9647,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -10262,15 +9740,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -10340,15 +9809,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -10434,15 +9894,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -10614,15 +10065,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -10729,15 +10171,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -10838,15 +10271,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -11015,15 +10439,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -11076,15 +10491,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -11178,15 +10584,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -11239,15 +10636,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -11355,15 +10743,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -11418,15 +10797,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -11520,15 +10890,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -11602,15 +10963,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -11665,15 +11017,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -11767,15 +11110,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -11845,15 +11179,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -11943,15 +11268,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -12019,15 +11335,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -12458,15 +11765,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -12907,15 +12205,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -13008,15 +12297,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -13090,15 +12370,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -13383,15 +12654,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -13444,15 +12706,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -13538,15 +12791,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -13620,15 +12864,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -13709,15 +12944,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical credentials and api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
