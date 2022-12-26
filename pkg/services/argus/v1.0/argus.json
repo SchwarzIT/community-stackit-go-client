@@ -2864,15 +2864,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts technical api gateway access.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "responses": {
@@ -2924,15 +2915,6 @@
           {
             "in": "path",
             "name": "projectId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts technical api gateway access.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"
@@ -13030,15 +13012,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "description": "Accepts system permissions.",
-            "in": "header",
-            "name": "Authorization",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
           }
         ],
         "requestBody": {
@@ -13119,15 +13092,6 @@
           {
             "in": "path",
             "name": "username",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "description": "Accepts system permission.",
-            "in": "header",
-            "name": "Authorization",
             "required": true,
             "schema": {
               "type": "string"

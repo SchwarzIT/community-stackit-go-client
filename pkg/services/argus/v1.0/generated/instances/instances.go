@@ -243,12 +243,6 @@ type SystemInstanceResponse struct {
 	Message  string         `json:"message"`
 }
 
-// InstanceListParams defines parameters for InstanceList.
-type InstanceListParams struct {
-	// Authorization Accepts technical api gateway access.
-	Authorization string `json:"Authorization"`
-}
-
 // InstanceCreateJSONBody defines parameters for InstanceCreate.
 type InstanceCreateJSONBody struct {
 	// Name Name of the service
@@ -259,12 +253,6 @@ type InstanceCreateJSONBody struct {
 
 	// PlanId uuid of the plan to create/update
 	PlanID string `json:"planId"`
-}
-
-// InstanceCreateParams defines parameters for InstanceCreate.
-type InstanceCreateParams struct {
-	// Authorization Accepts technical api gateway access.
-	Authorization string `json:"Authorization"`
 }
 
 // InstanceUpdateJSONBody defines parameters for InstanceUpdate.
@@ -289,18 +277,6 @@ type InstanceCredentialsRemoteWriteLimitsUpdateJSONBody struct {
 type SystemInstancesCredentialsCreateJSONBody struct {
 	// RemoteWriteMaxLimit Remote write metric sample limit for credential to push in a single minute.
 	RemoteWriteMaxLimit *float32 `json:"remoteWriteMaxLimit,omitempty"`
-}
-
-// SystemInstancesCredentialsCreateParams defines parameters for SystemInstancesCredentialsCreate.
-type SystemInstancesCredentialsCreateParams struct {
-	// Authorization Accepts system permissions.
-	Authorization string `json:"Authorization"`
-}
-
-// SystemInstancesCredentialsDeleteParams defines parameters for SystemInstancesCredentialsDelete.
-type SystemInstancesCredentialsDeleteParams struct {
-	// Authorization Accepts system permission.
-	Authorization string `json:"Authorization"`
 }
 
 // InstanceCreateJSONRequestBody defines body for InstanceCreate for application/json ContentType.
@@ -344,12 +320,12 @@ func NewClient(server string, httpClient common.Client) *Client {
 // The interface specification for the client above.
 type ClientInterface interface {
 	// InstanceList request
-	InstanceList(ctx context.Context, projectID string, params *InstanceListParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceList(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceCreate request with any body
-	InstanceCreateWithBody(ctx context.Context, projectID string, params *InstanceCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCreateWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	InstanceCreate(ctx context.Context, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	InstanceCreate(ctx context.Context, projectID string, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// InstanceDelete request
 	InstanceDelete(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -389,16 +365,16 @@ type ClientInterface interface {
 	SystemInstancesRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SystemInstancesCredentialsCreate request with any body
-	SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	SystemInstancesCredentialsCreate(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SystemInstancesCredentialsCreate(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// SystemInstancesCredentialsDelete request
-	SystemInstancesCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, params *SystemInstancesCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	SystemInstancesCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) InstanceList(ctx context.Context, projectID string, params *InstanceListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceListRequest(ctx, c.Server, projectID, params)
+func (c *Client) InstanceList(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -409,8 +385,8 @@ func (c *Client) InstanceList(ctx context.Context, projectID string, params *Ins
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCreateWithBody(ctx context.Context, projectID string, params *InstanceCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCreateRequestWithBody(ctx, c.Server, projectID, params, contentType, body)
+func (c *Client) InstanceCreateWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCreateRequestWithBody(ctx, c.Server, projectID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -421,8 +397,8 @@ func (c *Client) InstanceCreateWithBody(ctx context.Context, projectID string, p
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceCreate(ctx context.Context, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceCreateRequest(ctx, c.Server, projectID, params, body)
+func (c *Client) InstanceCreate(ctx context.Context, projectID string, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewInstanceCreateRequest(ctx, c.Server, projectID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -589,8 +565,8 @@ func (c *Client) SystemInstancesRead(ctx context.Context, projectID string, inst
 	return c.Client.Do(req)
 }
 
-func (c *Client) SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSystemInstancesCredentialsCreateRequestWithBody(ctx, c.Server, projectID, instanceID, params, contentType, body)
+func (c *Client) SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSystemInstancesCredentialsCreateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -601,8 +577,8 @@ func (c *Client) SystemInstancesCredentialsCreateWithBody(ctx context.Context, p
 	return c.Client.Do(req)
 }
 
-func (c *Client) SystemInstancesCredentialsCreate(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSystemInstancesCredentialsCreateRequest(ctx, c.Server, projectID, instanceID, params, body)
+func (c *Client) SystemInstancesCredentialsCreate(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSystemInstancesCredentialsCreateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -613,8 +589,8 @@ func (c *Client) SystemInstancesCredentialsCreate(ctx context.Context, projectID
 	return c.Client.Do(req)
 }
 
-func (c *Client) SystemInstancesCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, params *SystemInstancesCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewSystemInstancesCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, username, params)
+func (c *Client) SystemInstancesCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewSystemInstancesCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
 	}
@@ -626,7 +602,7 @@ func (c *Client) SystemInstancesCredentialsDelete(ctx context.Context, projectID
 }
 
 // NewInstanceListRequest generates requests for InstanceList
-func NewInstanceListRequest(ctx context.Context, server string, projectID string, params *InstanceListParams) (*http.Request, error) {
+func NewInstanceListRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -656,31 +632,22 @@ func NewInstanceListRequest(ctx context.Context, server string, projectID string
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewInstanceCreateRequest calls the generic InstanceCreate builder with application/json body
-func NewInstanceCreateRequest(ctx context.Context, server string, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody) (*http.Request, error) {
+func NewInstanceCreateRequest(ctx context.Context, server string, projectID string, body InstanceCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewInstanceCreateRequestWithBody(ctx, server, projectID, params, "application/json", bodyReader)
+	return NewInstanceCreateRequestWithBody(ctx, server, projectID, "application/json", bodyReader)
 }
 
 // NewInstanceCreateRequestWithBody generates requests for InstanceCreate with any type of body
-func NewInstanceCreateRequestWithBody(ctx context.Context, server string, projectID string, params *InstanceCreateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewInstanceCreateRequestWithBody(ctx context.Context, server string, projectID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -711,15 +678,6 @@ func NewInstanceCreateRequestWithBody(ctx context.Context, server string, projec
 	}
 
 	req.Header.Add("Content-Type", contentType)
-
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
 
 	return req, nil
 }
@@ -1237,18 +1195,18 @@ func NewSystemInstancesReadRequest(ctx context.Context, server string, projectID
 }
 
 // NewSystemInstancesCredentialsCreateRequest calls the generic SystemInstancesCredentialsCreate builder with application/json body
-func NewSystemInstancesCredentialsCreateRequest(ctx context.Context, server string, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, body SystemInstancesCredentialsCreateJSONRequestBody) (*http.Request, error) {
+func NewSystemInstancesCredentialsCreateRequest(ctx context.Context, server string, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewSystemInstancesCredentialsCreateRequestWithBody(ctx, server, projectID, instanceID, params, "application/json", bodyReader)
+	return NewSystemInstancesCredentialsCreateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
 // NewSystemInstancesCredentialsCreateRequestWithBody generates requests for SystemInstancesCredentialsCreate with any type of body
-func NewSystemInstancesCredentialsCreateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader) (*http.Request, error) {
+func NewSystemInstancesCredentialsCreateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1287,20 +1245,11 @@ func NewSystemInstancesCredentialsCreateRequestWithBody(ctx context.Context, ser
 
 	req.Header.Add("Content-Type", contentType)
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
 // NewSystemInstancesCredentialsDeleteRequest generates requests for SystemInstancesCredentialsDelete
-func NewSystemInstancesCredentialsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, username string, params *SystemInstancesCredentialsDeleteParams) (*http.Request, error) {
+func NewSystemInstancesCredentialsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, username string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1344,15 +1293,6 @@ func NewSystemInstancesCredentialsDeleteRequest(ctx context.Context, server stri
 		return nil, err
 	}
 
-	var headerParam0 string
-
-	headerParam0, err = runtime.StyleParamWithLocation("simple", false, "Authorization", runtime.ParamLocationHeader, params.Authorization)
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", headerParam0)
-
 	return req, nil
 }
 
@@ -1379,12 +1319,12 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
 	// InstanceList request
-	InstanceListWithResponse(ctx context.Context, projectID string, params *InstanceListParams, reqEditors ...RequestEditorFn) (*InstanceListResponse, error)
+	InstanceListWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*InstanceListResponse, error)
 
 	// InstanceCreate request with any body
-	InstanceCreateWithBodyWithResponse(ctx context.Context, projectID string, params *InstanceCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error)
+	InstanceCreateWithBodyWithResponse(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error)
 
-	InstanceCreateWithResponse(ctx context.Context, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error)
+	InstanceCreateWithResponse(ctx context.Context, projectID string, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error)
 
 	// InstanceDelete request
 	InstanceDeleteWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceDeleteResponse, error)
@@ -1424,12 +1364,12 @@ type ClientWithResponsesInterface interface {
 	SystemInstancesReadWithResponse(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error)
 
 	// SystemInstancesCredentialsCreate request with any body
-	SystemInstancesCredentialsCreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error)
+	SystemInstancesCredentialsCreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error)
 
-	SystemInstancesCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error)
+	SystemInstancesCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error)
 
 	// SystemInstancesCredentialsDelete request
-	SystemInstancesCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *SystemInstancesCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsDeleteResponse, error)
+	SystemInstancesCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsDeleteResponse, error)
 }
 
 type InstanceListResponse struct {
@@ -1809,8 +1749,8 @@ func (r SystemInstancesCredentialsDeleteResponse) StatusCode() int {
 }
 
 // InstanceListWithResponse request returning *InstanceListResponse
-func (c *ClientWithResponses) InstanceListWithResponse(ctx context.Context, projectID string, params *InstanceListParams, reqEditors ...RequestEditorFn) (*InstanceListResponse, error) {
-	rsp, err := c.InstanceList(ctx, projectID, params, reqEditors...)
+func (c *ClientWithResponses) InstanceListWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*InstanceListResponse, error) {
+	rsp, err := c.InstanceList(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1818,16 +1758,16 @@ func (c *ClientWithResponses) InstanceListWithResponse(ctx context.Context, proj
 }
 
 // InstanceCreateWithBodyWithResponse request with arbitrary body returning *InstanceCreateResponse
-func (c *ClientWithResponses) InstanceCreateWithBodyWithResponse(ctx context.Context, projectID string, params *InstanceCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error) {
-	rsp, err := c.InstanceCreateWithBody(ctx, projectID, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) InstanceCreateWithBodyWithResponse(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error) {
+	rsp, err := c.InstanceCreateWithBody(ctx, projectID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseInstanceCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) InstanceCreateWithResponse(ctx context.Context, projectID string, params *InstanceCreateParams, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error) {
-	rsp, err := c.InstanceCreate(ctx, projectID, params, body, reqEditors...)
+func (c *ClientWithResponses) InstanceCreateWithResponse(ctx context.Context, projectID string, body InstanceCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceCreateResponse, error) {
+	rsp, err := c.InstanceCreate(ctx, projectID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1950,16 +1890,16 @@ func (c *ClientWithResponses) SystemInstancesReadWithResponse(ctx context.Contex
 }
 
 // SystemInstancesCredentialsCreateWithBodyWithResponse request with arbitrary body returning *SystemInstancesCredentialsCreateResponse
-func (c *ClientWithResponses) SystemInstancesCredentialsCreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
-	rsp, err := c.SystemInstancesCredentialsCreateWithBody(ctx, projectID, instanceID, params, contentType, body, reqEditors...)
+func (c *ClientWithResponses) SystemInstancesCredentialsCreateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
+	rsp, err := c.SystemInstancesCredentialsCreateWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseSystemInstancesCredentialsCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) SystemInstancesCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, params *SystemInstancesCredentialsCreateParams, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
-	rsp, err := c.SystemInstancesCredentialsCreate(ctx, projectID, instanceID, params, body, reqEditors...)
+func (c *ClientWithResponses) SystemInstancesCredentialsCreateWithResponse(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
+	rsp, err := c.SystemInstancesCredentialsCreate(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1967,8 +1907,8 @@ func (c *ClientWithResponses) SystemInstancesCredentialsCreateWithResponse(ctx c
 }
 
 // SystemInstancesCredentialsDeleteWithResponse request returning *SystemInstancesCredentialsDeleteResponse
-func (c *ClientWithResponses) SystemInstancesCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, params *SystemInstancesCredentialsDeleteParams, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsDeleteResponse, error) {
-	rsp, err := c.SystemInstancesCredentialsDelete(ctx, projectID, instanceID, username, params, reqEditors...)
+func (c *ClientWithResponses) SystemInstancesCredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsDeleteResponse, error) {
+	rsp, err := c.SystemInstancesCredentialsDelete(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
