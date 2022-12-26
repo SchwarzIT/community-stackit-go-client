@@ -40,6 +40,9 @@ output-options:
   - from: include/service.go
     to: service.go
     trim: "argus."
+  - from: include/instances/wait.go
+    to: instances/wait.go
+    trim: "instances."
 tidy:
   verbose: false
   functions:
