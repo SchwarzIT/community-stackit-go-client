@@ -25,7 +25,7 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
 		}
-		if s.JSON200.Status == ProjectInstanceUIStatusCREATE_SUCCEEDED {
+		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED {
 			return s.JSON200, true, nil
 		}
 		return s.JSON200, false, nil
@@ -46,13 +46,13 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
 		}
-		if s.JSON200.Status == ProjectInstanceUIStatusUPDATE_SUCCEEDED {
+		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED {
 			return s.JSON200, true, nil
 		}
-		if s.JSON200.Status == ProjectInstanceUIStatusUPDATE_FAILED {
+		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_FAILED {
 			return s.JSON200, true, fmt.Errorf("update failed for instance %s", instanceID)
 		}
-		if s.JSON200.Status == ProjectInstanceUIStatusCREATE_SUCCEEDED {
+		if s.JSON200.Status != PROJECT_INSTANCE_UI_STATUS_UPDATING {
 			// in some cases it takes a long time for the server to change the
 			// instance status to UPDATING
 			// the following code will wait for the status change for 5 minutes
@@ -68,9 +68,9 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 				if s.JSON200 == nil {
 					return nil, false, errors.New("received an empty response. JSON200 == nil")
 				}
-				if si.JSON200.Status == ProjectInstanceUIStatusUPDATING ||
-					si.JSON200.Status == ProjectInstanceUIStatusUPDATE_SUCCEEDED ||
-					si.JSON200.Status == ProjectInstanceUIStatusUPDATE_FAILED {
+				if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATING ||
+					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED ||
+					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_FAILED {
 					return nil, true, nil
 				}
 				return nil, false, nil
@@ -102,13 +102,13 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
 		}
-		if s.JSON200.Status == ProjectInstanceUIStatusDELETE_SUCCEEDED {
+		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_SUCCEEDED {
 			return nil, true, nil
 		}
-		if s.JSON200.Status == ProjectInstanceUIStatusDELETE_FAILED {
+		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_FAILED {
 			return s.JSON200, true, fmt.Errorf("deletion failed for instance %s", instanceID)
 		}
-		if s.JSON200.Status != ProjectInstanceUIStatusDELETING {
+		if s.JSON200.Status != PROJECT_INSTANCE_UI_STATUS_DELETING {
 			// in some cases it takes a long time for the server to change the
 			// instance status to status DELETING
 			// the following code will wait for the status change for 5 minutes
@@ -130,9 +130,9 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 				if si.JSON200 == nil {
 					return nil, false, errors.New("received an empty response. JSON200 == nil")
 				}
-				if si.JSON200.Status == ProjectInstanceUIStatusDELETING ||
-					si.JSON200.Status == ProjectInstanceUIStatusDELETE_FAILED ||
-					si.JSON200.Status == ProjectInstanceUIStatusDELETE_SUCCEEDED {
+				if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETING ||
+					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_FAILED ||
+					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_SUCCEEDED {
 					return nil, true, nil
 				}
 				return nil, false, nil

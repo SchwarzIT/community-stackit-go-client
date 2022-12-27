@@ -5,9 +5,6 @@ import (
 )
 
 func NewService(c common.Client) *ClientWithResponses {
-	nc, _ := NewClientWithResponses(
-		"https://api.eu01.stackit.cloud",
-		WithHTTPClient(c),
-	)
+	nc, _ := NewClientWithResponses("https://argus.api.eu01.stackit.cloud", WithHTTPClient(c))
 	return nc
 }

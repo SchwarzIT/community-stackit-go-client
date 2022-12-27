@@ -21,16 +21,24 @@ output-options:
   copy:
   - from: include/cluster/wait.go
     to: cluster/wait.go
-    trim: "cluster."
+    tidy: 
+    - replace: "cluster."
+      all: true
   - from: include/cluster/validate.go
     to: cluster/validate.go
-    trim: "cluster."
+    tidy: 
+    - replace: "cluster."
+      all: true
   - from: include/service.go
     to: service.go
-    trim: "kubernetes."
+    tidy: 
+    - replace: "kubernetes."
+      all: true
   - from: include/project/wait.go
     to: project/wait.go
-    trim: "project."
+    tidy: 
+    - replace: "project."
+      all: true
 tidy:
   verbose: false
   functions:

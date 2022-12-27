@@ -6,9 +6,6 @@ import (
 )
 
 func NewService(c common.Client) *argus.ClientWithResponses {
-	nc, _ := argus.NewClientWithResponses(
-		"https://argus.api.eu01.stackit.cloud",
-		argus.WithHTTPClient(c),
-	)
+	nc, _ := argus.NewClientWithResponses("https://argus.api.eu01.stackit.cloud", argus.WithHTTPClient(c))
 	return nc
 }
