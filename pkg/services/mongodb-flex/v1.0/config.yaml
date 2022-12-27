@@ -27,10 +27,14 @@ output-options:
   copy:
   - from: include/service.go
     to: service.go
-    trim: "mongodbflex."
+    tidy: 
+    - replace: "mongodbflex."
+      all: true
   - from: include/instance/wait.go
     to: instance/wait.go
-    trim: "instance."
+    tidy: 
+    - replace: "instance."
+      all: true
 tidy:
   verbose: false
   functions:

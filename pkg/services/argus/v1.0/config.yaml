@@ -39,7 +39,19 @@ output-options:
   copy:
   - from: include/service.go
     to: service.go
-    trim: "argus."
+    tidy:
+    - replace: "*argus."
+      with: "*"
+      all: true
+    - replace: " argus."
+      with: " "
+      all: true
+  - from: include/instances/wait.go
+    to: instances/wait.go
+    tidy:
+    - replace: "instances."
+      with:
+      all: true
 tidy:
   verbose: false
   functions:

@@ -20,10 +20,14 @@ output-options:
   copy:
   - from: include/service.go
     to: service.go
-    trim: "dataservices."
+    tidy: 
+    - replace: "dataservices."
+      all: true
   - from: include/instances/wait.go
     to: instances/wait.go
-    trim: "instances."
+    tidy: 
+    - replace: "instances."
+      all: true
 tidy:
   verbose: false
   functions:
