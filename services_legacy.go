@@ -1,7 +1,6 @@
 package client
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/argus"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/data-services"
 	mongodbFlex "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/mongodb-flex"
@@ -15,7 +14,6 @@ import (
 
 // ProductiveServices is the struct representing all productive services
 type ProductiveServices struct {
-	Argus              *argus.ArgusService
 	Costs              *costs.CostsService
 	DataServices       DataServices
 	Membership         *membership.MembershipService
@@ -43,7 +41,6 @@ type DataServices struct {
 // init initializes the client and its services and returns the client
 func (c *Client) initLegacyServices() *Client {
 	// init productive services
-	c.Argus = argus.New(c)
 	c.Costs = costs.New(c)
 	c.Membership = membership.New(c)
 	c.MongoDBFlex = mongodbFlex.New(c)
