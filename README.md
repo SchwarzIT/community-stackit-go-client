@@ -48,7 +48,9 @@ func main() {
 	if res.HasError != nil {
 		panic(fmt.Sprintf("request failed: %s", res.HasError))
 	}
-
+	if res.JSON200 == nil {
+		panic("received an empty response from API")
+	}
 	if res.JSON200.AvailabilityZones == nil || len(*res.JSON200.AvailabilityZones) == 0 {
 		fmt.Println("No Kubernetes availability zones found")
 		return
