@@ -11,13 +11,20 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
+const (
+	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
+)
+
 // WaitHandler will wait for instance creation
 // returned interface is nil or *ProjectInstanceUI
 func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			return nil, false, err
+			if !strings.Contains(err.Error(), client_timeout_err) {
+				return s, false, err
+			}
+			return nil, false, nil
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
@@ -41,7 +48,10 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			return nil, false, err
+			if !strings.Contains(err.Error(), client_timeout_err) {
+				return s, false, err
+			}
+			return nil, false, nil
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
@@ -94,10 +104,10 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return nil, true, nil
+			if !strings.Contains(err.Error(), client_timeout_err) {
+				return s, false, err
 			}
-			return nil, false, err
+			return nil, false, nil
 		}
 		if s.StatusCode() == http.StatusNotFound {
 			return nil, true, nil
