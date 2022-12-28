@@ -52,17 +52,16 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 // WaitHandler will wait for instance deletion
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	return wait.New(func() (res interface{}, done bool, err error) {
-		if res, err := c.GetWithResponse(ctx, projectID, instanceID); err != nil {
-			if err != nil {
-				return nil, false, err
-			}
-			if res.StatusCode() == http.StatusNotFound {
-				return nil, true, nil
-			}
-			if res.HasError != nil {
-				return nil, false, res.HasError
-			}
+	return wait.New(func() (interface{}, bool, error) {
+		res, err := c.GetWithResponse(ctx, projectID, instanceID)
+		if err != nil {
+			return nil, false, err
+		}
+		if res.StatusCode() == http.StatusNotFound {
+			return nil, true, nil
+		}
+		if res.HasError != nil {
+			return nil, false, res.HasError
 		}
 		return nil, false, nil
 	})
