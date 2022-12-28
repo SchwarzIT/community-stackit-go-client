@@ -20,6 +20,9 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		if err != nil {
 			return nil, false, err
 		}
+		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
 		if s.HasError != nil {
 			return nil, false, s.HasError
 		}
@@ -40,6 +43,9 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
+		}
+		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
 		}
 		if s.HasError != nil {
 			return nil, false, s.HasError
@@ -96,6 +102,9 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		}
 		if s.StatusCode() == http.StatusNotFound {
 			return nil, true, nil
+		}
+		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
 		}
 		if s.HasError != nil {
 			return nil, false, s.HasError
