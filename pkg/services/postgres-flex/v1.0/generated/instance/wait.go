@@ -36,7 +36,9 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 		if s.JSON200 == nil {
 			return nil, false, errors.New("bad response")
 		}
-		if s.JSON200.Item == nil || *s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == consts.POSTGRES_STATUS_READY {
+		if s.JSON200.Item == nil ||
+			*s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == consts.POSTGRES_STATUS_UNKNOWN || // @TODO: remove this line, once the API returns a valid response
+			*s.JSON200.Item.Status == consts.POSTGRES_STATUS_READY {
 			return s.JSON200.Item, true, nil
 		}
 		if *s.JSON200.Item.Status == consts.POSTGRES_STATUS_FAILED {
