@@ -30,6 +30,9 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 		if err != nil {
 			return nil, false, err
 		}
+		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
 		if s.HasError != nil {
 			return nil, false, err
 		}
@@ -56,6 +59,9 @@ func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 			}
 			if res.StatusCode() == http.StatusNotFound {
 				return nil, true, nil
+			}
+			if res.StatusCode() == http.StatusInternalServerError {
+				return nil, false, nil
 			}
 			if res.HasError != nil {
 				return nil, false, res.HasError

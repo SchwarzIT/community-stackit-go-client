@@ -207,6 +207,9 @@ func (svc *MongoDBInstancesService) waitForCreateOrUpdate(ctx context.Context, p
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 				return nil, false, nil
 			}
+			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.Item.Status == consts.MONGO_DB_STATUS_READY {
@@ -275,6 +278,9 @@ func (svc *MongoDBInstancesService) waitForDeletion(ctx context.Context, project
 		if _, err := svc.Get(ctx, projectID, instanceID); err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 				return nil, true, nil
+			}
+			if strings.Contains(err.Error(), http.StatusText(http.StatusInternalServerError)) {
+				return nil, false, nil
 			}
 			return nil, false, err
 		}
