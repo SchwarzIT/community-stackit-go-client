@@ -17,10 +17,16 @@ const (
 func (r ProvisionResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
-		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
-			return nil, false, err
+		if err != nil {
+			if !strings.Contains(err.Error(), client_timeout_err) {
+				return s, false, err
+			}
+			return nil, false, nil
 		}
-		if s.HasError != nil && !strings.Contains(err.Error(), client_timeout_err) {
+		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if s.HasError != nil {
 			return nil, false, err
 		}
 		if s.JSON200 == nil {
@@ -39,10 +45,16 @@ func (r ProvisionResponse) WaitHandler(ctx context.Context, c *instances.ClientW
 func (r UpdateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
-		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
-			return nil, false, err
+		if err != nil {
+			if !strings.Contains(err.Error(), client_timeout_err) {
+				return s, false, err
+			}
+			return nil, false, nil
 		}
-		if s.HasError != nil && !strings.Contains(err.Error(), client_timeout_err) {
+		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if s.HasError != nil {
 			return nil, false, err
 		}
 		if s.JSON200 == nil {
@@ -64,14 +76,13 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *instances.ClientWith
 func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
-		if err != nil && !strings.Contains(err.Error(), client_timeout_err) {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) ||
-				strings.Contains(err.Error(), http.StatusText(http.StatusGone)) {
-				return nil, true, nil
+		if err != nil {
+			if !strings.Contains(err.Error(), client_timeout_err) {
+				return s, false, err
 			}
-			return s, false, err
+			return nil, false, nil
 		}
-		if s.StatusCode() == http.StatusNotFound {
+		if s.StatusCode() == http.StatusNotFound || s.StatusCode() == http.StatusGone {
 			return nil, true, nil
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
