@@ -22,6 +22,9 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
+		if s.StatusCode() == http.StatusBadGateway {
+			return nil, false, nil
+		}
 		if s.HasError != nil {
 			return nil, false, s.HasError
 		}
@@ -44,6 +47,9 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if s.StatusCode() == http.StatusBadGateway {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
@@ -103,6 +109,9 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			return nil, true, nil
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if s.StatusCode() == http.StatusBadGateway {
 			return nil, false, nil
 		}
 		if s.HasError != nil {

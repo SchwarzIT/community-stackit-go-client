@@ -181,6 +181,10 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 					maxRetries = maxRetries - 1
 					return false, nil
 				}
+				if resp != nil && resp.StatusCode == http.StatusBadGateway && maxRetries > 0 {
+					maxRetries = maxRetries - 1
+					return false, nil
+				}
 				return false, err
 			}
 			if resp != nil && resp.StatusCode == http.StatusInternalServerError {
