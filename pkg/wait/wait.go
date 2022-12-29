@@ -24,9 +24,12 @@ func New(f WaitFn) *Handler {
 }
 
 // SetThrottle sets the duration between func triggering
-func (w *Handler) SetThrottle(d time.Duration) *Handler {
+func (w *Handler) SetThrottle(d time.Duration) (*Handler, error) {
+	if d == 0 {
+		return w, errors.New("Throttle can't be 0")
+	}
 	w.throttle = d
-	return w
+	return w, nil
 }
 
 // SetTimeout sets the duration for wait timeout
@@ -35,7 +38,7 @@ func (w *Handler) SetTimeout(d time.Duration) *Handler {
 	return w
 }
 
-// Do starts the wait until there's an error or wait is done
+// Wait starts the wait until there's an error or wait is done
 func (w *Handler) Wait() (res interface{}, err error) {
 	var done bool
 	ctx, cancel := context.WithTimeout(context.Background(), w.timeout)
@@ -52,6 +55,31 @@ func (w *Handler) Wait() (res interface{}, err error) {
 
 		select {
 		case <-tick.Done():
+			// continue
+		case <-ctx.Done():
+			return res, errors.New("Wait() has timed out")
+		}
+	}
+}
+
+// WaitWithContext starts the wait until there's an error or wait is done
+func (w Handler) WaitWithContext(ctx context.Context) (res interface{}, err error) {
+	var done bool
+
+	ctx, cancel := context.WithTimeout(ctx, w.timeout)
+	defer cancel()
+
+	ticker := time.NewTicker(w.throttle)
+	defer ticker.Stop()
+
+	for {
+		res, done, err = w.fn()
+		if err != nil || done {
+			return
+		}
+
+		select {
+		case <-ticker.C:
 			// continue
 		case <-ctx.Done():
 			return res, errors.New("Wait() has timed out")
