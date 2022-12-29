@@ -186,7 +186,8 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 					maxRetries = maxRetries - 1
 					return false, nil
 				}
-				if strings.Contains(err.Error(), ClientEOFError) && maxRetries > 0 {
+				if req.Method == http.MethodGet &&
+					strings.Contains(err.Error(), ClientEOFError) && maxRetries > 0 {
 					maxRetries = maxRetries - 1
 					return false, nil
 				}
