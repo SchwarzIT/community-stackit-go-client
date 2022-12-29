@@ -15,7 +15,6 @@ type Client interface {
 	Do(req *http.Request) (*http.Response, error)
 	SetBaseURL(url string) error
 	GetBaseURL() string
-	Clone() Client
 }
 
 // Service is the struct every extending service is built on

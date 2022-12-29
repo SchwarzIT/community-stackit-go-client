@@ -15,7 +15,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
 	waitutil "k8s.io/apimachinery/pkg/util/wait"
@@ -67,12 +66,6 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 	c.initServices()
 	c.initLegacyServices()
 	return c, nil
-}
-
-// Clone creates a shallow clone of the client
-func (c *Client) Clone() common.Client {
-	nc := *c
-	return &nc
 }
 
 // GetHTTPClient returns the HTTP client
@@ -174,26 +167,23 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 		func() (bool, error) {
 			resp, err = c.client.Do(req)
 			if err != nil {
-				if strings.Contains(err.Error(), ClientTimeoutErr) && maxRetries > 0 {
-					maxRetries = maxRetries - 1
-					return false, nil
-				}
-				if strings.Contains(err.Error(), ClientContextDeadlineErr) && req.Context().Err() == nil && maxRetries > 0 {
-					maxRetries = maxRetries - 1
-					return false, nil
-				}
-				if resp != nil && resp.StatusCode == http.StatusBadGateway && maxRetries > 0 {
-					maxRetries = maxRetries - 1
-					return false, nil
-				}
-				if req.Method == http.MethodGet &&
-					strings.Contains(err.Error(), ClientEOFError) && maxRetries > 0 {
-					maxRetries = maxRetries - 1
-					return false, nil
+				if maxRetries > 0 {
+					if strings.Contains(err.Error(), ClientTimeoutErr) ||
+						(strings.Contains(err.Error(), ClientContextDeadlineErr) && req.Context().Err() == nil) ||
+						(req.Method == http.MethodGet && strings.Contains(err.Error(), ClientEOFError)) {
+
+						// reduce retries counter and retry
+						maxRetries = maxRetries - 1
+						return false, nil
+					}
 				}
 				return false, err
 			}
 			if resp != nil && resp.StatusCode == http.StatusInternalServerError {
+				return false, nil
+			}
+			if resp != nil && resp.StatusCode == http.StatusBadGateway && maxRetries > 0 {
+				maxRetries = maxRetries - 1
 				return false, nil
 			}
 			return true, nil

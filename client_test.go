@@ -284,6 +284,9 @@ func TestClient_DoWithRetry(t *testing.T) {
 	ctx1, td1 := context.WithTimeout(ctx, 2*basetime)
 	defer td1()
 
+	ctx2, td2 := context.WithTimeout(ctx, 3*basetime)
+	defer td2()
+
 	c.RetryTimout = 5 * basetime
 	c.RetryWait = basetime
 
@@ -293,12 +296,34 @@ func TestClient_DoWithRetry(t *testing.T) {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
 		}
+		if ctx2.Err() == nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadGateway)
+			return
+		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusAccepted)
 		w.Write([]byte("{}"))
 	})
 
 	req, _ := c.Request(context.Background(), http.MethodGet, "/ep", nil)
+	if _, err := c.Do(req); err != nil {
+		t.Error(err)
+	}
+
+	ctx3, td3 := context.WithTimeout(ctx, 5*basetime)
+	defer td3()
+
+	c.client.Timeout = basetime * 1
+	mux.HandleFunc("/ep2", func(w http.ResponseWriter, r *http.Request) {
+
+		if ctx3.Err() == nil {
+			time.Sleep(1 * basetime)
+		}
+	})
+
+	req, _ = c.Request(context.Background(), http.MethodGet, "/ep2", nil)
+
 	if _, err := c.Do(req); err != nil {
 		t.Error(err)
 	}
