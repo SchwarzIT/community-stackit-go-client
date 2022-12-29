@@ -12,29 +12,19 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
-const (
-	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
-)
-
 // WaitHandler will wait for instance creation
 // returned interface is nil or *instances.ProjectInstanceUI
 func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if !strings.Contains(err.Error(), client_timeout_err) {
-				return s, false, err
-			}
-			return nil, false, nil
+			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
-			if !strings.Contains(s.HasError.Error(), client_timeout_err) {
-				return s, false, s.HasError
-			}
-			return nil, false, nil
+			return nil, false, s.HasError
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
@@ -52,19 +42,13 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if !strings.Contains(err.Error(), client_timeout_err) {
-				return s, false, err
-			}
-			return nil, false, nil
+			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
-			if !strings.Contains(s.HasError.Error(), client_timeout_err) {
-				return s, false, s.HasError
-			}
-			return nil, false, nil
+			return nil, false, s.HasError
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
@@ -111,10 +95,10 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if !strings.Contains(err.Error(), client_timeout_err) {
-				return s, false, err
+			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				return nil, true, nil
 			}
-			return nil, false, nil
+			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusNotFound {
 			return nil, true, nil
@@ -123,10 +107,7 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 			return nil, false, nil
 		}
 		if s.HasError != nil {
-			if !strings.Contains(s.HasError.Error(), client_timeout_err) {
-				return s, false, s.HasError
-			}
-			return nil, false, nil
+			return nil, false, s.HasError
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")

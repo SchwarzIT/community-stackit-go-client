@@ -21,6 +21,10 @@ import (
 	waitutil "k8s.io/apimachinery/pkg/util/wait"
 )
 
+const (
+	ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
+)
+
 // Client service for managing interactions with STACKIT API
 type Client struct {
 	ctx    context.Context
@@ -163,10 +167,15 @@ func (c *Client) legacyDo(req *http.Request, v interface{}, errorHandlers ...fun
 
 // Do performs the request and decodes the response if given interface != nil
 func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
+	maxRetries := 3
 	if err := waitutil.PollImmediate(c.RetryWait, c.RetryTimout, waitutil.ConditionFunc(
 		func() (bool, error) {
 			resp, err = c.client.Do(req)
 			if err != nil {
+				if strings.Contains(err.Error(), ClientTimeoutErr) && maxRetries > 0 {
+					maxRetries = maxRetries - 1
+					return false, nil
+				}
 				return false, err
 			}
 			if resp != nil && resp.StatusCode == http.StatusInternalServerError {
