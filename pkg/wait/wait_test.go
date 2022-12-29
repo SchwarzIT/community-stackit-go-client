@@ -31,25 +31,28 @@ func TestNew(t *testing.T) {
 
 func TestWait_SetThrottle(t *testing.T) {
 	simple := func() (res interface{}, done bool, err error) { return nil, true, nil }
-	f := &Handler{
-		fn:       simple,
-		throttle: 10 * time.Second,
-	}
 	type args struct {
 		d time.Duration
 	}
 	tests := []struct {
 		name string
 		args args
-		want *Handler
+		want error
 	}{
-		{"ok", args{10 * time.Second}, f},
+		{"ok", args{10 * time.Second}, nil},
+		{"err", args{0 * time.Second}, errors.New("Throttle can't be 0")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := New(simple)
-			if got := w.SetThrottle(tt.args.d); !reflect.DeepEqual(got.throttle, tt.want.throttle) {
+			got := w.SetThrottle(tt.args.d)
+			if got == nil && tt.want != nil {
 				t.Errorf("Wait.SetThrottle() = %v, want %v", got, tt.want)
+			}
+			if got != nil && tt.want != nil {
+				if got.Error() != tt.want.Error() {
+					t.Errorf("Wait.SetThrottle() = %v, want %v", got, tt.want)
+				}
 			}
 		})
 	}
@@ -97,6 +100,56 @@ func TestWait_Run(t *testing.T) {
 				timeout:  tt.fields.timeout,
 			}
 			_, err := w.Wait()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Wait.Run() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func TestWaitWithCtx_Run(t *testing.T) {
+	ctx, cancel := context.WithTimeout(context.Background(), 200*time.Millisecond)
+	defer cancel()
+
+	type fields struct {
+		fn       WaitFn
+		throttle time.Duration
+		timeout  time.Duration
+	}
+	tests := []struct {
+		name     string
+		fields   fields
+		wantDone bool
+		wantErr  bool
+	}{
+		{"ok", fields{throttle: 1 * time.Second, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
+			return nil, true, nil
+		}}, true, false},
+
+		{"ok 2", fields{throttle: 200 * time.Millisecond, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
+			if ctx.Err() == nil {
+				return nil, false, nil
+			}
+			return nil, true, nil
+		}}, true, false},
+
+		{"err", fields{throttle: 1 * time.Millisecond, timeout: 1 * time.Hour, fn: func() (res interface{}, done bool, err error) {
+			return nil, true, errors.New("something happened")
+		}}, true, true},
+
+		{"timeout", fields{throttle: 1 * time.Millisecond, timeout: 1 * time.Millisecond, fn: func() (res interface{}, done bool, err error) {
+			return nil, false, nil
+		}}, false, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := &Handler{
+				fn:       tt.fields.fn,
+				throttle: tt.fields.throttle,
+				timeout:  tt.fields.timeout,
+			}
+			_, err := w.WaitWithContext(context.Background())
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Wait.Run() error = %v, wantErr %v", err, tt.wantErr)
 				return

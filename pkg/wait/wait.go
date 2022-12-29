@@ -25,12 +25,12 @@ func New(f WaitFn) *Handler {
 }
 
 // SetThrottle sets the duration between func triggering
-func (w *Handler) SetThrottle(d time.Duration) (*Handler, error) {
+func (w *Handler) SetThrottle(d time.Duration) error {
 	if d == 0 {
-		return w, errors.New("Throttle can't be 0")
+		return errors.New("Throttle can't be 0")
 	}
 	w.throttle = d
-	return w, nil
+	return nil
 }
 
 // SetTimeout sets the duration for wait timeout
