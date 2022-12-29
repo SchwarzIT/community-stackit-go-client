@@ -24,6 +24,7 @@ import (
 const (
 	ClientTimeoutErr         = "Client.Timeout exceeded while awaiting headers"
 	ClientContextDeadlineErr = "context deadline exceeded"
+	ClientEOFError           = "unexpected EOF"
 )
 
 // Client service for managing interactions with STACKIT API
@@ -182,6 +183,10 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 					return false, nil
 				}
 				if resp != nil && resp.StatusCode == http.StatusBadGateway && maxRetries > 0 {
+					maxRetries = maxRetries - 1
+					return false, nil
+				}
+				if strings.Contains(err.Error(), ClientEOFError) && maxRetries > 0 {
 					maxRetries = maxRetries - 1
 					return false, nil
 				}
