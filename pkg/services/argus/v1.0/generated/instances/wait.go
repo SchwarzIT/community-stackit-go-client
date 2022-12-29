@@ -41,6 +41,7 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 // WaitHandler will wait for instance update
 // returned interface is nil or *ProjectInstanceUI
 func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	seenUpdating := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
@@ -58,7 +59,8 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
 		}
-		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED {
+		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED ||
+			(seenUpdating && s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED) {
 			return s.JSON200, true, nil
 		}
 		if s.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_FAILED {
@@ -90,6 +92,7 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
 			return nil, false, err
 		}
+		seenUpdating = true
 		return s.JSON200, false, nil
 	})
 }
