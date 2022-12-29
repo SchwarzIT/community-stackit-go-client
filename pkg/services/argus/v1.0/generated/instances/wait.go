@@ -74,10 +74,10 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 				if err != nil {
 					return nil, false, err
 				}
-				if s.HasError != nil {
+				if si.HasError != nil {
 					return nil, false, s.HasError
 				}
-				if s.JSON200 == nil {
+				if si.JSON200 == nil {
 					return nil, false, errors.New("received an empty response. JSON200 == nil")
 				}
 				if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATING ||
@@ -87,7 +87,7 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 				}
 				return nil, false, nil
 			})
-			_, err := w.SetTimeout(5 * time.Minute).Wait()
+			_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
 			return nil, false, err
 		}
 		return s.JSON200, false, nil
@@ -155,7 +155,7 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 				}
 				return nil, false, nil
 			})
-			_, err := w.SetTimeout(5 * time.Minute).Wait()
+			_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
 			return nil, false, err
 		}
 		return nil, false, nil
