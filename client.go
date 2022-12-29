@@ -22,7 +22,8 @@ import (
 )
 
 const (
-	ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
+	ClientTimeoutErr         = "Client.Timeout exceeded while awaiting headers"
+	ClientContextDeadlineErr = "context deadline exceeded"
 )
 
 // Client service for managing interactions with STACKIT API
@@ -173,6 +174,10 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 			resp, err = c.client.Do(req)
 			if err != nil {
 				if strings.Contains(err.Error(), ClientTimeoutErr) && maxRetries > 0 {
+					maxRetries = maxRetries - 1
+					return false, nil
+				}
+				if strings.Contains(err.Error(), ClientContextDeadlineErr) && req.Context().Err() == nil && maxRetries > 0 {
 					maxRetries = maxRetries - 1
 					return false, nil
 				}
