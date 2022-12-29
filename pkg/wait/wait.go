@@ -2,8 +2,9 @@ package wait
 
 import (
 	"context"
-	"errors"
 	"time"
+
+	"github.com/pkg/errors"
 )
 
 type WaitFn func() (res interface{}, done bool, err error)
@@ -74,8 +75,11 @@ func (w Handler) WaitWithContext(ctx context.Context) (res interface{}, err erro
 
 	for {
 		res, done, err = w.fn()
-		if err != nil || done {
-			return
+		if err != nil {
+			return res, errors.Wrap(err, "defined wait function returned an error")
+		}
+		if done {
+			return res, nil
 		}
 
 		select {
