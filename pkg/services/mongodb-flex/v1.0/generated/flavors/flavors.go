@@ -21,7 +21,7 @@ const (
 // InfraFlavor defines model for infra.Flavor.
 type InfraFlavor struct {
 	Categories  *[]string `json:"categories,omitempty"`
-	Cpu         *int      `json:"cpu,omitempty"`
+	CPU         *int      `json:"cpu,omitempty"`
 	Description *string   `json:"description,omitempty"`
 	ID          *string   `json:"id,omitempty"`
 	Memory      *int      `json:"memory,omitempty"`

@@ -21,15 +21,15 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
-// InstanceAcl defines model for instance.Acl.
-type InstanceAcl struct {
+// InstanceACL defines model for instance.ACL.
+type InstanceACL struct {
 	// Items TODO validating in api (middleware)
 	Items *[]string `json:"items,omitempty"`
 }
 
 // InstanceCreateInstanceRequest defines model for instance.CreateInstanceRequest.
 type InstanceCreateInstanceRequest struct {
-	Acl            *InstanceAcl `json:"acl,omitempty"`
+	ACL            *InstanceACL `json:"acl,omitempty"`
 	BackupSchedule *string      `json:"backupSchedule,omitempty"`
 	FlavorID       *string      `json:"flavorId,omitempty"`
 
@@ -57,7 +57,7 @@ type InstanceError struct {
 
 // InstanceFlavor defines model for instance.Flavor.
 type InstanceFlavor struct {
-	Cpu         *int    `json:"cpu,omitempty"`
+	CPU         *int    `json:"cpu,omitempty"`
 	Description *string `json:"description,omitempty"`
 	ID          *string `json:"id,omitempty"`
 	Memory      *int    `json:"memory,omitempty"`
@@ -79,7 +79,7 @@ type InstanceListInstanceResponse struct {
 
 // InstanceSingleInstance defines model for instance.SingleInstance.
 type InstanceSingleInstance struct {
-	Acl            *InstanceAcl       `json:"acl,omitempty"`
+	ACL            *InstanceACL       `json:"acl,omitempty"`
 	BackupSchedule *string            `json:"backupSchedule,omitempty"`
 	Flavor         *InstanceFlavor    `json:"flavor,omitempty"`
 	ID             *string            `json:"id,omitempty"`
@@ -98,7 +98,7 @@ type InstanceStorage struct {
 
 // InstanceUpdateInstanceRequest defines model for instance.UpdateInstanceRequest.
 type InstanceUpdateInstanceRequest struct {
-	Acl            *InstanceAcl `json:"acl,omitempty"`
+	ACL            *InstanceACL `json:"acl,omitempty"`
 	BackupSchedule *string      `json:"backupSchedule,omitempty"`
 	FlavorID       *string      `json:"flavorId,omitempty"`
 
@@ -123,7 +123,7 @@ type InstancesGetInstanceResponse struct {
 
 // InstancesSingleInstance defines model for instances.SingleInstance.
 type InstancesSingleInstance struct {
-	Acl            *InstanceAcl       `json:"acl,omitempty"`
+	ACL            *InstanceACL       `json:"acl,omitempty"`
 	BackupSchedule *string            `json:"backupSchedule,omitempty"`
 	Flavor         *InstanceFlavor    `json:"flavor,omitempty"`
 	ID             *string            `json:"id,omitempty"`
