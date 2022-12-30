@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
 
@@ -21,15 +22,15 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
-// InstanceAcl defines model for instance.Acl.
-type InstanceAcl struct {
+// InstanceACL defines model for instance.ACL.
+type InstanceACL struct {
 	// Items TODO validating in api (middleware)
 	Items *[]string `json:"items,omitempty"`
 }
 
 // InstanceCreateInstanceRequest defines model for instance.CreateInstanceRequest.
 type InstanceCreateInstanceRequest struct {
-	Acl            *InstanceAcl `json:"acl,omitempty"`
+	ACL            *InstanceACL `json:"acl,omitempty"`
 	BackupSchedule *string      `json:"backupSchedule,omitempty"`
 	FlavorID       *string      `json:"flavorId,omitempty"`
 
@@ -57,7 +58,7 @@ type InstanceError struct {
 
 // InstanceFlavor defines model for instance.Flavor.
 type InstanceFlavor struct {
-	Cpu         *int    `json:"cpu,omitempty"`
+	CPU         *int    `json:"cpu,omitempty"`
 	Description *string `json:"description,omitempty"`
 	ID          *string `json:"id,omitempty"`
 	Memory      *int    `json:"memory,omitempty"`
@@ -79,7 +80,7 @@ type InstanceListInstanceResponse struct {
 
 // InstanceSingleInstance defines model for instance.SingleInstance.
 type InstanceSingleInstance struct {
-	Acl            *InstanceAcl       `json:"acl,omitempty"`
+	ACL            *InstanceACL       `json:"acl,omitempty"`
 	BackupSchedule *string            `json:"backupSchedule,omitempty"`
 	Flavor         *InstanceFlavor    `json:"flavor,omitempty"`
 	ID             *string            `json:"id,omitempty"`
@@ -98,7 +99,7 @@ type InstanceStorage struct {
 
 // InstanceUpdateInstanceRequest defines model for instance.UpdateInstanceRequest.
 type InstanceUpdateInstanceRequest struct {
-	Acl            *InstanceAcl `json:"acl,omitempty"`
+	ACL            *InstanceACL `json:"acl,omitempty"`
 	BackupSchedule *string      `json:"backupSchedule,omitempty"`
 	FlavorID       *string      `json:"flavorId,omitempty"`
 
@@ -123,7 +124,7 @@ type InstancesGetInstanceResponse struct {
 
 // InstancesSingleInstance defines model for instances.SingleInstance.
 type InstancesSingleInstance struct {
-	Acl            *InstanceAcl       `json:"acl,omitempty"`
+	ACL            *InstanceACL       `json:"acl,omitempty"`
 	BackupSchedule *string            `json:"backupSchedule,omitempty"`
 	Flavor         *InstanceFlavor    `json:"flavor,omitempty"`
 	ID             *string            `json:"id,omitempty"`
@@ -699,6 +700,9 @@ func (r CreateResponse) StatusCode() int {
 type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *InstanceError
+	JSON404      *InstanceError
+	JSON500      *InstanceError
 	HasError     error // Aggregated error
 }
 
@@ -885,6 +889,7 @@ func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -925,6 +930,7 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -972,6 +978,31 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
 
 	return response, nil
 }
@@ -988,6 +1019,7 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1028,6 +1060,7 @@ func (c *ClientWithResponses) ParsePatchResponse(rsp *http.Response) (*PatchResp
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -1075,6 +1108,7 @@ func (c *ClientWithResponses) ParsePutResponse(rsp *http.Response) (*PutResponse
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:

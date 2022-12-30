@@ -617,7 +617,7 @@
         "responses": {
           "200": {
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/infra.GetFlavorsResponse"
                 }
@@ -627,7 +627,7 @@
           },
           "400": {
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -637,7 +637,7 @@
           },
           "500": {
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -828,7 +828,7 @@
           },
           "400": {
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -838,7 +838,7 @@
           },
           "404": {
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -848,7 +848,7 @@
           },
           "500": {
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }

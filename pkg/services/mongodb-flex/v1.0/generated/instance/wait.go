@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
+
+const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
 // WaitHandler will wait for instance creation to complete
 // returned interface is of *InstanceSingleInstance
@@ -28,6 +31,9 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
@@ -52,21 +58,31 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 // WaitHandler will wait for instance deletion
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	return wait.New(func() (res interface{}, done bool, err error) {
-		if res, err := c.GetWithResponse(ctx, projectID, instanceID); err != nil {
-			if err != nil {
-				return nil, false, err
-			}
-			if res.StatusCode() == http.StatusNotFound {
-				return nil, true, nil
-			}
-			if res.StatusCode() == http.StatusInternalServerError {
+	return wait.New(func() (interface{}, bool, error) {
+		res, err := c.ListWithResponse(ctx, projectID, &ListParams{})
+		if err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) {
 				return nil, false, nil
 			}
-			if res.HasError != nil {
-				return nil, false, res.HasError
+			return nil, false, err
+		}
+		if res.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if res.HasError != nil {
+			return nil, false, res.HasError
+		}
+		if res.JSON200 == nil || res.JSON200.Items == nil {
+			return nil, false, errors.New("received an empty response for list")
+		}
+		for _, v := range *res.JSON200.Items {
+			if v.ID == nil {
+				continue
+			}
+			if *v.ID == instanceID {
+				return nil, false, nil
 			}
 		}
-		return nil, false, nil
+		return nil, true, nil
 	})
 }

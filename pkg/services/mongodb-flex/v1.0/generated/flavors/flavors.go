@@ -5,12 +5,15 @@ package flavors
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
 
@@ -21,7 +24,7 @@ const (
 // InfraFlavor defines model for infra.Flavor.
 type InfraFlavor struct {
 	Categories  *[]string `json:"categories,omitempty"`
-	Cpu         *int      `json:"cpu,omitempty"`
+	CPU         *int      `json:"cpu,omitempty"`
 	Description *string   `json:"description,omitempty"`
 	ID          *string   `json:"id,omitempty"`
 	Memory      *int      `json:"memory,omitempty"`
@@ -147,6 +150,9 @@ type ClientWithResponsesInterface interface {
 type GetFlavorsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *InfraGetFlavorsResponse
+	JSON400      *InstanceError
+	JSON500      *InstanceError
 	HasError     error // Aggregated error
 }
 
@@ -186,6 +192,31 @@ func (c *ClientWithResponses) ParseGetFlavorsResponse(rsp *http.Response) (*GetF
 	response := &GetFlavorsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
+	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InfraGetFlavorsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
 	}
 
 	return response, nil

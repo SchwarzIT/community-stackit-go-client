@@ -161,7 +161,6 @@ func TestClient_GetHTTPClient(t *testing.T) {
 		client             *http.Client
 		config             Config
 		ProductiveServices ProductiveServices
-		Incubator          IncubatorServices
 	}
 	tests := []struct {
 		name   string
@@ -176,7 +175,6 @@ func TestClient_GetHTTPClient(t *testing.T) {
 				client:             tt.fields.client,
 				config:             tt.fields.config,
 				ProductiveServices: tt.fields.ProductiveServices,
-				Incubator:          tt.fields.Incubator,
 			}
 			if got := c.GetHTTPClient(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Client.GetHTTPClient() = %v, want %v", got, tt.want)
@@ -190,7 +188,6 @@ func TestClient_GetConfig(t *testing.T) {
 		client             *http.Client
 		config             Config
 		ProductiveServices ProductiveServices
-		Incubator          IncubatorServices
 	}
 	tests := []struct {
 		name   string
@@ -205,7 +202,6 @@ func TestClient_GetConfig(t *testing.T) {
 				client:             tt.fields.client,
 				config:             tt.fields.config,
 				ProductiveServices: tt.fields.ProductiveServices,
-				Incubator:          tt.fields.Incubator,
 			}
 			if got := c.GetConfig(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Client.GetConfig() = %v, want %v", got, tt.want)
@@ -219,7 +215,6 @@ func TestClient_SetToken(t *testing.T) {
 		client             *http.Client
 		config             Config
 		ProductiveServices ProductiveServices
-		Incubator          IncubatorServices
 	}
 	type args struct {
 		token string
@@ -238,7 +233,6 @@ func TestClient_SetToken(t *testing.T) {
 				client:             tt.fields.client,
 				config:             tt.fields.config,
 				ProductiveServices: tt.fields.ProductiveServices,
-				Incubator:          tt.fields.Incubator,
 			}
 			c.SetToken(tt.args.token)
 		})

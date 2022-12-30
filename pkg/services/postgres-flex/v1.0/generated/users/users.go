@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
 
@@ -467,6 +468,7 @@ func (c *ClientWithResponses) ParseGetUsersResponse(rsp *http.Response) (*GetUse
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -500,6 +502,7 @@ func (c *ClientWithResponses) ParseCreateUserResponse(rsp *http.Response) (*Crea
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -533,6 +536,7 @@ func (c *ClientWithResponses) ParseGetUserResponse(rsp *http.Response) (*GetUser
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

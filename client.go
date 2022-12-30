@@ -43,10 +43,6 @@ type Client struct {
 	//----------
 	// Productive services - services that are ready to be used in production
 	ProductiveServices
-
-	// Incubator - services under development or currently being tested
-	// not ready for production usage
-	Incubator IncubatorServices
 }
 
 // New returns a new client

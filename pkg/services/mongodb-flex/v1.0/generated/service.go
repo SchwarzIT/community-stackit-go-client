@@ -6,7 +6,7 @@ import (
 
 func NewService(c common.Client) *ClientWithResponses {
 	nc, _ := NewClientWithResponses(
-		"https://mongodb-flex-service.api.eu01.stackit.cloud",
+		"https://api.stackit.cloud/mongodb/v1/",
 		WithHTTPClient(c),
 	)
 	return nc

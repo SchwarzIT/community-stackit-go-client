@@ -23,7 +23,8 @@ output-options:
     type: error
     description: "Aggregated error"
     apply-to: ["*"]
-    imports: ["errors"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
   copy:
   - from: include/service.go
     to: service.go
@@ -94,3 +95,9 @@ tidy:
   - replace: Id
     with: ID
     suffix: true
+  - replace: Acl
+    with: ACL
+    all: true
+  - replace: Cpu
+    with: CPU
+    all: true
