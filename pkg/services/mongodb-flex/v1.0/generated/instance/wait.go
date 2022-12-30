@@ -61,6 +61,9 @@ func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.ListWithResponse(ctx, projectID, &ListParams{})
 		if err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if res.StatusCode() == http.StatusInternalServerError {
