@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
 
@@ -182,6 +183,7 @@ func (c *ClientWithResponses) ParseGetVersionsResponse(rsp *http.Response) (*Get
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
