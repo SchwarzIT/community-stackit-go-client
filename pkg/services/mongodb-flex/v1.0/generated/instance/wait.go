@@ -53,12 +53,9 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		res, err := c.GetWithResponse(ctx, projectID, instanceID)
+		res, err := c.ListWithResponse(ctx, projectID, &ListParams{})
 		if err != nil {
 			return nil, false, err
-		}
-		if res.StatusCode() == http.StatusNotFound {
-			return nil, true, nil
 		}
 		if res.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
@@ -66,6 +63,17 @@ func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 		if res.HasError != nil {
 			return nil, false, res.HasError
 		}
-		return nil, false, nil
+		if res.JSON200 == nil || res.JSON200.Items == nil {
+			return nil, false, errors.New("received an empty response for list")
+		}
+		for _, v := range *res.JSON200.Items {
+			if v.ID == nil {
+				continue
+			}
+			if *v.ID == instanceID {
+				return nil, false, nil
+			}
+		}
+		return nil, true, nil
 	})
 }
