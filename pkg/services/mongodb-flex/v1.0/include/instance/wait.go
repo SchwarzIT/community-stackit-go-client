@@ -4,12 +4,15 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
+
+const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
 // WaitHandler will wait for instance creation to complete
 // returned interface is of *instance.InstanceSingleInstance
@@ -29,6 +32,9 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
@@ -56,6 +62,9 @@ func (r DeleteResponse) WaitHandler(ctx context.Context, c *instance.ClientWithR
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.ListWithResponse(ctx, projectID, &instance.ListParams{})
 		if err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if res.StatusCode() == http.StatusInternalServerError {

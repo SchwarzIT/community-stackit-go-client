@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
+
+const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
 // WaitHandler will wait for instance creation to complete
 // returned interface is of *InstanceSingleInstance
@@ -28,6 +31,9 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
 		if err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
