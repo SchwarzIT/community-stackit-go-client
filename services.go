@@ -6,13 +6,15 @@ import (
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	mongodbflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated"
+	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated"
 )
 
 type services struct {
-	Argus        *argus.ClientWithResponses
-	Kubernetes   *kubernetes.ClientWithResponses
-	MongoDBFlex  *mongodbflex.ClientWithResponses
-	PostgresFlex *postgresflex.ClientWithResponses
+	Argus              *argus.ClientWithResponses
+	Kubernetes         *kubernetes.ClientWithResponses
+	MongoDBFlex        *mongodbflex.ClientWithResponses
+	PostgresFlex       *postgresflex.ClientWithResponses
+	ResourceManagement *resourcemanagement.ClientWithResponses
 
 	// DSA
 	ElasticSearch *dataservices.ClientWithResponses
@@ -29,6 +31,7 @@ func (c *Client) initServices() {
 	c.Services.Kubernetes = kubernetes.NewService(c)
 	c.Services.MongoDBFlex = mongodbflex.NewService(c)
 	c.Services.PostgresFlex = postgresflex.NewService(c)
+	c.Services.ResourceManagement = resourcemanagement.NewService(c)
 
 	// DSA
 	c.Services.ElasticSearch = dataservices.NewService(c, dataservices.ElasticSearch)

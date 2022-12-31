@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client"
+	client "github.com/SchwarzIT/community-stackit-go-client"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -28,7 +28,7 @@ func TestStorageProjectService_Get(t *testing.T) {
 
 	want := projects.ObjectStorageProjectResponse{
 		ProjectID: projectID,
-		Scope:     consts.PROJECT_SCOPE_PUBLIC,
+		Scope:     "PUBLIC",
 	}
 
 	mux.HandleFunc(fmt.Sprintf(apiPath, projectID), func(w http.ResponseWriter, r *http.Request) {
@@ -82,7 +82,7 @@ func TestStorageProjectService_Create(t *testing.T) {
 
 	want := projects.ObjectStorageProjectResponse{
 		ProjectID: projectID,
-		Scope:     consts.PROJECT_SCOPE_PUBLIC,
+		Scope:     "PUBLIC",
 	}
 
 	mux.HandleFunc(fmt.Sprintf(apiPath, projectID), func(w http.ResponseWriter, r *http.Request) {

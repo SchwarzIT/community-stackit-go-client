@@ -1,0 +1,3 @@
+OpenAPI spec has been modified:
+
+- Component schemas Limit, Offset and Curser received the 'Schema' prefix to prevent conflicts (i.e. LimitSchema)

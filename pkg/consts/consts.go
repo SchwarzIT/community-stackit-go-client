@@ -20,16 +20,6 @@ const (
 	ROLE_PROJECT_ADMIN   = "project.admin"
 	ROLE_PROJECT_AUDITOR = "project.auditor"
 
-	// Project scopes
-	PROJECT_SCOPE_PUBLIC  = "PUBLIC"
-	PROJECT_SCOPE_PRIVATE = "PRIVATE"
-
-	// Project lifecycle statuses
-	PROJECT_STATUS_ACTIVE   = "ACTIVE"
-	PROJECT_STATUS_CREATING = "CREATING"
-	PROJECT_STATUS_DELETING = "DELETING"
-	PROJECT_STATUS_INACTIVE = "INACTIVE"
-
 	// granularity options; to be used for costs.GetProjectCosts()
 	COSTS_GRANULARITY_NONE    = "none"
 	COSTS_GRANULARITY_DAILY   = "daily"
