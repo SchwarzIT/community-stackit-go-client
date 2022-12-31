@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"net/http"
 
-	credentialsGroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/credentials-group"
+	credentialsGroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/credentials-group"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
