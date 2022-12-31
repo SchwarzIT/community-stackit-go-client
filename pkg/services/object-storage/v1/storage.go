@@ -5,10 +5,10 @@ package objectstorage
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	keys "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/access-keys"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/buckets"
-	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/credentials-group"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/projects"
+	keys "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/access-keys"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/buckets"
+	credentialsgroup "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/credentials-group"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/projects"
 )
 
 // New returns a new handler for the service

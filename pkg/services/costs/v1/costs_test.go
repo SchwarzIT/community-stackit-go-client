@@ -10,7 +10,7 @@ import (
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1"
 )
 
 var customerAccountRespBody string = `

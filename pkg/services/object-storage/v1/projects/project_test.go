@@ -10,8 +10,8 @@ import (
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
-	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/projects"
+	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1/projects"
 )
 
 const (

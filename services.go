@@ -2,12 +2,12 @@ package client
 
 import (
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs"
+	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
 	mongodbflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated"
-	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage"
+	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated"
 	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated"
 )
