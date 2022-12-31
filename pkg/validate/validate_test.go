@@ -188,27 +188,6 @@ func TestResourceType(t *testing.T) {
 	}
 }
 
-func TestUserOrigin(t *testing.T) {
-	type args struct {
-		origin string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{"ok", args{consts.SCHWARZ_AUTH_ORIGIN}, false},
-		{"bad origin", args{"something"}, true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validate.UserOrigin(tt.args.origin); (err != nil) != tt.wantErr {
-				t.Errorf("UserOrigin() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestSemVer(t *testing.T) {
 	type args struct {
 		version string
@@ -314,6 +293,39 @@ func TestSetClientError(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := validate.WrapError(tt.args.err); err.Error() != errors.Wrap(tt.args.err, "client validation error (Bad Request)").Error() {
 				t.Errorf("SetClientError() error = %v, wantErr %v", err, errors.Wrap(tt.args.err, "client validation error (Bad Request)"))
+			}
+		})
+	}
+}
+
+func TestResponse(t *testing.T) {
+	type args struct {
+		resp            interface{}
+		requestError    error
+		checkNullFields []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"error from request", args{requestError: errors.New("a request error")}, "a request error"},
+		{"no HasError", args{requestError: nil, resp: struct{}{}}, "No such field: HasError in obj"},
+		{"not struct", args{requestError: nil, resp: 1}, "Cannot use GetField on a non-struct interface"},
+		{"nil HasError", args{requestError: nil, resp: struct{ HasError error }{}}, ""},
+		{"defined HasError", args{requestError: nil, resp: struct{ HasError error }{HasError: errors.New("an error")}}, "an error"},
+		{"nil HasError, nil JSON200", args{requestError: nil, resp: struct {
+			HasError error
+			JSON200  interface{}
+		}{JSON200: nil}, checkNullFields: []string{"JSON200"}}, "field JSON200 in response is nil"},
+		{"nil HasError, notfound JSON200", args{requestError: nil, resp: struct {
+			HasError error
+		}{}, checkNullFields: []string{"JSON200"}}, "No such field: JSON200 in obj"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.Response(tt.args.resp, tt.args.requestError, tt.args.checkNullFields...); (err != nil) && (err.Error() != tt.want) {
+				t.Errorf("Response() error = %v, wantErr %s", err, tt.want)
 			}
 		})
 	}
