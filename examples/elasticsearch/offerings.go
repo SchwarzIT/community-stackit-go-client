@@ -6,6 +6,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
@@ -18,19 +19,14 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.Services.ElasticSearch.Offerings.GetWithResponse(ctx, "example")
-	if err != nil {
-		panic(fmt.Sprintf("preparing request failed: %s", err))
+	projectID := "123-456-789"
+	res, err := c.Services.ElasticSearch.Offerings.GetWithResponse(ctx, projectID)
+	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
+		panic(aggregatedError)
 	}
-	if res.HasError != nil {
-		panic(fmt.Sprintf("request failed: %s", res.HasError))
-	}
-	if res.JSON200 == nil {
-		panic("received an empty response from API")
-	}
+
 	fmt.Println("Received the following offerings:")
 	for _, o := range res.JSON200.Offerings {
 		fmt.Printf("- %s\n", o.Name)
 	}
-
 }
