@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
@@ -37,11 +36,11 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 			return nil, false, errors.New("bad response")
 		}
 		if s.JSON200.Item == nil ||
-			*s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == consts.POSTGRES_STATUS_UNKNOWN || // @TODO: remove this line, once the API returns a valid response
-			*s.JSON200.Item.Status == consts.POSTGRES_STATUS_READY {
+			*s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == STATUS_UNKNOWN || // @TODO: remove this line, once the API returns a valid response
+			*s.JSON200.Item.Status == STATUS_READY {
 			return s.JSON200.Item, true, nil
 		}
-		if *s.JSON200.Item.Status == consts.POSTGRES_STATUS_FAILED {
+		if *s.JSON200.Item.Status == STATUS_FAILED {
 			return s.JSON200.Item, false, errors.New("received status FAILED from server")
 		}
 		return s.JSON200.Item, false, nil

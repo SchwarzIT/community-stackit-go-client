@@ -7,7 +7,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
@@ -46,10 +45,10 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 		if s.JSON200 == nil {
 			return nil, false, errors.New("bad response")
 		}
-		if s.JSON200.Item == nil || *s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == consts.MONGO_DB_STATUS_READY {
+		if s.JSON200.Item == nil || *s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == STATUS_READY {
 			return s.JSON200.Item, true, nil
 		}
-		if *s.JSON200.Item.Status == consts.MONGO_DB_STATUS_FAILED {
+		if *s.JSON200.Item.Status == STATUS_FAILED {
 			return s.JSON200.Item, false, errors.New("received status FAILED from server")
 		}
 		return s.JSON200.Item, false, nil
