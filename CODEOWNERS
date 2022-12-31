@@ -2,7 +2,7 @@
 *   @do87
 
 # Costs integration owners
-pkg/api/v1/costs/* @troublete
+pkg/services/costs/* @troublete
 
 # Object Storage Credentials group
-client/pkg/api/v1/object-storage/credentials-group/* @johannes-riecken @SkyFox277
+client/pkg/services/object-storage/credentials-group/* @johannes-riecken @SkyFox277
