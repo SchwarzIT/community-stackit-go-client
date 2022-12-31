@@ -9,8 +9,8 @@ import (
 	"time"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/costs"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs"
 )
 
 var customerAccountRespBody string = `

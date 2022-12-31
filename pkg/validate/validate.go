@@ -118,19 +118,6 @@ func SemVer(version string) error {
 	return nil
 }
 
-// Role validates a role
-func Role(role string) error {
-	switch role {
-	case consts.ROLE_PROJECT_ADMIN:
-	case consts.ROLE_PROJECT_OWNER:
-	case consts.ROLE_PROJECT_AUDITOR:
-	case consts.ROLE_PROJECT_MEMBER:
-	default:
-		return fmt.Errorf("invalid role %s ", role)
-	}
-	return nil
-}
-
 // ResourceType validates a resource type
 func ResourceType(r string) error {
 	switch r {

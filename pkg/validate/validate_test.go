@@ -142,30 +142,6 @@ func TestDefaultResponseErrorHandler(t *testing.T) {
 	}
 }
 
-func TestRole(t *testing.T) {
-	type args struct {
-		role string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{"validate admin", args{consts.ROLE_PROJECT_ADMIN}, false},
-		{"validate owner", args{consts.ROLE_PROJECT_OWNER}, false},
-		{"validate auditor", args{consts.ROLE_PROJECT_AUDITOR}, false},
-		{"validate member", args{consts.ROLE_PROJECT_MEMBER}, false},
-		{"error", args{"something"}, true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validate.Role(tt.args.role); (err != nil) != tt.wantErr {
-				t.Errorf("Role() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestResourceType(t *testing.T) {
 	type args struct {
 		r string

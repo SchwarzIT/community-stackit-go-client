@@ -27,6 +27,11 @@ output-options:
     tidy: 
     - replace: "resourcemanagement."
       all: true
+  - from: include/projects/validate.go
+    to: projects/validate.go
+    tidy: 
+    - replace: "projects."
+      all: true
 tidy:
   verbose: false
   functions:

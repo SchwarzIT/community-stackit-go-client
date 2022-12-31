@@ -14,12 +14,6 @@ const (
 	RESOURCE_TYPE_PROJECT = "project"
 	RESOURCE_TYPE_ORG     = "organization"
 
-	// Member Roles
-	ROLE_PROJECT_OWNER   = "project.owner"
-	ROLE_PROJECT_MEMBER  = "project.member"
-	ROLE_PROJECT_ADMIN   = "project.admin"
-	ROLE_PROJECT_AUDITOR = "project.auditor"
-
 	// granularity options; to be used for costs.GetProjectCosts()
 	COSTS_GRANULARITY_NONE    = "none"
 	COSTS_GRANULARITY_DAILY   = "daily"

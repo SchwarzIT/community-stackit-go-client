@@ -10,9 +10,9 @@ import (
 	"time"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/api/v1/object-storage/buckets"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/buckets"
 )
 
 // constants
