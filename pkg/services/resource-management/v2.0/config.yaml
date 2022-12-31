@@ -32,6 +32,11 @@ output-options:
     tidy: 
     - replace: "projects."
       all: true
+  - from: include/projects/wait.go
+    to: projects/wait.go
+    tidy: 
+    - replace: "projects."
+      all: true
 tidy:
   verbose: false
   functions:
