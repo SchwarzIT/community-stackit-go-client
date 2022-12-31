@@ -158,9 +158,9 @@ func TestClient_Do(t *testing.T) {
 
 func TestClient_GetHTTPClient(t *testing.T) {
 	type fields struct {
-		client             *http.Client
-		config             Config
-		ProductiveServices ProductiveServices
+		client   *http.Client
+		config   Config
+		Services services
 	}
 	tests := []struct {
 		name   string
@@ -172,9 +172,9 @@ func TestClient_GetHTTPClient(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				client:             tt.fields.client,
-				config:             tt.fields.config,
-				ProductiveServices: tt.fields.ProductiveServices,
+				client:   tt.fields.client,
+				config:   tt.fields.config,
+				services: tt.fields.Services,
 			}
 			if got := c.GetHTTPClient(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Client.GetHTTPClient() = %v, want %v", got, tt.want)
@@ -185,9 +185,9 @@ func TestClient_GetHTTPClient(t *testing.T) {
 
 func TestClient_GetConfig(t *testing.T) {
 	type fields struct {
-		client             *http.Client
-		config             Config
-		ProductiveServices ProductiveServices
+		client   *http.Client
+		config   Config
+		Services services
 	}
 	tests := []struct {
 		name   string
@@ -199,9 +199,9 @@ func TestClient_GetConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				client:             tt.fields.client,
-				config:             tt.fields.config,
-				ProductiveServices: tt.fields.ProductiveServices,
+				client:   tt.fields.client,
+				config:   tt.fields.config,
+				services: tt.fields.Services,
 			}
 			if got := c.GetConfig(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Client.GetConfig() = %v, want %v", got, tt.want)
@@ -212,9 +212,9 @@ func TestClient_GetConfig(t *testing.T) {
 
 func TestClient_SetToken(t *testing.T) {
 	type fields struct {
-		client             *http.Client
-		config             Config
-		ProductiveServices ProductiveServices
+		client   *http.Client
+		config   Config
+		Services services
 	}
 	type args struct {
 		token string
@@ -230,9 +230,9 @@ func TestClient_SetToken(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				client:             tt.fields.client,
-				config:             tt.fields.config,
-				ProductiveServices: tt.fields.ProductiveServices,
+				client:   tt.fields.client,
+				config:   tt.fields.config,
+				services: tt.fields.Services,
 			}
 			c.SetToken(tt.args.token)
 		})

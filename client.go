@@ -37,12 +37,7 @@ type Client struct {
 	RetryTimout time.Duration // timeout for retrying a call
 	RetryWait   time.Duration // how long to wait before trying again
 
-	Services services
-
-	// Legacy
-	//----------
-	// Productive services - services that are ready to be used in production
-	ProductiveServices
+	services
 }
 
 // New returns a new client
@@ -60,7 +55,6 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 
 	c.setHttpClient(c.ctx)
 	c.initServices()
-	c.initLegacyServices()
 	return c, nil
 }
 
