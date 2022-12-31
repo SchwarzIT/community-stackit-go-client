@@ -36,6 +36,8 @@ output-options:
     tidy: 
     - replace: "instance."
       all: true
+  - from: include/instance/helper.go
+    to: instance/helper.go
 tidy:
   verbose: false
   functions:
