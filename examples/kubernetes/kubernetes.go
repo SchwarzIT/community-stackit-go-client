@@ -20,11 +20,11 @@ func main() {
 	}
 
 	res, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
-	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
+	if aggregatedError := validate.Response(res, err, "JSON200.AvailabilityZones"); aggregatedError != nil {
 		panic(aggregatedError)
 	}
 
-	if res.JSON200.AvailabilityZones == nil || len(*res.JSON200.AvailabilityZones) == 0 {
+	if len(*res.JSON200.AvailabilityZones) == 0 {
 		fmt.Println("No Kubernetes availability zones found")
 		return
 	}

@@ -321,11 +321,15 @@ func TestResponse(t *testing.T) {
 		{"nil HasError, notfound JSON200", args{requestError: nil, resp: struct {
 			HasError error
 		}{}, checkNullFields: []string{"JSON200"}}, "No such field: JSON200 in obj"},
+		{"nil HasError, JSON200.ABC is nil", args{requestError: nil, resp: struct {
+			HasError error
+			JSON200  struct{ ABC *string }
+		}{JSON200: struct{ ABC *string }{ABC: nil}}, checkNullFields: []string{"JSON200.ABC"}}, "field JSON200.ABC in response is nil"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := validate.Response(tt.args.resp, tt.args.requestError, tt.args.checkNullFields...); (err != nil) && (err.Error() != tt.want) {
-				t.Errorf("Response() error = %v, wantErr %s", err, tt.want)
+				t.Errorf("Response() error = %v, want %s", err, tt.want)
 			}
 		})
 	}

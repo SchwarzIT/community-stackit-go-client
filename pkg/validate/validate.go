@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"reflect"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
@@ -43,12 +45,17 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 	}
 
 	for _, field := range checkNullFields {
-		a, err := reflections.GetField(resp, field)
-		if err != nil {
-			return err
-		}
-		if a == nil {
-			return fmt.Errorf("field %s in response is nil", field)
+		sl := strings.Split(field, ".")
+		res := resp
+		for _, f := range sl {
+			a, err := reflections.GetField(res, f)
+			if err != nil {
+				return err
+			}
+			if a == nil || (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil()) {
+				return fmt.Errorf("field %s in response is nil", field)
+			}
+			res = a
 		}
 	}
 	return nil
