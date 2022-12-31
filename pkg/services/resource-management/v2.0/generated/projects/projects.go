@@ -337,18 +337,18 @@ type ClientInterface interface {
 	Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Delete request
-	Delete(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Delete(ctx context.Context, containerID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Get request
-	Get(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Get(ctx context.Context, containerID string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Update request with any body
-	UpdateWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateWithBody(ctx context.Context, containerID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	Update(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	Update(ctx context.Context, containerID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// DeleteProjectContainerIDLabels request
-	DeleteProjectContainerIDLabels(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	DeleteProjectContainerIDLabels(ctx context.Context, containerID string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) List(ctx context.Context, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -387,8 +387,8 @@ func (c *Client) Create(ctx context.Context, body CreateJSONRequestBody, reqEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) Delete(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteRequest(ctx, c.Server, containerId)
+func (c *Client) Delete(ctx context.Context, containerID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRequest(ctx, c.Server, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -399,8 +399,8 @@ func (c *Client) Delete(ctx context.Context, containerId string, reqEditors ...R
 	return c.Client.Do(req)
 }
 
-func (c *Client) Get(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetRequest(ctx, c.Server, containerId, params)
+func (c *Client) Get(ctx context.Context, containerID string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, containerID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -411,8 +411,8 @@ func (c *Client) Get(ctx context.Context, containerId string, params *GetParams,
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRequestWithBody(ctx, c.Server, containerId, contentType, body)
+func (c *Client) UpdateWithBody(ctx context.Context, containerID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequestWithBody(ctx, c.Server, containerID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -423,8 +423,8 @@ func (c *Client) UpdateWithBody(ctx context.Context, containerId string, content
 	return c.Client.Do(req)
 }
 
-func (c *Client) Update(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateRequest(ctx, c.Server, containerId, body)
+func (c *Client) Update(ctx context.Context, containerID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequest(ctx, c.Server, containerID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -435,8 +435,8 @@ func (c *Client) Update(ctx context.Context, containerId string, body UpdateJSON
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteProjectContainerIDLabels(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteProjectContainerIDLabelsRequest(ctx, c.Server, containerId, params)
+func (c *Client) DeleteProjectContainerIDLabels(ctx context.Context, containerID string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteProjectContainerIDLabelsRequest(ctx, c.Server, containerID, params)
 	if err != nil {
 		return nil, err
 	}
@@ -615,12 +615,12 @@ func NewCreateRequestWithBody(ctx context.Context, server string, contentType st
 }
 
 // NewDeleteRequest generates requests for Delete
-func NewDeleteRequest(ctx context.Context, server string, containerId string) (*http.Request, error) {
+func NewDeleteRequest(ctx context.Context, server string, containerID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -649,12 +649,12 @@ func NewDeleteRequest(ctx context.Context, server string, containerId string) (*
 }
 
 // NewGetRequest generates requests for Get
-func NewGetRequest(ctx context.Context, server string, containerId string, params *GetParams) (*http.Request, error) {
+func NewGetRequest(ctx context.Context, server string, containerID string, params *GetParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -703,23 +703,23 @@ func NewGetRequest(ctx context.Context, server string, containerId string, param
 }
 
 // NewUpdateRequest calls the generic Update builder with application/json body
-func NewUpdateRequest(ctx context.Context, server string, containerId string, body UpdateJSONRequestBody) (*http.Request, error) {
+func NewUpdateRequest(ctx context.Context, server string, containerID string, body UpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateRequestWithBody(ctx, server, containerId, "application/json", bodyReader)
+	return NewUpdateRequestWithBody(ctx, server, containerID, "application/json", bodyReader)
 }
 
 // NewUpdateRequestWithBody generates requests for Update with any type of body
-func NewUpdateRequestWithBody(ctx context.Context, server string, containerId string, contentType string, body io.Reader) (*http.Request, error) {
+func NewUpdateRequestWithBody(ctx context.Context, server string, containerID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -750,12 +750,12 @@ func NewUpdateRequestWithBody(ctx context.Context, server string, containerId st
 }
 
 // NewDeleteProjectContainerIDLabelsRequest generates requests for DeleteProjectContainerIDLabels
-func NewDeleteProjectContainerIDLabelsRequest(ctx context.Context, server string, containerId string, params *DeleteProjectContainerIDLabelsParams) (*http.Request, error) {
+func NewDeleteProjectContainerIDLabelsRequest(ctx context.Context, server string, containerID string, params *DeleteProjectContainerIDLabelsParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerId)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -834,18 +834,18 @@ type ClientWithResponsesInterface interface {
 	CreateWithResponse(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
 	// Delete request
-	DeleteWithResponse(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
+	DeleteWithResponse(ctx context.Context, containerID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
 	// Get request
-	GetWithResponse(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*GetResponse, error)
+	GetWithResponse(ctx context.Context, containerID string, params *GetParams, reqEditors ...RequestEditorFn) (*GetResponse, error)
 
 	// Update request with any body
-	UpdateWithBodyWithResponse(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
+	UpdateWithBodyWithResponse(ctx context.Context, containerID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
-	UpdateWithResponse(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
+	UpdateWithResponse(ctx context.Context, containerID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
 	// DeleteProjectContainerIDLabels request
-	DeleteProjectContainerIDLabelsWithResponse(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteProjectContainerIDLabelsResponse, error)
+	DeleteProjectContainerIDLabelsWithResponse(ctx context.Context, containerID string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteProjectContainerIDLabelsResponse, error)
 }
 
 type ListResponse struct {
@@ -1024,8 +1024,8 @@ func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, body Creat
 }
 
 // DeleteWithResponse request returning *DeleteResponse
-func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
-	rsp, err := c.Delete(ctx, containerId, reqEditors...)
+func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, containerID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+	rsp, err := c.Delete(ctx, containerID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1033,8 +1033,8 @@ func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, containerI
 }
 
 // GetWithResponse request returning *GetResponse
-func (c *ClientWithResponses) GetWithResponse(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*GetResponse, error) {
-	rsp, err := c.Get(ctx, containerId, params, reqEditors...)
+func (c *ClientWithResponses) GetWithResponse(ctx context.Context, containerID string, params *GetParams, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.Get(ctx, containerID, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1042,16 +1042,16 @@ func (c *ClientWithResponses) GetWithResponse(ctx context.Context, containerId s
 }
 
 // UpdateWithBodyWithResponse request with arbitrary body returning *UpdateResponse
-func (c *ClientWithResponses) UpdateWithBodyWithResponse(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
-	rsp, err := c.UpdateWithBody(ctx, containerId, contentType, body, reqEditors...)
+func (c *ClientWithResponses) UpdateWithBodyWithResponse(ctx context.Context, containerID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.UpdateWithBody(ctx, containerID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
 	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
-	rsp, err := c.Update(ctx, containerId, body, reqEditors...)
+func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, containerID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.Update(ctx, containerID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -1059,8 +1059,8 @@ func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, containerI
 }
 
 // DeleteProjectContainerIDLabelsWithResponse request returning *DeleteProjectContainerIDLabelsResponse
-func (c *ClientWithResponses) DeleteProjectContainerIDLabelsWithResponse(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteProjectContainerIDLabelsResponse, error) {
-	rsp, err := c.DeleteProjectContainerIDLabels(ctx, containerId, params, reqEditors...)
+func (c *ClientWithResponses) DeleteProjectContainerIDLabelsWithResponse(ctx context.Context, containerID string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteProjectContainerIDLabelsResponse, error) {
+	rsp, err := c.DeleteProjectContainerIDLabels(ctx, containerID, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
