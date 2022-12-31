@@ -1,0 +1,2347 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "STACKIT Membership API",
+    "description": "The Membership API is used to manage memberships, roles and permissions of STACKIT resources, like projects, folders, organizations and other resources.",
+    "contact": {
+      "name": "SIT-STACKIT-Core-Platform-Security",
+      "url": "https://developers.stackit.schwarz",
+      "email": "SIT-STACKIT-Core-Platform-Security@mail.schwarz"
+    },
+    "version": "2.0"
+  },
+  "servers": [
+    {
+      "url": "https://api-dev.stackit.cloud/membership",
+      "description": "STACKIT Membership DEV",
+      "x-stackit-stage": "dev"
+    },
+    {
+      "url": "https://api-qa.stackit.cloud/membership",
+      "description": "STACKIT Membership QA",
+      "x-stackit-stage": "qa"
+    },
+    {
+      "url": "https://api.stackit.cloud/membership",
+      "description": "STACKIT Membership PROD",
+      "x-stackit-stage": "prod"
+    }
+  ],
+  "paths": {
+    "/v2/permissions": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Get available permissions",
+        "description": "Get available permissions",
+        "operationId": "GetPermissions",
+        "parameters": [
+          {
+            "name": "resourceType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      },
+      "patch": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Add permission definitions",
+        "description": "Add a new permission to be used globally in STACKIT. This endpoint is only called by STACKIT tooling. When permission with the name already exists, updates the description.",
+        "operationId": "AddPermissions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddPermissionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/permissions/remove": {
+      "post": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Remove permission definitions",
+        "description": "Removes a permission globally in STACKIT. This endpoint is only called by STACKIT tooling. Returns an error if any role is using the listed permissions.",
+        "operationId": "RemovePermissions",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemovePermissionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PermissionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/roles": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Get default roles",
+        "description": "Get default roles and associated permissions. This endpoint is only called by STACKIT tooling.",
+        "operationId": "GetDefaultRoles",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultRolesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      },
+      "patch": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Add new default roles",
+        "description": "Add new, default roles that are used by every resource of that type. This endpoint is only called by STACKIT tooling.",
+        "operationId": "AddDefaultRoles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddDefaultRolesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultRolesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/roles/remove": {
+      "post": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Remove default roles",
+        "description": "Remove a default role. This endpoint is only called by STACKIT tooling. Returns error if the role is used by any memberships.",
+        "operationId": "RemoveDefaultRoles",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveDefaultRolesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DefaultRolesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/subjects": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "List subjects",
+        "description": "List subjects (with search options). To be used with administrative privileges.",
+        "operationId": "GetSubjects",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubjectsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/users/{email}/memberships": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "List memberships of a user",
+        "description": "List memberships of a user. An administrative access is needed to list any user's memberships, while the user can do it on his/her own email. You can use filters to scope the request to a project/folder/organization. In this case -if caller is not the subject-, owner permissions are required. Because of hierarchical role bindings, the user might have permissions on more resources.",
+        "operationId": "GetUserMemberships",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentResourceId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMembershipsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/users/{email}/permissions": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "List permissions of a user",
+        "description": "List permissions of a user. An administrative access is needed to list any user's permissions, while the user can do it on his/her own email. Lists every resource of the given type where the user has any effective permissions. When requested, also lists why the permission is present.",
+        "operationId": "GetUserPermissions",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "showReason",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "permissions",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "resource",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserPermissionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/users/{email}/resources": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "List resources of a user",
+        "description": "List resources of a user. An administrative or owner access is needed to list any user's permissions, while the user can do it on his/her own email. If user has any of the (inherited) permissions on a resource that is listed in the request, the resource will be returned.",
+        "operationId": "GetUserResources",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentResourceId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "parentResourceType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceType",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "recursive",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "permissions",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResourcesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceId}/child/members/validate": {
+      "post": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Validate member eligibility to be assigned to a child resource",
+        "description": "Validate if members are eligible to be assigned to a child resource. When creating a child resource, only the parent is known, therefore we validate the membership to a resource that will be created later. Returns OK status, or error with the validation message.",
+        "operationId": "ValidateChildMembers",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildMembersPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceId}/members": {
+      "put": {
+        "tags": [
+          "Membership",
+          "Private"
+        ],
+        "summary": "Replace members of a resource",
+        "description": "Replace members to the given resource with specified roles and conditions. Removes members that are not in the payload. Currently disabled.",
+        "operationId": "ReplaceMembers",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembersPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      },
+      "patch": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Add members to a resource",
+        "description": "Add members to the given resource with specified roles and conditions. Can be used to update conditions as well.",
+        "operationId": "AddMembers",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembersPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceId}/members/remove": {
+      "post": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Remove members from a resource",
+        "description": "Remove members from the given resource with specified roles.",
+        "operationId": "RemoveMembers",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembersWithoutConditionPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceId}/members/validate": {
+      "post": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Validate member eligibility to be assigned to the resource",
+        "description": "Validate if members are eligible to be assigned to a resource. Returns OK status, or error with the validation message.",
+        "operationId": "ValidateMembers",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MembersPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceId}/roles": {
+      "patch": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Add new roles to a resource",
+        "description": "Add new, user specified roles to a resource, and bind permissions to them. Permissions are predefined. There can be maximum of 5 custom roles to a resource",
+        "operationId": "AddRoles",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddRolesPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceId}/roles/remove": {
+      "post": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Remove custom roles from a resource",
+        "description": "Remove custom, user specified roles from a resource. When a role is deleted, memberships using this role are also deleted. Predefined roles cannot be deleted.",
+        "operationId": "RemoveRoles",
+        "parameters": [
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RemoveRolesPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceType}/{resourceId}/members": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Get members to a resource",
+        "description": "List members of the given resource.",
+        "operationId": "GetMembers",
+        "parameters": [
+          {
+            "name": "resourceType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "subject",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MembersResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    },
+    "/v2/{resourceType}/{resourceId}/roles": {
+      "get": {
+        "tags": [
+          "Membership",
+          "Public"
+        ],
+        "summary": "Get roles and permissions of a resource",
+        "description": "Get roles and permissions of a resource",
+        "operationId": "GetRoles",
+        "parameters": [
+          {
+            "name": "resourceType",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "resourceId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RolesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-stackit-authorization": {
+          "disabled": true
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "membership-%%env%%"
+          ],
+          "inject-email": true
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AddDefaultRolesRequest": {
+        "required": [
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "roles": {
+            "title": "The list of roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddRoleRequest"
+            }
+          }
+        }
+      },
+      "AddPermissionsRequest": {
+        "required": [
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "title": "List of permissions to add",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionWithInheritance"
+            }
+          }
+        }
+      },
+      "AddRoleRequest": {
+        "required": [
+          "name",
+          "description",
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "project.special-owner",
+            "title": "Name and identifier of the role. Must start with a valid resource type. The postfix must only contain lowercase letters and -. Postfix must not start or end with a -.",
+            "maxLength": 40,
+            "pattern": "^(?:project|folder|organization|system|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          },
+          "description": {
+            "example": "An owner of the project",
+            "title": "A human readable description of the role",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "permissions": {
+            "title": "Permissions for the role",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionRequest"
+            }
+          }
+        }
+      },
+      "AddRolesPayload": {
+        "required": [
+          "resourceType",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "roles": {
+            "title": "The list of roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AddRoleRequest"
+            }
+          }
+        }
+      },
+      "ChildMembersPayload": {
+        "required": [
+          "resourceType",
+          "childResourceType",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "childResourceType": {
+            "example": "project",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "members": {
+            "title": "The list of members",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          }
+        }
+      },
+      "Condition": {
+        "required": [
+          "expiresAt"
+        ],
+        "type": "object",
+        "properties": {
+          "expiresAt": {
+            "example": "2019-08-24T14:15:22.000Z",
+            "title": "The role assignment will only be effective until this date. Must be bigger than the current time",
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "DefaultRolesResponse": {
+        "required": [
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "roles": {
+            "title": "Roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }
+      },
+      "ErrorResponse": {
+        "example": {
+          "timeStamp": "2019-08-24T14:15:22Z",
+          "path": "/v1/path/which/returned/error",
+          "status": 400,
+          "error": "Bad Request",
+          "message": "Some information about what caused the Error"
+        },
+        "required": [
+          "timeStamp",
+          "path",
+          "status",
+          "error",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "timeStamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "path": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer"
+          },
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Member": {
+        "required": [
+          "subject",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "example": "user@mail.schwarz",
+            "title": "Identifier of user, service account or client. Usually email address or name in case of clients.",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "example": "organization.owner",
+            "title": "A valid role in STACKIT, that is matching the resource type.",
+            "maxLength": 255,
+            "pattern": "^(?:project|folder|organization|system|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/Condition"
+          }
+        }
+      },
+      "MemberWithoutCondition": {
+        "required": [
+          "subject",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "example": "user@mail.schwarz",
+            "title": "Identifier of user, service account or client. Usually email address or name in case of clients.",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "role": {
+            "example": "organization.owner",
+            "title": "A valid role in STACKIT, that is matching the resource type.",
+            "maxLength": 255,
+            "pattern": "^(?:project|folder|organization|system|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          }
+        }
+      },
+      "MembersPayload": {
+        "required": [
+          "resourceType",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "members": {
+            "title": "The list of members",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          }
+        }
+      },
+      "MembersResponse": {
+        "required": [
+          "resourceId",
+          "resourceType",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "example": "schwarz-it-kg-WJACUK1",
+            "title": "The ID of the resource, where the members should be updated",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "minLength": 1,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "members": {
+            "title": "The list of members who should be added to this resource",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            }
+          }
+        }
+      },
+      "MembersWithoutConditionPayload": {
+        "required": [
+          "resourceType",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "members": {
+            "title": "The list of members",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MemberWithoutCondition"
+            }
+          }
+        }
+      },
+      "Permission": {
+        "required": [
+          "name",
+          "description"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "organization.projects.create",
+            "title": "Permission name",
+            "maxLength": 255,
+            "pattern": "^(?:system|project|folder|organization|resource.[a-z-]+)(?:\\.[a-z]+(?:-?[a-z])*){1,2}$",
+            "type": "string"
+          },
+          "description": {
+            "example": "Can create projects in an organization",
+            "title": "A human readable description of the permission",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          }
+        }
+      },
+      "PermissionReason": {
+        "required": [
+          "subject",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "subject": {
+            "example": "user@mail.scwharz",
+            "title": "Identifier of user, service account or client. Usually email address or name in case of clients.",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "role": {
+            "example": "organization.owner",
+            "title": "A valid role in STACKIT, that is matching the resource type.",
+            "maxLength": 255,
+            "pattern": "^(?:project|folder|organization|system|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/Condition"
+          }
+        }
+      },
+      "PermissionRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "organization.projects.create",
+            "title": "Must be an existing permission",
+            "maxLength": 255,
+            "pattern": "^(?:system|project|folder|organization|resource.[a-z-]+)(?:\\.[a-z]+(?:-?[a-z])*){1,2}$",
+            "type": "string"
+          }
+        }
+      },
+      "PermissionWithInheritance": {
+        "required": [
+          "name",
+          "description",
+          "inheritance"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "organization.projects.create",
+            "title": "Permission name",
+            "maxLength": 255,
+            "pattern": "^(?:system|project|folder|organization|resource.[a-z-]+)(?:\\.[a-z]+(?:-?[a-z])*){1,2}$",
+            "type": "string"
+          },
+          "description": {
+            "example": "Can create projects in an organization",
+            "title": "A human readable description of the permission",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "inheritance": {
+            "title": "Inheritance setting for the permission. In case of FULL, permission is inherited by every children of the resource. In case of SINGLE (only valid for organization and folder permissions), permission is inherited by resources that have type one level below the resource. (E.g. if the resource type is organization, every folder will inherit the permission). In case of none, permission is not inherited.",
+            "enum": [
+              "NONE",
+              "SINGLE",
+              "FULL"
+            ],
+            "type": "string",
+            "format": "enum"
+          }
+        }
+      },
+      "PermissionWithReason": {
+        "required": [
+          "name",
+          "description",
+          "memberships"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "organization.projects.create",
+            "title": "Permission of the subject.",
+            "maxLength": 255,
+            "pattern": "^(?:system|project|folder|organization|resource.[a-z-]+)(?:\\.[a-z]+(?:-?[a-z])*){1,2}$",
+            "type": "string"
+          },
+          "description": {
+            "example": "Can create projects in an organization",
+            "title": "A human readable description of the permission",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "memberships": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionReason"
+            }
+          }
+        }
+      },
+      "PermissionsResponse": {
+        "required": [
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "title": "List of permissions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionWithInheritance"
+            }
+          }
+        }
+      },
+      "RemoveDefaultRolesRequest": {
+        "required": [
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "roles": {
+            "title": "The list of roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoveRoleRequest"
+            }
+          }
+        }
+      },
+      "RemovePermissionsRequest": {
+        "required": [
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "title": "List of permissions to remove",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionRequest"
+            }
+          }
+        }
+      },
+      "RemoveRoleRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "project.special-owner",
+            "title": "Name and identifier of the role. Must start with a valid resource type. The postfix must only contain lowercase letters and -. Postfix must not start or end with a -.",
+            "maxLength": 40,
+            "pattern": "^(?:project|folder|organization|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          }
+        }
+      },
+      "RemoveRolesPayload": {
+        "required": [
+          "resourceType",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "roles": {
+            "title": "The list of roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RemoveRoleRequest"
+            }
+          }
+        }
+      },
+      "Resource": {
+        "required": [
+          "resourceId",
+          "resourceType"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "example": "schwarz-it-kg-WJACUK1",
+            "title": "The ID of the resource",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "resourceAlias": {
+            "example": "schwarz-it-kg-WJACUK1-alias",
+            "title": "Resource alias (if exists)",
+            "maxLength": 255,
+            "type": "string"
+          }
+        }
+      },
+      "Role": {
+        "required": [
+          "name",
+          "description",
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "example": "project.special-owner",
+            "title": "Name and identifier of the role.",
+            "maxLength": 40,
+            "pattern": "^(?:project|folder|organization|system|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          },
+          "description": {
+            "example": "An owner of the project",
+            "title": "A human readable description of the role",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "permissions": {
+            "title": "Permissions for the role",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Permission"
+            }
+          }
+        }
+      },
+      "RolesResponse": {
+        "required": [
+          "resourceId",
+          "resourceType",
+          "roles"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "example": "schwarz-it-kg-WJACUK1",
+            "title": "The ID of the resource, where the members should be updated",
+            "maxLength": 255,
+            "minLength": 1,
+            "type": "string"
+          },
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "roles": {
+            "title": "Roles",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Role"
+            }
+          }
+        }
+      },
+      "Subject": {
+        "required": [
+          "email",
+          "id",
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "email": {
+            "example": "user@mail.schwarz",
+            "title": "Subject email",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "id": {
+            "example": "fea4e3d2-0710-4365-8dda-f54bfa2467e5",
+            "title": "Subject id",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "type": {
+            "example": "user",
+            "title": "Subject type",
+            "enum": [
+              "user",
+              "client",
+              "service-account"
+            ],
+            "type": "string"
+          }
+        }
+      },
+      "SubjectsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Subject"
+            }
+          }
+        }
+      },
+      "UserMembership": {
+        "required": [
+          "resourceId",
+          "resourceType",
+          "subject",
+          "role"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "example": "schwarz-it-kg-WJACUK1",
+            "title": "The ID of the resource",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "subject": {
+            "title": "Identifier of user, service account or client. Usually email address or name in case of clients.",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "role": {
+            "example": "organization.owner",
+            "title": "A valid role in STACKIT, that is matching the resource type.",
+            "maxLength": 255,
+            "pattern": "^(?:project|folder|organization|system|resource.[a-z-]+)\\.[a-z]+(?:-?[a-z])*$",
+            "type": "string"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/Condition"
+          }
+        }
+      },
+      "UserMembershipsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserMembership"
+            }
+          }
+        }
+      },
+      "UserPermission": {
+        "required": [
+          "resourceId",
+          "resourceType",
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "resourceId": {
+            "example": "schwarz-it-kg-WJACUK1",
+            "title": "The ID of the resource",
+            "maxLength": 255,
+            "type": "string"
+          },
+          "resourceType": {
+            "example": "organization",
+            "title": "Resource type",
+            "maxLength": 255,
+            "pattern": "^project|folder|organization|system|resource\\.[a-z-]+$",
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PermissionWithReason"
+            }
+          }
+        }
+      },
+      "UserPermissionsResponse": {
+        "required": [
+          "items"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserPermission"
+            }
+          }
+        }
+      },
+      "UserResourcesResponse": {
+        "required": [
+          "items",
+          "cursor",
+          "limit"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "title": "A child resource of the requested parent where the user has any of the requested permissions",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Resource"
+            }
+          },
+          "cursor": {
+            "title": "Pagination cursor. A cursor is returned on the first call of the pagination process. If given, it will start from the end of the previous position. If not given, a new pagination is started",
+            "type": "string"
+          },
+          "limit": {
+            "title": "Pagination limit. Limits the maximum size of returned elements. The item count starts from the beginning or from the given cursor. When out of bounds, limited to min and max.",
+            "maximum": 100,
+            "type": "integer",
+            "default": 50,
+            "format": "int32"
+          }
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Membership"
+    }
+  ],
+  "x-stackit-api": {
+    "type": "stackit"
+  },
+  "x-stackit-scope": {
+    "visibility": "public"
+  }
+}

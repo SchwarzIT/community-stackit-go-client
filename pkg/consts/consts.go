@@ -14,22 +14,6 @@ const (
 	RESOURCE_TYPE_PROJECT = "project"
 	RESOURCE_TYPE_ORG     = "organization"
 
-	// Member Roles
-	ROLE_PROJECT_OWNER   = "project.owner"
-	ROLE_PROJECT_MEMBER  = "project.member"
-	ROLE_PROJECT_ADMIN   = "project.admin"
-	ROLE_PROJECT_AUDITOR = "project.auditor"
-
-	// Project scopes
-	PROJECT_SCOPE_PUBLIC  = "PUBLIC"
-	PROJECT_SCOPE_PRIVATE = "PRIVATE"
-
-	// Project lifecycle statuses
-	PROJECT_STATUS_ACTIVE   = "ACTIVE"
-	PROJECT_STATUS_CREATING = "CREATING"
-	PROJECT_STATUS_DELETING = "DELETING"
-	PROJECT_STATUS_INACTIVE = "INACTIVE"
-
 	// granularity options; to be used for costs.GetProjectCosts()
 	COSTS_GRANULARITY_NONE    = "none"
 	COSTS_GRANULARITY_DAILY   = "daily"

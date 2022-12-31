@@ -19,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
+	res, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
 	if aggregatedError := validate.Response(res, err, "JSON200.AvailabilityZones"); aggregatedError != nil {
 		panic(aggregatedError)
 	}
