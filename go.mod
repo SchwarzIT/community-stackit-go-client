@@ -6,6 +6,7 @@ require (
 	github.com/do87/oapi-codegen v0.0.1
 	github.com/google/uuid v1.3.0
 	github.com/karrick/tparse/v2 v2.8.2
+	github.com/oleiade/reflections v1.0.1
 	github.com/pkg/errors v0.9.1
 	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b
 	golang.org/x/oauth2 v0.3.0

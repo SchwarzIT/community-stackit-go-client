@@ -6,6 +6,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
@@ -19,15 +20,10 @@ func main() {
 	}
 
 	res, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
-	if err != nil {
-		panic(fmt.Sprintf("preparing request failed: %s", err))
+	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
+		panic(aggregatedError)
 	}
-	if res.HasError != nil {
-		panic(fmt.Sprintf("request failed: %s", res.HasError))
-	}
-	if res.JSON200 == nil {
-		panic("received an empty response from API")
-	}
+
 	if res.JSON200.AvailabilityZones == nil || len(*res.JSON200.AvailabilityZones) == 0 {
 		fmt.Println("No Kubernetes availability zones found")
 		return

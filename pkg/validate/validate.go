@@ -10,11 +10,48 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/google/uuid"
 	parse "github.com/karrick/tparse/v2"
+	"github.com/oleiade/reflections"
 	"github.com/pkg/errors"
 )
 
+// WrapError wraps a given error
 func WrapError(err error) error {
 	return errors.Wrap(err, "client validation error (Bad Request)")
+}
+
+// Response validates a response interface and error
+// if requestError has an error, it is returned
+// if resp.HasError is defined and not nil, it is returned
+// if one of the field namess provided in []checkNullFields are nil, an error is returned
+func Response(resp interface{}, requestError error, checkNullFields ...string) error {
+	// check request error
+	if requestError != nil {
+		return requestError
+	}
+
+	// check HasError field
+	{
+		value, err := reflections.GetField(resp, "HasError")
+		if err != nil {
+			return err
+		}
+		if v, ok := value.(error); ok {
+			if v != nil {
+				return v
+			}
+		}
+	}
+
+	for _, field := range checkNullFields {
+		a, err := reflections.GetField(resp, field)
+		if err != nil {
+			return err
+		}
+		if a == nil {
+			return fmt.Errorf("field %s in response is nil", field)
+		}
+	}
+	return nil
 }
 
 // UUID validates a given UUID
@@ -94,15 +131,6 @@ func ResourceType(r string) error {
 	case consts.RESOURCE_TYPE_PROJECT:
 	default:
 		return fmt.Errorf("invalid resource type %s ", r)
-	}
-	return nil
-}
-
-// UserOrigin validates a given user origin
-// @TODO: remove after APIv1 is deprecated
-func UserOrigin(origin string) error {
-	if origin != consts.SCHWARZ_AUTH_ORIGIN {
-		return fmt.Errorf("unsupported user origin: %s", origin)
 	}
 	return nil
 }

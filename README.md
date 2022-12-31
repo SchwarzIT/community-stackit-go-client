@@ -29,6 +29,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
@@ -41,32 +42,17 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.Services.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
-	if err != nil {
-		panic(fmt.Sprintf("preparing request failed: %s", err))
-	}
-	if res.HasError != nil {
-		panic(fmt.Sprintf("request failed: %s", res.HasError))
-	}
-	if res.JSON200 == nil {
-		panic("received an empty response from API")
-	}
-	if res.JSON200.AvailabilityZones == nil || len(*res.JSON200.AvailabilityZones) == 0 {
-		fmt.Println("No Kubernetes availability zones found")
-		return
+	projectID := "123-456-789"
+	res, err := c.Services.ElasticSearch.Offerings.GetWithResponse(ctx, projectID)
+	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
+		panic(aggregatedError)
 	}
 
-	fmt.Println("We found the following Kubernetes availability zones:")
-	for _, zone := range *res.JSON200.AvailabilityZones {
-		if zone.Name == nil {
-			continue
-		}
-		fmt.Printf("- %s\n", *zone.Name)
+	fmt.Println("Received the following offerings:")
+	for _, o := range res.JSON200.Offerings {
+		fmt.Printf("- %s\n", o.Name)
 	}
-
 }
-
-
 ```
 
 Further usage examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) 
