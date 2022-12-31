@@ -305,7 +305,7 @@ func TestClient_DoWithRetry(t *testing.T) {
 		t.Error(err)
 	}
 
-	ctx3, td3 := context.WithTimeout(ctx, 5*basetime)
+	ctx3, td3 := context.WithTimeout(ctx, 6*basetime)
 	defer td3()
 
 	c.client.Timeout = basetime * 1
