@@ -27,7 +27,7 @@ type services struct {
 	MongoDB       *dataservices.ClientWithResponses
 	PostgresDB    *dataservices.ClientWithResponses
 	RabbitMQ      *dataservices.ClientWithResponses
-	Reddis        *dataservices.ClientWithResponses
+	Redis         *dataservices.ClientWithResponses
 
 	// Non generated
 	Costs         *costs.CostsService
@@ -49,7 +49,7 @@ func (c *Client) initServices() {
 	c.MongoDB = dataservices.NewService(c, dataservices.MongoDB)
 	c.PostgresDB = dataservices.NewService(c, dataservices.PostgresDB)
 	c.RabbitMQ = dataservices.NewService(c, dataservices.RabbitMQ)
-	c.Reddis = dataservices.NewService(c, dataservices.Reddis)
+	c.Redis = dataservices.NewService(c, dataservices.Redis)
 
 	// Non Generated
 	c.Costs = costs.New(c)
