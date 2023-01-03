@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -74,7 +73,7 @@ type ErrorResponse struct {
 	Status float32 `json:"status"`
 
 	// TimeStamp Timestamp at which the error occurred.
-	TimeStamp time.Time `json:"timeStamp"`
+	TimeStamp string `json:"timeStamp"`
 }
 
 // LifecycleState Lifecycle state of the resource container.
@@ -96,7 +95,7 @@ type OffsetSchema = float32
 // Parent Parent container.
 type Parent struct {
 	// ContainerId User-friendly identifier of either organization or folder (will replace id).
-	ContainerID string `json:"containerId"`
+	ContainerID string `json:"containerID"`
 
 	// Id Legacy identifier of either organization or folder (for backward compatibility). Field name according to parent object of v1.
 	ID openapi_types.UUID `json:"id"`
@@ -111,7 +110,7 @@ type ParentType string
 // ParentList defines model for ParentList.
 type ParentList = []struct {
 	// ContainerId User-friendly identifier of either organization or folder (will replace id).
-	ContainerID string `json:"containerId"`
+	ContainerID string `json:"containerID"`
 
 	// ContainerParentId User-friendly parent identifier of either organization or folder (will replace parentId).
 	ContainerParentID string `json:"containerParentId"`
@@ -175,10 +174,10 @@ type ProjectRequestBody struct {
 // ProjectResponse defines model for ProjectResponse.
 type ProjectResponse struct {
 	// ContainerId Globally unique, user-friendly identifier. Will replace old, legacy identifier "projectId".
-	ContainerID string `json:"containerId"`
+	ContainerID string `json:"containerID"`
 
 	// CreationTime Timestamp at which the project was created.
-	CreationTime time.Time `json:"creationTime"`
+	CreationTime string `json:"creationTime"`
 
 	// Labels Labels are key-value string pairs which can be attached to a resource container. Some labels may be enforced via policies.
 	// - A label key must match the regex `[A-ZÄÜÖa-zäüöß0-9_-]{1,64}`.
@@ -205,16 +204,16 @@ type ProjectResponse struct {
 	ProjectID openapi_types.UUID `json:"projectId"`
 
 	// UpdateTime Timestamp at which the project was last modified.
-	UpdateTime time.Time `json:"updateTime"`
+	UpdateTime string `json:"updateTime"`
 }
 
 // ProjectResponseWithParents defines model for ProjectResponseWithParents.
 type ProjectResponseWithParents struct {
 	// ContainerId Globally unique, user-friendly identifier. Will replace old, legacy identifier "projectId".
-	ContainerID string `json:"containerId"`
+	ContainerID string `json:"containerID"`
 
 	// CreationTime Timestamp at which the project was created.
-	CreationTime time.Time `json:"creationTime"`
+	CreationTime string `json:"creationTime"`
 
 	// Labels Labels are key-value string pairs which can be attached to a resource container. Some labels may be enforced via policies.
 	// - A label key must match the regex `[A-ZÄÜÖa-zäüöß0-9_-]{1,64}`.
@@ -242,7 +241,7 @@ type ProjectResponseWithParents struct {
 	ProjectID openapi_types.UUID `json:"projectId"`
 
 	// UpdateTime Timestamp at which the project was last modified.
-	UpdateTime time.Time `json:"updateTime"`
+	UpdateTime string `json:"updateTime"`
 }
 
 // ResourceLabels Labels are key-value string pairs which can be attached to a resource container. Some labels may be enforced via policies.
@@ -251,7 +250,7 @@ type ProjectResponseWithParents struct {
 type ResourceLabels map[string]string
 
 // CreationTimeStart defines model for creation-time-start.
-type CreationTimeStart = time.Time
+type CreationTimeStart = string
 
 // Limit defines model for limit.
 type Limit = float32
@@ -620,7 +619,7 @@ func NewDeleteRequest(ctx context.Context, server string, containerID string) (*
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerID", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -654,7 +653,7 @@ func NewGetRequest(ctx context.Context, server string, containerID string, param
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerID", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -719,7 +718,7 @@ func NewUpdateRequestWithBody(ctx context.Context, server string, containerID st
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerID", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}
@@ -755,7 +754,7 @@ func NewDeleteProjectContainerIDLabelsRequest(ctx context.Context, server string
 
 	var pathParam0 string
 
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerId", runtime.ParamLocationPath, containerID)
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "containerID", runtime.ParamLocationPath, containerID)
 	if err != nil {
 		return nil, err
 	}

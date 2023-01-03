@@ -12,7 +12,6 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
-	"time"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -50,7 +49,7 @@ type ErrorResponse struct {
 	Status float32 `json:"status"`
 
 	// TimeStamp Timestamp at which the error occurred.
-	TimeStamp time.Time `json:"timeStamp"`
+	TimeStamp string `json:"timeStamp"`
 }
 
 // LifecycleState Lifecycle state of the resource container.
@@ -95,7 +94,7 @@ type OrganizationResponse struct {
 	ContainerID string `json:"containerId"`
 
 	// CreationTime Timestamp at which the organization was created.
-	CreationTime time.Time `json:"creationTime"`
+	CreationTime string `json:"creationTime"`
 
 	// Labels Labels are key-value string pairs which can be attached to a resource container. Some labels may be enforced via policies.
 	// - A label key must match the regex `[A-ZÄÜÖa-zäüöß0-9_-]{1,64}`.
@@ -119,7 +118,7 @@ type OrganizationResponse struct {
 	OrganizationID openapi_types.UUID `json:"organizationId"`
 
 	// UpdateTime Timestamp at which the organization was last modified.
-	UpdateTime time.Time `json:"updateTime"`
+	UpdateTime string `json:"updateTime"`
 }
 
 // ResourceLabels Labels are key-value string pairs which can be attached to a resource container. Some labels may be enforced via policies.
