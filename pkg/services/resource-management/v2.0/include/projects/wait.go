@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
@@ -14,6 +15,9 @@ func (r CreateResponse) WaitHandler(ctx context.Context, c *projects.ClientWithR
 	return wait.New(func() (interface{}, bool, error) {
 		project, err := c.GetWithResponse(ctx, containerID, &projects.GetParams{})
 		if err != nil {
+			if strings.Contains(err.Error(), "404") {
+				return project, false, nil
+			}
 			return project, false, err
 		}
 		if project.StatusCode() == http.StatusForbidden {
