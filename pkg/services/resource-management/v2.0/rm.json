@@ -1494,13 +1494,11 @@
           "updateTime": {
             "type": "string",
             "description": "Timestamp at which the project was last modified.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "creationTime": {
             "type": "string",
             "description": "Timestamp at which the project was created.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           }
         },
@@ -1549,13 +1547,11 @@
           "updateTime": {
             "type": "string",
             "description": "Timestamp at which the project was last modified.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "creationTime": {
             "type": "string",
             "description": "Timestamp at which the project was created.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           }
         },
@@ -1617,13 +1613,11 @@
           "creationTime": {
             "type": "string",
             "description": "Timestamp at which the organization was created.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "updateTime": {
             "type": "string",
             "description": "Timestamp at which the organization was last modified.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "labels": {
@@ -1711,13 +1705,11 @@
                 },
                 "creationTime": {
                   "type": "string",
-                  "format": "date-time",
                   "description": "Timestamp at which the organization was created.",
                   "example": "2021-08-24T14:15:22Z"
                 },
                 "updateTime": {
                   "type": "string",
-                  "format": "date-time",
                   "description": "Timestamp at which the organization was last modified.",
                   "example": "2021-08-24T14:15:22Z"
                 }
@@ -1898,13 +1890,11 @@
           "creationTime": {
             "type": "string",
             "description": "Timestamp at which the folder was created.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "updateTime": {
             "type": "string",
             "description": "Timestamp at which the folder was last modified.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "labels": {
@@ -1947,13 +1937,11 @@
           "creationTime": {
             "type": "string",
             "description": "Timestamp at which the folder was created.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "updateTime": {
             "type": "string",
             "description": "Timestamp at which the folder was last modified.",
-            "format": "date-time",
             "example": "2021-08-24T14:15:22Z"
           },
           "labels": {
@@ -2026,13 +2014,11 @@
                 },
                 "creationTime": {
                   "type": "string",
-                  "format": "date-time",
                   "description": "Timestamp at which the folder was created.",
                   "example": "2020-08-24T14:15:22Z"
                 },
                 "updateTime": {
                   "type": "string",
-                  "format": "date-time",
                   "description": "Timestamp at which the folder was created.",
                   "example": "2020-08-24T14:15:22Z"
                 },
@@ -2143,7 +2129,6 @@
         "properties": {
           "timeStamp": {
             "type": "string",
-            "format": "date-time",
             "description": "Timestamp at which the error occurred.",
             "example": "2019-08-24T14:15:22Z"
           },
@@ -2338,7 +2323,6 @@
         "in": "query",
         "schema": {
           "type": "string",
-          "format": "date-time",
           "example": "2021-01-20T00:00:00Z"
         },
         "description": "A timestamp to specifiy the beginning of the creationTime from which entries should be returned. If not given, defaults to the beginning of time."
