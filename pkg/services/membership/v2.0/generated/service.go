@@ -6,7 +6,7 @@ import (
 
 func NewService(c common.Client) *ClientWithResponses {
 	nc, _ := NewClientWithResponses(
-		"https://api.stackit.cloud/membership/v2/",
+		"https://api.stackit.cloud/membership/",
 		WithHTTPClient(c),
 	)
 	return nc
