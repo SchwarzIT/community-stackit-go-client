@@ -13,7 +13,7 @@ const (
 	MongoDB
 	PostgresDB
 	RabbitMQ
-	Reddis
+	Redis
 )
 
 func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponses {
@@ -32,7 +32,7 @@ func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponse
 		url = "https://postgres-flex-service.api.eu01.stackit.cloud"
 	case RabbitMQ:
 		url = "https://rabbitmq.api.eu01.stackit.cloud"
-	case Reddis:
+	case Redis:
 		url = "https://redis.api.eu01.stackit.cloud"
 	}
 
