@@ -31,6 +31,10 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 		return requestError
 	}
 
+	if resp == nil {
+		return errors.New("response interface is nil")
+	}
+
 	// check HasError field
 	{
 		value, err := reflections.GetField(resp, "HasError")
