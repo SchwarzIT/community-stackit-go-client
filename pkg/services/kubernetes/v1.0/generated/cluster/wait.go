@@ -12,7 +12,16 @@ func (r CreateOrUpdateClusterResponse) WaitHandler(ctx context.Context, c *Clien
 	return wait.New(func() (res interface{}, done bool, err error) {
 		resp, err := c.GetClusterWithResponse(ctx, projectID, clusterName)
 		if err != nil {
+			if strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
+				return nil, false, nil
+			}
 			return nil, false, err
+		}
+		if resp.StatusCode() == http.StatusForbidden {
+			return nil, false, nil
+		}
+		if resp.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
 		}
 		if resp.HasError != nil {
 			return nil, false, resp.HasError
@@ -34,6 +43,9 @@ func (r DeleteClusterResponse) WaitHandler(ctx context.Context, c *ClientWithRes
 				return nil, true, nil
 			}
 			return nil, false, err
+		}
+		if resp.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
 		}
 		if resp.HasError != nil {
 			if resp.StatusCode() == http.StatusNotFound {
