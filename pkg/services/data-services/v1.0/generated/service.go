@@ -27,9 +27,9 @@ func NewService(c common.Client, serviceID int) *ClientWithResponses {
 	case PostgresDB:
 		url = "https://dsa-postgres.api.eu01.stackit.cloud"
 	case RabbitMQ:
-		url = "https://rabbitmq.api.eu01.stackit.cloud"
+		url = "https://dsa-rabbitmq.api.eu01.stackit.cloud"
 	case Redis:
-		url = "https://redis.api.eu01.stackit.cloud"
+		url = "https://dsa-redis.api.eu01.stackit.cloud"
 	}
 
 	nc, _ := NewClientWithResponses(url, WithHTTPClient(c))
