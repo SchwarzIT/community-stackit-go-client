@@ -9,7 +9,6 @@ const (
 	ElasticSearch = iota
 	LogMe
 	MariaDB
-	MongoDB
 	PostgresDB
 	RabbitMQ
 	Redis
@@ -25,10 +24,8 @@ func NewService(c common.Client, serviceID int) *ClientWithResponses {
 		url = "https://dsa-logme.api.eu01.stackit.cloud"
 	case MariaDB:
 		url = "https://dsa-mariadb.api.eu01.stackit.cloud"
-	case MongoDB:
-		url = "https://mongo-flex-prd.api.eu01.stackit.cloud"
 	case PostgresDB:
-		url = "https://postgres-flex-service.api.eu01.stackit.cloud"
+		url = "https://dsa-postgres.api.eu01.stackit.cloud"
 	case RabbitMQ:
 		url = "https://rabbitmq.api.eu01.stackit.cloud"
 	case Redis:
