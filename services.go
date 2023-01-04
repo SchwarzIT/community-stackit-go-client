@@ -46,7 +46,6 @@ func (c *Client) initServices() {
 	c.ElasticSearch = dataservices.NewService(c, dataservices.ElasticSearch)
 	c.LogMe = dataservices.NewService(c, dataservices.LogMe)
 	c.MariaDB = dataservices.NewService(c, dataservices.MariaDB)
-	c.MongoDB = dataservices.NewService(c, dataservices.MongoDB)
 	c.PostgresDB = dataservices.NewService(c, dataservices.PostgresDB)
 	c.RabbitMQ = dataservices.NewService(c, dataservices.RabbitMQ)
 	c.Redis = dataservices.NewService(c, dataservices.Redis)
