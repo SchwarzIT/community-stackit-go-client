@@ -7,7 +7,7 @@ import (
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
 	mongodbflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated"
-	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1"
+	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated"
 	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated"
 )
@@ -17,6 +17,7 @@ type services struct {
 	Kubernetes         *kubernetes.ClientWithResponses
 	Membership         *membership.ClientWithResponses
 	MongoDBFlex        *mongodbflex.ClientWithResponses
+	ObjectStorage      *objectstorage.ClientWithResponses
 	PostgresFlex       *postgresflex.ClientWithResponses
 	ResourceManagement *resourcemanagement.ClientWithResponses
 
@@ -30,8 +31,7 @@ type services struct {
 	Redis         *dataservices.ClientWithResponses
 
 	// Non generated
-	Costs         *costs.CostsService
-	ObjectStorage *objectstorage.ObjectStorageService
+	Costs *costs.CostsService
 }
 
 func (c *Client) initServices() {
@@ -39,6 +39,7 @@ func (c *Client) initServices() {
 	c.Kubernetes = kubernetes.NewService(c)
 	c.Membership = membership.NewService(c)
 	c.MongoDBFlex = mongodbflex.NewService(c)
+	c.ObjectStorage = objectstorage.NewService(c)
 	c.PostgresFlex = postgresflex.NewService(c)
 	c.ResourceManagement = resourcemanagement.NewService(c)
 
@@ -52,5 +53,4 @@ func (c *Client) initServices() {
 
 	// Non Generated
 	c.Costs = costs.New(c)
-	c.ObjectStorage = objectstorage.New(c)
 }

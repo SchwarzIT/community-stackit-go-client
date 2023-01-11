@@ -6,6 +6,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
@@ -18,16 +19,11 @@ func main() {
 		panic(err)
 	}
 
-	projectID := "1234"
+	projectID := "123-456-789"
 	bucketName := "example"
 
-	process, err := c.ObjectStorage.Buckets.Create(ctx, projectID, bucketName)
-	if err != nil {
-		panic(err)
-	}
-
-	// wait for bucket to be created
-	if _, err := process.Wait(); err != nil {
+	res, err := c.ObjectStorage.Bucket.CreateWithResponse(ctx, projectID, bucketName)
+	if agg := validate.Response(res, err); agg != nil {
 		panic(err)
 	}
 
