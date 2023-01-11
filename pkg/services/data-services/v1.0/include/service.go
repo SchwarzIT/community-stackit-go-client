@@ -21,15 +21,13 @@ func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponse
 
 	switch serviceID {
 	case ElasticSearch:
-		url = "https://dsa-elasticsearch.api.eu01.stackit.cloud"
+		url = "https://elasticsearch.api.eu01.stackit.cloud"
 	case LogMe:
-		url = "https://dsa-logme.api.eu01.stackit.cloud"
+		url = "https://logme.api.eu01.stackit.cloud"
 	case MariaDB:
-		url = "https://dsa-mariadb.api.eu01.stackit.cloud"
-	case MongoDB:
-		url = "https://mongo-flex-prd.api.eu01.stackit.cloud"
+		url = "https://mariadb.api.eu01.stackit.cloud"
 	case PostgresDB:
-		url = "https://postgres-flex-service.api.eu01.stackit.cloud"
+		url = "https://postgres.api.eu01.stackit.cloud"
 	case RabbitMQ:
 		url = "https://rabbitmq.api.eu01.stackit.cloud"
 	case Redis:

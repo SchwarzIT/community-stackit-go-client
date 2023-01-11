@@ -9,6 +9,7 @@ const (
 	ElasticSearch = iota
 	LogMe
 	MariaDB
+	MongoDB
 	PostgresDB
 	RabbitMQ
 	Redis
@@ -19,17 +20,17 @@ func NewService(c common.Client, serviceID int) *ClientWithResponses {
 
 	switch serviceID {
 	case ElasticSearch:
-		url = "https://dsa-elasticsearch.api.eu01.stackit.cloud"
+		url = "https://elasticsearch.api.eu01.stackit.cloud"
 	case LogMe:
-		url = "https://dsa-logme.api.eu01.stackit.cloud"
+		url = "https://logme.api.eu01.stackit.cloud"
 	case MariaDB:
-		url = "https://dsa-mariadb.api.eu01.stackit.cloud"
+		url = "https://mariadb.api.eu01.stackit.cloud"
 	case PostgresDB:
-		url = "https://dsa-postgres.api.eu01.stackit.cloud"
+		url = "https://postgres.api.eu01.stackit.cloud"
 	case RabbitMQ:
-		url = "https://dsa-rabbitmq.api.eu01.stackit.cloud"
+		url = "https://rabbitmq.api.eu01.stackit.cloud"
 	case Redis:
-		url = "https://dsa-redis.api.eu01.stackit.cloud"
+		url = "https://redis.api.eu01.stackit.cloud"
 	}
 
 	nc, _ := NewClientWithResponses(url, WithHTTPClient(c))
