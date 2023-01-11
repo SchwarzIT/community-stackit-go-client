@@ -4,16 +4,28 @@
 package accesskey
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
+	"time"
+
+	"github.com/pkg/errors"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
+
+// CreateJSONBody defines parameters for Create.
+type CreateJSONBody struct {
+	// Expires Expiration date. Null means never expires.
+	Expires *time.Time `json:"expires,omitempty"`
+}
 
 // CreateParams defines parameters for Create.
 type CreateParams struct {
@@ -29,6 +41,9 @@ type DeleteParams struct {
 type GetParams struct {
 	CredentialsGroup *string `form:"credentials-group,omitempty" json:"credentials-group,omitempty"`
 }
+
+// CreateJSONRequestBody defines body for Create for application/json ContentType.
+type CreateJSONRequestBody CreateJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -58,8 +73,10 @@ func NewClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// Create request
-	Create(ctx context.Context, projectID string, params *CreateParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Create request with any body
+	CreateWithBody(ctx context.Context, projectID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	Create(ctx context.Context, projectID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Delete request
 	Delete(ctx context.Context, projectID string, keyID string, params *DeleteParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -68,8 +85,20 @@ type ClientInterface interface {
 	Get(ctx context.Context, projectID string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) Create(ctx context.Context, projectID string, params *CreateParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequest(ctx, c.Server, projectID, params)
+func (c *Client) CreateWithBody(ctx context.Context, projectID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, params, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) Create(ctx context.Context, projectID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectID, params, body)
 	if err != nil {
 		return nil, err
 	}
@@ -104,8 +133,19 @@ func (c *Client) Get(ctx context.Context, projectID string, params *GetParams, r
 	return c.Client.Do(req)
 }
 
-// NewCreateRequest generates requests for Create
-func NewCreateRequest(ctx context.Context, server string, projectID string, params *CreateParams) (*http.Request, error) {
+// NewCreateRequest calls the generic Create builder with application/json body
+func NewCreateRequest(ctx context.Context, server string, projectID string, params *CreateParams, body CreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRequestWithBody(ctx, server, projectID, params, "application/json", bodyReader)
+}
+
+// NewCreateRequestWithBody generates requests for Create with any type of body
+func NewCreateRequestWithBody(ctx context.Context, server string, projectID string, params *CreateParams, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -150,10 +190,12 @@ func NewCreateRequest(ctx context.Context, server string, projectID string, para
 
 	queryURL.RawQuery = queryValues.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, "POST", queryURL.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -295,8 +337,10 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// Create request
-	CreateWithResponse(ctx context.Context, projectID string, params *CreateParams, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	// Create request with any body
+	CreateWithBodyWithResponse(ctx context.Context, projectID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+
+	CreateWithResponse(ctx context.Context, projectID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
 	// Delete request
 	DeleteWithResponse(ctx context.Context, projectID string, keyID string, params *DeleteParams, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
@@ -308,7 +352,51 @@ type ClientWithResponsesInterface interface {
 type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON201      *struct {
+		// AccessKey Access key
+		AccessKey string `json:"accessKey"`
+
+		// DisplayName Obfuscated access key
+		DisplayName string `json:"displayName"`
+
+		// Expires Expiration date. Null means never expires.
+		Expires string `json:"expires"`
+
+		// KeyId Identifies the pair of access key and secret access key for deletion
+		KeyID string `json:"keyId"`
+
+		// Project Project ID
+		Project string `json:"project"`
+
+		// SecretAccessKey Secret access key
+		SecretAccessKey string `json:"secretAccessKey"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -330,7 +418,45 @@ func (r CreateResponse) StatusCode() int {
 type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		// KeyId Identifies the pair of access key and secret access key for deletion
+		KeyID string `json:"keyId"`
+
+		// Project Project ID
+		Project string `json:"project"`
+	}
+	JSON307 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -352,7 +478,44 @@ func (r DeleteResponse) StatusCode() int {
 type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		AccessKeys []struct {
+			DisplayName string `json:"displayName"`
+			Expires     string `json:"expires"`
+
+			// KeyId Identifies the pair of access key and secret access key for deletion
+			KeyID string `json:"keyId"`
+		} `json:"accessKeys"`
+
+		// Project Project ID
+		Project string `json:"project"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -371,9 +534,17 @@ func (r GetResponse) StatusCode() int {
 	return 0
 }
 
-// CreateWithResponse request returning *CreateResponse
-func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, params *CreateParams, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.Create(ctx, projectID, params, reqEditors...)
+// CreateWithBodyWithResponse request with arbitrary body returning *CreateResponse
+func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, projectID string, params *CreateParams, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateWithBody(ctx, projectID, params, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, params *CreateParams, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.Create(ctx, projectID, params, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -412,6 +583,83 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			// AccessKey Access key
+			AccessKey string `json:"accessKey"`
+
+			// DisplayName Obfuscated access key
+			DisplayName string `json:"displayName"`
+
+			// Expires Expiration date. Null means never expires.
+			Expires string `json:"expires"`
+
+			// KeyId Identifies the pair of access key and secret access key for deletion
+			KeyID string `json:"keyId"`
+
+			// Project Project ID
+			Project string `json:"project"`
+
+			// SecretAccessKey Secret access key
+			SecretAccessKey string `json:"secretAccessKey"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -429,6 +677,83 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// KeyId Identifies the pair of access key and secret access key for deletion
+			KeyID string `json:"keyId"`
+
+			// Project Project ID
+			Project string `json:"project"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 307:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON307 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -445,6 +770,76 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 		HTTPResponse: rsp,
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			AccessKeys []struct {
+				DisplayName string `json:"displayName"`
+				Expires     string `json:"expires"`
+
+				// KeyId Identifies the pair of access key and secret access key for deletion
+				KeyID string `json:"keyId"`
+			} `json:"accessKeys"`
+
+			// Project Project ID
+			Project string `json:"project"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
 
 	return response, nil
 }

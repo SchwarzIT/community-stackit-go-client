@@ -4,16 +4,30 @@
 package credentialsgroup
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
+
+	"github.com/pkg/errors"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/do87/oapi-codegen/pkg/runtime"
 )
+
+// CreateJSONBody defines parameters for Create.
+type CreateJSONBody struct {
+	// DisplayName Name of the group holding credentials
+	DisplayName string `json:"displayName"`
+}
+
+// CreateJSONRequestBody defines body for Create for application/json ContentType.
+type CreateJSONRequestBody CreateJSONBody
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -43,8 +57,10 @@ func NewClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// Create request
-	Create(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Create request with any body
+	CreateWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	Create(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Delete request
 	Delete(ctx context.Context, projectID string, groupID string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -53,8 +69,20 @@ type ClientInterface interface {
 	Get(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) Create(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateRequest(ctx, c.Server, projectID)
+func (c *Client) CreateWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) Create(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +117,19 @@ func (c *Client) Get(ctx context.Context, projectID string, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
-// NewCreateRequest generates requests for Create
-func NewCreateRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewCreateRequest calls the generic Create builder with application/json body
+func NewCreateRequest(ctx context.Context, server string, projectID string, body CreateJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateRequestWithBody(ctx, server, projectID, "application/json", bodyReader)
+}
+
+// NewCreateRequestWithBody generates requests for Create with any type of body
+func NewCreateRequestWithBody(ctx context.Context, server string, projectID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -115,10 +154,12 @@ func NewCreateRequest(ctx context.Context, server string, projectID string) (*ht
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", queryURL.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, "POST", queryURL.String(), body)
 	if err != nil {
 		return nil, err
 	}
+
+	req.Header.Add("Content-Type", contentType)
 
 	return req, nil
 }
@@ -220,8 +261,10 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// Create request
-	CreateWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+	// Create request with any body
+	CreateWithBodyWithResponse(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
+
+	CreateWithResponse(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
 	// Delete request
 	DeleteWithResponse(ctx context.Context, projectID string, groupID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
@@ -233,7 +276,53 @@ type ClientWithResponsesInterface interface {
 type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON201      *struct {
+		CredentialsGroup struct {
+			// CredentialsGroupId The ID of the credentials group
+			CredentialsGroupID string `json:"credentialsGroupId"`
+
+			// DisplayName Name of the group holding credentials
+			DisplayName string `json:"displayName"`
+
+			// Urn Credentials group URN
+			URN string `json:"urn"`
+		} `json:"credentialsGroup"`
+
+		// Project Project ID
+		Project string `json:"project"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON409 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -255,7 +344,33 @@ func (r CreateResponse) StatusCode() int {
 type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		// CredentialsGroupId The ID of the credentials group
+		CredentialsGroupID string `json:"credentialsGroupId"`
+
+		// Project Project ID
+		Project string `json:"project"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -277,7 +392,41 @@ func (r DeleteResponse) StatusCode() int {
 type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		CredentialsGroups []struct {
+			// CredentialsGroupId The ID of the credentials group
+			CredentialsGroupID string `json:"credentialsGroupId"`
+
+			// DisplayName Name of the group holding credentials
+			DisplayName string `json:"displayName"`
+
+			// Urn Credentials group URN
+			URN string `json:"urn"`
+		} `json:"credentialsGroups"`
+
+		// Project Project ID
+		Project string `json:"project"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -296,9 +445,17 @@ func (r GetResponse) StatusCode() int {
 	return 0
 }
 
-// CreateWithResponse request returning *CreateResponse
-func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
-	rsp, err := c.Create(ctx, projectID, reqEditors...)
+// CreateWithBodyWithResponse request with arbitrary body returning *CreateResponse
+func (c *ClientWithResponses) CreateWithBodyWithResponse(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateWithBody(ctx, projectID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseCreateResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.Create(ctx, projectID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
@@ -337,6 +494,91 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			CredentialsGroup struct {
+				// CredentialsGroupId The ID of the credentials group
+				CredentialsGroupID string `json:"credentialsGroupId"`
+
+				// DisplayName Name of the group holding credentials
+				DisplayName string `json:"displayName"`
+
+				// Urn Credentials group URN
+				URN string `json:"urn"`
+			} `json:"credentialsGroup"`
+
+			// Project Project ID
+			Project string `json:"project"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -354,6 +596,59 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// CredentialsGroupId The ID of the credentials group
+			CredentialsGroupID string `json:"credentialsGroupId"`
+
+			// Project Project ID
+			Project string `json:"project"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -370,6 +665,67 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 		HTTPResponse: rsp,
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			CredentialsGroups []struct {
+				// CredentialsGroupId The ID of the credentials group
+				CredentialsGroupID string `json:"credentialsGroupId"`
+
+				// DisplayName Name of the group holding credentials
+				DisplayName string `json:"displayName"`
+
+				// Urn Credentials group URN
+				URN string `json:"urn"`
+			} `json:"credentialsGroups"`
+
+			// Project Project ID
+			Project string `json:"project"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
 
 	return response, nil
 }

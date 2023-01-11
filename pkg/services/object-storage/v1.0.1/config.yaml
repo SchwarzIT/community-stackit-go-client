@@ -26,6 +26,12 @@ output-options:
     tidy: 
     - replace: "objectstorage."
       all: true
+  - from: include/bucket/wait.go
+    to: bucket/wait.go
+    tidy: 
+    - replace: "*bucket."
+      with: "*"
+      all: true
 tidy:
   verbose: false
   functions:
@@ -83,3 +89,9 @@ tidy:
   - replace: Id
     with: ID
     suffix: true
+  - replace: Detail
+    with: Details
+    match: true
+  - replace: Urn
+    with: URN
+    match: true

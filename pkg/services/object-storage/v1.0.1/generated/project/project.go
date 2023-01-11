@@ -5,10 +5,14 @@ package project
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strings"
+
+	"github.com/pkg/errors"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -226,7 +230,44 @@ type ClientWithResponsesInterface interface {
 type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		// Project Project ID
+		Project string `json:"project"`
+
+		// Scope Project Scope
+		Scope interface{} `json:"scope"`
+	}
+	JSON400 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -248,7 +289,39 @@ func (r DeleteResponse) StatusCode() int {
 type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		// Project Project ID
+		Project string `json:"project"`
+
+		// Scope Project Scope
+		Scope interface{} `json:"scope"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON404 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -270,7 +343,46 @@ func (r GetResponse) StatusCode() int {
 type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	HasError     error // Aggregated error
+	JSON200      *struct {
+		// Project Project ID
+		Project string `json:"project"`
+
+		// Scope Project Scope
+		Scope interface{} `json:"scope"`
+	}
+	JSON201 *struct {
+		// Project Project ID
+		Project string `json:"project"`
+
+		// Scope Project Scope
+		Scope interface{} `json:"scope"`
+	}
+	JSON403 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON409 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	JSON422 *struct {
+		Details *[]struct {
+			Loc  []string `json:"loc"`
+			Msg  string   `json:"msg"`
+			Type string   `json:"type"`
+		} `json:"detail,omitempty"`
+	}
+	JSON500 *struct {
+		Details []struct {
+			Key string `json:"key"`
+			Msg string `json:"msg"`
+		} `json:"detail"`
+	}
+	HasError error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -330,6 +442,82 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// Project Project ID
+			Project string `json:"project"`
+
+			// Scope Project Scope
+			Scope interface{} `json:"scope"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -347,6 +535,71 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// Project Project ID
+			Project string `json:"project"`
+
+			// Scope Project Scope
+			Scope interface{} `json:"scope"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
 	return response, nil
 }
 
@@ -363,6 +616,84 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 		HTTPResponse: rsp,
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest struct {
+			// Project Project ID
+			Project string `json:"project"`
+
+			// Scope Project Scope
+			Scope interface{} `json:"scope"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest struct {
+			// Project Project ID
+			Project string `json:"project"`
+
+			// Scope Project Scope
+			Scope interface{} `json:"scope"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON201 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 409:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON409 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 422:
+		var dest struct {
+			Details *[]struct {
+				Loc  []string `json:"loc"`
+				Msg  string   `json:"msg"`
+				Type string   `json:"type"`
+			} `json:"detail,omitempty"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON422 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest struct {
+			Details []struct {
+				Key string `json:"key"`
+				Msg string `json:"msg"`
+			} `json:"detail"`
+		}
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
 
 	return response, nil
 }
