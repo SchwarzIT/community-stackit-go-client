@@ -27,5 +27,10 @@ func main() {
 		panic(err)
 	}
 
+	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, projectID, bucketName)
+	if _, err := process.WaitWithContext(ctx); err != nil {
+		panic(err)
+	}
+
 	fmt.Printf("bucket '%s' created successfully", bucketName)
 }
