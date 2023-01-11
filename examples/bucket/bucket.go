@@ -20,7 +20,7 @@ func main() {
 	}
 
 	projectID := "123-456-789"
-	bucketName := "example"
+	bucketName := "bucket"
 
 	res, err := c.ObjectStorage.Bucket.CreateWithResponse(ctx, projectID, bucketName)
 	if agg := validate.Response(res, err); agg != nil {

@@ -43,15 +43,19 @@ func main() {
 	}
 
 	projectID := "123-456-789"
-	res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, projectID)
-	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
-		panic(aggregatedError)
+	bucketName := "bucket"
+
+	res, err := c.ObjectStorage.Bucket.CreateWithResponse(ctx, projectID, bucketName)
+	if agg := validate.Response(res, err); agg != nil {
+		panic(err)
 	}
 
-	fmt.Println("Received the following offerings:")
-	for _, o := range res.JSON200.Offerings {
-		fmt.Printf("- %s\n", o.Name)
+	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, projectID, bucketName)
+	if _, err := process.WaitWithContext(ctx); err != nil {
+		panic(err)
 	}
+
+	fmt.Printf("bucket '%s' created successfully", bucketName)
 }
 ```
 
