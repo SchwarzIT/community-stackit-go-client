@@ -53,4 +53,21 @@ func main() {
 }
 ```
 
-Further usage examples can be found in [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit) 
+## Working with API environments
+
+In order to modify the API environment, set the Config's Environment field to one of `dev`, `qa` or `prod`
+
+By default `prod` is being used.
+
+```Go
+c, err := client.New(ctx, client.Config{
+	ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
+	ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
+	Environment: "dev"
+})
+```
+
+## Usage Examples
+
+1. Under `/examples` directory
+2. In [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
