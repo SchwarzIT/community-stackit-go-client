@@ -20,20 +20,85 @@ func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponse
 
 	switch serviceID {
 	case ElasticSearch:
-
-		url = "https://elasticsearch.api.eu01.stackit.cloud"
+		url = getElasticSearchURL(c)
 	case LogMe:
-		url = "https://logme.api.eu01.stackit.cloud"
+		url = getLogMeURL(c)
 	case MariaDB:
-		url = "https://mariadb.api.eu01.stackit.cloud"
+		url = getMariaDBURL(c)
 	case PostgresDB:
-		url = "https://postgresql.api.eu01.stackit.cloud"
+		url = getPostgresDBURL(c)
 	case RabbitMQ:
-		url = "https://rabbitmq.api.eu01.stackit.cloud"
+		url = getRabbitMQURL(c)
 	case Redis:
-		url = "https://redis.api.eu01.stackit.cloud"
+		url = getRedisURL(c)
 	}
 
 	nc, _ := dataservices.NewClientWithResponses(url, dataservices.WithHTTPClient(c))
 	return nc
+}
+
+func getElasticSearchURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://elasticsearch.api.eu01.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://elasticsearch.api.eu01.qa.stackit.cloud"
+	default:
+		return "https://elasticsearch.api.eu01.stackit.cloud"
+	}
+}
+
+func getLogMeURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://logme.api.eu01.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://logme.api.eu01.qa.stackit.cloud"
+	default:
+		return "https://logme.api.eu01.stackit.cloud"
+	}
+}
+
+func getMariaDBURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://mariadb.api.eu01.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://mariadb.api.eu01.qa.stackit.cloud"
+	default:
+		return "https://mariadb.api.eu01.stackit.cloud"
+	}
+}
+
+func getPostgresDBURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://postgresql.api.eu01.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://postgresql.api.eu01.qa.stackit.cloud"
+	default:
+		return "https://postgresql.api.eu01.stackit.cloud"
+	}
+}
+
+func getRabbitMQURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://rabbitmq.api.eu01.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://rabbitmq.api.eu01.qa.stackit.cloud"
+	default:
+		return "https://rabbitmq.api.eu01.stackit.cloud"
+	}
+}
+
+func getRedisURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://redis.api.eu01.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://redis.api.eu01.qa.stackit.cloud"
+	default:
+		return "https://redis.api.eu01.stackit.cloud"
+	}
 }

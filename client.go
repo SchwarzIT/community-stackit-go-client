@@ -14,6 +14,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	"golang.org/x/oauth2"
 	waitutil "k8s.io/apimachinery/pkg/util/wait"
 )
@@ -61,23 +62,21 @@ func (c *Client) GetHTTPClient() *http.Client {
 	return c.client
 }
 
-// GetBaseURL returns the base url string
-func (c *Client) GetBaseURL() string {
-	return c.config.BaseUrl.String()
-}
-
-// SetBaseURL sets the base url
-func (c *Client) SetBaseURL(url string) error {
-	return c.config.SetURL(url)
-}
-
 // GetConfig returns the client config
 func (c *Client) GetConfig() Config {
 	return c.config
 }
 
-func (c *Client) SetToken(token string) {
-	c.config.ServiceAccountToken = token
+// GetEnvironment returns the client environment
+func (c *Client) GetEnvironment() common.Environment {
+	switch strings.ToLower(c.config.Environment) {
+	case "dev":
+		return common.ENV_DEV
+	case "qa":
+		return common.ENV_QA
+	default:
+		return common.ENV_PROD
+	}
 }
 
 // setHttpClient creates the client's oauth client
@@ -88,29 +87,6 @@ func (c *Client) setHttpClient(ctx context.Context) {
 	hcl := oauth2.NewClient(ctx, ts)
 	hcl.Timeout = time.Second * 10
 	c.client = hcl
-}
-
-// Request creates a new API request
-func (c *Client) Request(ctx context.Context, method, path string, body []byte) (*http.Request, error) {
-	if ctx != nil && ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
-	pathSplit := strings.Split(path, "?")
-	rel := &url.URL{Path: pathSplit[0]}
-	if len(pathSplit) == 2 {
-		rel.RawQuery = pathSplit[1]
-	}
-	u := c.config.BaseUrl.ResolveReference(rel)
-	payload := strings.NewReader(string(body))
-	req, err := http.NewRequestWithContext(ctx, method, u.String(), payload)
-	if err != nil {
-		return nil, err
-	}
-	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
-	}
-	req.Header.Set("Accept", "application/json")
-	return req, nil
 }
 
 func (c *Client) Do(req *http.Request) (*http.Response, error) {

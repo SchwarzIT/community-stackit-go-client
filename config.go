@@ -15,14 +15,11 @@ type Config struct {
 	BaseUrl             *url.URL
 	ServiceAccountToken string
 	ServiceAccountEmail string
+	Environment         string
 }
 
 // Validate verifies that the given config is valid
 func (c *Config) Validate() error {
-	if c.BaseUrl == nil {
-		c.SetURL("") // set default
-	}
-
 	if c.ServiceAccountToken == "" {
 		return errors.New("Service Account Access Token cannot be empty")
 	}
@@ -30,19 +27,9 @@ func (c *Config) Validate() error {
 	if c.ServiceAccountEmail == "" {
 		return errors.New("Service Account Email cannot be empty")
 	}
-	return nil
-}
 
-// SetURL sets a given url string as the base url in the config
-// if the given value is empty, the default base URL will be used
-func (c *Config) SetURL(value string) error {
-	if value == "" {
-		value = common.DEFAULT_BASE_URL
+	if c.Environment == "" {
+		c.Environment = string(common.ENV_PROD)
 	}
-	u, err := url.Parse(value)
-	if err != nil {
-		return err
-	}
-	c.BaseUrl = u
 	return nil
 }

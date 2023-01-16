@@ -11,12 +11,19 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
+const (
+	connection_reset = "read: connection reset" // catch connection reset by peer error
+)
+
 // WaitHandler will wait for instance creation
 // returned interface is nil or *ProjectInstanceUI
 func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
+			if strings.Contains(err.Error(), connection_reset) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
@@ -45,6 +52,9 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
+			if strings.Contains(err.Error(), connection_reset) {
+				return nil, false, nil
+			}
 			return nil, false, err
 		}
 		if s.StatusCode() == http.StatusInternalServerError {
@@ -103,8 +113,8 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-				return nil, true, nil
+			if strings.Contains(err.Error(), connection_reset) {
+				return nil, false, nil
 			}
 			return nil, false, err
 		}
