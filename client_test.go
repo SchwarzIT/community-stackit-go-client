@@ -130,3 +130,39 @@ func TestClient_GeneralTests(t *testing.T) {
 		t.Error("expected do request to return error")
 	}
 }
+
+func TestClient_GetEnvironment(t *testing.T) {
+	type fields struct {
+		ctx         context.Context
+		client      *http.Client
+		config      Config
+		RetryTimout time.Duration
+		RetryWait   time.Duration
+		services    services
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   common.Environment
+	}{
+		{"ok 1", fields{config: Config{Environment: ""}}, common.ENV_PROD},
+		{"ok 1", fields{config: Config{Environment: "dev"}}, common.ENV_DEV},
+		{"ok 1", fields{config: Config{Environment: "qa"}}, common.ENV_QA},
+		{"ok 1", fields{config: Config{Environment: "prod"}}, common.ENV_PROD},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				ctx:         tt.fields.ctx,
+				client:      tt.fields.client,
+				config:      tt.fields.config,
+				RetryTimout: tt.fields.RetryTimout,
+				RetryWait:   tt.fields.RetryWait,
+				services:    tt.fields.services,
+			}
+			if got := c.GetEnvironment(); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Client.GetEnvironment() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
