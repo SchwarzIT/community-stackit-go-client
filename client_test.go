@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"net/http"
-	"net/url"
 	"reflect"
 	"testing"
 	"time"
@@ -44,170 +43,15 @@ func TestNew(t *testing.T) {
 	}
 }
 
-func TestClient_Request(t *testing.T) {
-	cfg := Config{
-		ServiceAccountToken: "token",
-		ServiceAccountEmail: "sa-id",
-	}
-	c, err := New(context.Background(), cfg)
-	if err != nil {
-		t.Error(err)
-	}
-
-	ctx, cancel := context.WithCancel(context.TODO())
-	cancel()
-
-	type args struct {
-		ctx    context.Context
-		method string
-		path   string
-		body   string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *http.Request
-		wantErr bool
-	}{
-		{"canceled context", args{ctx, "something", "my-path", ""}, &http.Request{}, true},
-		{"bad context", args{nil, "something", "my-path", ""}, &http.Request{}, true},
-		{"bad method", args{context.Background(), "something", "my-path", ""}, &http.Request{}, true},
-		{"all ok", args{context.Background(), http.MethodGet, "my-path", ""}, &http.Request{Method: http.MethodGet, URL: &url.URL{Path: "/my-path"}}, false},
-		{"all ok with url params", args{context.Background(), http.MethodGet, "my-path?a=b", ""}, &http.Request{Method: http.MethodGet, URL: &url.URL{Path: "/my-path"}}, false},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := c.Request(tt.args.ctx, tt.args.method, tt.args.path, []byte(tt.args.body))
-			if !tt.wantErr {
-				if err != nil {
-					t.Error(err)
-				}
-				if tt.want.Method != got.Method {
-					t.Error("wrong method")
-				}
-				if tt.want.URL.Path != got.URL.Path {
-					t.Error("wrong url path", tt.want.URL.Path, got.URL.Path)
-				}
-			}
-		})
-	}
-}
-
-func TestClient_GetHTTPClient(t *testing.T) {
-	type fields struct {
-		client   *http.Client
-		config   Config
-		Services services
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   *http.Client
-	}{
-		{"all ok", fields{client: &http.Client{}}, &http.Client{}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				client:   tt.fields.client,
-				config:   tt.fields.config,
-				services: tt.fields.Services,
-			}
-			if got := c.GetHTTPClient(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.GetHTTPClient() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestClient_GetConfig(t *testing.T) {
-	type fields struct {
-		client   *http.Client
-		config   Config
-		Services services
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   Config
-	}{
-		{"all ok", fields{config: Config{}}, Config{}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				client:   tt.fields.client,
-				config:   tt.fields.config,
-				services: tt.fields.Services,
-			}
-			if got := c.GetConfig(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.GetConfig() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestClient_SetToken(t *testing.T) {
-	type fields struct {
-		client   *http.Client
-		config   Config
-		Services services
-	}
-	type args struct {
-		token string
-	}
-	c := Config{ServiceAccountToken: "abc"}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-		{"all ok", fields{config: c}, args{token: c.ServiceAccountToken}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &Client{
-				client:   tt.fields.client,
-				config:   tt.fields.config,
-				services: tt.fields.Services,
-			}
-			c.SetToken(tt.args.token)
-		})
-	}
-}
-
-func TestClient_GeneralTests(t *testing.T) {
-	c, _, teardown, err := MockServer()
-	defer teardown()
-	if err != nil {
-		t.Errorf("error from mock.AuthServer: %s", err.Error())
-	}
-
-	basetime := 200 * time.Millisecond
-	c.RetryTimout = 5 * basetime
-	c.RetryWait = basetime
-
-	c.SetBaseURL("ht#@://aa")
-	req, _ := c.Request(context.Background(), http.MethodGet, "err2", nil)
-	if _, err := c.Do(req); err == nil {
-		t.Error("expected do request to return error")
-	}
-
-	c.SetBaseURL(common.DEFAULT_BASE_URL)
-	if c.GetBaseURL() != common.DEFAULT_BASE_URL {
-		t.Error("bad url")
-	}
-	cfg := c.GetConfig()
-	if cfg.BaseUrl.String() != common.DEFAULT_BASE_URL {
-		t.Errorf("expected base URL to be %s, got %s instead", common.DEFAULT_BASE_URL, cfg.BaseUrl.String())
-	}
-}
-
 func TestClient_DoWithRetry(t *testing.T) {
 	c, mux, teardown, err := MockServer()
 	defer teardown()
 	if err != nil {
 		t.Errorf("error from mock.AuthServer: %s", err.Error())
+	}
+
+	if c.GetEnvironment() != common.ENV_PROD {
+		t.Error("default environment isn't set to prod")
 	}
 
 	basetime := 200 * time.Millisecond
@@ -237,7 +81,11 @@ func TestClient_DoWithRetry(t *testing.T) {
 		w.Write([]byte("{}"))
 	})
 
-	req, _ := c.Request(context.Background(), http.MethodGet, "/ep", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.config.BaseUrl.String()+"/ep", nil)
+	if err != nil {
+		t.Error(err)
+	}
+
 	if _, err := c.Do(req); err != nil {
 		t.Error(err)
 	}
@@ -253,9 +101,32 @@ func TestClient_DoWithRetry(t *testing.T) {
 		}
 	})
 
-	req, _ = c.Request(context.Background(), http.MethodGet, "/ep2", nil)
+	req, err = http.NewRequestWithContext(ctx, http.MethodGet, c.config.BaseUrl.String()+"/ep2", nil)
+	if err != nil {
+		t.Error(err)
+	}
 
 	if _, err := c.Do(req); err != nil {
 		t.Error(err)
+	}
+}
+
+func TestClient_GeneralTests(t *testing.T) {
+	c, _, teardown, err := MockServer()
+	defer teardown()
+	if err != nil {
+		t.Errorf("error from mock.AuthServer: %s", err.Error())
+	}
+
+	basetime := 200 * time.Millisecond
+	c.RetryTimout = 5 * basetime
+	c.RetryWait = basetime
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "23423!$!err2", nil)
+	if err != nil {
+		t.Error(err)
+	}
+	if _, err := c.Do(req); err == nil {
+		t.Error("expected do request to return error")
 	}
 }

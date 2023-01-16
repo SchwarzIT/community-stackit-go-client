@@ -4,8 +4,15 @@
 package common
 
 import (
-	"context"
 	"net/http"
+)
+
+type Environment string
+
+const (
+	ENV_PROD Environment = "prod"
+	ENV_QA   Environment = "qa"
+	ENV_DEV  Environment = "dev"
 )
 
 const (
@@ -14,10 +21,8 @@ const (
 
 // Client is the client interface
 type Client interface {
-	Request(ctx context.Context, method, path string, body []byte) (*http.Request, error)
 	Do(req *http.Request) (*http.Response, error)
-	SetBaseURL(url string) error
-	GetBaseURL() string
+	GetEnvironment() Environment
 }
 
 // Service is the struct every extending service is built on
