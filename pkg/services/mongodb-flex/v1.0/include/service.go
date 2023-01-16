@@ -16,10 +16,10 @@ func NewService(c common.Client) *mongodbflex.ClientWithResponses {
 func getURL(c common.Client) string {
 	switch c.GetEnvironment() {
 	case common.ENV_DEV:
-		return "https://mongo-flex-dev.api.eu01.stackit.cloud/"
+		return "https://api-dev.stackit.cloud/mongodb/v1/"
 	case common.ENV_QA:
-		return "https://mongo-flex-qa.api.eu01.stackit.cloud/"
+		return "https://api-qa.stackit.cloud/mongodb/v1/"
 	default:
-		return "https://mongo-flex-prd.api.eu01.stackit.cloud/"
+		return "https://api.stackit.cloud/mongodb/v1/"
 	}
 }
