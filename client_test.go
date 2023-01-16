@@ -146,9 +146,10 @@ func TestClient_GetEnvironment(t *testing.T) {
 		want   common.Environment
 	}{
 		{"ok 1", fields{config: Config{Environment: ""}}, common.ENV_PROD},
-		{"ok 1", fields{config: Config{Environment: "dev"}}, common.ENV_DEV},
-		{"ok 1", fields{config: Config{Environment: "qa"}}, common.ENV_QA},
-		{"ok 1", fields{config: Config{Environment: "prod"}}, common.ENV_PROD},
+		{"ok 2", fields{config: Config{Environment: "dev"}}, common.ENV_DEV},
+		{"ok 3", fields{config: Config{Environment: "qa"}}, common.ENV_QA},
+		{"ok 4", fields{config: Config{Environment: "prod"}}, common.ENV_PROD},
+		{"ok 5", fields{config: Config{Environment: "test"}}, common.ENV_PROD},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
