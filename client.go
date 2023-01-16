@@ -64,7 +64,14 @@ func (c *Client) GetHTTPClient() *http.Client {
 
 // GetEnvironment returns the client environment
 func (c *Client) GetEnvironment() common.Environment {
-	return c.config.Environment
+	switch strings.ToLower(c.config.Environment) {
+	case "dev":
+		return common.ENV_DEV
+	case "qa":
+		return common.ENV_QA
+	default:
+		return common.ENV_PROD
+	}
 }
 
 // setHttpClient creates the client's oauth client

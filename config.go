@@ -15,7 +15,7 @@ type Config struct {
 	BaseUrl             *url.URL
 	ServiceAccountToken string
 	ServiceAccountEmail string
-	Environment         common.Environment
+	Environment         string
 }
 
 // Validate verifies that the given config is valid
@@ -29,7 +29,7 @@ func (c *Config) Validate() error {
 	}
 
 	if c.Environment == "" {
-		c.Environment = common.ENV_PROD
+		c.Environment = string(common.ENV_PROD)
 	}
 	return nil
 }
