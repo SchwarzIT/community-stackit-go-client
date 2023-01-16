@@ -81,7 +81,7 @@ func TestClient_DoWithRetry(t *testing.T) {
 		w.Write([]byte("{}"))
 	})
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.config.BaseUrl.String()+"/ep", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, c.GetConfig().BaseUrl.String()+"/ep", nil)
 	if err != nil {
 		t.Error(err)
 	}

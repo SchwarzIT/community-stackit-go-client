@@ -62,6 +62,11 @@ func (c *Client) GetHTTPClient() *http.Client {
 	return c.client
 }
 
+// GetConfig returns the client config
+func (c *Client) GetConfig() Config {
+	return c.config
+}
+
 // GetEnvironment returns the client environment
 func (c *Client) GetEnvironment() common.Environment {
 	switch strings.ToLower(c.config.Environment) {
