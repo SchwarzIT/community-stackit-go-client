@@ -8,6 +8,7 @@ package client
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -15,6 +16,7 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	waitutil "k8s.io/apimachinery/pkg/util/wait"
 )
@@ -122,7 +124,7 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 			return true, nil
 		}),
 	); err != nil {
-		return resp, err
+		return resp, errors.Wrap(err, fmt.Sprintf("url: %s\nmethod: %s", req.URL.String(), req.Method))
 	}
 
 	return resp, err
