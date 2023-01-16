@@ -58,7 +58,7 @@ func main() {
 In order to modify the API environment, set the `Environment` field to one of `dev`, `qa` or `prod`
 
 - The `Environment` field is optional
-- By default `prod` is being used.
+- By default `prod` is being used
 
 ```Go
 c, err := client.New(ctx, client.Config{
