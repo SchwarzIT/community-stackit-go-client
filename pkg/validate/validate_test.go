@@ -7,7 +7,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/pkg/errors"
 )
@@ -21,34 +20,13 @@ func TestUUID(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"ok", args{consts.SCHWARZ_ORGANIZATION_ID}, false},
+		{"ok", args{"5dae0612-f5b1-4615-b7ca-b18796aa7e78"}, false},
 		{"not ok", args{"bad-uuid"}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if err := validate.UUID(tt.args.id); (err != nil) != tt.wantErr {
 				t.Errorf("UUID() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestOrganizationID(t *testing.T) {
-	type args struct {
-		orgID string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{"ok", args{consts.SCHWARZ_ORGANIZATION_ID}, false},
-		{"not ok", args{"bad-uuid"}, true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validate.OrganizationID(tt.args.orgID); (err != nil) != tt.wantErr {
-				t.Errorf("OrganizationID() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -142,28 +120,6 @@ func TestDefaultResponseErrorHandler(t *testing.T) {
 	}
 }
 
-func TestResourceType(t *testing.T) {
-	type args struct {
-		r string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{"resource type project", args{consts.RESOURCE_TYPE_PROJECT}, false},
-		{"resource type organization", args{consts.RESOURCE_TYPE_ORG}, false},
-		{"resource type invalid", args{"something"}, true},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validate.ResourceType(tt.args.r); (err != nil) != tt.wantErr {
-				t.Errorf("ResourceType() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestSemVer(t *testing.T) {
 	type args struct {
 		version string
@@ -250,25 +206,6 @@ func TestDuration(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if _, err := validate.Duration(tt.args.s); (err != nil) != tt.wantErr {
 				t.Errorf("Duration() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
-func TestSetClientError(t *testing.T) {
-	type args struct {
-		err error
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		{"all ok", args{errors.New("test")}},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validate.WrapError(tt.args.err); err.Error() != errors.Wrap(tt.args.err, "client validation error (Bad Request)").Error() {
-				t.Errorf("SetClientError() error = %v, wantErr %v", err, errors.Wrap(tt.args.err, "client validation error (Bad Request)"))
 			}
 		})
 	}

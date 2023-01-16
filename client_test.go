@@ -2,16 +2,13 @@ package client
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 	"reflect"
 	"testing"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 )
 
 func TestNew(t *testing.T) {
@@ -94,66 +91,6 @@ func TestClient_Request(t *testing.T) {
 			}
 		})
 	}
-}
-
-func TestClient_Do(t *testing.T) {
-	type Test struct {
-		Payload string `json:"payload,omitempty"`
-	}
-
-	c, mux, teardown, err := MockServer()
-	defer teardown()
-	if err != nil {
-		t.Errorf("error from mock.AuthServer: %s", err.Error())
-	}
-
-	mux.HandleFunc("/echo", func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-
-		b, err := io.ReadAll(r.Body)
-		if err != nil {
-			t.Fatal(err)
-		}
-		fmt.Fprint(w, string(b))
-	})
-
-	p := Test{Payload: "my-payload"}
-	body, err := json.Marshal(p)
-	if err != nil {
-		t.Errorf("marshal err: %v", err)
-		return
-	}
-
-	req, err := c.Request(context.Background(), http.MethodPost, "/echo", body)
-	if err != nil {
-		t.Errorf("new request: %v", err)
-		return
-	}
-
-	var got Test
-	_, err = c.LegacyDo(req, &got)
-	if err != nil {
-		t.Errorf("do request: %v", err)
-	}
-
-	want := p
-	if !reflect.DeepEqual(got, want) {
-		t.Errorf("got = %v, want %v", got, want)
-	}
-
-	req.URL.Path = "/blah"
-	if _, err = c.LegacyDo(req, &got); err == nil {
-		t.Error("expected error over path")
-	}
-
-	ctx2, cancel := context.WithTimeout(context.TODO(), 0)
-	defer cancel()
-	req = req.WithContext(ctx2)
-	if _, err = c.LegacyDo(req, &got); err == nil {
-		t.Error("expected error over context timeout")
-	}
-
 }
 
 func TestClient_GetHTTPClient(t *testing.T) {
@@ -256,13 +193,13 @@ func TestClient_GeneralTests(t *testing.T) {
 		t.Error("expected do request to return error")
 	}
 
-	c.SetBaseURL(consts.DEFAULT_BASE_URL)
-	if c.GetBaseURL() != consts.DEFAULT_BASE_URL {
+	c.SetBaseURL(common.DEFAULT_BASE_URL)
+	if c.GetBaseURL() != common.DEFAULT_BASE_URL {
 		t.Error("bad url")
 	}
 	cfg := c.GetConfig()
-	if cfg.BaseUrl.String() != consts.DEFAULT_BASE_URL {
-		t.Errorf("expected base URL to be %s, got %s instead", consts.DEFAULT_BASE_URL, cfg.BaseUrl.String())
+	if cfg.BaseUrl.String() != common.DEFAULT_BASE_URL {
+		t.Errorf("expected base URL to be %s, got %s instead", common.DEFAULT_BASE_URL, cfg.BaseUrl.String())
 	}
 }
 

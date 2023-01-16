@@ -10,12 +10,11 @@ The client is community-supported and not an official STACKIT release, it is mai
 
 To install the latest stable release, run:
 
-```
+```bash
 go get github.com/SchwarzIT/community-stackit-go-client@latest
 ```
 
 ## Usage Example
-
 
 In order to use the client, a STACKIT Service Account [must be created](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2) and have relevant roles [assigned to it](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts).<br />
 For further assistance, please contact [STACKIT support](https://support.stackit.cloud)
@@ -24,38 +23,33 @@ For further assistance, please contact [STACKIT support](https://support.stackit
 package main
 
 import (
-	"context"
-	"fmt"
-	"os"
+ "context"
+ "fmt"
+ "os"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+ client "github.com/SchwarzIT/community-stackit-go-client"
+ "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
-	ctx := context.Background()
-	c, err := client.New(ctx, client.Config{
-		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
-		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-	})
-	if err != nil {
-		panic(err)
-	}
+ ctx := context.Background()
+ c, err := client.New(ctx, client.Config{
+  ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
+  ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
+ })
+ if err != nil {
+  panic(err)
+ }
 
-	projectID := "123-456-789"
-	bucketName := "bucket"
+ res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, "{project-id}")
+ if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
+  panic(aggregatedError)
+ }
 
-	res, err := c.ObjectStorage.Bucket.CreateWithResponse(ctx, projectID, bucketName)
-	if agg := validate.Response(res, err); agg != nil {
-		panic(err)
-	}
-
-	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, projectID, bucketName)
-	if _, err := process.WaitWithContext(ctx); err != nil {
-		panic(err)
-	}
-
-	fmt.Printf("bucket '%s' created successfully", bucketName)
+ fmt.Println("Received the following offerings:")
+ for _, o := range res.JSON200.Offerings {
+  fmt.Printf("- %s\n", o.Name)
+ }
 }
 ```
 

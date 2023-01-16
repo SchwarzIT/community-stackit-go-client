@@ -9,17 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	"github.com/google/uuid"
 	parse "github.com/karrick/tparse/v2"
 	"github.com/oleiade/reflections"
 	"github.com/pkg/errors"
 )
-
-// WrapError wraps a given error
-func WrapError(err error) error {
-	return errors.Wrap(err, "client validation error (Bad Request)")
-}
 
 // Response validates a response interface and error
 // if requestError has an error, it is returned
@@ -73,14 +67,6 @@ func UUID(id string) error {
 	return nil
 }
 
-// OrganizationID validates a given organization ID
-func OrganizationID(orgID string) error {
-	if err := UUID(orgID); err != nil {
-		return errors.Wrap(err, "invalid UUID for organization")
-	}
-	return nil
-}
-
 // ProjectID validates a given project ID
 func ProjectID(projectID string) error {
 	if err := UUID(projectID); err != nil {
@@ -118,17 +104,6 @@ func SemVer(version string) error {
 	r := regexp.MustCompile(exp)
 	if !r.MatchString(version) {
 		return fmt.Errorf("invalid version. valid version is of: %s", exp)
-	}
-	return nil
-}
-
-// ResourceType validates a resource type
-func ResourceType(r string) error {
-	switch r {
-	case consts.RESOURCE_TYPE_ORG:
-	case consts.RESOURCE_TYPE_PROJECT:
-	default:
-		return fmt.Errorf("invalid resource type %s ", r)
 	}
 	return nil
 }

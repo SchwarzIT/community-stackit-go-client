@@ -19,8 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	projectID := "123-456-789"
-	res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, projectID)
+	res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, "{project-id}")
 	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
 		panic(aggregatedError)
 	}

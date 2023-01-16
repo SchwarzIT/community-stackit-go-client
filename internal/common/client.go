@@ -8,10 +8,13 @@ import (
 	"net/http"
 )
 
+const (
+	DEFAULT_BASE_URL = "https://api.stackit.cloud/"
+)
+
 // Client is the client interface
 type Client interface {
 	Request(ctx context.Context, method, path string, body []byte) (*http.Request, error)
-	LegacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) // @TODO: remove once all services are generated
 	Do(req *http.Request) (*http.Response, error)
 	SetBaseURL(url string) error
 	GetBaseURL() string
