@@ -5,6 +5,17 @@ import (
 )
 
 func NewService(c common.Client) *ClientWithResponses {
-	nc, _ := NewClientWithResponses("https://argus.api.eu01.stackit.cloud", WithHTTPClient(c))
+	nc, _ := NewClientWithResponses(getURL(c), WithHTTPClient(c))
 	return nc
+}
+
+func getURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://argus.api.dev.stackit.cloud"
+	case common.ENV_QA:
+		return "https://argus.api.stg.stackit.cloud"
+	default:
+		return "https://argus.api.stackit.cloud"
+	}
 }
