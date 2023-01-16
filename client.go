@@ -57,6 +57,11 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 	return c, nil
 }
 
+// GetHTTPClient returns the HTTP client
+func (c *Client) GetHTTPClient() *http.Client {
+	return c.client
+}
+
 // GetEnvironment returns the client environment
 func (c *Client) GetEnvironment() common.Environment {
 	return c.config.Environment

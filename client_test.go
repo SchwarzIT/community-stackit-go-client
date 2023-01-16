@@ -93,7 +93,7 @@ func TestClient_DoWithRetry(t *testing.T) {
 	ctx3, td3 := context.WithTimeout(ctx, 6*basetime)
 	defer td3()
 
-	c.client.Timeout = basetime * 1
+	c.GetHTTPClient().Timeout = basetime * 1
 	mux.HandleFunc("/ep2", func(w http.ResponseWriter, r *http.Request) {
 
 		if ctx3.Err() == nil {
