@@ -58,6 +58,9 @@ func main() {
 1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
 2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
 
+
+<br />
+
 ## Working with API environments
 
 In order to modify the API environment, set the `Environment` field to one of `dev`, `qa` or `prod`
