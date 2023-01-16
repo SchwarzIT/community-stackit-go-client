@@ -2,13 +2,18 @@ package membership
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated"
+	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
+)
+
+const (
+	// resource types
+	RESOURCE_TYPE_PROJECT = "project"
+	RESOURCE_TYPE_ORG     = "organization"
 )
 
 func NewService(c common.Client) *membership.ClientWithResponses {
-	nc, _ := membership.NewClientWithResponses(
+	return membership.NewClientWithResponses(
 		"https://api.stackit.cloud/membership/",
-		membership.WithHTTPClient(c),
+		c,
 	)
-	return nc
 }

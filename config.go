@@ -7,7 +7,7 @@ import (
 	"errors"
 	"net/url"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 )
 
 // Config is the STACKIT client configuration
@@ -37,7 +37,7 @@ func (c *Config) Validate() error {
 // if the given value is empty, the default base URL will be used
 func (c *Config) SetURL(value string) error {
 	if value == "" {
-		value = consts.DEFAULT_BASE_URL
+		value = common.DEFAULT_BASE_URL
 	}
 	u, err := url.Parse(value)
 	if err != nil {

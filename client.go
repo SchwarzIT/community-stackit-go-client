@@ -8,14 +8,12 @@ package client
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"golang.org/x/oauth2"
 	waitutil "k8s.io/apimachinery/pkg/util/wait"
 )
@@ -115,39 +113,8 @@ func (c *Client) Request(ctx context.Context, method, path string, body []byte) 
 	return req, nil
 }
 
-// LegacyDo performs the request, including retry if set
-// To set retry, use WithRetry() which returns a shalow copy of the client
-func (c *Client) LegacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	return c.legacyDo(req, v, errorHandlers...)
-}
-
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	return c.do(req)
-}
-
-// Do performs the request and decodes the response if given interface != nil
-func (c *Client) legacyDo(req *http.Request, v interface{}, errorHandlers ...func(*http.Response) error) (*http.Response, error) {
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	// handle errors in the response
-	if len(errorHandlers) == 0 {
-		errorHandlers = append(errorHandlers, validate.DefaultResponseErrorHandler)
-	}
-	for _, fn := range errorHandlers {
-		if err := fn(resp); err != nil {
-			return resp, err
-		}
-	}
-
-	// parse response JSON
-	if v != nil {
-		err = json.NewDecoder(resp.Body).Decode(v)
-		defer resp.Body.Close()
-	}
-	return resp, err
 }
 
 // Do performs the request and decodes the response if given interface != nil

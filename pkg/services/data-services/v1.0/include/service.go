@@ -2,7 +2,6 @@ package dataservices
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/consts"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
 )
 
@@ -17,7 +16,7 @@ const (
 )
 
 func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponses {
-	url := consts.DEFAULT_BASE_URL
+	url := common.DEFAULT_BASE_URL
 
 	switch serviceID {
 	case ElasticSearch:

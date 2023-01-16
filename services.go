@@ -2,7 +2,7 @@ package client
 
 import (
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
-	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1"
+	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1.0/generated"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
@@ -14,6 +14,7 @@ import (
 
 type services struct {
 	Argus              *argus.ClientWithResponses
+	Costs              *costs.ClientWithResponses
 	Kubernetes         *kubernetes.ClientWithResponses
 	Membership         *membership.ClientWithResponses
 	MongoDBFlex        *mongodbflex.ClientWithResponses
@@ -29,13 +30,11 @@ type services struct {
 	PostgresDB    *dataservices.ClientWithResponses
 	RabbitMQ      *dataservices.ClientWithResponses
 	Redis         *dataservices.ClientWithResponses
-
-	// Non generated
-	Costs *costs.CostsService
 }
 
 func (c *Client) initServices() {
 	c.Argus = argus.NewService(c)
+	c.Costs = costs.NewService(c)
 	c.Kubernetes = kubernetes.NewService(c)
 	c.Membership = membership.NewService(c)
 	c.MongoDBFlex = mongodbflex.NewService(c)
@@ -51,6 +50,4 @@ func (c *Client) initServices() {
 	c.RabbitMQ = dataservices.NewService(c, dataservices.RabbitMQ)
 	c.Redis = dataservices.NewService(c, dataservices.Redis)
 
-	// Non Generated
-	c.Costs = costs.New(c)
 }

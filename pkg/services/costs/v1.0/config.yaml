@@ -1,5 +1,5 @@
-package: membership
-output: generated/membership.gen.go
+package: costs
+output: generated/costs.gen.go
 generate:
   models: true
   client: true
@@ -12,7 +12,7 @@ output-options:
     verbose: false
     enabled: true
     include:
-    - Membership
+    - Costs
   extend-response:
   - field: HasError
     type: error
@@ -24,19 +24,31 @@ output-options:
   - from: include/service.go
     to: service.go
     tidy: 
-    - replace: "membership."
+    - replace: "costs."
       all: true
 tidy:
   verbose: false
   functions:
   - replace: Id
     with: ID
-    all: true
+    suffix: true
+  - replace: GetCostsCustomerAccount
+    with: GetCostsForAllProjectsInCustomerAccount
+    prefix: true
+  - replace: GetCostsCustomersAccounts
+    with: GetCostsForAllProjectsInAllSubCustomerAccounts
+    prefix: true
+  - replace: GetCostsProject
+    with: GetProjectCosts
+    prefix: true
+  - replace: GetForecastCustomerAccountWithResponse
+    with: GetForecastForAllProjectsInCustomerAccount
+    prefix: true
   params:
   - replace: Id
     with: ID
-    all: true
+    suffix: true
   schemas:
   - replace: Id
     with: ID
-    all: true
+    suffix: true
