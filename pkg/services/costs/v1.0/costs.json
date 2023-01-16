@@ -1,0 +1,1368 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "version": "1.0",
+    "title": "STACKIT Costs API",
+    "termsOfService": "https://stackit.de/en/imprint",
+    "contact": {
+      "url": "https://developers.stackit.schwarz",
+      "name": "Bernd Fischer",
+      "email": "bernd.fischer@mail.schwarz"
+    },
+    "description": "The costs API provides detailed reports on the costs for a customer or project over a certain amount of time\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->"
+  },
+  "tags": [
+    {
+      "name": "Costs",
+      "description": "Costs service"
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://api-dev.stackit.cloud/costs-service/v1",
+      "description": "Development endpoint"
+    },
+    {
+      "url": "https://api-qa.stackit.cloud/costs-service/v1",
+      "description": "QA endpoint"
+    },
+    {
+      "url": "https://api.stackit.cloud/costs-service/v1",
+      "description": "Production endpoint"
+    }
+  ],
+  "paths": {
+    "/costs/{customerAccountId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "customerAccountId",
+          "in": "path",
+          "required": true,
+          "description": "ID of a customer account"
+        }
+      ],
+      "get": {
+        "summary": "Costs for all projects",
+        "tags": ["Costs"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "customerAccountId",
+                      "projectId",
+                      "projectName",
+                      "totalCharge",
+                      "totalDiscount"
+                    ],
+                    "properties": {
+                      "customerAccountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "9caede67-72ce-4ce1-be58-90b6d1216540"
+                      },
+                      "projectId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "ba04b091-ec32-4423-81e6-976f1b8a8363"
+                      },
+                      "projectName": {
+                        "type": "string",
+                        "example": "sit.dev"
+                      },
+                      "totalCharge": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 20103023.912003,
+                        "description": "Total charge for all services and the whole requested date range (value in cents)"
+                      },
+                      "totalDiscount": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 103023.912003,
+                        "description": "Total discount for all services and the whole requested date range (value in cents)"
+                      },
+                      "reportData": {
+                        "type": "array",
+                        "description": "Detailed project costs which are ONLY included if granularity is provided AND depth is \"project\"",
+                        "items": {
+                          "title": "Costs",
+                          "type": "object",
+                          "description": "Costs report for a certain period of time",
+                          "required": [
+                            "timePeriod",
+                            "charge",
+                            "discount",
+                            "quantity"
+                          ],
+                          "properties": {
+                            "timePeriod": {
+                              "type": "object",
+                              "format": "date",
+                              "description": "Time period according to desired granularity",
+                              "properties": {
+                                "start": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "example": "2021-11-29"
+                                },
+                                "end": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "example": "2021-11-30"
+                                }
+                              }
+                            },
+                            "charge": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 20103023.912003,
+                              "description": "Charge, value in cents"
+                            },
+                            "discount": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 103023.912003,
+                              "description": "Discount, value in cents"
+                            },
+                            "quantity": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 123,
+                              "description": "Quantity"
+                            }
+                          }
+                        }
+                      },
+                      "services": {
+                        "type": "array",
+                        "description": "Total discount for all services and the whole requested date range (value in cents). Please see \"depth\" parameter for more details.",
+                        "items": {
+                          "title": "Service Costs",
+                          "type": "object",
+                          "description": "Costs for a single service",
+                          "required": [
+                            "totalQuantity",
+                            "totalCharge",
+                            "totalDiscount",
+                            "unitLabel",
+                            "sku",
+                            "serviceName",
+                            "serviceCategoryName"
+                          ],
+                          "properties": {
+                            "totalQuantity": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 321,
+                              "description": "Total quantity"
+                            },
+                            "totalCharge": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 20103023.912003,
+                              "description": "Total charge for the whole requested date range (value in cents)"
+                            },
+                            "totalDiscount": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 103023.912003,
+                              "description": "Total discount for the whole requested date range (value in cents)"
+                            },
+                            "unitLabel": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Label for unit",
+                              "example": "Giga Hours"
+                            },
+                            "sku": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Service key",
+                              "example": "ST-0010801"
+                            },
+                            "serviceName": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 128,
+                              "description": "Name of the service",
+                              "example": "SAP_DB"
+                            },
+                            "serviceCategoryName": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Service category name",
+                              "example": "Compute Engine"
+                            },
+                            "reportData": {
+                              "type": "array",
+                              "description": "Detailed service costs which are ONLY included if granularity is provided",
+                              "items": {
+                                "title": "Costs",
+                                "type": "object",
+                                "description": "Costs report for a certain period of time",
+                                "required": [
+                                  "timePeriod",
+                                  "charge",
+                                  "discount",
+                                  "quantity"
+                                ],
+                                "properties": {
+                                  "timePeriod": {
+                                    "type": "object",
+                                    "format": "date",
+                                    "description": "Time period according to desired granularity",
+                                    "properties": {
+                                      "start": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2021-11-29"
+                                      },
+                                      "end": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2021-11-30"
+                                      }
+                                    }
+                                  },
+                                  "charge": {
+                                    "type": "number",
+                                    "format": "double",
+                                    "example": 20103023.912003,
+                                    "description": "Charge, value in cents"
+                                  },
+                                  "discount": {
+                                    "type": "number",
+                                    "format": "double",
+                                    "example": 103023.912003,
+                                    "description": "Discount, value in cents"
+                                  },
+                                  "quantity": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "example": 123,
+                                    "description": "Quantity"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Summarized Project Costs": {
+                    "value": "customerAccountId,projectId,projectName,totalCharge,totalDiscount \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,1407.4073407199998,2074.07340738\n"
+                  },
+                  "Project costs with report data": {
+                    "value": "customerAccountId,projectId,projectName,start,end,charge,discount,quantity \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,2022-02-28,2022-02-28,469.13578024,691.35780246,2 \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,2022-03-01,2022-03-01,469.13578024,691.35780246,2\n"
+                  },
+                  "Project costs with summarized services": {
+                    "value": "customerAccountId,projectId,projectName,sku,serviceName,serviceCategoryName,totalCharge,totalDiscount,totalQuantity,unitLabel \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku 2,service 2,bar,703.70367036,1037.03670369,3,hour \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku name,service name,foo,703.70367036,1037.03670369,3,giga\n"
+                  },
+                  "Project Costs with detailed service costs": {
+                    "value": "customerAccountId,projectId,projectName,sku,serviceName,serviceCategoryName,start,end,charge,discount,quantity,unitLabel \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku 2,service 2,bar,2022-02-28,2022-02-28,234.56789012,345.67890123,1,hour \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku name,service name,foo,2022-02-28,2022-02-28,234.56789012,345.67890123,1,giga\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Customer account not found"
+          },
+          "default": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Error",
+                  "description": "A standard error object.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code"]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-costs-customer-account",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "description": "Start date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "description": "End date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["project", "service", "auto"],
+              "example": "project",
+              "default": "auto"
+            },
+            "in": "query",
+            "name": "depth",
+            "required": false,
+            "description": "Depth of desired cost information. \"project\" provides costs grouped by project, without services. \"service\" provides costs separated on service level."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly", "yearly", "none"],
+              "example": "daily",
+              "default": "none"
+            },
+            "in": "query",
+            "name": "granularity",
+            "description": "Define granularity of costs – Default is \"none\" which does NOT include detailed report data.\n\nIf \"monthly\", \"weekly\" or \"yearly\" is requested, the \"from\" parameter SHOULD be the first day and the \"to\" parameter SHOULD be the last day of that time period. \nIf not, they are normalized accordingly.\n\nIf \"daily\" is requested, the date range defined by \"from\" and \"to\" MUST NOT be longer than 92 days."
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "in": "query",
+            "name": "includeZeroCosts",
+            "description": "Whether costs of 0 should be included in the response"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["application/json", "text/csv"]
+            },
+            "in": "header",
+            "name": "Accept",
+            "description": "Desired content type"
+          }
+        ],
+        "description": "Get costs for all projects in a customer account"
+      }
+    },
+    "/costs/{customerAccountId}/customers": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "customerAccountId",
+          "in": "path",
+          "required": true,
+          "description": "ID of a customer account"
+        }
+      ],
+      "get": {
+        "summary": "Costs for all projects of all related sub-customers",
+        "tags": ["Costs"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "customerAccountId",
+                      "projectId",
+                      "projectName",
+                      "totalCharge",
+                      "totalDiscount"
+                    ],
+                    "properties": {
+                      "customerAccountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "9caede67-72ce-4ce1-be58-90b6d1216540"
+                      },
+                      "projectId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "ba04b091-ec32-4423-81e6-976f1b8a8363"
+                      },
+                      "projectName": {
+                        "type": "string",
+                        "example": "sit.dev"
+                      },
+                      "totalCharge": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 20103023.912003,
+                        "description": "Total charge for all services and the whole requested date range (value in cents)"
+                      },
+                      "totalDiscount": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 103023.912003,
+                        "description": "Total discount for all services and the whole requested date range (value in cents)"
+                      },
+                      "reportData": {
+                        "type": "array",
+                        "description": "Detailed project costs which are ONLY included if granularity is provided AND depth is \"project\"",
+                        "items": {
+                          "title": "Costs",
+                          "type": "object",
+                          "description": "Costs report for a certain period of time",
+                          "required": [
+                            "timePeriod",
+                            "charge",
+                            "discount",
+                            "quantity"
+                          ],
+                          "properties": {
+                            "timePeriod": {
+                              "type": "object",
+                              "format": "date",
+                              "description": "Time period according to desired granularity",
+                              "properties": {
+                                "start": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "example": "2021-11-29"
+                                },
+                                "end": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "example": "2021-11-30"
+                                }
+                              }
+                            },
+                            "charge": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 20103023.912003,
+                              "description": "Charge, value in cents"
+                            },
+                            "discount": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 103023.912003,
+                              "description": "Discount, value in cents"
+                            },
+                            "quantity": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 123,
+                              "description": "Quantity"
+                            }
+                          }
+                        }
+                      },
+                      "services": {
+                        "type": "array",
+                        "description": "Total discount for all services and the whole requested date range (value in cents). Please see \"depth\" parameter for more details.",
+                        "items": {
+                          "title": "Service Costs",
+                          "type": "object",
+                          "description": "Costs for a single service",
+                          "required": [
+                            "totalQuantity",
+                            "totalCharge",
+                            "totalDiscount",
+                            "unitLabel",
+                            "sku",
+                            "serviceName",
+                            "serviceCategoryName"
+                          ],
+                          "properties": {
+                            "totalQuantity": {
+                              "type": "integer",
+                              "format": "int32",
+                              "example": 321,
+                              "description": "Total quantity"
+                            },
+                            "totalCharge": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 20103023.912003,
+                              "description": "Total charge for the whole requested date range (value in cents)"
+                            },
+                            "totalDiscount": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 103023.912003,
+                              "description": "Total discount for the whole requested date range (value in cents)"
+                            },
+                            "unitLabel": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Label for unit",
+                              "example": "Giga Hours"
+                            },
+                            "sku": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Service key",
+                              "example": "ST-0010801"
+                            },
+                            "serviceName": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 128,
+                              "description": "Name of the service",
+                              "example": "SAP_DB"
+                            },
+                            "serviceCategoryName": {
+                              "type": "string",
+                              "minLength": 1,
+                              "maxLength": 64,
+                              "description": "Service category name",
+                              "example": "Compute Engine"
+                            },
+                            "reportData": {
+                              "type": "array",
+                              "description": "Detailed service costs which are ONLY included if granularity is provided",
+                              "items": {
+                                "title": "Costs",
+                                "type": "object",
+                                "description": "Costs report for a certain period of time",
+                                "required": [
+                                  "timePeriod",
+                                  "charge",
+                                  "discount",
+                                  "quantity"
+                                ],
+                                "properties": {
+                                  "timePeriod": {
+                                    "type": "object",
+                                    "format": "date",
+                                    "description": "Time period according to desired granularity",
+                                    "properties": {
+                                      "start": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2021-11-29"
+                                      },
+                                      "end": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2021-11-30"
+                                      }
+                                    }
+                                  },
+                                  "charge": {
+                                    "type": "number",
+                                    "format": "double",
+                                    "example": 20103023.912003,
+                                    "description": "Charge, value in cents"
+                                  },
+                                  "discount": {
+                                    "type": "number",
+                                    "format": "double",
+                                    "example": 103023.912003,
+                                    "description": "Discount, value in cents"
+                                  },
+                                  "quantity": {
+                                    "type": "integer",
+                                    "format": "int32",
+                                    "example": 123,
+                                    "description": "Quantity"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Summarized Project Costs": {
+                    "value": "customerAccountId,projectId,projectName,totalCharge,totalDiscount \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,1407.4073407199998,2074.07340738\n"
+                  },
+                  "Project costs with report data": {
+                    "value": "customerAccountId,projectId,projectName,start,end,charge,discount,quantity \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,2022-02-28,2022-02-28,469.13578024,691.35780246,2 \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,2022-03-01,2022-03-01,469.13578024,691.35780246,2\n"
+                  },
+                  "Project costs with summarized services": {
+                    "value": "customerAccountId,projectId,projectName,sku,serviceName,serviceCategoryName,totalCharge,totalDiscount,totalQuantity,unitLabel \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku 2,service 2,bar,703.70367036,1037.03670369,3,hour \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku name,service name,foo,703.70367036,1037.03670369,3,giga\n"
+                  },
+                  "Project Costs with detailed service costs": {
+                    "value": "customerAccountId,projectId,projectName,sku,serviceName,serviceCategoryName,start,end,charge,discount,quantity,unitLabel \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku 2,service 2,bar,2022-02-28,2022-02-28,234.56789012,345.67890123,1,hour \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku name,service name,foo,2022-02-28,2022-02-28,234.56789012,345.67890123,1,giga\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Customer account not found"
+          },
+          "default": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Error",
+                  "description": "A standard error object.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code"]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-costs-customers-accounts",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "description": "Start date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "description": "End date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["project", "service", "auto"],
+              "example": "project",
+              "default": "auto"
+            },
+            "in": "query",
+            "name": "depth",
+            "required": false,
+            "description": "Depth of desired cost information. \"project\" provides costs grouped by project, without services. \"service\" provides costs separated on service level."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly", "yearly", "none"],
+              "example": "daily",
+              "default": "none"
+            },
+            "in": "query",
+            "name": "granularity",
+            "description": "Define granularity of costs – Default is \"none\" which does NOT include detailed report data.\n\nIf \"monthly\", \"weekly\" or \"yearly\" is requested, the \"from\" parameter SHOULD be the first day and the \"to\" parameter SHOULD be the last day of that time period. \nIf not, they are normalized accordingly.\n\nIf \"daily\" is requested, the date range defined by \"from\" and \"to\" MUST NOT be longer than 92 days."
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "in": "query",
+            "name": "includeZeroCosts",
+            "description": "Whether costs of 0 should be included in the response"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["application/json", "text/csv"]
+            },
+            "in": "header",
+            "name": "Accept",
+            "description": "Desired content type"
+          }
+        ],
+        "description": "Get costs for all projects of all related sub-customer accounts"
+      }
+    },
+    "/costs/{customerAccountId}/projects/{projectId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "customerAccountId",
+          "in": "path",
+          "required": true,
+          "description": "ID of a customer account"
+        },
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "projectId",
+          "in": "path",
+          "required": true,
+          "description": "ID of a project"
+        }
+      ],
+      "get": {
+        "summary": "Costs for a certain project",
+        "tags": ["Costs"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "customerAccountId",
+                    "projectId",
+                    "projectName",
+                    "totalCharge",
+                    "totalDiscount"
+                  ],
+                  "properties": {
+                    "customerAccountId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "9caede67-72ce-4ce1-be58-90b6d1216540"
+                    },
+                    "projectId": {
+                      "type": "string",
+                      "format": "uuid",
+                      "example": "ba04b091-ec32-4423-81e6-976f1b8a8363"
+                    },
+                    "projectName": {
+                      "type": "string",
+                      "example": "sit.dev"
+                    },
+                    "totalCharge": {
+                      "type": "number",
+                      "format": "double",
+                      "example": 20103023.912003,
+                      "description": "Total charge for all services and the whole requested date range (value in cents)"
+                    },
+                    "totalDiscount": {
+                      "type": "number",
+                      "format": "double",
+                      "example": 103023.912003,
+                      "description": "Total discount for all services and the whole requested date range (value in cents)"
+                    },
+                    "reportData": {
+                      "type": "array",
+                      "description": "Detailed project costs which are ONLY included if granularity is provided AND depth is \"project\"",
+                      "items": {
+                        "title": "Costs",
+                        "type": "object",
+                        "description": "Costs report for a certain period of time",
+                        "required": [
+                          "timePeriod",
+                          "charge",
+                          "discount",
+                          "quantity"
+                        ],
+                        "properties": {
+                          "timePeriod": {
+                            "type": "object",
+                            "format": "date",
+                            "description": "Time period according to desired granularity",
+                            "properties": {
+                              "start": {
+                                "type": "string",
+                                "format": "date",
+                                "example": "2021-11-29"
+                              },
+                              "end": {
+                                "type": "string",
+                                "format": "date",
+                                "example": "2021-11-30"
+                              }
+                            }
+                          },
+                          "charge": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 20103023.912003,
+                            "description": "Charge, value in cents"
+                          },
+                          "discount": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 103023.912003,
+                            "description": "Discount, value in cents"
+                          },
+                          "quantity": {
+                            "type": "integer",
+                            "format": "int32",
+                            "example": 123,
+                            "description": "Quantity"
+                          }
+                        }
+                      }
+                    },
+                    "services": {
+                      "type": "array",
+                      "description": "Total discount for all services and the whole requested date range (value in cents). Please see \"depth\" parameter for more details.",
+                      "items": {
+                        "title": "Service Costs",
+                        "type": "object",
+                        "description": "Costs for a single service",
+                        "required": [
+                          "totalQuantity",
+                          "totalCharge",
+                          "totalDiscount",
+                          "unitLabel",
+                          "sku",
+                          "serviceName",
+                          "serviceCategoryName"
+                        ],
+                        "properties": {
+                          "totalQuantity": {
+                            "type": "integer",
+                            "format": "int32",
+                            "example": 321,
+                            "description": "Total quantity"
+                          },
+                          "totalCharge": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 20103023.912003,
+                            "description": "Total charge for the whole requested date range (value in cents)"
+                          },
+                          "totalDiscount": {
+                            "type": "number",
+                            "format": "double",
+                            "example": 103023.912003,
+                            "description": "Total discount for the whole requested date range (value in cents)"
+                          },
+                          "unitLabel": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "description": "Label for unit",
+                            "example": "Giga Hours"
+                          },
+                          "sku": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "description": "Service key",
+                            "example": "ST-0010801"
+                          },
+                          "serviceName": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 128,
+                            "description": "Name of the service",
+                            "example": "SAP_DB"
+                          },
+                          "serviceCategoryName": {
+                            "type": "string",
+                            "minLength": 1,
+                            "maxLength": 64,
+                            "description": "Service category name",
+                            "example": "Compute Engine"
+                          },
+                          "reportData": {
+                            "type": "array",
+                            "description": "Detailed service costs which are ONLY included if granularity is provided",
+                            "items": {
+                              "title": "Costs",
+                              "type": "object",
+                              "description": "Costs report for a certain period of time",
+                              "required": [
+                                "timePeriod",
+                                "charge",
+                                "discount",
+                                "quantity"
+                              ],
+                              "properties": {
+                                "timePeriod": {
+                                  "type": "object",
+                                  "format": "date",
+                                  "description": "Time period according to desired granularity",
+                                  "properties": {
+                                    "start": {
+                                      "type": "string",
+                                      "format": "date",
+                                      "example": "2021-11-29"
+                                    },
+                                    "end": {
+                                      "type": "string",
+                                      "format": "date",
+                                      "example": "2021-11-30"
+                                    }
+                                  }
+                                },
+                                "charge": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "example": 20103023.912003,
+                                  "description": "Charge, value in cents"
+                                },
+                                "discount": {
+                                  "type": "number",
+                                  "format": "double",
+                                  "example": 103023.912003,
+                                  "description": "Discount, value in cents"
+                                },
+                                "quantity": {
+                                  "type": "integer",
+                                  "format": "int32",
+                                  "example": 123,
+                                  "description": "Quantity"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {
+                  "Summarized Project Costs": {
+                    "value": "customerAccountId,projectId,projectName,totalCharge,totalDiscount \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,1407.4073407199998,2074.07340738\n"
+                  },
+                  "Project costs with report data": {
+                    "value": "customerAccountId,projectId,projectName,start,end,charge,discount,quantity \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,2022-02-28,2022-02-28,469.13578024,691.35780246,2 \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,2022-03-01,2022-03-01,469.13578024,691.35780246,2\n"
+                  },
+                  "Project costs with summarized services": {
+                    "value": "customerAccountId,projectId,projectName,sku,serviceName,serviceCategoryName,totalCharge,totalDiscount,totalQuantity,unitLabel \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku 2,service 2,bar,703.70367036,1037.03670369,3,hour \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku name,service name,foo,703.70367036,1037.03670369,3,giga\n"
+                  },
+                  "Project Costs with detailed service costs": {
+                    "value": "customerAccountId,projectId,projectName,sku,serviceName,serviceCategoryName,start,end,charge,discount,quantity,unitLabel \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku 2,service 2,bar,2022-02-28,2022-02-28,234.56789012,345.67890123,1,hour \n9caede67-72ce-4ce1-be58-90b6d1216540,491c5413-f561-44a5-adae-941fcd2d7a8a,testProject,sku name,service name,foo,2022-02-28,2022-02-28,234.56789012,345.67890123,1,giga\n"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Customer account or project not found"
+          },
+          "default": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Error",
+                  "description": "A standard error object.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code"]
+                }
+              },
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-costs-project",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "description": "Start date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "description": "End date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["project", "service", "auto"],
+              "example": "project",
+              "default": "auto"
+            },
+            "in": "query",
+            "name": "depth",
+            "required": false,
+            "description": "Depth of desired cost information. \"project\" provides costs grouped by project, without services. \"service\" provides costs separated on service level."
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly", "yearly", "none"],
+              "example": "daily",
+              "default": "none"
+            },
+            "in": "query",
+            "name": "granularity",
+            "description": "Define granularity of costs – Default is \"none\" which does NOT include detailed report data.\n\nIf \"monthly\", \"weekly\" or \"yearly\" is requested, the \"from\" parameter SHOULD be the first day and the \"to\" parameter SHOULD be the last day of that time period. \nIf not, they are normalized accordingly.\n\nIf \"daily\" is requested, the date range defined by \"from\" and \"to\" MUST NOT be longer than 92 days."
+          },
+          {
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "in": "query",
+            "name": "includeZeroCosts",
+            "description": "Whether costs of 0 should be included in the response"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["application/json", "text/csv"]
+            },
+            "in": "header",
+            "name": "Accept",
+            "description": "Desired content type"
+          }
+        ],
+        "description": "Get costs for a certain project in a customer account"
+      }
+    },
+    "/forecast/{customerAccountId}": {
+      "parameters": [
+        {
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": "customerAccountId",
+          "in": "path",
+          "required": true,
+          "description": "ID of a customer account"
+        }
+      ],
+      "get": {
+        "summary": "Cost forecast for all projects",
+        "tags": ["Costs"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "customerAccountId",
+                      "projectId",
+                      "projectName",
+                      "totalCharge"
+                    ],
+                    "properties": {
+                      "customerAccountId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "9caede67-72ce-4ce1-be58-90b6d1216540"
+                      },
+                      "projectId": {
+                        "type": "string",
+                        "format": "uuid",
+                        "example": "ba04b091-ec32-4423-81e6-976f1b8a8363"
+                      },
+                      "projectName": {
+                        "type": "string",
+                        "example": "sit.dev"
+                      },
+                      "totalCharge": {
+                        "type": "number",
+                        "format": "double",
+                        "example": 20103023.912003,
+                        "description": "Total forecasted charge for all services and the whole requested date range (value in cents)"
+                      },
+                      "reportData": {
+                        "type": "array",
+                        "description": "Detailed forcasted project costs which are ONLY included if granularity is provided AND depth is \"project\"",
+                        "items": {
+                          "title": "Forecasted costs",
+                          "type": "object",
+                          "description": "Forecasted costs report for a certain period of time",
+                          "required": ["timePeriod", "charge"],
+                          "properties": {
+                            "timePeriod": {
+                              "type": "object",
+                              "format": "date",
+                              "description": "Time period according to desired granularity",
+                              "properties": {
+                                "start": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "example": "2021-11-29"
+                                },
+                                "end": {
+                                  "type": "string",
+                                  "format": "date",
+                                  "example": "2021-11-30"
+                                }
+                              }
+                            },
+                            "charge": {
+                              "type": "number",
+                              "format": "double",
+                              "example": 20103023.912003,
+                              "description": "Forecasted charge, value in cents"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Customer account not found"
+          },
+          "default": {
+            "description": "Not Implemented",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "title": "Error",
+                  "description": "A standard error object.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["code"]
+                }
+              }
+            }
+          }
+        },
+        "operationId": "get-forecast-customer-account",
+        "parameters": [
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "description": "Start date (including)"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["application/json", "text/csv"]
+            },
+            "in": "header",
+            "name": "Accept",
+            "description": "Desired content type"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "example": "2020-05-30"
+            },
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "description": "End date (including), maximum 3 months in the future"
+          },
+          {
+            "schema": {
+              "type": "string",
+              "enum": ["daily", "weekly", "monthly", "none"],
+              "example": "daily",
+              "default": "none"
+            },
+            "in": "query",
+            "name": "granularity",
+            "description": "Define granularity of costs – Default is \"none\" which does NOT include detailed report data.\n\nIf \"monthly\" or \"weekly\" is requested, the \"from\" parameter SHOULD be the first day and the \"to\" parameter SHOULD be the last day of that time period. \nIf not, they are normalized accordingly.\n\nIf \"daily\" is requested, the date range defined by \"from\" and \"to\" MUST NOT be longer than 92 days."
+          }
+        ],
+        "description": "Get a cost forecast for all projects in a customer account"
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
+    "parameters": {
+      "depth": {
+        "schema": {
+          "type": "string",
+          "enum": ["project", "service", "auto"],
+          "example": "project",
+          "default": "auto"
+        },
+        "in": "query",
+        "name": "depth",
+        "required": false,
+        "description": "Depth of desired cost information. \"project\" provides costs grouped by project, without services. \"service\" provides costs separated on service level."
+      },
+      "granularity": {
+        "schema": {
+          "type": "string",
+          "enum": ["daily", "weekly", "monthly", "yearly", "none"],
+          "example": "daily",
+          "default": "none"
+        },
+        "in": "query",
+        "name": "granularity",
+        "description": "Define granularity of costs – Default is \"none\" which does NOT include detailed report data.\n\nIf \"monthly\", \"weekly\" or \"yearly\" is requested, the \"from\" parameter SHOULD be the first day and the \"to\" parameter SHOULD be the last day of that time period. \nIf not, they are normalized accordingly.\n\nIf \"daily\" is requested, the date range defined by \"from\" and \"to\" MUST NOT be longer than 92 days."
+      },
+      "from": {
+        "schema": {
+          "type": "string",
+          "format": "date",
+          "example": "2020-05-30"
+        },
+        "in": "query",
+        "name": "from",
+        "required": true,
+        "description": "Start date (including)"
+      },
+      "to": {
+        "schema": {
+          "type": "string",
+          "format": "date",
+          "example": "2020-05-30"
+        },
+        "in": "query",
+        "name": "to",
+        "required": true,
+        "description": "End date (including)"
+      },
+      "includeZeroCosts": {
+        "schema": {
+          "type": "boolean",
+          "default": false
+        },
+        "in": "query",
+        "name": "includeZeroCosts",
+        "description": "Whether costs of 0 should be included in the response"
+      }
+    },
+    "responses": {
+      "account_with_project_costs": {
+        "description": "Example response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "properties": {
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ]
+}
