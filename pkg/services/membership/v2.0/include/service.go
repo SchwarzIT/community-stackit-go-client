@@ -12,8 +12,16 @@ const (
 )
 
 func NewService(c common.Client) *membership.ClientWithResponses {
-	return membership.NewClientWithResponses(
-		"https://api.stackit.cloud/membership/",
-		c,
-	)
+	return membership.NewClientWithResponses(getURL(c), c)
+}
+
+func getURL(c common.Client) string {
+	switch c.GetEnvironment() {
+	case common.ENV_DEV:
+		return "https://api-dev.stackit.cloud/membership/"
+	case common.ENV_QA:
+		return "https://api-qa.stackit.cloud/membership/"
+	default:
+		return "https://api.stackit.cloud/membership/"
+	}
 }
