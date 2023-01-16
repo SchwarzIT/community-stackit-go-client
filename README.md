@@ -70,4 +70,4 @@ c, err := client.New(ctx, client.Config{
 ## Usage Examples
 
 1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
-2. In [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
+2. In our [STACKIT community Terraform provider](https://github.com/SchwarzIT/terraform-provider-stackit)
