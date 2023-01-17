@@ -99,9 +99,6 @@ func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *ClientWithRespo
 		if s.JSON200.LastOperation.State == SUCCEEDED {
 			return s, true, nil
 		}
-		if s.JSON200.LastOperation.State == FAILED {
-			return s, false, errors.New("received failed status for DSA instance deletion")
-		}
 		return s, false, nil
 	})
 }

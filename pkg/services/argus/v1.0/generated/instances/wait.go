@@ -84,7 +84,16 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			w := wait.New(func() (res interface{}, done bool, err error) {
 				si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 				if err != nil {
+					if strings.Contains(err.Error(), connection_reset) {
+						return nil, false, nil
+					}
 					return nil, false, err
+				}
+				if s.StatusCode() == http.StatusInternalServerError {
+					return nil, false, nil
+				}
+				if s.StatusCode() == http.StatusBadGateway {
+					return nil, false, nil
 				}
 				if si.HasError != nil {
 					return nil, false, s.HasError
