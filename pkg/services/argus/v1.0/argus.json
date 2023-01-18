@@ -9479,7 +9479,7 @@
                       },
                       "scopes": {
                         "default": "openid profile email",
-                        "description": "Space seperated list of scopes of the token",
+                        "description": "Space separated list of scopes of the token",
                         "type": "string"
                       },
                       "tokenUrl": {

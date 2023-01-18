@@ -2325,7 +2325,7 @@
           "type": "string",
           "example": "2021-01-20T00:00:00Z"
         },
-        "description": "A timestamp to specifiy the beginning of the creationTime from which entries should be returned. If not given, defaults to the beginning of time."
+        "description": "A timestamp to specify the beginning of the creationTime from which entries should be returned. If not given, defaults to the beginning of time."
       },
       "recursive": {
         "name": "recursive",

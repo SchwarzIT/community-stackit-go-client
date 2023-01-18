@@ -85,7 +85,7 @@ type UpdateJSONBody struct {
 		// RoleAttributeStrict If  therole_attribute_path property does not return a role, then the user is assigned the Viewer role by default. You can disable the role assignment by setting role_attribute_strict = true. It denies user access if no role or an invalid role is returned.
 		RoleAttributeStrict *bool `json:"roleAttributeStrict,omitempty"`
 
-		// Scopes Space seperated list of scopes of the token
+		// Scopes Space separated list of scopes of the token
 		Scopes *string `json:"scopes,omitempty"`
 
 		// TokenUrl Token endpoint of the idp.

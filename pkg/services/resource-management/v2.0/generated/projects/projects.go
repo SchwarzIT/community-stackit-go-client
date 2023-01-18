@@ -280,7 +280,7 @@ type ListParams struct {
 	// Limit The maximum number of projects to return in the response. If not present, an appropriate default will be used. If maximum is exceeded, maximum is used.
 	Limit *Limit `form:"limit,omitempty" json:"limit,omitempty"`
 
-	// CreationTimeStart A timestamp to specifiy the beginning of the creationTime from which entries should be returned. If not given, defaults to the beginning of time.
+	// CreationTimeStart A timestamp to specify the beginning of the creationTime from which entries should be returned. If not given, defaults to the beginning of time.
 	CreationTimeStart *CreationTimeStart `form:"creation-time-start,omitempty" json:"creation-time-start,omitempty"`
 }
 
