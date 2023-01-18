@@ -80,15 +80,24 @@ func ValidateNodePool(np Nodepool) error {
 	if np.Volume.Size < 20 || np.Volume.Size > 10240 {
 		return errors.New("volume size value must be in the range of 20..10240")
 	}
-	if np.Taints != nil {
-		for _, t := range *np.Taints {
-			if err := ValidateTaint(t); err != nil {
-				return err
-			}
-		}
+	if err := ValidateTaints(np.Taints); err != nil {
+		return err
 	}
 	if err := ValidateCRI(np.CRI); err != nil {
 		return err
+	}
+	return nil
+}
+
+// ValidateTaints validates the given taints
+func ValidateTaints(taints *[]Taint) error {
+	if taints == nil {
+		return nil
+	}
+	for _, t := range *taints {
+		if err := ValidateTaint(t); err != nil {
+			return err
+		}
 	}
 	return nil
 }

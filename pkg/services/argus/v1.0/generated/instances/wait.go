@@ -57,10 +57,7 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			}
 			return nil, false, err
 		}
-		if s.StatusCode() == http.StatusInternalServerError {
-			return nil, false, nil
-		}
-		if s.StatusCode() == http.StatusBadGateway {
+		if s.StatusCode() == http.StatusInternalServerError || s.StatusCode() == http.StatusBadGateway {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
@@ -81,39 +78,45 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			// instance status to UPDATING
 			// the following code will wait for the status change for 5 minutes
 			// and continue the outer wait on change or fail
-			w := wait.New(func() (res interface{}, done bool, err error) {
-				si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-				if err != nil {
-					if strings.Contains(err.Error(), connection_reset) {
-						return nil, false, nil
-					}
-					return nil, false, err
-				}
-				if s.StatusCode() == http.StatusInternalServerError {
-					return nil, false, nil
-				}
-				if s.StatusCode() == http.StatusBadGateway {
-					return nil, false, nil
-				}
-				if si.HasError != nil {
-					return nil, false, s.HasError
-				}
-				if si.JSON200 == nil {
-					return nil, false, errors.New("received an empty response. JSON200 == nil")
-				}
-				if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATING ||
-					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED ||
-					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_FAILED {
-					return nil, true, nil
-				}
-				return nil, false, nil
-			})
-			_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
+			err := waitForUpdatingStatus(ctx, c, projectID, instanceID)
 			return nil, false, err
 		}
 		seenUpdating = true
 		return s.JSON200, false, nil
 	})
+}
+
+// wait for instance status to change to UPDATING
+func waitForUpdatingStatus(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) error {
+	w := wait.New(func() (res interface{}, done bool, err error) {
+		si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		if err != nil {
+			if strings.Contains(err.Error(), connection_reset) {
+				return nil, false, nil
+			}
+			return nil, false, err
+		}
+		if si.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if si.StatusCode() == http.StatusBadGateway {
+			return nil, false, nil
+		}
+		if si.HasError != nil {
+			return nil, false, si.HasError
+		}
+		if si.JSON200 == nil {
+			return nil, false, errors.New("received an empty response. JSON200 == nil")
+		}
+		if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATING ||
+			si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED ||
+			si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_UPDATE_FAILED {
+			return nil, true, nil
+		}
+		return nil, false, nil
+	})
+	_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
+	return err
 }
 
 // WaitHandler will wait for instance deletion
@@ -130,10 +133,7 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 		if s.StatusCode() == http.StatusNotFound {
 			return nil, true, nil
 		}
-		if s.StatusCode() == http.StatusInternalServerError {
-			return nil, false, nil
-		}
-		if s.StatusCode() == http.StatusBadGateway {
+		if s.StatusCode() == http.StatusInternalServerError || s.StatusCode() == http.StatusBadGateway {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
@@ -153,33 +153,45 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			// instance status to status DELETING
 			// the following code will wait for the status change for 5 minutes
 			// and continue the outer wait on change or fail
-			w := wait.New(func() (res interface{}, done bool, err error) {
-				si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-				if err != nil {
-					if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
-						return nil, true, nil
-					}
-					return nil, false, err
-				}
-				if si.StatusCode() == http.StatusNotFound {
-					return nil, true, nil
-				}
-				if si.HasError != nil {
-					return nil, false, s.HasError
-				}
-				if si.JSON200 == nil {
-					return nil, false, errors.New("received an empty response. JSON200 == nil")
-				}
-				if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETING ||
-					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_FAILED ||
-					si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_SUCCEEDED {
-					return nil, true, nil
-				}
-				return nil, false, nil
-			})
-			_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
+			err := waitForDeletingStatus(ctx, c, projectID, instanceID)
 			return nil, false, err
 		}
 		return nil, false, nil
 	})
+}
+
+// wait for instance status to change to DELETING
+func waitForDeletingStatus(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) error {
+	w := wait.New(func() (res interface{}, done bool, err error) {
+		si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		if err != nil {
+			if strings.Contains(err.Error(), connection_reset) {
+				return nil, false, nil
+			}
+			return nil, false, err
+		}
+		if si.StatusCode() == http.StatusInternalServerError {
+			return nil, false, nil
+		}
+		if si.StatusCode() == http.StatusBadGateway {
+			return nil, false, nil
+		}
+		if si.StatusCode() == http.StatusNotFound {
+			return nil, true, nil
+		}
+		if si.HasError != nil {
+			return nil, false, si.HasError
+		}
+		if si.JSON200 == nil {
+			return nil, false, errors.New("received an empty response. JSON200 == nil")
+		}
+		if si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETING ||
+			si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_FAILED ||
+			si.JSON200.Status == PROJECT_INSTANCE_UI_STATUS_DELETE_SUCCEEDED {
+			return nil, true, nil
+		}
+		return nil, false, nil
+	})
+	_, err := w.SetTimeout(5 * time.Minute).WaitWithContext(ctx)
+	return err
 }
