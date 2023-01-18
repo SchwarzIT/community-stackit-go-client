@@ -16,11 +16,13 @@ const (
 	connection_reset = "read: connection reset" // catch connection reset by peer error
 )
 
+type InstanceReadWithResponse func(ctx context.Context, projectID string, instanceID string, reqEditors ...instances.RequestEditorFn) (*instances.InstanceReadResponse, error)
+
 // WaitHandler will wait for instance creation
 // returned interface is nil or *instances.ProjectInstanceUI
-func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c InstanceReadWithResponse, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		s, err := c(ctx, projectID, instanceID)
 		if err != nil {
 			if strings.Contains(err.Error(), connection_reset) {
 				return nil, false, nil
@@ -48,10 +50,10 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 
 // WaitHandler will wait for instance update
 // returned interface is nil or *instances.ProjectInstanceUI
-func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c InstanceReadWithResponse, projectID, instanceID string) *wait.Handler {
 	seenUpdating := false
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		s, err := c(ctx, projectID, instanceID)
 		if err != nil {
 			if strings.Contains(err.Error(), connection_reset) {
 				return nil, false, nil
@@ -88,9 +90,9 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 }
 
 // wait for instance status to change to UPDATING
-func waitForUpdatingStatus(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) error {
+func waitForUpdatingStatus(ctx context.Context, c InstanceReadWithResponse, projectID, instanceID string) error {
 	w := wait.New(func() (res interface{}, done bool, err error) {
-		si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		si, err := c(ctx, projectID, instanceID)
 		if err != nil {
 			if strings.Contains(err.Error(), connection_reset) {
 				return nil, false, nil
@@ -122,9 +124,9 @@ func waitForUpdatingStatus(ctx context.Context, c *instances.ClientWithResponses
 
 // WaitHandler will wait for instance deletion
 // returned interface is nil
-func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c InstanceReadWithResponse, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		s, err := c(ctx, projectID, instanceID)
 		if err != nil {
 			if strings.Contains(err.Error(), connection_reset) {
 				return nil, false, nil
@@ -162,9 +164,9 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 }
 
 // wait for instance status to change to DELETING
-func waitForDeletingStatus(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) error {
+func waitForDeletingStatus(ctx context.Context, c InstanceReadWithResponse, projectID, instanceID string) error {
 	w := wait.New(func() (res interface{}, done bool, err error) {
-		si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
+		si, err := c(ctx, projectID, instanceID)
 		if err != nil {
 			if strings.Contains(err.Error(), connection_reset) {
 				return nil, false, nil
