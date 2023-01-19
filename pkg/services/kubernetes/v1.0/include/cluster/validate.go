@@ -48,7 +48,7 @@ func Validate(
 
 // ValidateClusterName validates a given cluster name
 func ValidateClusterName(name string) error {
-	exp := `^[a-z0-9-]{1,11}$`
+	exp := `^[a-z0-9]{1}[a-z0-9-]{0,10}$`
 	r := regexp.MustCompile(exp)
 	if !r.MatchString(name) {
 		return fmt.Errorf("invalid cluster name. valid name is of: %s", exp)
@@ -56,8 +56,21 @@ func ValidateClusterName(name string) error {
 	return nil
 }
 
+// ValidateNodePoolName validates a given pool name
+func ValidateNodePoolName(name string) error {
+	exp := `^[a-z0-9]{1}[a-z0-9-]{0,14}$`
+	r := regexp.MustCompile(exp)
+	if !r.MatchString(name) {
+		return fmt.Errorf("invalid node pool name. valid name is of: %s", exp)
+	}
+	return nil
+}
+
 // ValidateNodePool validates a given node pool
 func ValidateNodePool(np cluster.Nodepool) error {
+	if err := ValidateNodePoolName(np.Name); err != nil {
+		return err
+	}
 	if np.Machine.Type == "" {
 		return errors.New("machine type must be specified")
 	}
