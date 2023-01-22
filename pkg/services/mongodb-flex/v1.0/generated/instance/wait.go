@@ -28,6 +28,7 @@ func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, pr
 
 func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	outerfound := false
+	instanceID = strings.TrimSpace(instanceID)
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.ListWithResponse(ctx, projectID, &ListParams{})
 		if err != nil {
