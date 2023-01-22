@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -26,6 +27,7 @@ func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, pr
 }
 
 func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	outerfound := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.ListWithResponse(ctx, projectID, &ListParams{})
 		if err != nil {
@@ -37,13 +39,20 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil || s.JSON200.Items == nil {
 			return nil, false, nil
 		}
+
+		innerfound := false
 		for _, item := range *s.JSON200.Items {
 			if item.ID == nil || item.Status == nil || *item.ID != instanceID {
 				continue
 			}
+			outerfound = true
+			innerfound = true
 			if *item.Status == STATUS_READY {
 				return nil, true, nil
 			}
+		}
+		if !innerfound && outerfound {
+			return nil, false, fmt.Errorf("instance %s is not in the project's instance list", instanceID)
 		}
 		return nil, false, nil
 	})
