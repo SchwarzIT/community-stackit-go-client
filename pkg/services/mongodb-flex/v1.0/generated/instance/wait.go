@@ -2,7 +2,6 @@ package instance
 
 import (
 	"context"
-	"errors"
 	"net/http"
 	"strings"
 	"time"
@@ -19,38 +18,34 @@ func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 }
 
 // WaitHandler will wait for instance update to complete
-// returned interface is of *InstanceSingleInstance
+// returned interface is nil
 func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	// artifical wait for instance to change from status ready to updating
+	// artificial wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
 }
 
 func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.GetWithResponse(ctx, projectID, instanceID)
+		s, err := c.ListWithResponse(ctx, projectID, &ListParams{})
 		if err != nil {
 			if strings.Contains(err.Error(), ClientTimeoutErr) {
 				return nil, false, nil
 			}
 			return nil, false, err
 		}
-		if s.StatusCode() == http.StatusInternalServerError {
+		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil || s.JSON200.Items == nil {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
-			return nil, false, err
+		for _, item := range *s.JSON200.Items {
+			if item.ID == nil || item.Status == nil || *item.ID != instanceID {
+				continue
+			}
+			if *item.Status == STATUS_READY {
+				return nil, true, nil
+			}
 		}
-		if s.JSON200 == nil {
-			return nil, false, errors.New("bad response")
-		}
-		if s.JSON200.Item == nil || *s.JSON200.Item.Status == "" || *s.JSON200.Item.Status == STATUS_READY {
-			return s.JSON200.Item, true, nil
-		}
-		if *s.JSON200.Item.Status == STATUS_FAILED {
-			return s.JSON200.Item, false, errors.New("received status FAILED from server")
-		}
-		return s.JSON200.Item, false, nil
+		return nil, false, nil
 	})
 }
 
@@ -58,29 +53,22 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		res, err := c.ListWithResponse(ctx, projectID, &ListParams{})
+		s, err := c.ListWithResponse(ctx, projectID, &ListParams{})
 		if err != nil {
 			if strings.Contains(err.Error(), ClientTimeoutErr) {
 				return nil, false, nil
 			}
 			return nil, false, err
 		}
-		if res.StatusCode() == http.StatusInternalServerError {
+		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil || s.JSON200.Items == nil {
 			return nil, false, nil
 		}
-		if res.HasError != nil {
-			return nil, false, res.HasError
-		}
-		if res.JSON200 == nil || res.JSON200.Items == nil {
-			return nil, false, errors.New("received an empty response for list")
-		}
-		for _, v := range *res.JSON200.Items {
-			if v.ID == nil {
+		for _, v := range *s.JSON200.Items {
+			if v.ID == nil || *v.ID != instanceID {
 				continue
 			}
-			if *v.ID == instanceID {
-				return nil, false, nil
-			}
+			// instance was found
+			return nil, false, nil
 		}
 		return nil, true, nil
 	})
