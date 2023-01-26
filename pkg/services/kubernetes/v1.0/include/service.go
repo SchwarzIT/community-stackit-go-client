@@ -18,7 +18,7 @@ func getURL(c common.Client) string {
 	case common.ENV_DEV:
 		return "https://ske.api.eu01.dev.stackit.cloud/"
 	case common.ENV_QA:
-		return "https://ske.api.eu01.qa.stackit.cloud/"
+		return "https://ske.api.eu01.stg.stackit.cloud/"
 	default:
 		return "https://ske.api.eu01.stackit.cloud/"
 	}
