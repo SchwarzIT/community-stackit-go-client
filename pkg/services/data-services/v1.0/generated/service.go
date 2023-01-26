@@ -31,14 +31,18 @@ func NewService(c common.Client, serviceID int) *ClientWithResponses {
 		setRedisURL()
 	}
 
-	nc, _ := NewClientWithResponses(BaseURLs.GetURL(c), WithHTTPClient(c))
+	nc, _ := NewClientWithResponses(baseURLs.GetURL(c), WithHTTPClient(c))
 	return nc
 }
 
-var BaseURLs *urls.ByEnvs
+func (*ClientWithResponses) GetBaseURLs() *urls.ByEnvs {
+	return baseURLs
+}
+
+var baseURLs *urls.ByEnvs
 
 func setElasticSearchURLs() {
-	BaseURLs = urls.Init(
+	baseURLs = urls.Init(
 		"elasticsearch",
 		"https://elasticsearch.api.eu01.stackit.cloud",
 		"https://elasticsearch.api.eu01.qa.stackit.cloud",
@@ -47,7 +51,7 @@ func setElasticSearchURLs() {
 }
 
 func setLogMeURLs() {
-	BaseURLs = urls.Init(
+	baseURLs = urls.Init(
 		"logme",
 		"https://logme.api.eu01.stackit.cloud",
 		"https://logme.api.eu01.qa.stackit.cloud",
@@ -56,7 +60,7 @@ func setLogMeURLs() {
 }
 
 func setMariaDBURLs() {
-	BaseURLs = urls.Init(
+	baseURLs = urls.Init(
 		"mariadb",
 		"https://mariadb.api.eu01.stackit.cloud",
 		"https://mariadb.api.eu01.qa.stackit.cloud",
@@ -65,7 +69,7 @@ func setMariaDBURLs() {
 }
 
 func setPostgresDBURLs() {
-	BaseURLs = urls.Init(
+	baseURLs = urls.Init(
 		"postgresql",
 		"https://postgresql.api.eu01.stackit.cloud",
 		"https://postgresql.api.eu01.qa.stackit.cloud",
@@ -74,7 +78,7 @@ func setPostgresDBURLs() {
 }
 
 func setRabbitMQURLs() {
-	BaseURLs = urls.Init(
+	baseURLs = urls.Init(
 		"rabbitmq",
 		"https://rabbitmq.api.eu01.stackit.cloud",
 		"https://rabbitmq.api.eu01.qa.stackit.cloud",
@@ -83,7 +87,7 @@ func setRabbitMQURLs() {
 }
 
 func setRedisURL() {
-	BaseURLs = urls.Init(
+	baseURLs = urls.Init(
 		"redis",
 		"https://redis.api.eu01.stackit.cloud",
 		"https://redis.api.eu01.qa.stackit.cloud",
