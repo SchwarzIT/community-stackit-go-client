@@ -10,9 +10,10 @@ output-options:
     name: "common.Client"
   split-by-tags:
     verbose: false
-    enabled: true
+    enabled: false
     include:
     - Costs
+    - private
   extend-response:
   - field: HasError
     type: error
