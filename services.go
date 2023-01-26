@@ -34,7 +34,7 @@ type services struct {
 
 func (c *Client) initServices() {
 	c.Argus = argus.NewService(c)
-	c.Costs = costs.NewService(c)
+	c.Costs = costs.NewService(c, c.config.BaseUrl)
 	c.Kubernetes = kubernetes.NewService(c)
 	c.Membership = membership.NewService(c)
 	c.MongoDBFlex = mongodbflex.NewService(c)
