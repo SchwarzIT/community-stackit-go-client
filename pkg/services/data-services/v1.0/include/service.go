@@ -22,9 +22,9 @@ func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponse
 	return nc
 }
 
-func (*ClientWithResponses) GetBaseURLs(serviceID int) *urls.ByEnvs { return getBaseURLs(serviceID) }
+func (*ClientWithResponses) GetBaseURLs(serviceID int) urls.ByEnvs { return getBaseURLs(serviceID) }
 
-func getBaseURLs(serviceID int) *urls.ByEnvs {
+func getBaseURLs(serviceID int) urls.ByEnvs {
 	switch serviceID {
 	case ElasticSearch:
 		return setElasticSearchURLs()
@@ -39,10 +39,10 @@ func getBaseURLs(serviceID int) *urls.ByEnvs {
 	case Redis:
 		return setRedisURL()
 	}
-	return &urls.ByEnvs{}
+	return urls.ByEnvs{}
 }
 
-func setElasticSearchURLs() *urls.ByEnvs {
+func setElasticSearchURLs() urls.ByEnvs {
 	return urls.Init(
 		"elasticsearch",
 		"https://elasticsearch.api.eu01.stackit.cloud",
@@ -51,7 +51,7 @@ func setElasticSearchURLs() *urls.ByEnvs {
 	)
 }
 
-func setLogMeURLs() *urls.ByEnvs {
+func setLogMeURLs() urls.ByEnvs {
 	return urls.Init(
 		"logme",
 		"https://logme.api.eu01.stackit.cloud",
@@ -60,7 +60,7 @@ func setLogMeURLs() *urls.ByEnvs {
 	)
 }
 
-func setMariaDBURLs() *urls.ByEnvs {
+func setMariaDBURLs() urls.ByEnvs {
 	return urls.Init(
 		"mariadb",
 		"https://mariadb.api.eu01.stackit.cloud",
@@ -69,7 +69,7 @@ func setMariaDBURLs() *urls.ByEnvs {
 	)
 }
 
-func setPostgresDBURLs() *urls.ByEnvs {
+func setPostgresDBURLs() urls.ByEnvs {
 	return urls.Init(
 		"postgresql",
 		"https://postgresql.api.eu01.stackit.cloud",
@@ -78,7 +78,7 @@ func setPostgresDBURLs() *urls.ByEnvs {
 	)
 }
 
-func setRabbitMQURLs() *urls.ByEnvs {
+func setRabbitMQURLs() urls.ByEnvs {
 	return urls.Init(
 		"rabbitmq",
 		"https://rabbitmq.api.eu01.stackit.cloud",
@@ -87,7 +87,7 @@ func setRabbitMQURLs() *urls.ByEnvs {
 	)
 }
 
-func setRedisURL() *urls.ByEnvs {
+func setRedisURL() urls.ByEnvs {
 	return urls.Init(
 		"redis",
 		"https://redis.api.eu01.stackit.cloud",
