@@ -13,13 +13,16 @@ func NewService(c common.Client) *costs.ClientWithResponses {
 }
 
 func getURL(c common.Client) string {
+	url := os.Getenv("STACKIT_COST_BASEURL")
+	if url != "" {
+		return url
+	}
+
 	switch c.GetEnvironment() {
 	case common.ENV_DEV:
 		return "https://api-dev.stackit.cloud/costs-service/v1/"
 	case common.ENV_QA:
 		return "https://api-qa.stackit.cloud/costs-service/v1/"
-	case common.ENV_CUSTOM:
-		return os.Getenv("STACKIT_COST_HOST")
 	default:
 		return "https://api.stackit.cloud/costs-service/v1/"
 	}

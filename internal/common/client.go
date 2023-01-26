@@ -10,10 +10,9 @@ import (
 type Environment string
 
 const (
-	ENV_PROD   Environment = "prod"
-	ENV_QA     Environment = "qa"
-	ENV_DEV    Environment = "dev"
-	ENV_CUSTOM Environment = "custom"
+	ENV_PROD Environment = "prod"
+	ENV_QA   Environment = "qa"
+	ENV_DEV  Environment = "dev"
 )
 
 const (
