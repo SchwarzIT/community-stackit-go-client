@@ -2,8 +2,8 @@ package dataservices
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/internal/urls"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
 const (

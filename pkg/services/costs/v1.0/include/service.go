@@ -2,8 +2,8 @@ package costs
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/internal/urls"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1.0/generated"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
 var BaseURLs = urls.Init(
