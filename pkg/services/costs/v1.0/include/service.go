@@ -1,12 +1,15 @@
 package costs
 
 import (
+	"os"
+
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1.0/generated"
 )
 
 func NewService(c common.Client) *costs.ClientWithResponses {
-	return costs.NewClientWithResponses(getURL(c), c)
+	s, _ := costs.NewClientWithResponses(getURL(c), costs.WithHTTPClient(c))
+	return s
 }
 
 func getURL(c common.Client) string {
@@ -15,6 +18,8 @@ func getURL(c common.Client) string {
 		return "https://api-dev.stackit.cloud/costs-service/v1/"
 	case common.ENV_QA:
 		return "https://api-qa.stackit.cloud/costs-service/v1/"
+	case common.ENV_CUSTOM:
+		return os.Getenv("STACKIT_COST_HOST")
 	default:
 		return "https://api.stackit.cloud/costs-service/v1/"
 	}
