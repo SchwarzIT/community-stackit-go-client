@@ -2,10 +2,10 @@ package costs
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/internal/envs"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/urls"
 )
 
-var BaseURLs = envs.Init(
+var BaseURLs = urls.Init(
 	"costs",
 	"https://api.stackit.cloud/costs-service/v1/",
 	"https://api-qa.stackit.cloud/costs-service/v1/",
