@@ -21,7 +21,7 @@ func NewService(c common.Client, serviceID int) *ClientWithResponses {
 	return nc
 }
 
-func (*ClientWithResponses) GetBaseURLs(serviceID int) urls.ByEnvs { return getBaseURLs(serviceID) }
+func (*ClientWithResponses) GetBaseURLs() func(int) urls.ByEnvs { return getBaseURLs }
 
 func getBaseURLs(serviceID int) urls.ByEnvs {
 	switch serviceID {
