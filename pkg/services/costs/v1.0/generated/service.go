@@ -12,7 +12,7 @@ func NewService(c common.Client) *ClientWithResponses {
 }
 
 func getURL(c common.Client) string {
-	url := os.Getenv("STACKIT_COST_BASEURL")
+	url := os.Getenv("STACKIT_COSTS_BASEURL")
 	if url != "" {
 		return url
 	}
