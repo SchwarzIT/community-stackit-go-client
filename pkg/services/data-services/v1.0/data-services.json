@@ -58,6 +58,9 @@
           "name": {
             "type": "string"
           },
+          "username": {
+            "type": "string"
+          },
           "password": {
             "type": "string"
           },
@@ -73,7 +76,8 @@
           "hosts",
           "port",
           "name",
-          "password"
+          "password",
+          "username"
         ],
         "type": "object"
       },

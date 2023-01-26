@@ -27,6 +27,7 @@ type Credentials struct {
 	Password  string   `json:"password"`
 	Port      int      `json:"port"`
 	Protocols *Object  `json:"protocols,omitempty"`
+	Username  string   `json:"username"`
 }
 
 // CredentialsList defines model for CredentialsList.
