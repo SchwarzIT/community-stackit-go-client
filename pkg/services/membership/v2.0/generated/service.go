@@ -2,6 +2,7 @@ package membership
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
 const (
@@ -10,17 +11,13 @@ const (
 	RESOURCE_TYPE_ORG     = "organization"
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	return NewClientWithResponses(getURL(c), c)
-}
+var BaseURLs = urls.Init(
+	"membership",
+	"https://api.stackit.cloud/membership/",
+	"https://api-qa.stackit.cloud/membership/",
+	"https://api-dev.stackit.cloud/membership/",
+)
 
-func getURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://api-dev.stackit.cloud/membership/"
-	case common.ENV_QA:
-		return "https://api-qa.stackit.cloud/membership/"
-	default:
-		return "https://api.stackit.cloud/membership/"
-	}
+func NewService(c common.Client) *ClientWithResponses {
+	return NewClientWithResponses(BaseURLs.GetURL(c), c)
 }
