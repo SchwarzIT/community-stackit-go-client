@@ -3,9 +3,7 @@
 // services using the Service struct are located under pkg/api
 package common
 
-import (
-	"net/http"
-)
+import "net/http"
 
 type Environment string
 

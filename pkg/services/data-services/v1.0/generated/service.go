@@ -2,6 +2,7 @@ package dataservices
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
 const (
@@ -15,89 +16,78 @@ const (
 )
 
 func NewService(c common.Client, serviceID int) *ClientWithResponses {
-	url := common.DEFAULT_BASE_URL
-
-	switch serviceID {
-	case ElasticSearch:
-		url = getElasticSearchURL(c)
-	case LogMe:
-		url = getLogMeURL(c)
-	case MariaDB:
-		url = getMariaDBURL(c)
-	case PostgresDB:
-		url = getPostgresDBURL(c)
-	case RabbitMQ:
-		url = getRabbitMQURL(c)
-	case Redis:
-		url = getRedisURL(c)
-	}
-
+	url := GetBaseURLs(serviceID).GetURL(c)
 	nc, _ := NewClientWithResponses(url, WithHTTPClient(c))
 	return nc
 }
-
-func getElasticSearchURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://elasticsearch.api.eu01.dev.stackit.cloud"
-	case common.ENV_QA:
-		return "https://elasticsearch.api.eu01.qa.stackit.cloud"
-	default:
-		return "https://elasticsearch.api.eu01.stackit.cloud"
+func GetBaseURLs(serviceID int) urls.ByEnvs {
+	switch serviceID {
+	case ElasticSearch:
+		return setElasticSearchURLs()
+	case LogMe:
+		return setLogMeURLs()
+	case MariaDB:
+		return setMariaDBURLs()
+	case PostgresDB:
+		return setPostgresDBURLs()
+	case RabbitMQ:
+		return setRabbitMQURLs()
+	case Redis:
+		return setRedisURL()
 	}
+	return urls.ByEnvs{}
 }
 
-func getLogMeURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://logme.api.eu01.dev.stackit.cloud"
-	case common.ENV_QA:
-		return "https://logme.api.eu01.qa.stackit.cloud"
-	default:
-		return "https://logme.api.eu01.stackit.cloud"
-	}
+func setElasticSearchURLs() urls.ByEnvs {
+	return urls.Init(
+		"elasticsearch",
+		"https://elasticsearch.api.eu01.stackit.cloud",
+		"https://elasticsearch.api.eu01.qa.stackit.cloud",
+		"https://elasticsearch.api.eu01.dev.stackit.cloud",
+	)
 }
 
-func getMariaDBURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://mariadb.api.eu01.dev.stackit.cloud"
-	case common.ENV_QA:
-		return "https://mariadb.api.eu01.qa.stackit.cloud"
-	default:
-		return "https://mariadb.api.eu01.stackit.cloud"
-	}
+func setLogMeURLs() urls.ByEnvs {
+	return urls.Init(
+		"logme",
+		"https://logme.api.eu01.stackit.cloud",
+		"https://logme.api.eu01.qa.stackit.cloud",
+		"https://logme.api.eu01.dev.stackit.cloud",
+	)
 }
 
-func getPostgresDBURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://postgresql.api.eu01.dev.stackit.cloud"
-	case common.ENV_QA:
-		return "https://postgresql.api.eu01.qa.stackit.cloud"
-	default:
-		return "https://postgresql.api.eu01.stackit.cloud"
-	}
+func setMariaDBURLs() urls.ByEnvs {
+	return urls.Init(
+		"mariadb",
+		"https://mariadb.api.eu01.stackit.cloud",
+		"https://mariadb.api.eu01.qa.stackit.cloud",
+		"https://mariadb.api.eu01.dev.stackit.cloud",
+	)
 }
 
-func getRabbitMQURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://rabbitmq.api.eu01.dev.stackit.cloud"
-	case common.ENV_QA:
-		return "https://rabbitmq.api.eu01.qa.stackit.cloud"
-	default:
-		return "https://rabbitmq.api.eu01.stackit.cloud"
-	}
+func setPostgresDBURLs() urls.ByEnvs {
+	return urls.Init(
+		"postgresql",
+		"https://postgresql.api.eu01.stackit.cloud",
+		"https://postgresql.api.eu01.qa.stackit.cloud",
+		"https://postgresql.api.eu01.dev.stackit.cloud",
+	)
 }
 
-func getRedisURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://redis.api.eu01.dev.stackit.cloud"
-	case common.ENV_QA:
-		return "https://redis.api.eu01.qa.stackit.cloud"
-	default:
-		return "https://redis.api.eu01.stackit.cloud"
-	}
+func setRabbitMQURLs() urls.ByEnvs {
+	return urls.Init(
+		"rabbitmq",
+		"https://rabbitmq.api.eu01.stackit.cloud",
+		"https://rabbitmq.api.eu01.qa.stackit.cloud",
+		"https://rabbitmq.api.eu01.dev.stackit.cloud",
+	)
+}
+
+func setRedisURL() urls.ByEnvs {
+	return urls.Init(
+		"redis",
+		"https://redis.api.eu01.stackit.cloud",
+		"https://redis.api.eu01.qa.stackit.cloud",
+		"https://redis.api.eu01.dev.stackit.cloud",
+	)
 }

@@ -2,23 +2,20 @@ package mongodbflex
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+)
+
+var BaseURLs = urls.Init(
+	"mongodb_flex",
+	"https://api.stackit.cloud/mongodb/v1/",
+	"https://api-qa.stackit.cloud/mongodb/v1/",
+	"https://api-dev.stackit.cloud/mongodb/v1/",
 )
 
 func NewService(c common.Client) *ClientWithResponses {
 	nc, _ := NewClientWithResponses(
-		getURL(c),
+		BaseURLs.GetURL(c),
 		WithHTTPClient(c),
 	)
 	return nc
-}
-
-func getURL(c common.Client) string {
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return "https://api-dev.stackit.cloud/mongodb/v1/"
-	case common.ENV_QA:
-		return "https://api-qa.stackit.cloud/mongodb/v1/"
-	default:
-		return "https://api.stackit.cloud/mongodb/v1/"
-	}
 }
