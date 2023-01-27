@@ -5,6 +5,7 @@ package urls
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 )
@@ -30,7 +31,7 @@ func Init(pkg, prod, qa, dev string) ByEnvs {
 		Prod:         prod,
 		QA:           qa,
 		Dev:          dev,
-		OverrideWith: fmt.Sprintf("STACKIT_%s_BASEURL", pkg),
+		OverrideWith: fmt.Sprintf("STACKIT_%s_BASEURL", strings.ToUpper(pkg)),
 	}
 }
 
