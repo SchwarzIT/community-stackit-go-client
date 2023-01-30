@@ -15,7 +15,7 @@ func (r CreateResponse) WaitHandler(ctx context.Context, c *projects.ClientWithR
 	return wait.New(func() (interface{}, bool, error) {
 		project, err := c.GetWithResponse(ctx, containerID, &projects.GetParams{})
 		if err != nil {
-			if strings.Contains(err.Error(), "404") {
+			if strings.Contains(err.Error(), "404") || strings.Contains(err.Error(), "403") {
 				return project, false, nil
 			}
 			return project, false, err
