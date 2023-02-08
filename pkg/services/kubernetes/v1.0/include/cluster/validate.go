@@ -87,7 +87,7 @@ func ValidateNodePool(np cluster.Nodepool) error {
 		return errors.New("maximum value must be in the range of 1..100")
 	}
 	if np.MaxSurge != nil {
-		if *np.MaxSurge < 1 || np.Maximum > 10 {
+		if *np.MaxSurge < 1 || *np.MaxSurge > 10 {
 			return errors.New("max surge value must be in the range of 1..10")
 		}
 	}
