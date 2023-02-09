@@ -36,7 +36,10 @@ tidy:
     with:
     all: true
   - replace: ServiceAccounts
-    with:
+    with: SA
+    all: true
+  - replace: SAV2
+    with: SAv2
     all: true
   - replace: Post
     with: Create
