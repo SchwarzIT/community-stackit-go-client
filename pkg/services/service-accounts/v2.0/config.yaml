@@ -50,6 +50,24 @@ tidy:
   - replace: GetKeysKeyID
     with: GetKey
     prefix: true
+  - replace: GetSAv2
+    with: List
+    match: true
+  - replace: GetSAServiceAccountID
+    with: Get
+    prefix: true
+  - replace: DeleteSAServiceAccountID
+    with: DeleteSA
+    prefix: true
+  - replace: SAV2
+    with: SAv2
+    all: true
+  - replace: SAServiceAccountID
+    with: SA
+    all: true
+  - replace: AccessTokensAccessTokenID
+    with: AccessTokens
+    all: true
   params:
   - replace: Id
     with: ID
