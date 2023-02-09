@@ -10,6 +10,7 @@ import (
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated"
 	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated"
+	serviceaccounts "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-accounts/v2.0/generated"
 )
 
 type services struct {
@@ -21,6 +22,7 @@ type services struct {
 	ObjectStorage      *objectstorage.ClientWithResponses
 	PostgresFlex       *postgresflex.ClientWithResponses
 	ResourceManagement *resourcemanagement.ClientWithResponses
+	ServiceAccounts    *serviceaccounts.ClientWithResponses
 
 	// DSA
 	ElasticSearch *dataservices.ClientWithResponses
@@ -41,6 +43,7 @@ func (c *Client) initServices() {
 	c.ObjectStorage = objectstorage.NewService(c)
 	c.PostgresFlex = postgresflex.NewService(c)
 	c.ResourceManagement = resourcemanagement.NewService(c)
+	c.ServiceAccounts = serviceaccounts.NewService(c)
 
 	// DSA
 	c.ElasticSearch = dataservices.NewService(c, dataservices.ElasticSearch)

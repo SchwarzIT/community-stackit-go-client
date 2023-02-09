@@ -1,0 +1,78 @@
+package: serviceaccounts
+output: generated/service_accounts.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+    - Public
+  extend-response:
+  - field: HasError
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "serviceaccounts."
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    all: true
+  - replace: ProjectsProjectID
+    with:
+    all: true
+  - replace: ServiceAccounts
+    with: SA
+    all: true
+  - replace: SAV2
+    with: SAv2
+    all: true
+  - replace: Post
+    with: Create
+    prefix: true
+  - replace: Patch
+    with: Update
+    prefix: true
+  - replace: GetKeysKeyID
+    with: GetKey
+    prefix: true
+  - replace: GetSAv2
+    with: List
+    match: true
+  - replace: GetSAServiceAccountID
+    with: Get
+    prefix: true
+  - replace: DeleteSAServiceAccountID
+    with: DeleteSA
+    prefix: true
+  - replace: SAV2
+    with: SAv2
+    all: true
+  - replace: SAServiceAccountID
+    with: SA
+    all: true
+  - replace: AccessTokensAccessTokenID
+    with: AccessTokens
+    all: true
+  params:
+  - replace: Id
+    with: ID
+    all: true
+  schemas:
+  - replace: Id
+    with: ID
+    all: true
