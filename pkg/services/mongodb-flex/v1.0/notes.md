@@ -1,3 +1,3 @@
 # changes in OpenAPI config
 
-- none
+- add flavors and versions tags
