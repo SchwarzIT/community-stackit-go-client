@@ -64,6 +64,11 @@ type InstanceError struct {
 	Type    *string              `json:"type,omitempty"`
 }
 
+// InstanceGetBackupResponse defines model for instance.GetBackupResponse.
+type InstanceGetBackupResponse struct {
+	Item *InstanceBackup `json:"item,omitempty"`
+}
+
 // InstanceListBackupResponse defines model for instance.ListBackupResponse.
 type InstanceListBackupResponse struct {
 	Count *int              `json:"count,omitempty"`
@@ -583,7 +588,7 @@ func (r UpdateResponse) StatusCode() int {
 type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *InstanceBackup
+	JSON200      *InstanceGetBackupResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	HasError     error // Aggregated error
@@ -608,7 +613,7 @@ func (r GetResponse) StatusCode() int {
 type CreateCloneResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *InstanceCreateCloneInstanceResponse
+	JSON202      *InstanceCreateCloneInstanceResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	HasError     error // Aggregated error
@@ -633,7 +638,7 @@ func (r CreateCloneResponse) StatusCode() int {
 type CreateRestoreResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *InstanceCreateRestoreInstanceResponse
+	JSON202      *InstanceCreateRestoreInstanceResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	HasError     error // Aggregated error
@@ -822,7 +827,7 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest InstanceBackup
+		var dest InstanceGetBackupResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
@@ -862,12 +867,12 @@ func (c *ClientWithResponses) ParseCreateCloneResponse(rsp *http.Response) (*Cre
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
 		var dest InstanceCreateCloneInstanceResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
-		response.JSON200 = &dest
+		response.JSON202 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest InstanceError
@@ -903,12 +908,12 @@ func (c *ClientWithResponses) ParseCreateRestoreResponse(rsp *http.Response) (*C
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
 		var dest InstanceCreateRestoreInstanceResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
-		response.JSON200 = &dest
+		response.JSON202 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest InstanceError

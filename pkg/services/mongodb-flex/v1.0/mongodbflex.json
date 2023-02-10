@@ -1,0 +1,2452 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "STACKIT Mongo Service API",
+    "description": "This is the documentation for the STACKIT mongo service\n\n# Authentication\n\n<!-- ReDoc-Inject: <security-definitions> -->",
+    "termsOfService": "https://www.stackit.de/en/general-terms-and-conditions/",
+    "contact": {
+      "name": "STACKIT Mongo Service Support",
+      "url": "https://www.stackit.de/en/contact",
+      "email": "support@stackit.cloud"
+    },
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "description": "dev stage",
+      "url": "https://service-api-mgmt-dev.mongodb.eu01.stackit.cloud/v1",
+      "x-stackit-stage": "dev"
+    },
+    {
+      "description": "qa stage",
+      "url": "https://service-api-mgmt-qa.mongodb.eu01.stackit.cloud/v1",
+      "x-stackit-stage": "qa"
+    },
+    {
+      "description": "prd stage",
+      "url": "https://service-api-mgmt.mongodb.eu01.stackit.cloud",
+      "x-stackit-stage": "prd"
+    }
+  ],
+  "paths": {
+    "/projects/{projectId}/flavors": {
+      "get": {
+        "summary": "Flavors",
+        "description": "returns all possible flavors",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/infra.GetFlavorsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      }
+    },
+    "/projects/{projectId}/instances": {
+      "get": {
+        "tags": [
+          "instance"
+        ],
+        "summary": "List Instances",
+        "description": "list all instances for a projectID",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "instance tag",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.ListInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "instance"
+        ],
+        "summary": "Create instance",
+        "description": "Create and deploys an instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.CreateInstanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.CreateInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}": {
+      "get": {
+        "tags": [
+          "instance"
+        ],
+        "summary": "Get instance",
+        "description": "gets information of an instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instances.GetInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "instance"
+        ],
+        "summary": "Update endpoint",
+        "description": "updates a deployment plan",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.UpdateInstanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.UpdateInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      },
+      "delete": {
+        "tags": [
+          "instance"
+        ],
+        "summary": "Delete instance",
+        "description": "removes an instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "*/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "patch": {
+        "tags": [
+          "instance"
+        ],
+        "summary": "Update endpoint",
+        "description": "updates a deployment plan",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.UpdateInstanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.UpdateInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/backups": {
+      "get": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "List backup",
+        "description": "List backups of an instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.ListBackupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "Update schedule",
+        "description": "Updates a backup schedule",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/opsmanager.UpdateScheduleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/opsmanager.UpdateScheduleRequest"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/backups/{backupId}": {
+      "get": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "Get backup",
+        "description": "Get details about a specific backup",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "backupId",
+            "in": "path",
+            "description": "backup id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.GetBackupResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/clone": {
+      "post": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "Clone instance",
+        "description": "Clone an instance via PIT restore",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.CreateCloneInstanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.CreateCloneInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/restore": {
+      "post": {
+        "tags": [
+          "backup"
+        ],
+        "summary": "Restore instance",
+        "description": "Restore an instance based on snapshot",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.CreateRestoreInstanceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.CreateRestoreInstanceResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/users": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "List Users",
+        "description": "list all users for a mongodb instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.ListUserResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Create User",
+        "description": "create a new user for a mongodb instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.CreateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.CreateUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/users/{userId}": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get User",
+        "description": "get detailed information of a user of a mongodb instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.GetUserResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "put": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update User",
+        "description": "updates user for a mongodb instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete User",
+        "description": "delete mongodb user",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {}
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      },
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update User",
+        "description": "updates user for a mongodb instance",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "payload",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.UpdateUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {}
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/instances/{instanceId}/users/{userId}/reset": {
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Reset User",
+        "description": "resets mongodb user's password",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "instanceId",
+            "in": "path",
+            "description": "instance id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "user id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        },
+        "x-codegen-request-body-name": "payload"
+      }
+    },
+    "/projects/{projectId}/storages/{flavor}": {
+      "get": {
+        "summary": "Get storage",
+        "description": "returns the storage for a certain flavor",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "flavor",
+            "in": "path",
+            "description": "flavor id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.GetFlavorStorageResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      }
+    },
+    "/projects/{projectId}/versions": {
+      "get": {
+        "summary": "Get versions",
+        "description": "returns all available versions for creating endpoint",
+        "parameters": [
+          {
+            "name": "projectId",
+            "in": "path",
+            "description": "project id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.GetVersionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "mongo-flex-service"
+          ]
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "infra.Flavor": {
+        "type": "object",
+        "properties": {
+          "categories": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cpu": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "memory": {
+            "type": "integer"
+          }
+        }
+      },
+      "infra.GetFlavorsResponse": {
+        "type": "object",
+        "properties": {
+          "flavors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/infra.Flavor"
+            }
+          }
+        }
+      },
+      "instance.Acl": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "description": "TODO validating in api (middleware)",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "instance.Backup": {
+        "type": "object",
+        "properties": {
+          "endTime": {
+            "type": "string"
+          },
+          "error": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "startTime": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.GetBackupResponse": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/instance.Backup"
+          }
+        }
+      },
+      "instance.CreateCloneInstanceRequest": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateCloneInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateInstanceRequest": {
+        "type": "object",
+        "properties": {
+          "acl": {
+            "$ref": "#/components/schemas/instance.Acl"
+          },
+          "backupSchedule": {
+            "type": "string"
+          },
+          "flavorId": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Following fields are not certain/clear"
+          },
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "description": "it must be one of \"Single\", \"Replica\", \"Sharded\"",
+                "type": "string"
+              }
+            }
+          },
+          "replicas": {
+            "type": "integer"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/instance.Storage"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateRestoreInstanceRequest": {
+        "type": "object",
+        "properties": {
+          "backupId": {
+            "type": "string"
+          },
+          "instanceId": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateRestoreInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "instanceId": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateUserRequest": {
+        "type": "object",
+        "required": [
+          "database",
+          "roles"
+        ],
+        "properties": {
+          "database": {
+            "type": "string"
+          },
+          "roles": {
+            "description": "available roles are \"read\" or \"readWrite\"",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "username": {
+            "description": "if provided it must match the regex \"^[a-zA-Z][a-zA-Z0-9_-]{1,30}[a-zA-Z0-9]$\"",
+            "type": "string"
+          }
+        }
+      },
+      "instance.CreateUserResponse": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/instance.User"
+          }
+        }
+      },
+      "instance.Error": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "message": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.Flavor": {
+        "type": "object",
+        "properties": {
+          "cpu": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "memory": {
+            "type": "integer"
+          }
+        }
+      },
+      "instance.GetFlavorStorageResponse": {
+        "type": "object",
+        "properties": {
+          "storageClasses": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "storageRange": {
+            "$ref": "#/components/schemas/instance.StorageRange"
+          }
+        }
+      },
+      "instance.GetUserResponse": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/instance.ResponseUser"
+          }
+        }
+      },
+      "instance.GetVersionsResponse": {
+        "type": "object",
+        "properties": {
+          "versions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "instance.ListBackupResponse": {
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/instance.Backup"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "instance.ListInstance": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.ListInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "TODO pagination ?"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/instance.ListInstance"
+            }
+          }
+        }
+      },
+      "instance.ListUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.ListUserResponse": {
+        "type": "object",
+        "properties": {
+          "count": {
+            "type": "integer"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/instance.ListUser"
+            }
+          }
+        }
+      },
+      "instance.ResponseUser": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.SingleInstance": {
+        "type": "object",
+        "properties": {
+          "acl": {
+            "$ref": "#/components/schemas/instance.Acl"
+          },
+          "backupSchedule": {
+            "type": "string"
+          },
+          "flavor": {
+            "$ref": "#/components/schemas/instance.Flavor"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "replicas": {
+            "type": "integer"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/instance.Storage"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.Storage": {
+        "type": "object",
+        "properties": {
+          "class": {
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          }
+        }
+      },
+      "instance.StorageRange": {
+        "type": "object",
+        "properties": {
+          "max": {
+            "type": "integer"
+          },
+          "min": {
+            "type": "integer"
+          }
+        }
+      },
+      "instance.UpdateInstanceRequest": {
+        "type": "object",
+        "properties": {
+          "acl": {
+            "$ref": "#/components/schemas/instance.Acl"
+          },
+          "backupSchedule": {
+            "type": "string"
+          },
+          "flavorId": {
+            "type": "string"
+          },
+          "labels": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Following fields are not certain/clear"
+          },
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "replicas": {
+            "type": "integer"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/instance.Storage"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "instance.UpdateInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/instance.SingleInstance"
+          }
+        }
+      },
+      "instance.UpdateUserRequest": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "instance.User": {
+        "type": "object",
+        "properties": {
+          "database": {
+            "type": "string"
+          },
+          "host": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "port": {
+            "type": "integer"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "uri": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          }
+        }
+      },
+      "instances.GetInstanceResponse": {
+        "type": "object",
+        "properties": {
+          "item": {
+            "$ref": "#/components/schemas/instances.SingleInstance"
+          }
+        }
+      },
+      "instances.SingleInstance": {
+        "type": "object",
+        "properties": {
+          "acl": {
+            "$ref": "#/components/schemas/instance.Acl"
+          },
+          "backupSchedule": {
+            "type": "string"
+          },
+          "flavor": {
+            "$ref": "#/components/schemas/instance.Flavor"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "replicas": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/instance.Storage"
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "opsmanager.UpdateScheduleRequest": {
+        "type": "object",
+        "properties": {
+          "backupSchedule": {
+            "type": "string"
+          },
+          "dailySnapshotRetentionDays": {
+            "type": "integer"
+          },
+          "monthlySnapshotRetentionMonths": {
+            "type": "integer"
+          },
+          "pointInTimeWindowHours": {
+            "type": "integer"
+          },
+          "snapshotRetentionDays": {
+            "type": "integer"
+          },
+          "weeklySnapshotRetentionWeeks": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "apiKey",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "x-stackit-api": {
+    "type": "stackit"
+  },
+  "x-stackit-scope": {
+    "visibility": "private"
+  }
+}
