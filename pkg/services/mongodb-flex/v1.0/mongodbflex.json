@@ -31,6 +31,9 @@
   "paths": {
     "/projects/{projectId}/flavors": {
       "get": {
+        "tags": [
+          "flavors"
+        ],
         "summary": "Flavors",
         "description": "returns all possible flavors",
         "parameters": [
@@ -1712,6 +1715,9 @@
     },
     "/projects/{projectId}/storages/{flavor}": {
       "get": {
+        "tags": [
+          "flavors"
+        ],
         "summary": "Get storage",
         "description": "returns the storage for a certain flavor",
         "parameters": [
@@ -1788,6 +1794,9 @@
     },
     "/projects/{projectId}/versions": {
       "get": {
+        "tags": [
+          "versions"
+        ],
         "summary": "Get versions",
         "description": "returns all available versions for creating endpoint",
         "parameters": [
