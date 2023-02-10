@@ -51,7 +51,7 @@
           "200": {
             "description": "OK",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/infra.GetFlavorsResponse"
                 }
@@ -61,7 +61,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -71,7 +71,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -479,7 +479,7 @@
           "400": {
             "description": "Bad Request",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -489,7 +489,7 @@
           "404": {
             "description": "Not Found",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
@@ -499,7 +499,7 @@
           "500": {
             "description": "Internal Server Error",
             "content": {
-              "*/*": {
+              "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/instance.Error"
                 }
