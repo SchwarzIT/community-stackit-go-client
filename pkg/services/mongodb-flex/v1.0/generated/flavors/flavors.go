@@ -5,22 +5,9 @@ package flavors
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"io"
 	"net/http"
-	"net/url"
-	"strings"
-
-	"github.com/pkg/errors"
 
 	common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-	"github.com/do87/oapi-codegen/pkg/runtime"
-)
-
-const (
-	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
 // InfraFlavor defines model for infra.Flavor.
