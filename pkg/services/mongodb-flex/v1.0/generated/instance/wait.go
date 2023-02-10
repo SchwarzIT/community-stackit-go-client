@@ -74,8 +74,11 @@ func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 			}
 			return nil, false, err
 		}
-		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil || s.JSON200.Items == nil {
+		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil {
 			return nil, false, nil
+		}
+		if s.JSON200.Items == nil {
+			return nil, true, nil
 		}
 		for _, v := range *s.JSON200.Items {
 			if v.ID == nil || *v.ID != instanceID {
