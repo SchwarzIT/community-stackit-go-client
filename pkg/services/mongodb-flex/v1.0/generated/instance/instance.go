@@ -705,6 +705,9 @@ func (r CreateResponse) StatusCode() int {
 type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON400      *InstanceError
+	JSON404      *InstanceError
+	JSON500      *InstanceError
 	HasError     error // Aggregated error
 }
 
@@ -981,6 +984,30 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 		HTTPResponse: rsp,
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
 
 	return response, nil
 }

@@ -223,6 +223,9 @@ type ClientWithResponsesInterface interface {
 type GetFlavorsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
+	JSON200      *InfraGetFlavorsResponse
+	JSON400      *InstanceError
+	JSON500      *InstanceError
 	HasError     error // Aggregated error
 }
 
@@ -298,6 +301,30 @@ func (c *ClientWithResponses) ParseGetFlavorsResponse(rsp *http.Response) (*GetF
 		HTTPResponse: rsp,
 	}
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InfraGetFlavorsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
 
 	return response, nil
 }
