@@ -2,6 +2,7 @@ package instance
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -37,8 +38,12 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 			}
 			return nil, false, err
 		}
-		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil || s.JSON200.Items == nil {
+		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil {
 			return nil, false, nil
+		}
+
+		if s.JSON200.Items == nil {
+			return nil, false, errors.New("received an empty list of instances")
 		}
 
 		innerfound := false
