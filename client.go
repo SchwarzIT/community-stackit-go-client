@@ -26,6 +26,7 @@ const (
 	ClientContextDeadlineErr   = "context deadline exceeded"
 	ClientConnectionRefusedErr = "connection refused"
 	ClientEOFError             = "unexpected EOF"
+	ClientGWTimeoutFError      = "Gateway Timeout"
 )
 
 // Client service for managing interactions with STACKIT API
@@ -107,6 +108,7 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 					if strings.Contains(err.Error(), ClientTimeoutErr) ||
 						(strings.Contains(err.Error(), ClientContextDeadlineErr) && req.Context().Err() == nil) ||
 						strings.Contains(err.Error(), ClientConnectionRefusedErr) ||
+						strings.Contains(err.Error(), ClientGWTimeoutFError) ||
 						(req.Method == http.MethodGet && strings.Contains(err.Error(), ClientEOFError)) {
 
 						// reduce retries counter and retry
@@ -119,7 +121,7 @@ func (c *Client) do(req *http.Request) (resp *http.Response, err error) {
 			if resp != nil && resp.StatusCode == http.StatusInternalServerError {
 				return false, nil
 			}
-			if resp != nil && resp.StatusCode == http.StatusBadGateway && maxRetries > 0 {
+			if resp != nil && (resp.StatusCode == http.StatusBadGateway || resp.StatusCode == http.StatusGatewayTimeout) && maxRetries > 0 {
 				maxRetries = maxRetries - 1
 				return false, nil
 			}
