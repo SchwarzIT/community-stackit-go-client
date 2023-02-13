@@ -14,6 +14,7 @@ import (
 
 const (
 	connection_reset = "read: connection reset" // catch connection reset by peer error
+	gateway_timeout  = "Gateway Timeout"
 )
 
 // WaitHandler will wait for instance creation
@@ -22,15 +23,15 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if strings.Contains(err.Error(), connection_reset) {
+			if strings.Contains(err.Error(), connection_reset) || strings.Contains(err.Error(), gateway_timeout) {
 				return nil, false, nil
 			}
 			return nil, false, err
 		}
-		if s.StatusCode() == http.StatusInternalServerError {
+		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
 			return nil, false, nil
 		}
-		if s.StatusCode() == http.StatusBadGateway {
+		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
@@ -53,7 +54,7 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if strings.Contains(err.Error(), connection_reset) {
+			if strings.Contains(err.Error(), connection_reset) || strings.Contains(err.Error(), gateway_timeout) {
 				return nil, false, nil
 			}
 			return nil, false, err
@@ -61,7 +62,7 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if s.StatusCode() == http.StatusBadGateway {
+		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
@@ -123,7 +124,7 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
 		if err != nil {
-			if strings.Contains(err.Error(), connection_reset) {
+			if strings.Contains(err.Error(), connection_reset) || strings.Contains(err.Error(), gateway_timeout) {
 				return nil, false, nil
 			}
 			return nil, false, err
@@ -134,7 +135,7 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if s.StatusCode() == http.StatusBadGateway {
+		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
 			return nil, false, nil
 		}
 		if s.HasError != nil {
