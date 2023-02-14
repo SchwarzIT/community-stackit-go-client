@@ -1,0 +1,111 @@
+package: postgresflex
+output: generated/postgresflex.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+  extend-response:
+  - field: HasError
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "postgresflex."
+      all: true
+  - from: include/instances/wait.go
+    to: instances/wait.go
+    tidy: 
+    - replace: "instances."
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: V1ProjectsProjectId
+    with:
+    all: true
+  - replace: InstancesInstanceId
+    with: Instance
+    all: true
+  - replace: StoragesFlavorID
+    with: Flavor
+    all: true
+  - replace: UsersUserID
+    with: User
+    all: true
+  - replace: InstancesInstanceID
+    with: Instance
+    all: true
+  - replace: BackupsBackupID
+    with: Backup
+    all: true
+  - replace: GetInstanceBackups
+    with: List
+    prefix: true
+  - replace: PutInstanceBackups
+    with: Update
+    all: true
+  - replace: InstanceBackup
+    with: 
+    suffix: true
+  - replace: InstanceProvision
+    with: Create
+    all: true
+  - replace: InstanceUpdate
+    with: Update
+    all: true
+  - replace: PatchInstance
+    with: PatchUpdate
+    all: true
+  - replace: InstanceList
+    with: List
+    all: true
+  - replace: InstanceGet
+    with: Get
+    all: true
+  - replace: InstanceDeprovision
+    with: Delete
+    all: true
+  - replace: PostInstanceUsers
+    with: CreateUser
+    prefix: true
+  - replace: CredentialGet
+    with: Get
+    prefix: true
+  - replace: CredentialsGet
+    with: List
+    prefix: true
+  - replace: CredentialsPost
+    with: Create
+    prefix: true
+  - replace: CredentialsDelete
+    with: Delete
+    prefix: true
+  - replace: OfferingsGet
+    with: Get
+    prefix: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Acl
+    with: ACL
+    suffix: true
