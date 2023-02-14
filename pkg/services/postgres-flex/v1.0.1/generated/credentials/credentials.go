@@ -102,21 +102,21 @@ func NewClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type ClientInterface interface {
-	// CredentialsGet request
-	CredentialsGet(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	List(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CredentialsPost request
-	CredentialsPost(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Create request
+	Create(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CredentialsDelete request
-	CredentialsDelete(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Delete request
+	Delete(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CredentialGet request
-	CredentialGet(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Get request
+	Get(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) CredentialsGet(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCredentialsGetRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) List(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +127,8 @@ func (c *Client) CredentialsGet(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) CredentialsPost(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCredentialsPostRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) Create(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -139,8 +139,8 @@ func (c *Client) CredentialsPost(ctx context.Context, projectID string, instance
 	return c.Client.Do(req)
 }
 
-func (c *Client) CredentialsDelete(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, credentialsID)
+func (c *Client) Delete(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRequest(ctx, c.Server, projectID, instanceID, credentialsID)
 	if err != nil {
 		return nil, err
 	}
@@ -151,8 +151,8 @@ func (c *Client) CredentialsDelete(ctx context.Context, projectID string, instan
 	return c.Client.Do(req)
 }
 
-func (c *Client) CredentialGet(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCredentialGetRequest(ctx, c.Server, projectID, instanceID, credentialsID)
+func (c *Client) Get(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID, credentialsID)
 	if err != nil {
 		return nil, err
 	}
@@ -163,8 +163,8 @@ func (c *Client) CredentialGet(ctx context.Context, projectID string, instanceID
 	return c.Client.Do(req)
 }
 
-// NewCredentialsGetRequest generates requests for CredentialsGet
-func NewCredentialsGetRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -204,8 +204,8 @@ func NewCredentialsGetRequest(ctx context.Context, server string, projectID stri
 	return req, nil
 }
 
-// NewCredentialsPostRequest generates requests for CredentialsPost
-func NewCredentialsPostRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
+// NewCreateRequest generates requests for Create
+func NewCreateRequest(ctx context.Context, server string, projectID string, instanceID InstanceId) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -245,8 +245,8 @@ func NewCredentialsPostRequest(ctx context.Context, server string, projectID str
 	return req, nil
 }
 
-// NewCredentialsDeleteRequest generates requests for CredentialsDelete
-func NewCredentialsDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, credentialsID string) (*http.Request, error) {
+// NewDeleteRequest generates requests for Delete
+func NewDeleteRequest(ctx context.Context, server string, projectID string, instanceID string, credentialsID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -293,8 +293,8 @@ func NewCredentialsDeleteRequest(ctx context.Context, server string, projectID s
 	return req, nil
 }
 
-// NewCredentialGetRequest generates requests for CredentialGet
-func NewCredentialGetRequest(ctx context.Context, server string, projectID string, instanceID InstanceId, credentialsID string) (*http.Request, error) {
+// NewGetRequest generates requests for Get
+func NewGetRequest(ctx context.Context, server string, projectID string, instanceID InstanceId, credentialsID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -363,20 +363,20 @@ func NewClientWithResponses(server string, httpClient common.Client) *ClientWith
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// CredentialsGet request
-	CredentialsGetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*CredentialsGetResponse, error)
+	// List request
+	ListWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
-	// CredentialsPost request
-	CredentialsPostWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*CredentialsPostResponse, error)
+	// Create request
+	CreateWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
-	// CredentialsDelete request
-	CredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*CredentialsDeleteResponse, error)
+	// Delete request
+	DeleteWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
-	// CredentialGet request
-	CredentialGetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*CredentialGetResponse, error)
+	// Get request
+	GetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 }
 
-type CredentialsGetResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *CredentialsList
@@ -385,7 +385,7 @@ type CredentialsGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CredentialsGetResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -393,14 +393,14 @@ func (r CredentialsGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CredentialsGetResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CredentialsPostResponse struct {
+type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *CredentialsResponse
@@ -409,7 +409,7 @@ type CredentialsPostResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CredentialsPostResponse) Status() string {
+func (r CreateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -417,14 +417,14 @@ func (r CredentialsPostResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CredentialsPostResponse) StatusCode() int {
+func (r CreateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CredentialsDeleteResponse struct {
+type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON404      *Error
@@ -432,7 +432,7 @@ type CredentialsDeleteResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CredentialsDeleteResponse) Status() string {
+func (r DeleteResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -440,14 +440,14 @@ func (r CredentialsDeleteResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CredentialsDeleteResponse) StatusCode() int {
+func (r DeleteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CredentialGetResponse struct {
+type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *CredentialsResponse
@@ -456,7 +456,7 @@ type CredentialGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CredentialGetResponse) Status() string {
+func (r GetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -464,58 +464,58 @@ func (r CredentialGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CredentialGetResponse) StatusCode() int {
+func (r GetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// CredentialsGetWithResponse request returning *CredentialsGetResponse
-func (c *ClientWithResponses) CredentialsGetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*CredentialsGetResponse, error) {
-	rsp, err := c.CredentialsGet(ctx, projectID, instanceID, reqEditors...)
+// ListWithResponse request returning *ListResponse
+func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.List(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCredentialsGetResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// CredentialsPostWithResponse request returning *CredentialsPostResponse
-func (c *ClientWithResponses) CredentialsPostWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*CredentialsPostResponse, error) {
-	rsp, err := c.CredentialsPost(ctx, projectID, instanceID, reqEditors...)
+// CreateWithResponse request returning *CreateResponse
+func (c *ClientWithResponses) CreateWithResponse(ctx context.Context, projectID string, instanceID InstanceId, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.Create(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCredentialsPostResponse(rsp)
+	return c.ParseCreateResponse(rsp)
 }
 
-// CredentialsDeleteWithResponse request returning *CredentialsDeleteResponse
-func (c *ClientWithResponses) CredentialsDeleteWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*CredentialsDeleteResponse, error) {
-	rsp, err := c.CredentialsDelete(ctx, projectID, instanceID, credentialsID, reqEditors...)
+// DeleteWithResponse request returning *DeleteResponse
+func (c *ClientWithResponses) DeleteWithResponse(ctx context.Context, projectID string, instanceID string, credentialsID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+	rsp, err := c.Delete(ctx, projectID, instanceID, credentialsID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCredentialsDeleteResponse(rsp)
+	return c.ParseDeleteResponse(rsp)
 }
 
-// CredentialGetWithResponse request returning *CredentialGetResponse
-func (c *ClientWithResponses) CredentialGetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*CredentialGetResponse, error) {
-	rsp, err := c.CredentialGet(ctx, projectID, instanceID, credentialsID, reqEditors...)
+// GetWithResponse request returning *GetResponse
+func (c *ClientWithResponses) GetWithResponse(ctx context.Context, projectID string, instanceID InstanceId, credentialsID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.Get(ctx, projectID, instanceID, credentialsID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCredentialGetResponse(rsp)
+	return c.ParseGetResponse(rsp)
 }
 
-// ParseCredentialsGetResponse parses an HTTP response from a CredentialsGetWithResponse call
-func (c *ClientWithResponses) ParseCredentialsGetResponse(rsp *http.Response) (*CredentialsGetResponse, error) {
+// ParseListResponse parses an HTTP response from a ListWithResponse call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CredentialsGetResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -541,15 +541,15 @@ func (c *ClientWithResponses) ParseCredentialsGetResponse(rsp *http.Response) (*
 	return response, nil
 }
 
-// ParseCredentialsPostResponse parses an HTTP response from a CredentialsPostWithResponse call
-func (c *ClientWithResponses) ParseCredentialsPostResponse(rsp *http.Response) (*CredentialsPostResponse, error) {
+// ParseCreateResponse parses an HTTP response from a CreateWithResponse call
+func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CredentialsPostResponse{
+	response := &CreateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -575,15 +575,15 @@ func (c *ClientWithResponses) ParseCredentialsPostResponse(rsp *http.Response) (
 	return response, nil
 }
 
-// ParseCredentialsDeleteResponse parses an HTTP response from a CredentialsDeleteWithResponse call
-func (c *ClientWithResponses) ParseCredentialsDeleteResponse(rsp *http.Response) (*CredentialsDeleteResponse, error) {
+// ParseDeleteResponse parses an HTTP response from a DeleteWithResponse call
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CredentialsDeleteResponse{
+	response := &DeleteResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -602,15 +602,15 @@ func (c *ClientWithResponses) ParseCredentialsDeleteResponse(rsp *http.Response)
 	return response, nil
 }
 
-// ParseCredentialGetResponse parses an HTTP response from a CredentialGetWithResponse call
-func (c *ClientWithResponses) ParseCredentialGetResponse(rsp *http.Response) (*CredentialGetResponse, error) {
+// ParseGetResponse parses an HTTP response from a GetWithResponse call
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CredentialGetResponse{
+	response := &GetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

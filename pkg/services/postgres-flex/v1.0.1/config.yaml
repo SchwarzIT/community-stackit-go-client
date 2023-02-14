@@ -83,6 +83,21 @@ tidy:
   - replace: PostInstanceUsers
     with: CreateUser
     prefix: true
+  - replace: CredentialGet
+    with: Get
+    prefix: true
+  - replace: CredentialsGet
+    with: List
+    prefix: true
+  - replace: CredentialsPost
+    with: Create
+    prefix: true
+  - replace: CredentialsDelete
+    with: Delete
+    prefix: true
+  - replace: OfferingsGet
+    with: Get
+    prefix: true
   params:
   - replace: Id
     with: ID
