@@ -13,6 +13,10 @@ type PutResponse struct {
 	instance.ClientWithResponsesInterface
 }
 
+type PatchResponse struct {
+	instance.ClientWithResponsesInterface
+}
+
 type DeleteResponse struct {
 	instance.ClientWithResponsesInterface
 }
