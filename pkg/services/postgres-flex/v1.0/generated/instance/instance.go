@@ -30,6 +30,17 @@ type InstanceACL struct {
 	Items *[]string `json:"items,omitempty"`
 }
 
+// InstanceCreateCloneInstanceRequest defines model for instance.CreateCloneInstanceRequest.
+type InstanceCreateCloneInstanceRequest struct {
+	InstanceID *string `json:"instanceId,omitempty"`
+	Timestamp  *string `json:"timestamp,omitempty"`
+}
+
+// InstanceCreateCloneInstanceResponse defines model for instance.CreateCloneInstanceResponse.
+type InstanceCreateCloneInstanceResponse struct {
+	InstanceID *string `json:"instanceId,omitempty"`
+}
+
 // InstanceCreateInstanceRequest defines model for instance.CreateInstanceRequest.
 type InstanceCreateInstanceRequest struct {
 	ACL            *InstanceACL `json:"acl,omitempty"`
@@ -134,6 +145,9 @@ type PatchUpdateJSONRequestBody = InstanceUpdateInstanceRequest
 // UpdateJSONRequestBody defines body for Update for application/json ContentType.
 type UpdateJSONRequestBody = InstanceUpdateInstanceRequest
 
+// CreateCloneJSONRequestBody defines body for CreateClone for application/json ContentType.
+type CreateCloneJSONRequestBody = InstanceCreateCloneInstanceRequest
+
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
@@ -185,6 +199,11 @@ type ClientInterface interface {
 	UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// CreateClone request with any body
+	CreateCloneWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	CreateClone(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -285,6 +304,30 @@ func (c *Client) UpdateWithBody(ctx context.Context, projectID string, instanceI
 
 func (c *Client) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateCloneWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateCloneRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) CreateClone(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateCloneRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -566,6 +609,60 @@ func NewUpdateRequestWithBody(ctx context.Context, server string, projectID stri
 	return req, nil
 }
 
+// NewCreateCloneRequest calls the generic CreateClone builder with application/json body
+func NewCreateCloneRequest(ctx context.Context, server string, projectID string, instanceID string, body CreateCloneJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewCreateCloneRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
+}
+
+// NewCreateCloneRequestWithBody generates requests for CreateClone with any type of body
+func NewCreateCloneRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/clone", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
@@ -611,6 +708,11 @@ type ClientWithResponsesInterface interface {
 	UpdateWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
 	UpdateWithResponse(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
+
+	// CreateClone request with any body
+	CreateCloneWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error)
+
+	CreateCloneWithResponse(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error)
 }
 
 type ListResponse struct {
@@ -640,7 +742,7 @@ func (r ListResponse) StatusCode() int {
 type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *InstanceCreateInstanceResponse
+	JSON201      *InstanceCreateInstanceResponse
 	JSON400      *InstanceError
 	HasError     error // Aggregated error
 }
@@ -756,6 +858,30 @@ func (r UpdateResponse) StatusCode() int {
 	return 0
 }
 
+type CreateCloneResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON201      *InstanceCreateCloneInstanceResponse
+	JSON400      *InstanceError
+	HasError     error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r CreateCloneResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r CreateCloneResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // ListWithResponse request returning *ListResponse
 func (c *ClientWithResponses) ListWithResponse(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.List(ctx, projectID, reqEditors...)
@@ -834,6 +960,23 @@ func (c *ClientWithResponses) UpdateWithResponse(ctx context.Context, projectID 
 	return c.ParseUpdateResponse(rsp)
 }
 
+// CreateCloneWithBodyWithResponse request with arbitrary body returning *CreateCloneResponse
+func (c *ClientWithResponses) CreateCloneWithBodyWithResponse(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error) {
+	rsp, err := c.CreateCloneWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseCreateCloneResponse(rsp)
+}
+
+func (c *ClientWithResponses) CreateCloneWithResponse(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error) {
+	rsp, err := c.CreateClone(ctx, projectID, instanceID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseCreateCloneResponse(rsp)
+}
+
 // ParseListResponse parses an HTTP response from a ListWithResponse call
 func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -883,12 +1026,12 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest InstanceCreateInstanceResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
-		response.JSON200 = &dest
+		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest InstanceError
@@ -1018,6 +1161,40 @@ func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateRe
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseCreateCloneResponse parses an HTTP response from a CreateCloneWithResponse call
+func (c *ClientWithResponses) ParseCreateCloneResponse(rsp *http.Response) (*CreateCloneResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &CreateCloneResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
+		var dest InstanceCreateCloneInstanceResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON201 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest InstanceError
