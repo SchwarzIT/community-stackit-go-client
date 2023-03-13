@@ -24,6 +24,14 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithR
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
 }
 
+// WaitHandler will wait for instance update to complete
+// returned interface is of *instance.InstanceSingleInstance
+func (r PatchUpdateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	// artifical wait for instance to change from status ready to updating
+	time.Sleep(5 * time.Second)
+	return createOrUpdateWait(ctx, c, projectID, instanceID)
+}
+
 func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.GetWithResponse(ctx, projectID, instanceID)
