@@ -91,6 +91,14 @@ tidy:
     all: true
   - replace: PostInstanceUsers
     with: CreateUser
+  - replace: PostInstanceClone
+    with: CreateClone
+    prefix: true
+  - replace: PostInstanceUsersUserIdReset
+    with: ResetUser
+    prefix: true
+  - replace: PostInstanceUsers
+    with: CreateUser
     prefix: true
   params:
   - replace: Id
@@ -100,6 +108,9 @@ tidy:
   - replace: Id
     with: ID
     suffix: true
+  - replace: Uri
+    with: URI
+    all: true
   - replace: Acl
     with: ACL
     suffix: true

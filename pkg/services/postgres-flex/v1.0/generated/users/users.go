@@ -24,13 +24,6 @@ const (
 	BearerAuthScopes = "BearerAuth.Scopes"
 )
 
-// InstanceCreateUserRequest defines model for instance.CreateUserRequest.
-type InstanceCreateUserRequest struct {
-	Database *string   `json:"database,omitempty"`
-	Roles    *[]string `json:"roles,omitempty"`
-	Username *string   `json:"username,omitempty"`
-}
-
 // InstanceCreateUserResponse defines model for instance.CreateUserResponse.
 type InstanceCreateUserResponse struct {
 	Item *InstanceUser `json:"item,omitempty"`
@@ -42,11 +35,6 @@ type InstanceError struct {
 	Fields  *map[string][]string `json:"fields,omitempty"`
 	Message *string              `json:"message,omitempty"`
 	Type    *string              `json:"type,omitempty"`
-}
-
-// InstanceGetUserResponse defines model for instance.GetUserResponse.
-type InstanceGetUserResponse struct {
-	Item *InstanceResponseUser `json:"item,omitempty"`
 }
 
 // InstanceListUser defines model for instance.ListUser.
@@ -61,14 +49,9 @@ type InstanceListUserResponse struct {
 	Items *[]InstanceListUser `json:"items,omitempty"`
 }
 
-// InstanceResponseUser defines model for instance.ResponseUser.
-type InstanceResponseUser struct {
-	Database *string   `json:"database,omitempty"`
-	Host     *string   `json:"host,omitempty"`
-	ID       *string   `json:"id,omitempty"`
-	Port     *int      `json:"port,omitempty"`
-	Roles    *[]string `json:"roles,omitempty"`
-	Username *string   `json:"username,omitempty"`
+// InstanceResetUserResponse defines model for instance.ResetUserResponse.
+type InstanceResetUserResponse struct {
+	Item *InstanceUser `json:"item,omitempty"`
 }
 
 // InstanceUser defines model for instance.User.
@@ -79,12 +62,32 @@ type InstanceUser struct {
 	Password *string   `json:"password,omitempty"`
 	Port     *int      `json:"port,omitempty"`
 	Roles    *[]string `json:"roles,omitempty"`
-	Uri      *string   `json:"uri,omitempty"`
+	URI      *string   `json:"uri,omitempty"`
+	Username *string   `json:"username,omitempty"`
+}
+
+// UserCreateUserRequest defines model for user.CreateUserRequest.
+type UserCreateUserRequest struct {
+	Roles    *[]string `json:"roles,omitempty"`
+	Username *string   `json:"username,omitempty"`
+}
+
+// UserGetUserResponse defines model for user.GetUserResponse.
+type UserGetUserResponse struct {
+	Item *UserResponseUser `json:"item,omitempty"`
+}
+
+// UserResponseUser defines model for user.ResponseUser.
+type UserResponseUser struct {
+	Host     *string   `json:"host,omitempty"`
+	ID       *string   `json:"id,omitempty"`
+	Port     *int      `json:"port,omitempty"`
+	Roles    *[]string `json:"roles,omitempty"`
 	Username *string   `json:"username,omitempty"`
 }
 
 // CreateUserJSONRequestBody defines body for CreateUser for application/json ContentType.
-type CreateUserJSONRequestBody = InstanceCreateUserRequest
+type CreateUserJSONRequestBody = UserCreateUserRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -122,8 +125,14 @@ type ClientInterface interface {
 
 	CreateUser(ctx context.Context, projectID string, instanceID string, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
+	// DeleteUser request
+	DeleteUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// GetUser request
 	GetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ResetUser request
+	ResetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) GetUsers(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -162,8 +171,32 @@ func (c *Client) CreateUser(ctx context.Context, projectID string, instanceID st
 	return c.Client.Do(req)
 }
 
+func (c *Client) DeleteUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteUserRequest(ctx, c.Server, projectID, instanceID, userID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
 func (c *Client) GetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserRequest(ctx, c.Server, projectID, instanceID, userID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ResetUser(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewResetUserRequest(ctx, c.Server, projectID, instanceID, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -269,6 +302,54 @@ func NewCreateUserRequestWithBody(ctx context.Context, server string, projectID 
 	return req, nil
 }
 
+// NewDeleteUserRequest generates requests for DeleteUser
+func NewDeleteUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "userID", runtime.ParamLocationPath, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/users/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewGetUserRequest generates requests for GetUser
 func NewGetUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string) (*http.Request, error) {
 	var err error
@@ -317,6 +398,54 @@ func NewGetUserRequest(ctx context.Context, server string, projectID string, ins
 	return req, nil
 }
 
+// NewResetUserRequest generates requests for ResetUser
+func NewResetUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "userID", runtime.ParamLocationPath, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/users/%s/reset", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
@@ -347,8 +476,14 @@ type ClientWithResponsesInterface interface {
 
 	CreateUserWithResponse(ctx context.Context, projectID string, instanceID string, body CreateUserJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateUserResponse, error)
 
+	// DeleteUser request
+	DeleteUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error)
+
 	// GetUser request
 	GetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetUserResponse, error)
+
+	// ResetUser request
+	ResetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*ResetUserResponse, error)
 }
 
 type GetUsersResponse struct {
@@ -378,7 +513,7 @@ func (r GetUsersResponse) StatusCode() int {
 type CreateUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *InstanceCreateUserResponse
+	JSON201      *InstanceCreateUserResponse
 	JSON400      *InstanceError
 	HasError     error // Aggregated error
 }
@@ -399,10 +534,33 @@ func (r CreateUserResponse) StatusCode() int {
 	return 0
 }
 
+type DeleteUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *InstanceError
+	HasError     error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type GetUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *InstanceGetUserResponse
+	JSON200      *UserGetUserResponse
 	JSON400      *InstanceError
 	HasError     error // Aggregated error
 }
@@ -417,6 +575,32 @@ func (r GetUserResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ResetUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON202      *InstanceResetUserResponse
+	JSON400      *InstanceError
+	JSON404      *InstanceError
+	JSON500      *InstanceError
+	HasError     error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r ResetUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ResetUserResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -449,6 +633,15 @@ func (c *ClientWithResponses) CreateUserWithResponse(ctx context.Context, projec
 	return c.ParseCreateUserResponse(rsp)
 }
 
+// DeleteUserWithResponse request returning *DeleteUserResponse
+func (c *ClientWithResponses) DeleteUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*DeleteUserResponse, error) {
+	rsp, err := c.DeleteUser(ctx, projectID, instanceID, userID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseDeleteUserResponse(rsp)
+}
+
 // GetUserWithResponse request returning *GetUserResponse
 func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetUserResponse, error) {
 	rsp, err := c.GetUser(ctx, projectID, instanceID, userID, reqEditors...)
@@ -456,6 +649,15 @@ func (c *ClientWithResponses) GetUserWithResponse(ctx context.Context, projectID
 		return nil, err
 	}
 	return c.ParseGetUserResponse(rsp)
+}
+
+// ResetUserWithResponse request returning *ResetUserResponse
+func (c *ClientWithResponses) ResetUserWithResponse(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*ResetUserResponse, error) {
+	rsp, err := c.ResetUser(ctx, projectID, instanceID, userID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseResetUserResponse(rsp)
 }
 
 // ParseGetUsersResponse parses an HTTP response from a GetUsersWithResponse call
@@ -507,13 +709,40 @@ func (c *ClientWithResponses) ParseCreateUserResponse(rsp *http.Response) (*Crea
 	response.HasError = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
 		var dest InstanceCreateUserResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
-		response.JSON200 = &dest
+		response.JSON201 = &dest
 
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseDeleteUserResponse parses an HTTP response from a DeleteUserWithResponse call
+func (c *ClientWithResponses) ParseDeleteUserResponse(rsp *http.Response) (*DeleteUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
 		var dest InstanceError
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
@@ -542,7 +771,7 @@ func (c *ClientWithResponses) ParseGetUserResponse(rsp *http.Response) (*GetUser
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest InstanceGetUserResponse
+		var dest UserGetUserResponse
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
@@ -554,6 +783,54 @@ func (c *ClientWithResponses) ParseGetUserResponse(rsp *http.Response) (*GetUser
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseResetUserResponse parses an HTTP response from a ResetUserWithResponse call
+func (c *ClientWithResponses) ParseResetUserResponse(rsp *http.Response) (*ResetUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ResetUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
+		var dest InstanceResetUserResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON202 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
 
 	}
 
