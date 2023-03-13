@@ -13,6 +13,10 @@ type UpdateResponse struct {
 	instance.ClientWithResponsesInterface
 }
 
+type PatchUpdateResponse struct {
+	instance.ClientWithResponsesInterface
+}
+
 type DeleteResponse struct {
 	instance.ClientWithResponsesInterface
 }
