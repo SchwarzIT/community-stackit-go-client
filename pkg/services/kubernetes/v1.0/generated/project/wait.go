@@ -17,8 +17,8 @@ func (r CreateProjectResponse) WaitHandler(ctx context.Context, c *ClientWithRes
 		if err != nil {
 			return nil, false, errors.Wrap(err, "failed during create request preparation")
 		}
-		if resp.HasError != nil {
-			if strings.Contains(resp.HasError.Error(), "project has no assigned namespace") {
+		if resp.Error != nil {
+			if strings.Contains(resp.Error.Error(), "project has no assigned namespace") {
 				return nil, false, nil
 			}
 			return nil, false, err
@@ -48,8 +48,8 @@ func (r DeleteProjectResponse) WaitHandler(ctx context.Context, c *ClientWithRes
 			}
 			return nil, false, errors.Wrap(err, "failed during delete request preparation")
 		}
-		if resp.HasError != nil {
-			if strings.Contains(resp.HasError.Error(), http.StatusText(http.StatusNotFound)) {
+		if resp.Error != nil {
+			if strings.Contains(resp.Error.Error(), http.StatusText(http.StatusNotFound)) {
 				return nil, true, nil
 			}
 			return nil, false, err

@@ -1615,7 +1615,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *GetAlert
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1640,7 +1640,7 @@ type UpdateResponse struct {
 	JSON202      *PutAlert
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1664,7 +1664,7 @@ type ReceiversListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *ReceiversResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1689,7 +1689,7 @@ type ReceiversCreateResponse struct {
 	JSON202      *ReceiversResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1714,7 +1714,7 @@ type ReceiversDeleteResponse struct {
 	JSON202      *ReceiversResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1739,7 +1739,7 @@ type ReceiversReadResponse struct {
 	JSON200      *ReceiversResponseSerializerSingle
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1765,7 +1765,7 @@ type ReceiversUpdateResponse struct {
 	JSON400      *Error
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1789,7 +1789,7 @@ type RoutesListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *RouteResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1814,7 +1814,7 @@ type RoutesCreateResponse struct {
 	JSON202      *RouteResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1839,7 +1839,7 @@ type RoutesDeleteResponse struct {
 	JSON202      *RouteResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1863,7 +1863,7 @@ type RoutesReadResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *RouteResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1889,7 +1889,7 @@ type RoutesUpdateResponse struct {
 	JSON400      *Error
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2068,7 +2068,7 @@ func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2102,7 +2102,7 @@ func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2143,7 +2143,7 @@ func (c *ClientWithResponses) ParseReceiversListResponse(rsp *http.Response) (*R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2177,7 +2177,7 @@ func (c *ClientWithResponses) ParseReceiversCreateResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2218,7 +2218,7 @@ func (c *ClientWithResponses) ParseReceiversDeleteResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2259,7 +2259,7 @@ func (c *ClientWithResponses) ParseReceiversReadResponse(rsp *http.Response) (*R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2300,7 +2300,7 @@ func (c *ClientWithResponses) ParseReceiversUpdateResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2348,7 +2348,7 @@ func (c *ClientWithResponses) ParseRoutesListResponse(rsp *http.Response) (*Rout
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2382,7 +2382,7 @@ func (c *ClientWithResponses) ParseRoutesCreateResponse(rsp *http.Response) (*Ro
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2423,7 +2423,7 @@ func (c *ClientWithResponses) ParseRoutesDeleteResponse(rsp *http.Response) (*Ro
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2464,7 +2464,7 @@ func (c *ClientWithResponses) ParseRoutesReadResponse(rsp *http.Response) (*Rout
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2498,7 +2498,7 @@ func (c *ClientWithResponses) ParseRoutesUpdateResponse(rsp *http.Response) (*Ro
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:

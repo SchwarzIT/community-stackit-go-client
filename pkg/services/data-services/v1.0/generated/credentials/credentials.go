@@ -377,7 +377,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *CredentialsList
 	JSON404      *Error
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -401,7 +401,7 @@ type PostResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *CredentialsResponse
 	JSON400      *Error
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -424,7 +424,7 @@ type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON404      *Error
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -448,7 +448,7 @@ type GetResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *CredentialsResponse
 	JSON404      *Error
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -515,7 +515,7 @@ func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -549,7 +549,7 @@ func (c *ClientWithResponses) ParsePostResponse(rsp *http.Response) (*PostRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -583,7 +583,7 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
@@ -610,7 +610,7 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

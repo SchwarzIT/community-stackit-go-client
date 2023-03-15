@@ -26,7 +26,7 @@ func (r ProvisionResponse) WaitHandler(ctx context.Context, c *instances.ClientW
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
+		if s.Error != nil {
 			return nil, false, err
 		}
 		if s.JSON200 == nil {
@@ -54,7 +54,7 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *instances.ClientWith
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
+		if s.Error != nil {
 			return nil, false, err
 		}
 		if s.JSON200 == nil {
@@ -88,8 +88,8 @@ func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *instances.Clien
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
-			return nil, false, s.HasError
+		if s.Error != nil {
+			return nil, false, s.Error
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("bad response, JSON200 is nil")

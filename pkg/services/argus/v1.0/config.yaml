@@ -30,7 +30,7 @@ output-options:
     - traces
     - plans
   extend-response:
-  - field: HasError
+  - field: Error
     type: error
     description: "Aggregated error"
     apply-to: ["*"]

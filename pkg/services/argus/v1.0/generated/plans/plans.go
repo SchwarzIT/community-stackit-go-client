@@ -231,7 +231,7 @@ type ListOfferingsResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Offerings
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -255,7 +255,7 @@ type ListPlansResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Plan
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -304,7 +304,7 @@ func (c *ClientWithResponses) ParseListOfferingsResponse(rsp *http.Response) (*L
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -338,7 +338,7 @@ func (c *ClientWithResponses) ParseListPlansResponse(rsp *http.Response) (*ListP
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

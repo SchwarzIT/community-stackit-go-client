@@ -223,20 +223,21 @@ func TestResponse(t *testing.T) {
 		want string
 	}{
 		{"error from request", args{requestError: errors.New("a request error")}, "a request error"},
-		{"no HasError", args{requestError: nil, resp: struct{}{}}, "No such field: HasError in obj"},
+		{"nil resp", args{requestError: nil, resp: nil}, "response interface is nil"},
+		{"no Error", args{requestError: nil, resp: struct{}{}}, "No such field: Error in obj"},
 		{"not struct", args{requestError: nil, resp: 1}, "Cannot use GetField on a non-struct interface"},
-		{"nil HasError", args{requestError: nil, resp: struct{ HasError error }{}}, ""},
-		{"defined HasError", args{requestError: nil, resp: struct{ HasError error }{HasError: errors.New("an error")}}, "an error"},
-		{"nil HasError, nil JSON200", args{requestError: nil, resp: struct {
-			HasError error
-			JSON200  interface{}
+		{"nil Error", args{requestError: nil, resp: struct{ Error error }{}}, ""},
+		{"defined Error", args{requestError: nil, resp: struct{ Error error }{Error: errors.New("an error")}}, "an error"},
+		{"nil Error, nil JSON200", args{requestError: nil, resp: struct {
+			Error   error
+			JSON200 interface{}
 		}{JSON200: nil}, checkNullFields: []string{"JSON200"}}, "field JSON200 in response is nil"},
-		{"nil HasError, notfound JSON200", args{requestError: nil, resp: struct {
-			HasError error
+		{"nil Error, notfound JSON200", args{requestError: nil, resp: struct {
+			Error error
 		}{}, checkNullFields: []string{"JSON200"}}, "No such field: JSON200 in obj"},
-		{"nil HasError, JSON200.ABC is nil", args{requestError: nil, resp: struct {
-			HasError error
-			JSON200  struct{ ABC *string }
+		{"nil Error, JSON200.ABC is nil", args{requestError: nil, resp: struct {
+			Error   error
+			JSON200 struct{ ABC *string }
 		}{JSON200: struct{ ABC *string }{ABC: nil}}, checkNullFields: []string{"JSON200.ABC"}}, "field JSON200.ABC in response is nil"},
 	}
 	for _, tt := range tests {
@@ -245,5 +246,25 @@ func TestResponse(t *testing.T) {
 				t.Errorf("Response() error = %v, want %s", err, tt.want)
 			}
 		})
+	}
+}
+
+type sample struct{}
+
+func (sample) StatusCode() uint {
+	return http.StatusAccepted
+}
+
+func TestStatusCode(t *testing.T) {
+
+	var a *sample = &sample{}
+	var b *sample = nil
+
+	if validate.StatusCode(b, http.StatusAccepted) {
+		t.Error("expected false for b, got true")
+	}
+
+	if !validate.StatusCode(a, http.StatusAccepted) {
+		t.Error("expected true for a, got false")
 	}
 }

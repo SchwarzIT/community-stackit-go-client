@@ -491,7 +491,7 @@ type GetUsersResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceListUserResponse
 	JSON400      *InstanceError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -515,7 +515,7 @@ type CreateUserResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *InstanceCreateUserResponse
 	JSON400      *InstanceError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -538,7 +538,7 @@ type DeleteUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *InstanceError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -562,7 +562,7 @@ type GetUserResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *UserGetUserResponse
 	JSON400      *InstanceError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -588,7 +588,7 @@ type ResetUserResponse struct {
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	JSON500      *InstanceError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -672,7 +672,7 @@ func (c *ClientWithResponses) ParseGetUsersResponse(rsp *http.Response) (*GetUse
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -706,7 +706,7 @@ func (c *ClientWithResponses) ParseCreateUserResponse(rsp *http.Response) (*Crea
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -740,7 +740,7 @@ func (c *ClientWithResponses) ParseDeleteUserResponse(rsp *http.Response) (*Dele
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
@@ -767,7 +767,7 @@ func (c *ClientWithResponses) ParseGetUserResponse(rsp *http.Response) (*GetUser
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -801,7 +801,7 @@ func (c *ClientWithResponses) ParseResetUserResponse(rsp *http.Response) (*Reset
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:

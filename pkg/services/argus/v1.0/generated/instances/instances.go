@@ -1379,7 +1379,7 @@ type InstanceListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *ProjectInstanceFullMany
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1404,7 +1404,7 @@ type InstanceCreateResponse struct {
 	JSON202      *ProjectInstancesCreateResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1428,7 +1428,7 @@ type InstanceDeleteResponse struct {
 	HTTPResponse *http.Response
 	JSON202      *ProjectInstancesUpdateResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1452,7 +1452,7 @@ type InstanceReadResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *ProjectInstanceUI
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1477,7 +1477,7 @@ type InstanceUpdateResponse struct {
 	JSON202      *ProjectInstancesUpdateResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1501,7 +1501,7 @@ type InstanceCredentialsListResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *CredentialsListResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1525,7 +1525,7 @@ type InstanceCredentialsCreateResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *APIUserProjectCreated
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1551,7 +1551,7 @@ type InstanceCredentialsDeleteResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON500      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1576,7 +1576,7 @@ type InstanceCredentialsReadResponse struct {
 	JSON200      *ServiceKeysResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1603,7 +1603,7 @@ type InstanceCredentialsRemoteWriteLimitsDeleteResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON502      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1629,7 +1629,7 @@ type InstanceCredentialsRemoteWriteLimitsListResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON502      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1656,7 +1656,7 @@ type InstanceCredentialsRemoteWriteLimitsUpdateResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON502      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1681,7 +1681,7 @@ type SystemInstancesReadResponse struct {
 	JSON200      *SystemInstanceResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1705,7 +1705,7 @@ type SystemInstancesCredentialsCreateResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *APIUserCreated
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1731,7 +1731,7 @@ type SystemInstancesCredentialsDeleteResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON500      *Message
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1929,7 +1929,7 @@ func (c *ClientWithResponses) ParseInstanceListResponse(rsp *http.Response) (*In
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1963,7 +1963,7 @@ func (c *ClientWithResponses) ParseInstanceCreateResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2004,7 +2004,7 @@ func (c *ClientWithResponses) ParseInstanceDeleteResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2038,7 +2038,7 @@ func (c *ClientWithResponses) ParseInstanceReadResponse(rsp *http.Response) (*In
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2072,7 +2072,7 @@ func (c *ClientWithResponses) ParseInstanceUpdateResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -2113,7 +2113,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsListResponse(rsp *http.Res
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -2147,7 +2147,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsCreateResponse(rsp *http.R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -2181,7 +2181,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsDeleteResponse(rsp *http.R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2229,7 +2229,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsReadResponse(rsp *http.Res
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2270,7 +2270,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsRemoteWriteLimitsDeleteRes
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2325,7 +2325,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsRemoteWriteLimitsListRespo
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2373,7 +2373,7 @@ func (c *ClientWithResponses) ParseInstanceCredentialsRemoteWriteLimitsUpdateRes
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2428,7 +2428,7 @@ func (c *ClientWithResponses) ParseSystemInstancesReadResponse(rsp *http.Respons
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2469,7 +2469,7 @@ func (c *ClientWithResponses) ParseSystemInstancesCredentialsCreateResponse(rsp 
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -2503,7 +2503,7 @@ func (c *ClientWithResponses) ParseSystemInstancesCredentialsDeleteResponse(rsp 
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

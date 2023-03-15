@@ -951,7 +951,7 @@ type GetCostsForAllProjectsInCustomerAccountResponse struct {
 		Code    string  `json:"code"`
 		Message *string `json:"message,omitempty"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1048,7 +1048,7 @@ type GetCostsForAllProjectsInAllSubCustomerAccountsResponse struct {
 		Code    string  `json:"code"`
 		Message *string `json:"message,omitempty"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1145,7 +1145,7 @@ type GetProjectCostsResponse struct {
 		Code    string  `json:"code"`
 		Message *string `json:"message,omitempty"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1191,7 +1191,7 @@ type GetForecastCustomerAccountResponse struct {
 		Code    string  `json:"code"`
 		Message *string `json:"message,omitempty"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1258,7 +1258,7 @@ func (c *ClientWithResponses) ParseGetCostsForAllProjectsInCustomerAccountRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1368,7 +1368,7 @@ func (c *ClientWithResponses) ParseGetCostsForAllProjectsInAllSubCustomerAccount
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1478,7 +1478,7 @@ func (c *ClientWithResponses) ParseGetProjectCostsResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1591,7 +1591,7 @@ func (c *ClientWithResponses) ParseGetForecastCustomerAccountResponse(rsp *http.
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

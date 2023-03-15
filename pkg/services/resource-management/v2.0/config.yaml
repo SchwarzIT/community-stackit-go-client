@@ -15,7 +15,7 @@ output-options:
     - Projects
     - Private
   extend-response:
-  - field: HasError
+  - field: Error
     type: error
     description: "Aggregated error"
     apply-to: ["*"]

@@ -320,7 +320,7 @@ type DeleteProjectResponse struct {
 	JSON202      *map[string]interface{}
 	JSON400      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -345,7 +345,7 @@ type GetProjectResponse struct {
 	JSON200      *Project
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -370,7 +370,7 @@ type CreateProjectResponse struct {
 	JSON200      *Project
 	JSON400      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -428,7 +428,7 @@ func (c *ClientWithResponses) ParseDeleteProjectResponse(rsp *http.Response) (*D
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -476,7 +476,7 @@ func (c *ClientWithResponses) ParseGetProjectResponse(rsp *http.Response) (*GetP
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -517,7 +517,7 @@ func (c *ClientWithResponses) ParseCreateProjectResponse(rsp *http.Response) (*C
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

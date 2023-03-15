@@ -263,7 +263,7 @@ type PostOrganizationsResponse struct {
 	JSON201      *OrganizationResponse
 	JSON400      *ErrorResponse
 	JSON409      *ErrorResponse
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -311,7 +311,7 @@ func (c *ClientWithResponses) ParsePostOrganizationsResponse(rsp *http.Response)
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:

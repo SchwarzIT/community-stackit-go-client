@@ -24,8 +24,8 @@ func (r CreateOrUpdateClusterResponse) WaitHandler(ctx context.Context, c *clust
 		if resp.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if resp.HasError != nil {
-			return nil, false, resp.HasError
+		if resp.Error != nil {
+			return nil, false, resp.Error
 		}
 
 		status := *resp.JSON200.Status.Aggregated
@@ -48,7 +48,7 @@ func (r DeleteClusterResponse) WaitHandler(ctx context.Context, c *cluster.Clien
 		if resp.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if resp.HasError != nil {
+		if resp.Error != nil {
 			if resp.StatusCode() == http.StatusNotFound {
 				return nil, true, nil
 			}

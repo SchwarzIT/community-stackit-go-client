@@ -34,8 +34,8 @@ func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		if s.StatusCode() == http.StatusInternalServerError {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
-			return nil, false, s.HasError
+		if s.Error != nil {
+			return nil, false, s.Error
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
@@ -65,8 +65,8 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
-			return nil, false, s.HasError
+		if s.Error != nil {
+			return nil, false, s.Error
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
@@ -97,8 +97,8 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 				if s.StatusCode() == http.StatusBadGateway {
 					return nil, false, nil
 				}
-				if si.HasError != nil {
-					return nil, false, s.HasError
+				if si.Error != nil {
+					return nil, false, s.Error
 				}
 				if si.JSON200 == nil {
 					return nil, false, errors.New("received an empty response. JSON200 == nil")
@@ -138,8 +138,8 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
 			return nil, false, nil
 		}
-		if s.HasError != nil {
-			return nil, false, s.HasError
+		if s.Error != nil {
+			return nil, false, s.Error
 		}
 		if s.JSON200 == nil {
 			return nil, false, errors.New("received an empty response. JSON200 == nil")
@@ -166,8 +166,8 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 				if si.StatusCode() == http.StatusNotFound {
 					return nil, true, nil
 				}
-				if si.HasError != nil {
-					return nil, false, s.HasError
+				if si.Error != nil {
+					return nil, false, s.Error
 				}
 				if si.JSON200 == nil {
 					return nil, false, errors.New("received an empty response. JSON200 == nil")

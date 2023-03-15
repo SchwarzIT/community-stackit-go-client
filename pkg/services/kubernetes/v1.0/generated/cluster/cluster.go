@@ -829,7 +829,7 @@ type ListClustersResponse struct {
 	JSON400      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -854,7 +854,7 @@ type DeleteClusterResponse struct {
 	JSON200      *map[string]interface{}
 	JSON202      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -878,7 +878,7 @@ type GetClusterResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *Cluster
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -905,7 +905,7 @@ type CreateOrUpdateClusterResponse struct {
 	JSON400      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -931,7 +931,7 @@ type TriggerClusterHibernationResponse struct {
 	JSON202      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -957,7 +957,7 @@ type TriggerClusterMaintenanceResponse struct {
 	JSON202      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -983,7 +983,7 @@ type TriggerClusterReconciliationResponse struct {
 	JSON202      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1009,7 +1009,7 @@ type TriggerClusterWakeupResponse struct {
 	JSON202      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1120,7 +1120,7 @@ func (c *ClientWithResponses) ParseListClustersResponse(rsp *http.Response) (*Li
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1168,7 +1168,7 @@ func (c *ClientWithResponses) ParseDeleteClusterResponse(rsp *http.Response) (*D
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1209,7 +1209,7 @@ func (c *ClientWithResponses) ParseGetClusterResponse(rsp *http.Response) (*GetC
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1243,7 +1243,7 @@ func (c *ClientWithResponses) ParseCreateOrUpdateClusterResponse(rsp *http.Respo
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1298,7 +1298,7 @@ func (c *ClientWithResponses) ParseTriggerClusterHibernationResponse(rsp *http.R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1346,7 +1346,7 @@ func (c *ClientWithResponses) ParseTriggerClusterMaintenanceResponse(rsp *http.R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1394,7 +1394,7 @@ func (c *ClientWithResponses) ParseTriggerClusterReconciliationResponse(rsp *htt
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1442,7 +1442,7 @@ func (c *ClientWithResponses) ParseTriggerClusterWakeupResponse(rsp *http.Respon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
