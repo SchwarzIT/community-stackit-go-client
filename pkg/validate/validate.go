@@ -63,8 +63,8 @@ type ResponseInterface interface {
 	StatusCode() int
 }
 
-// StatusCode returns true if interface.StatusCode() equals a given http code
-func StatusCode(a ResponseInterface, statusCode int) bool {
+// StatusEquals returns true if interface.StatusCode() equals a given http code
+func StatusEquals(a ResponseInterface, statusCode int) bool {
 	if a == nil || (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil()) {
 		return false
 	}
