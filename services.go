@@ -2,7 +2,7 @@ package client
 
 import (
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
-	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1.0/generated"
+	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0/generated"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
@@ -52,5 +52,4 @@ func (c *Client) initServices() {
 	c.PostgresDB = dataservices.NewService(c, dataservices.PostgresDB)
 	c.RabbitMQ = dataservices.NewService(c, dataservices.RabbitMQ)
 	c.Redis = dataservices.NewService(c, dataservices.Redis)
-
 }
