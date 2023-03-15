@@ -541,7 +541,7 @@ type ListResponse struct {
 	JSON200      *InstanceListBackupResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -566,7 +566,7 @@ type UpdateResponse struct {
 	JSON200      *OpsmanagerUpdateScheduleRequest
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -591,7 +591,7 @@ type GetResponse struct {
 	JSON200      *InstanceGetBackupResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -616,7 +616,7 @@ type CreateCloneResponse struct {
 	JSON202      *InstanceCreateCloneInstanceResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -641,7 +641,7 @@ type CreateRestoreResponse struct {
 	JSON202      *InstanceCreateRestoreInstanceResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

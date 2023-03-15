@@ -1379,7 +1379,7 @@ type InstanceListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *ProjectInstanceFullMany
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1404,7 +1404,7 @@ type InstanceCreateResponse struct {
 	JSON202      *ProjectInstancesCreateResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1428,7 +1428,7 @@ type InstanceDeleteResponse struct {
 	HTTPResponse *http.Response
 	JSON202      *ProjectInstancesUpdateResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1452,7 +1452,7 @@ type InstanceReadResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *ProjectInstanceUI
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1477,7 +1477,7 @@ type InstanceUpdateResponse struct {
 	JSON202      *ProjectInstancesUpdateResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1501,7 +1501,7 @@ type InstanceCredentialsListResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *CredentialsListResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1525,7 +1525,7 @@ type InstanceCredentialsCreateResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *APIUserProjectCreated
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1551,7 +1551,7 @@ type InstanceCredentialsDeleteResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON500      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1576,7 +1576,7 @@ type InstanceCredentialsReadResponse struct {
 	JSON200      *ServiceKeysResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1603,7 +1603,7 @@ type InstanceCredentialsRemoteWriteLimitsDeleteResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON502      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1629,7 +1629,7 @@ type InstanceCredentialsRemoteWriteLimitsListResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON502      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1656,7 +1656,7 @@ type InstanceCredentialsRemoteWriteLimitsUpdateResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON502      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1681,7 +1681,7 @@ type SystemInstancesReadResponse struct {
 	JSON200      *SystemInstanceResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1705,7 +1705,7 @@ type SystemInstancesCredentialsCreateResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *APIUserCreated
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1731,7 +1731,7 @@ type SystemInstancesCredentialsDeleteResponse struct {
 	JSON403      *PermissionDenied
 	JSON404      *Message
 	JSON500      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

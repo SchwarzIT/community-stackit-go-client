@@ -164,7 +164,7 @@ type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Offerings
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

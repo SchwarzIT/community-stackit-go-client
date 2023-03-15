@@ -226,7 +226,7 @@ type GetFlavorsResponse struct {
 	JSON200      *InfraGetFlavorsResponse
 	JSON400      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -251,7 +251,7 @@ type GetStoragesFlavorResponse struct {
 	JSON200      *InstanceGetFlavorStorageResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

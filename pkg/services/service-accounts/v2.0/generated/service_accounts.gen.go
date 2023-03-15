@@ -1414,7 +1414,7 @@ type CreateTokenResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *TokenResponseBody
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1440,7 +1440,7 @@ type ListResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1467,7 +1467,7 @@ type CreateSAv2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON409      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1493,7 +1493,7 @@ type DeleteSAv2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1520,7 +1520,7 @@ type GetAccessTokensV2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1547,7 +1547,7 @@ type CreateSAAccessTokensV2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1574,7 +1574,7 @@ type DeleteSAAccessTokensV2Response struct {
 	JSON403      *Error
 	JSON404      *Error
 	JSON409      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1597,7 +1597,7 @@ type GetServiceAccountJwksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *GetJWKResponseBody
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1623,7 +1623,7 @@ type GetSAKeysResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1650,7 +1650,7 @@ type CreateSAKeysResponse struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON409      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1675,7 +1675,7 @@ type DeleteSAKeysResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1701,7 +1701,7 @@ type GetSAKeysKeyIDResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1728,7 +1728,7 @@ type UpdateSAKeysResponse struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON409      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

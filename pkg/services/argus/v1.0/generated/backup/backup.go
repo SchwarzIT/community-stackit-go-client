@@ -721,7 +721,7 @@ type RestoresCreateResponse struct {
 	JSON202      *Message
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -745,7 +745,7 @@ type RetentionsListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *BackupRetentionResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -769,7 +769,7 @@ type SchedulesListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *BackupScheduleResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -794,7 +794,7 @@ type SchedulesCreateResponse struct {
 	JSON202      *BackupSchedulePostResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -819,7 +819,7 @@ type ListResponse struct {
 	JSON200      *BackupResponse
 	JSON403      *PermissionDenied
 	JSON502      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -844,7 +844,7 @@ type CreateResponse struct {
 	JSON202      *Message
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

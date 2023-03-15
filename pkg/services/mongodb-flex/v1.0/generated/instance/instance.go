@@ -657,7 +657,7 @@ type ListResponse struct {
 	JSON200      *InstanceListInstanceResponse
 	JSON400      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -683,7 +683,7 @@ type CreateResponse struct {
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -708,7 +708,7 @@ type DeleteResponse struct {
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -733,7 +733,7 @@ type GetResponse struct {
 	JSON200      *InstancesGetInstanceResponse
 	JSON400      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -759,7 +759,7 @@ type PatchResponse struct {
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -785,7 +785,7 @@ type PutResponse struct {
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

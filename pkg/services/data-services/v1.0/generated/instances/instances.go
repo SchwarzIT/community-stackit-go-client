@@ -501,7 +501,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceList
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -526,7 +526,7 @@ type ProvisionResponse struct {
 	JSON202      *InstanceID
 	JSON400      *Error
 	JSON409      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -550,7 +550,7 @@ type DeprovisionResponse struct {
 	HTTPResponse *http.Response
 	JSON400      *Error
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -575,7 +575,7 @@ type GetResponse struct {
 	JSON200      *Instance
 	JSON404      *Error
 	JSON410      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -599,7 +599,7 @@ type UpdateResponse struct {
 	HTTPResponse *http.Response
 	JSON400      *Error
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

@@ -171,7 +171,7 @@ type GetVersionsResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceGetVersionsResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

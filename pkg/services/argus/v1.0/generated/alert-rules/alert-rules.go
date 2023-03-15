@@ -800,7 +800,7 @@ type DeleteResponse struct {
 	HTTPResponse *http.Response
 	JSON202      *AlertRulesResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -824,7 +824,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *AlertRulesResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -849,7 +849,7 @@ type PartialUpdateResponse struct {
 	JSON202      *AlertRulesResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -874,7 +874,7 @@ type CreateResponse struct {
 	JSON202      *AlertRulesResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -900,7 +900,7 @@ type DeleteRulesResponse struct {
 	JSON400      *Error
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -925,7 +925,7 @@ type ReadResponse struct {
 	JSON200      *AlertRuleResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -951,7 +951,7 @@ type UpdateResponse struct {
 	JSON400      *Error
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

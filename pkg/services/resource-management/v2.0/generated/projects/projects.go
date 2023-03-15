@@ -856,7 +856,7 @@ type ListResponse struct {
 	JSON400      *ErrorResponse
 	JSON403      *ErrorResponse
 	JSON409      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -882,7 +882,7 @@ type CreateResponse struct {
 	JSON400      *ErrorResponse
 	JSON403      *ErrorResponse
 	JSON409      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -905,7 +905,7 @@ type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON409      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -930,7 +930,7 @@ type GetResponse struct {
 	JSON200      *ProjectResponseWithParents
 	JSON403      *ErrorResponse
 	JSON404      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -956,7 +956,7 @@ type UpdateResponse struct {
 	JSON403      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON409      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -979,7 +979,7 @@ type DeleteProjectContainerIDLabelsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON409      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

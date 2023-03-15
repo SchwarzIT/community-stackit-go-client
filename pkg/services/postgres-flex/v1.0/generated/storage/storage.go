@@ -159,7 +159,7 @@ type GetFlavorResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceGetFlavorStorageResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

@@ -491,7 +491,7 @@ type GetUsersResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceListUserResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -515,7 +515,7 @@ type CreateUserResponse struct {
 	HTTPResponse *http.Response
 	JSON201      *InstanceCreateUserResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -538,7 +538,7 @@ type DeleteUserResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -562,7 +562,7 @@ type GetUserResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *UserGetUserResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -588,7 +588,7 @@ type ResetUserResponse struct {
 	JSON400      *InstanceError
 	JSON404      *InstanceError
 	JSON500      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

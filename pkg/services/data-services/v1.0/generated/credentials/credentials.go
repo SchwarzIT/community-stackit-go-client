@@ -377,7 +377,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *CredentialsList
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -401,7 +401,7 @@ type PostResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *CredentialsResponse
 	JSON400      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -424,7 +424,7 @@ type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -448,7 +448,7 @@ type GetResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *CredentialsResponse
 	JSON404      *Error
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

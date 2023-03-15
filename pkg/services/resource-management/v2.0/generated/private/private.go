@@ -263,7 +263,7 @@ type PostOrganizationsResponse struct {
 	JSON201      *OrganizationResponse
 	JSON400      *ErrorResponse
 	JSON409      *ErrorResponse
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

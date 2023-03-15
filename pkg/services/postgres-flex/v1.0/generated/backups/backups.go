@@ -333,7 +333,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceListBackupResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -356,7 +356,7 @@ type UpdateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -380,7 +380,7 @@ type GetResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceGetBackupResponse
 	JSON400      *InstanceError
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status

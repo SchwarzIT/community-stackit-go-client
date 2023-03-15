@@ -324,7 +324,7 @@ type ListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *HttpCheckResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -348,7 +348,7 @@ type CreateResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *HttpCheckResponse
 	JSON403      *PermissionDenied
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -373,7 +373,7 @@ type DeleteResponse struct {
 	JSON200      *HttpCheckResponse
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	Error     error // Aggregated error
+	Error        error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
