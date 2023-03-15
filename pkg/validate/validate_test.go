@@ -251,7 +251,7 @@ func TestResponse(t *testing.T) {
 
 type sample struct{}
 
-func (sample) StatusCode() uint {
+func (sample) StatusCode() int {
 	return http.StatusAccepted
 }
 
