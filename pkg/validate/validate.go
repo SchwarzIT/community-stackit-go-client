@@ -59,6 +59,18 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 	return nil
 }
 
+type ResponseInterface interface {
+	StatusCode() uint
+}
+
+// StatusCode returns true if interface.StatusCode() equals a given http code
+func StatusCode(a ResponseInterface, statusCode uint) bool {
+	if a == nil || (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil()) {
+		return false
+	}
+	return a.StatusCode() == statusCode
+}
+
 // UUID validates a given UUID
 func UUID(id string) error {
 	if _, err := uuid.Parse(id); err != nil {

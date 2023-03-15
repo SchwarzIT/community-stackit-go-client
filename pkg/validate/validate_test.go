@@ -223,6 +223,7 @@ func TestResponse(t *testing.T) {
 		want string
 	}{
 		{"error from request", args{requestError: errors.New("a request error")}, "a request error"},
+		{"nil resp", args{requestError: nil, resp: nil}, "response interface is nil"},
 		{"no Error", args{requestError: nil, resp: struct{}{}}, "No such field: Error in obj"},
 		{"not struct", args{requestError: nil, resp: 1}, "Cannot use GetField on a non-struct interface"},
 		{"nil Error", args{requestError: nil, resp: struct{ Error error }{}}, ""},
@@ -245,5 +246,25 @@ func TestResponse(t *testing.T) {
 				t.Errorf("Response() error = %v, want %s", err, tt.want)
 			}
 		})
+	}
+}
+
+type sample struct{}
+
+func (sample) StatusCode() uint {
+	return http.StatusAccepted
+}
+
+func TestStatusCode(t *testing.T) {
+
+	var a *sample = &sample{}
+	var b *sample = nil
+
+	if validate.StatusCode(b, http.StatusAccepted) {
+		t.Error("expected false for b, got true")
+	}
+
+	if !validate.StatusCode(a, http.StatusAccepted) {
+		t.Error("expected true for a, got false")
 	}
 }
