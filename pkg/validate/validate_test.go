@@ -255,16 +255,16 @@ func (sample) StatusCode() int {
 	return http.StatusAccepted
 }
 
-func TestStatusCode(t *testing.T) {
+func TestStatusEquals(t *testing.T) {
 
 	var a *sample = &sample{}
 	var b *sample = nil
 
-	if validate.StatusCode(b, http.StatusAccepted) {
+	if validate.StatusEquals(b, http.StatusAccepted) {
 		t.Error("expected false for b, got true")
 	}
 
-	if !validate.StatusCode(a, http.StatusAccepted) {
+	if !validate.StatusEquals(a, http.StatusAccepted) {
 		t.Error("expected true for a, got false")
 	}
 }
