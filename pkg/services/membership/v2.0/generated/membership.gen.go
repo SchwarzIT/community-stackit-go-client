@@ -1947,7 +1947,7 @@ type GetPermissionsResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1973,7 +1973,7 @@ type AddPermissionsResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1999,7 +1999,7 @@ type RemovePermissionsResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2024,7 +2024,7 @@ type GetDefaultRolesResponse struct {
 	JSON200      *DefaultRolesResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2050,7 +2050,7 @@ type AddDefaultRolesResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2076,7 +2076,7 @@ type RemoveDefaultRolesResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2102,7 +2102,7 @@ type GetSubjectsResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2128,7 +2128,7 @@ type GetUserMembershipsResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2154,7 +2154,7 @@ type GetUserPermissionsResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2180,7 +2180,7 @@ type GetUserResourcesResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2205,7 +2205,7 @@ type ValidateChildMembersResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2231,7 +2231,7 @@ type AddMembersResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2257,7 +2257,7 @@ type ReplaceMembersResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2283,7 +2283,7 @@ type RemoveMembersResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2308,7 +2308,7 @@ type ValidateMembersResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2334,7 +2334,7 @@ type AddRolesResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2360,7 +2360,7 @@ type RemoveRolesResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2386,7 +2386,7 @@ type GetMembersResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2412,7 +2412,7 @@ type GetRolesResponse struct {
 	JSON400      *ErrorResponse
 	JSON401      *ErrorResponse
 	JSON403      *ErrorResponse
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -2702,7 +2702,7 @@ func (c *ClientWithResponses) ParseGetPermissionsResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2750,7 +2750,7 @@ func (c *ClientWithResponses) ParseAddPermissionsResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2798,7 +2798,7 @@ func (c *ClientWithResponses) ParseRemovePermissionsResponse(rsp *http.Response)
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2846,7 +2846,7 @@ func (c *ClientWithResponses) ParseGetDefaultRolesResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2887,7 +2887,7 @@ func (c *ClientWithResponses) ParseAddDefaultRolesResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2935,7 +2935,7 @@ func (c *ClientWithResponses) ParseRemoveDefaultRolesResponse(rsp *http.Response
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2983,7 +2983,7 @@ func (c *ClientWithResponses) ParseGetSubjectsResponse(rsp *http.Response) (*Get
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3031,7 +3031,7 @@ func (c *ClientWithResponses) ParseGetUserMembershipsResponse(rsp *http.Response
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3079,7 +3079,7 @@ func (c *ClientWithResponses) ParseGetUserPermissionsResponse(rsp *http.Response
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3127,7 +3127,7 @@ func (c *ClientWithResponses) ParseGetUserResourcesResponse(rsp *http.Response) 
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3175,7 +3175,7 @@ func (c *ClientWithResponses) ParseValidateChildMembersResponse(rsp *http.Respon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
@@ -3216,7 +3216,7 @@ func (c *ClientWithResponses) ParseAddMembersResponse(rsp *http.Response) (*AddM
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3264,7 +3264,7 @@ func (c *ClientWithResponses) ParseReplaceMembersResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3312,7 +3312,7 @@ func (c *ClientWithResponses) ParseRemoveMembersResponse(rsp *http.Response) (*R
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3360,7 +3360,7 @@ func (c *ClientWithResponses) ParseValidateMembersResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
@@ -3401,7 +3401,7 @@ func (c *ClientWithResponses) ParseAddRolesResponse(rsp *http.Response) (*AddRol
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3449,7 +3449,7 @@ func (c *ClientWithResponses) ParseRemoveRolesResponse(rsp *http.Response) (*Rem
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3497,7 +3497,7 @@ func (c *ClientWithResponses) ParseGetMembersResponse(rsp *http.Response) (*GetM
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -3545,7 +3545,7 @@ func (c *ClientWithResponses) ParseGetRolesResponse(rsp *http.Response) (*GetRol
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

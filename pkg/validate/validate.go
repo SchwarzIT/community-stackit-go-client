@@ -17,7 +17,7 @@ import (
 
 // Response validates a response interface and error
 // if requestError has an error, it is returned
-// if resp.HasError is defined and not nil, it is returned
+// if resp.Error is defined and not nil, it is returned
 // if one of the field namess provided in []checkNullFields are nil, an error is returned
 func Response(resp interface{}, requestError error, checkNullFields ...string) error {
 	// check request error
@@ -29,9 +29,9 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 		return errors.New("response interface is nil")
 	}
 
-	// check HasError field
+	// check Error field
 	{
-		value, err := reflections.GetField(resp, "HasError")
+		value, err := reflections.GetField(resp, "Error")
 		if err != nil {
 			return err
 		}

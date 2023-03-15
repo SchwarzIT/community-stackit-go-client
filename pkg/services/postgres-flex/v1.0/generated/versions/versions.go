@@ -171,7 +171,7 @@ type GetVersionsResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *InstanceGetVersionsResponse
 	JSON400      *InstanceError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -211,7 +211,7 @@ func (c *ClientWithResponses) ParseGetVersionsResponse(rsp *http.Response) (*Get
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

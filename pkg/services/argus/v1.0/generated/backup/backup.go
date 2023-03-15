@@ -721,7 +721,7 @@ type RestoresCreateResponse struct {
 	JSON202      *Message
 	JSON403      *PermissionDenied
 	JSON404      *Message
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -745,7 +745,7 @@ type RetentionsListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *BackupRetentionResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -769,7 +769,7 @@ type SchedulesListResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *BackupScheduleResponse
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -794,7 +794,7 @@ type SchedulesCreateResponse struct {
 	JSON202      *BackupSchedulePostResponse
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -819,7 +819,7 @@ type ListResponse struct {
 	JSON200      *BackupResponse
 	JSON403      *PermissionDenied
 	JSON502      *Message
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -844,7 +844,7 @@ type CreateResponse struct {
 	JSON202      *Message
 	JSON400      *Error
 	JSON403      *PermissionDenied
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -937,7 +937,7 @@ func (c *ClientWithResponses) ParseRestoresCreateResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -978,7 +978,7 @@ func (c *ClientWithResponses) ParseRetentionsListResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1012,7 +1012,7 @@ func (c *ClientWithResponses) ParseSchedulesListResponse(rsp *http.Response) (*S
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1046,7 +1046,7 @@ func (c *ClientWithResponses) ParseSchedulesCreateResponse(rsp *http.Response) (
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:
@@ -1087,7 +1087,7 @@ func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1128,7 +1128,7 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 202:

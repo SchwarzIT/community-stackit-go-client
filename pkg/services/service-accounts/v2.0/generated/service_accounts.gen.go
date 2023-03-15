@@ -1414,7 +1414,7 @@ type CreateTokenResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *TokenResponseBody
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1440,7 +1440,7 @@ type ListResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1467,7 +1467,7 @@ type CreateSAv2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON409      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1493,7 +1493,7 @@ type DeleteSAv2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON404      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1520,7 +1520,7 @@ type GetAccessTokensV2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON404      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1547,7 +1547,7 @@ type CreateSAAccessTokensV2Response struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON404      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1574,7 +1574,7 @@ type DeleteSAAccessTokensV2Response struct {
 	JSON403      *Error
 	JSON404      *Error
 	JSON409      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1597,7 +1597,7 @@ type GetServiceAccountJwksResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *GetJWKResponseBody
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1623,7 +1623,7 @@ type GetSAKeysResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1650,7 +1650,7 @@ type CreateSAKeysResponse struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON409      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1675,7 +1675,7 @@ type DeleteSAKeysResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1701,7 +1701,7 @@ type GetSAKeysKeyIDResponse struct {
 	JSON400      *Error
 	JSON401      *AuthError
 	JSON403      *AuthError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1728,7 +1728,7 @@ type UpdateSAKeysResponse struct {
 	JSON401      *AuthError
 	JSON403      *Error
 	JSON409      *Error
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -1916,7 +1916,7 @@ func (c *ClientWithResponses) ParseCreateTokenResponse(rsp *http.Response) (*Cre
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1943,7 +1943,7 @@ func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListRespon
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -1991,7 +1991,7 @@ func (c *ClientWithResponses) ParseCreateSAv2Response(rsp *http.Response) (*Crea
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -2046,7 +2046,7 @@ func (c *ClientWithResponses) ParseDeleteSAv2Response(rsp *http.Response) (*Dele
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
@@ -2094,7 +2094,7 @@ func (c *ClientWithResponses) ParseGetAccessTokensV2Response(rsp *http.Response)
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2149,7 +2149,7 @@ func (c *ClientWithResponses) ParseCreateSAAccessTokensV2Response(rsp *http.Resp
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -2204,7 +2204,7 @@ func (c *ClientWithResponses) ParseDeleteSAAccessTokensV2Response(rsp *http.Resp
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
@@ -2259,7 +2259,7 @@ func (c *ClientWithResponses) ParseGetServiceAccountJwksResponse(rsp *http.Respo
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2286,7 +2286,7 @@ func (c *ClientWithResponses) ParseGetSAKeysResponse(rsp *http.Response) (*GetSA
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2334,7 +2334,7 @@ func (c *ClientWithResponses) ParseCreateSAKeysResponse(rsp *http.Response) (*Cr
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -2389,7 +2389,7 @@ func (c *ClientWithResponses) ParseDeleteSAKeysResponse(rsp *http.Response) (*De
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
@@ -2430,7 +2430,7 @@ func (c *ClientWithResponses) ParseGetSAKeysKeyIDResponse(rsp *http.Response) (*
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -2478,7 +2478,7 @@ func (c *ClientWithResponses) ParseUpdateSAKeysResponse(rsp *http.Response) (*Up
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:

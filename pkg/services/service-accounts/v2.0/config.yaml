@@ -14,7 +14,7 @@ output-options:
     include:
     - Public
   extend-response:
-  - field: HasError
+  - field: Error
     type: error
     description: "Aggregated error"
     apply-to: ["*"]

@@ -226,7 +226,7 @@ type GetFlavorsResponse struct {
 	JSON200      *InfraGetFlavorsResponse
 	JSON400      *InstanceError
 	JSON500      *InstanceError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -251,7 +251,7 @@ type GetStoragesFlavorResponse struct {
 	JSON200      *InstanceGetFlavorStorageResponse
 	JSON400      *InstanceError
 	JSON404      *InstanceError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -300,7 +300,7 @@ func (c *ClientWithResponses) ParseGetFlavorsResponse(rsp *http.Response) (*GetF
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -341,7 +341,7 @@ func (c *ClientWithResponses) ParseGetStoragesFlavorResponse(rsp *http.Response)
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

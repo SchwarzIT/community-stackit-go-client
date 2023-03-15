@@ -37,7 +37,7 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 		if err != nil {
 			return nil, false, err
 		}
-		if s.HasError != nil {
+		if s.Error != nil {
 			return nil, false, err
 		}
 		if s.JSON200 == nil || s.JSON200.Item == nil {
@@ -64,8 +64,8 @@ func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 		if res.StatusCode() == http.StatusNotFound {
 			return nil, true, nil
 		}
-		if res.HasError != nil {
-			return nil, false, res.HasError
+		if res.Error != nil {
+			return nil, false, res.Error
 		}
 		return nil, false, nil
 	})

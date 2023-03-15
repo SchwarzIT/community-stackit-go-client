@@ -396,7 +396,7 @@ type CreateResponse struct {
 			Msg string `json:"msg"`
 		} `json:"detail"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -456,7 +456,7 @@ type DeleteResponse struct {
 			Msg string `json:"msg"`
 		} `json:"detail"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -515,7 +515,7 @@ type GetResponse struct {
 			Msg string `json:"msg"`
 		} `json:"detail"`
 	}
-	HasError error // Aggregated error
+	Error error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -581,7 +581,7 @@ func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 201:
@@ -675,7 +675,7 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -769,7 +769,7 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

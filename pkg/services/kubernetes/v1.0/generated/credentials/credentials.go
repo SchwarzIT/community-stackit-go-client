@@ -275,7 +275,7 @@ type GetClusterCredentialsResponse struct {
 	JSON400      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -301,7 +301,7 @@ type TriggerClusterCredentialRotationResponse struct {
 	JSON202      *map[string]interface{}
 	JSON404      *map[string]interface{}
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -350,7 +350,7 @@ func (c *ClientWithResponses) ParseGetClusterCredentialsResponse(rsp *http.Respo
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
@@ -398,7 +398,7 @@ func (c *ClientWithResponses) ParseTriggerClusterCredentialRotationResponse(rsp 
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:

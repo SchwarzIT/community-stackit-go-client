@@ -250,7 +250,7 @@ type GetProviderOptionsResponse struct {
 	HTTPResponse *http.Response
 	JSON200      *ProviderOptions
 	JSONDefault  *RuntimeError
-	HasError     error // Aggregated error
+	Error     error // Aggregated error
 }
 
 // Status returns HTTPResponse.Status
@@ -290,7 +290,7 @@ func (c *ClientWithResponses) ParseGetProviderOptionsResponse(rsp *http.Response
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
-	response.HasError = validate.DefaultResponseErrorHandler(rsp)
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
