@@ -6,7 +6,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1.0/generated"
+	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0/generated"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/google/uuid"
 )
