@@ -1,0 +1,55 @@
+package: costs
+output: generated/costs.gen.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: false
+    include:
+    - Costs
+    - private
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "costs."
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: GetCostsCustomerAccount
+    with: GetCostsForAllProjectsInCustomerAccount
+    prefix: true
+  - replace: GetCostsCustomersAccounts
+    with: GetCostsForAllProjectsInAllSubCustomerAccounts
+    prefix: true
+  - replace: GetCostsProject
+    with: GetProjectCosts
+    prefix: true
+  - replace: GetForecastCustomerAccountWithResponse
+    with: GetForecastForAllProjectsInCustomerAccount
+    prefix: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true
