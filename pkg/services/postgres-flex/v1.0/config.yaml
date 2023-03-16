@@ -36,6 +36,11 @@ output-options:
     tidy: 
     - replace: "instance."
       all: true
+  - from: include/users/wait.go
+    to: users/wait.go
+    tidy: 
+    - replace: "users."
+      all: true
   - from: include/instance/helper.go
     to: instance/helper.go
 tidy:
