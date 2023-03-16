@@ -2,13 +2,13 @@ package instances
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
@@ -22,23 +22,20 @@ const (
 func (r InstanceCreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-		if err != nil {
-			if strings.Contains(err.Error(), connection_reset) || strings.Contains(err.Error(), gateway_timeout) {
+		if agg := validate.Response(s, err, "JSON200"); agg != nil {
+			if strings.Contains(agg.Error(), connection_reset) ||
+				strings.Contains(agg.Error(), gateway_timeout) {
 				return nil, false, nil
 			}
-			return nil, false, err
-		}
-		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
-			return nil, false, nil
-		}
-		if s.StatusCode() == http.StatusInternalServerError {
-			return nil, false, nil
-		}
-		if s.Error != nil {
-			return nil, false, s.Error
-		}
-		if s.JSON200 == nil {
-			return nil, false, errors.New("received an empty response. JSON200 == nil")
+			if validate.StatusEquals(s,
+				http.StatusBadGateway,
+				http.StatusGatewayTimeout,
+				http.StatusInternalServerError,
+				http.StatusForbidden,
+			) {
+				return nil, false, nil
+			}
+			return nil, false, agg
 		}
 		if s.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED {
 			return s.JSON200, true, nil
@@ -53,24 +50,22 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 	seenUpdating := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-		if err != nil {
-			if strings.Contains(err.Error(), connection_reset) || strings.Contains(err.Error(), gateway_timeout) {
+		if agg := validate.Response(s, err, "JSON200"); agg != nil {
+			if strings.Contains(agg.Error(), connection_reset) ||
+				strings.Contains(agg.Error(), gateway_timeout) {
 				return nil, false, nil
 			}
-			return nil, false, err
+			if validate.StatusEquals(s,
+				http.StatusBadGateway,
+				http.StatusGatewayTimeout,
+				http.StatusInternalServerError,
+				http.StatusForbidden,
+			) {
+				return nil, false, nil
+			}
+			return nil, false, agg
 		}
-		if s.StatusCode() == http.StatusInternalServerError {
-			return nil, false, nil
-		}
-		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
-			return nil, false, nil
-		}
-		if s.Error != nil {
-			return nil, false, s.Error
-		}
-		if s.JSON200 == nil {
-			return nil, false, errors.New("received an empty response. JSON200 == nil")
-		}
+
 		if s.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED ||
 			(seenUpdating && s.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_CREATE_SUCCEEDED) {
 			return s.JSON200, true, nil
@@ -85,23 +80,20 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 			// and continue the outer wait on change or fail
 			w := wait.New(func() (res interface{}, done bool, err error) {
 				si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-				if err != nil {
-					if strings.Contains(err.Error(), connection_reset) {
+				if agg := validate.Response(si, err, "JSON200"); agg != nil {
+					if strings.Contains(agg.Error(), connection_reset) ||
+						strings.Contains(agg.Error(), gateway_timeout) {
 						return nil, false, nil
 					}
-					return nil, false, err
-				}
-				if s.StatusCode() == http.StatusInternalServerError {
-					return nil, false, nil
-				}
-				if s.StatusCode() == http.StatusBadGateway {
-					return nil, false, nil
-				}
-				if si.Error != nil {
-					return nil, false, s.Error
-				}
-				if si.JSON200 == nil {
-					return nil, false, errors.New("received an empty response. JSON200 == nil")
+					if validate.StatusEquals(s,
+						http.StatusBadGateway,
+						http.StatusGatewayTimeout,
+						http.StatusInternalServerError,
+						http.StatusForbidden,
+					) {
+						return nil, false, nil
+					}
+					return nil, false, agg
 				}
 				if si.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_UPDATING ||
 					si.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_UPDATE_SUCCEEDED ||
@@ -123,26 +115,23 @@ func (r InstanceUpdateResponse) WaitHandler(ctx context.Context, c *instances.Cl
 func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-		if err != nil {
-			if strings.Contains(err.Error(), connection_reset) || strings.Contains(err.Error(), gateway_timeout) {
+		if agg := validate.Response(s, err, "JSON200"); agg != nil {
+			if strings.Contains(agg.Error(), connection_reset) ||
+				strings.Contains(agg.Error(), gateway_timeout) {
 				return nil, false, nil
 			}
-			return nil, false, err
-		}
-		if s.StatusCode() == http.StatusNotFound {
-			return nil, true, nil
-		}
-		if s.StatusCode() == http.StatusInternalServerError {
-			return nil, false, nil
-		}
-		if s.StatusCode() == http.StatusBadGateway || s.StatusCode() == http.StatusGatewayTimeout {
-			return nil, false, nil
-		}
-		if s.Error != nil {
-			return nil, false, s.Error
-		}
-		if s.JSON200 == nil {
-			return nil, false, errors.New("received an empty response. JSON200 == nil")
+			if validate.StatusEquals(s,
+				http.StatusBadGateway,
+				http.StatusGatewayTimeout,
+				http.StatusInternalServerError,
+				http.StatusForbidden,
+			) {
+				return nil, false, nil
+			}
+			if validate.StatusEquals(s, http.StatusNotFound) {
+				return nil, true, nil
+			}
+			return nil, false, agg
 		}
 		if s.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_DELETE_SUCCEEDED {
 			return nil, true, nil
@@ -157,20 +146,23 @@ func (r InstanceDeleteResponse) WaitHandler(ctx context.Context, c *instances.Cl
 			// and continue the outer wait on change or fail
 			w := wait.New(func() (res interface{}, done bool, err error) {
 				si, err := c.InstanceReadWithResponse(ctx, projectID, instanceID)
-				if err != nil {
-					if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
+				if agg := validate.Response(si, err, "JSON200"); agg != nil {
+					if strings.Contains(agg.Error(), connection_reset) ||
+						strings.Contains(agg.Error(), gateway_timeout) {
+						return nil, false, nil
+					}
+					if validate.StatusEquals(s,
+						http.StatusBadGateway,
+						http.StatusGatewayTimeout,
+						http.StatusInternalServerError,
+						http.StatusForbidden,
+					) {
+						return nil, false, nil
+					}
+					if validate.StatusEquals(s, http.StatusNotFound) {
 						return nil, true, nil
 					}
-					return nil, false, err
-				}
-				if si.StatusCode() == http.StatusNotFound {
-					return nil, true, nil
-				}
-				if si.Error != nil {
-					return nil, false, s.Error
-				}
-				if si.JSON200 == nil {
-					return nil, false, errors.New("received an empty response. JSON200 == nil")
+					return nil, false, agg
 				}
 				if si.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_DELETING ||
 					si.JSON200.Status == instances.PROJECT_INSTANCE_UI_STATUS_DELETE_FAILED ||

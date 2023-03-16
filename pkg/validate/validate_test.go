@@ -267,4 +267,7 @@ func TestStatusEquals(t *testing.T) {
 	if !validate.StatusEquals(a, http.StatusAccepted) {
 		t.Error("expected true for a, got false")
 	}
+	if validate.StatusEquals(a, http.StatusBadGateway) {
+		t.Error("expected false for a, got true")
+	}
 }

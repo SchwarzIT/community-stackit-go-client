@@ -64,11 +64,17 @@ type ResponseInterface interface {
 }
 
 // StatusEquals returns true if interface.StatusCode() equals a given http code
-func StatusEquals(a ResponseInterface, statusCode int) bool {
+// if more than one status code is provided, the function will return true if one of them matches
+func StatusEquals(a ResponseInterface, statusCode ...int) bool {
 	if a == nil || (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil()) {
 		return false
 	}
-	return a.StatusCode() == statusCode
+	for _, code := range statusCode {
+		if a.StatusCode() == code {
+			return true
+		}
+	}
+	return false
 }
 
 // UUID validates a given UUID
