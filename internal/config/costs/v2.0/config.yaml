@@ -1,5 +1,5 @@
 package: costs
-output: generated/costs.gen.go
+output: ../../../../pkg/services/costs/v2.0/costs.go
 generate:
   models: true
   client: true

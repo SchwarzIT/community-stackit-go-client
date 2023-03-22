@@ -6,7 +6,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0/generated"
+	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/google/uuid"
 )
@@ -22,7 +22,7 @@ func main() {
 	}
 
 	params := &costs.GetProjectCostsParams{}
-	res, err := c.Costs.GetProjectCostsWithResponse(
+	res, err := c.Costs.GetProjectCosts(
 		ctx,
 		uuid.MustParse("Customer Account ID"), // update to relevat Customer Account ID
 		uuid.MustParse("Project ID"),          // update to relevant Project ID

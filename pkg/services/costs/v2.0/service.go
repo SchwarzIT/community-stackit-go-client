@@ -13,6 +13,6 @@ var BaseURLs = urls.Init(
 )
 
 func NewService(c common.Client) *ClientWithResponses {
-	s, _ := NewClientWithResponses(BaseURLs.GetURL(c), WithHTTPClient(c))
+	s, _ := NewClient(BaseURLs.GetURL(c), WithHTTPClient(c))
 	return s
 }
