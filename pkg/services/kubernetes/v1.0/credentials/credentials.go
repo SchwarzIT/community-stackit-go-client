@@ -126,15 +126,15 @@ func NewRawClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// GetClusterCredentials request
-	GetClusterCredentialsRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	ListRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerCredentialRotation request
-	TriggerCredentialRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerRotation request
+	TriggerRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetClusterCredentialsRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetClusterCredentialsRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) ListRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -145,8 +145,8 @@ func (c *Client) GetClusterCredentialsRaw(ctx context.Context, projectID string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerCredentialRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerCredentialRotationRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerRotationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -157,8 +157,8 @@ func (c *Client) TriggerCredentialRotationRaw(ctx context.Context, projectID str
 	return c.Client.Do(req)
 }
 
-// NewGetClusterCredentialsRequest generates requests for GetClusterCredentials
-func NewGetClusterCredentialsRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -198,8 +198,8 @@ func NewGetClusterCredentialsRequest(ctx context.Context, server string, project
 	return req, nil
 }
 
-// NewTriggerCredentialRotationRequest generates requests for TriggerCredentialRotation
-func NewTriggerCredentialRotationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerRotationRequest generates requests for TriggerRotation
+func NewTriggerRotationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -261,14 +261,14 @@ func NewClient(server string, httpClient common.Client) *ClientWithResponses {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetClusterCredentials request
-	GetClusterCredentials(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*GetClusterCredentialsResponse, error)
+	// List request
+	List(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
-	// TriggerCredentialRotation request
-	TriggerCredentialRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerCredentialRotationResponse, error)
+	// TriggerRotation request
+	TriggerRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerRotationResponse, error)
 }
 
-type GetClusterCredentialsResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Credentials
@@ -279,7 +279,7 @@ type GetClusterCredentialsResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetClusterCredentialsResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -287,14 +287,14 @@ func (r GetClusterCredentialsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetClusterCredentialsResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerCredentialRotationResponse struct {
+type TriggerRotationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -305,7 +305,7 @@ type TriggerCredentialRotationResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerCredentialRotationResponse) Status() string {
+func (r TriggerRotationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -313,40 +313,40 @@ func (r TriggerCredentialRotationResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerCredentialRotationResponse) StatusCode() int {
+func (r TriggerRotationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// GetClusterCredentials request returning *GetClusterCredentialsResponse
-func (c *ClientWithResponses) GetClusterCredentials(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*GetClusterCredentialsResponse, error) {
-	rsp, err := c.GetClusterCredentialsRaw(ctx, projectID, clusterName, reqEditors...)
+// List request returning *ListResponse
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.ListRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetClusterCredentialsResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// TriggerCredentialRotation request returning *TriggerCredentialRotationResponse
-func (c *ClientWithResponses) TriggerCredentialRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerCredentialRotationResponse, error) {
-	rsp, err := c.TriggerCredentialRotationRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerRotation request returning *TriggerRotationResponse
+func (c *ClientWithResponses) TriggerRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerRotationResponse, error) {
+	rsp, err := c.TriggerRotationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerCredentialRotationResponse(rsp)
+	return c.ParseTriggerRotationResponse(rsp)
 }
 
-// ParseGetClusterCredentialsResponse parses an HTTP response from a GetClusterCredentials call
-func (c *ClientWithResponses) ParseGetClusterCredentialsResponse(rsp *http.Response) (*GetClusterCredentialsResponse, error) {
+// ParseListResponse parses an HTTP response from a List call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetClusterCredentialsResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -386,15 +386,15 @@ func (c *ClientWithResponses) ParseGetClusterCredentialsResponse(rsp *http.Respo
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerCredentialRotationResponse parses an HTTP response from a TriggerCredentialRotation call
-func (c *ClientWithResponses) ParseTriggerCredentialRotationResponse(rsp *http.Response) (*TriggerCredentialRotationResponse, error) {
+// ParseTriggerRotationResponse parses an HTTP response from a TriggerRotation call
+func (c *ClientWithResponses) ParseTriggerRotationResponse(rsp *http.Response) (*TriggerRotationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerCredentialRotationResponse{
+	response := &TriggerRotationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

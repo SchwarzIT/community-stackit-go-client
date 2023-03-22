@@ -5,10 +5,10 @@ package project
 
 import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
 
-type CreateProjectResponse struct {
+type CreateResponse struct {
 	project.ClientWithResponsesInterface
 }
 
-type DeleteProjectResponse struct {
+type DeleteResponse struct {
 	project.ClientWithResponsesInterface
 }

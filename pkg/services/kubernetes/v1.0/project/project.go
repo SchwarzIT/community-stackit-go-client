@@ -133,18 +133,18 @@ func NewRawClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// DeleteProject request
-	DeleteProjectRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Delete request
+	DeleteRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetProject request
-	GetProjectRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Get request
+	GetRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateProject request
-	CreateProjectRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Create request
+	CreateRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) DeleteProjectRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteProjectRequest(ctx, c.Server, projectID)
+func (c *Client) DeleteRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -155,8 +155,8 @@ func (c *Client) DeleteProjectRaw(ctx context.Context, projectID string, reqEdit
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetProjectRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetProjectRequest(ctx, c.Server, projectID)
+func (c *Client) GetRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ func (c *Client) GetProjectRaw(ctx context.Context, projectID string, reqEditors
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateProjectRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateProjectRequest(ctx, c.Server, projectID)
+func (c *Client) CreateRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +179,8 @@ func (c *Client) CreateProjectRaw(ctx context.Context, projectID string, reqEdit
 	return c.Client.Do(req)
 }
 
-// NewDeleteProjectRequest generates requests for DeleteProject
-func NewDeleteProjectRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewDeleteRequest generates requests for Delete
+func NewDeleteRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -213,8 +213,8 @@ func NewDeleteProjectRequest(ctx context.Context, server string, projectID strin
 	return req, nil
 }
 
-// NewGetProjectRequest generates requests for GetProject
-func NewGetProjectRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewGetRequest generates requests for Get
+func NewGetRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -247,8 +247,8 @@ func NewGetProjectRequest(ctx context.Context, server string, projectID string) 
 	return req, nil
 }
 
-// NewCreateProjectRequest generates requests for CreateProject
-func NewCreateProjectRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewCreateRequest generates requests for Create
+func NewCreateRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -303,17 +303,17 @@ func NewClient(server string, httpClient common.Client) *ClientWithResponses {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// DeleteProject request
-	DeleteProject(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*DeleteProjectResponse, error)
+	// Delete request
+	Delete(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
-	// GetProject request
-	GetProject(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*GetProjectResponse, error)
+	// Get request
+	Get(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 
-	// CreateProject request
-	CreateProject(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*CreateProjectResponse, error)
+	// Create request
+	Create(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 }
 
-type DeleteProjectResponse struct {
+type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -324,7 +324,7 @@ type DeleteProjectResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteProjectResponse) Status() string {
+func (r DeleteResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -332,14 +332,14 @@ func (r DeleteProjectResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteProjectResponse) StatusCode() int {
+func (r DeleteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetProjectResponse struct {
+type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Project
@@ -349,7 +349,7 @@ type GetProjectResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetProjectResponse) Status() string {
+func (r GetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -357,14 +357,14 @@ func (r GetProjectResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetProjectResponse) StatusCode() int {
+func (r GetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateProjectResponse struct {
+type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Project
@@ -374,7 +374,7 @@ type CreateProjectResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateProjectResponse) Status() string {
+func (r CreateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -382,49 +382,49 @@ func (r CreateProjectResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateProjectResponse) StatusCode() int {
+func (r CreateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// DeleteProject request returning *DeleteProjectResponse
-func (c *ClientWithResponses) DeleteProject(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*DeleteProjectResponse, error) {
-	rsp, err := c.DeleteProjectRaw(ctx, projectID, reqEditors...)
+// Delete request returning *DeleteResponse
+func (c *ClientWithResponses) Delete(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+	rsp, err := c.DeleteRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseDeleteProjectResponse(rsp)
+	return c.ParseDeleteResponse(rsp)
 }
 
-// GetProject request returning *GetProjectResponse
-func (c *ClientWithResponses) GetProject(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*GetProjectResponse, error) {
-	rsp, err := c.GetProjectRaw(ctx, projectID, reqEditors...)
+// Get request returning *GetResponse
+func (c *ClientWithResponses) Get(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.GetRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetProjectResponse(rsp)
+	return c.ParseGetResponse(rsp)
 }
 
-// CreateProject request returning *CreateProjectResponse
-func (c *ClientWithResponses) CreateProject(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*CreateProjectResponse, error) {
-	rsp, err := c.CreateProjectRaw(ctx, projectID, reqEditors...)
+// Create request returning *CreateResponse
+func (c *ClientWithResponses) Create(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateProjectResponse(rsp)
+	return c.ParseCreateResponse(rsp)
 }
 
-// ParseDeleteProjectResponse parses an HTTP response from a DeleteProject call
-func (c *ClientWithResponses) ParseDeleteProjectResponse(rsp *http.Response) (*DeleteProjectResponse, error) {
+// ParseDeleteResponse parses an HTTP response from a Delete call
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteProjectResponse{
+	response := &DeleteResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -464,15 +464,15 @@ func (c *ClientWithResponses) ParseDeleteProjectResponse(rsp *http.Response) (*D
 	return response, validate.ResponseObject(response)
 }
 
-// ParseGetProjectResponse parses an HTTP response from a GetProject call
-func (c *ClientWithResponses) ParseGetProjectResponse(rsp *http.Response) (*GetProjectResponse, error) {
+// ParseGetResponse parses an HTTP response from a Get call
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetProjectResponse{
+	response := &GetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -505,15 +505,15 @@ func (c *ClientWithResponses) ParseGetProjectResponse(rsp *http.Response) (*GetP
 	return response, validate.ResponseObject(response)
 }
 
-// ParseCreateProjectResponse parses an HTTP response from a CreateProject call
-func (c *ClientWithResponses) ParseCreateProjectResponse(rsp *http.Response) (*CreateProjectResponse, error) {
+// ParseCreateResponse parses an HTTP response from a Create call
+func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateProjectResponse{
+	response := &CreateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

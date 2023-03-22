@@ -54,6 +54,18 @@ tidy:
   - replace: TriggerCluster
     with: Trigger
     prefix: true
+  - replace: GetClusterCredentials
+    with: List
+    prefix: true
+  - replace: TriggerCredentialRotation
+    with: TriggerRotation
+    prefix: true
+  - replace: Project
+    with: 
+    suffix: true
+  - replace: GetProviderOptions
+    with: List
+    prefix: true
   params:
   - replace: Id
     with: ID

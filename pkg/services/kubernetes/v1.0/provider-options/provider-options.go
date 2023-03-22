@@ -176,12 +176,12 @@ func NewRawClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// GetProviderOptions request
-	GetProviderOptionsRaw(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	ListRaw(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetProviderOptionsRaw(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetProviderOptionsRequest(ctx, c.Server)
+func (c *Client) ListRaw(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server)
 	if err != nil {
 		return nil, err
 	}
@@ -192,8 +192,8 @@ func (c *Client) GetProviderOptionsRaw(ctx context.Context, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
-// NewGetProviderOptionsRequest generates requests for GetProviderOptions
-func NewGetProviderOptionsRequest(ctx context.Context, server string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string) (*http.Request, error) {
 	var err error
 
 	serverURL, err := url.Parse(server)
@@ -241,11 +241,11 @@ func NewClient(server string, httpClient common.Client) *ClientWithResponses {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// GetProviderOptions request
-	GetProviderOptions(ctx context.Context, reqEditors ...RequestEditorFn) (*GetProviderOptionsResponse, error)
+	// List request
+	List(ctx context.Context, reqEditors ...RequestEditorFn) (*ListResponse, error)
 }
 
-type GetProviderOptionsResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ProviderOptions
@@ -254,7 +254,7 @@ type GetProviderOptionsResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetProviderOptionsResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -262,31 +262,31 @@ func (r GetProviderOptionsResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetProviderOptionsResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// GetProviderOptions request returning *GetProviderOptionsResponse
-func (c *ClientWithResponses) GetProviderOptions(ctx context.Context, reqEditors ...RequestEditorFn) (*GetProviderOptionsResponse, error) {
-	rsp, err := c.GetProviderOptionsRaw(ctx, reqEditors...)
+// List request returning *ListResponse
+func (c *ClientWithResponses) List(ctx context.Context, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.ListRaw(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetProviderOptionsResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// ParseGetProviderOptionsResponse parses an HTTP response from a GetProviderOptions call
-func (c *ClientWithResponses) ParseGetProviderOptionsResponse(rsp *http.Response) (*GetProviderOptionsResponse, error) {
+// ParseListResponse parses an HTTP response from a List call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetProviderOptionsResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

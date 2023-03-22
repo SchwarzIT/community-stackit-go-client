@@ -19,7 +19,7 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.Kubernetes.ProviderOptions.GetProviderOptions(ctx)
+	res, err := c.Kubernetes.ProviderOptions.List(ctx)
 	if err = validate.Response(res, err, "JSON200.AvailabilityZones"); err != nil {
 		panic(err)
 	}

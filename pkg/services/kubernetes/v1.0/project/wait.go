@@ -10,10 +10,10 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (r CreateProjectResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID string) *wait.Handler {
+func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 
-		resp, err := c.GetProject(ctx, projectID)
+		resp, err := c.Get(ctx, projectID)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "failed during create request preparation")
 		}
@@ -39,9 +39,9 @@ func (r CreateProjectResponse) WaitHandler(ctx context.Context, c *ClientWithRes
 	})
 }
 
-func (r DeleteProjectResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID string) *wait.Handler {
+func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		resp, err := c.GetProject(ctx, projectID)
+		resp, err := c.Get(ctx, projectID)
 		if err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 				return nil, true, nil
