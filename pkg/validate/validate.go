@@ -25,21 +25,8 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 		return requestError
 	}
 
-	if resp == nil {
-		return errors.New("response interface is nil")
-	}
-
-	// check Error field
-	{
-		value, err := reflections.GetField(resp, "Error")
-		if err != nil {
-			return err
-		}
-		if v, ok := value.(error); ok {
-			if v != nil {
-				return v
-			}
-		}
+	if err := ResponseObject(resp); err != nil {
+		return err
 	}
 
 	for _, field := range checkNullFields {
@@ -54,6 +41,28 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 				return fmt.Errorf("field %s in response is nil", field)
 			}
 			res = a
+		}
+	}
+	return nil
+}
+
+// ResponseObject validates the response response and checks if it has an Error field
+// that's set
+func ResponseObject(resp interface{}) error {
+	if resp == nil {
+		return errors.New("response interface is nil")
+	}
+
+	// check Error field exists
+	// if not return err (unless the resp is a non-struct, err will be nil)
+	if ok, err := reflections.HasField(resp, "Error"); !ok {
+		return err
+	}
+
+	value, _ := reflections.GetField(resp, "Error")
+	if v, ok := value.(error); ok {
+		if v != nil {
+			return v
 		}
 	}
 	return nil
