@@ -1,5 +1,5 @@
 package: kubernetes
-output: generated/kubernetes.gen.go
+output: ../../../../pkg/services/kubernetes/v1.0/kubernetes.go
 generate:
   models: true
   client: true

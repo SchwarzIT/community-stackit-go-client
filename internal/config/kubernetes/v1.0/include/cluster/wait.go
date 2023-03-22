@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
 func (r CreateOrUpdateClusterResponse) WaitHandler(ctx context.Context, c *cluster.ClientWithResponses, projectID, clusterName string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		resp, err := c.GetClusterWithResponse(ctx, projectID, clusterName)
+		resp, err := c.GetCluster(ctx, projectID, clusterName)
 		if err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
 				return nil, false, nil
@@ -38,7 +38,7 @@ func (r CreateOrUpdateClusterResponse) WaitHandler(ctx context.Context, c *clust
 
 func (r DeleteClusterResponse) WaitHandler(ctx context.Context, c *cluster.ClientWithResponses, projectID, clusterName string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		resp, err := c.GetClusterWithResponse(ctx, projectID, clusterName)
+		resp, err := c.GetCluster(ctx, projectID, clusterName)
 		if err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 				return nil, true, nil

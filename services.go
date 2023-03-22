@@ -4,7 +4,7 @@ import (
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
-	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
+	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
 	mongodbflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated"

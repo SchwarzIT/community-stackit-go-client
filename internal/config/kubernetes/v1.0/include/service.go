@@ -2,7 +2,7 @@ package kubernetes
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
+	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -14,7 +14,7 @@ var BaseURLs = urls.Init(
 )
 
 func NewService(c common.Client) *kubernetes.ClientWithResponses {
-	nc, _ := kubernetes.NewClientWithResponses(
+	nc, _ := kubernetes.NewClient(
 		BaseURLs.GetURL(c),
 		kubernetes.WithHTTPClient(c),
 	)

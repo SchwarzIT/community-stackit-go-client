@@ -3,7 +3,7 @@
 
 package cluster
 
-import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/cluster"
+import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 
 type CreateOrUpdateClusterResponse struct {
 	cluster.ClientWithResponsesInterface

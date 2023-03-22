@@ -6,15 +6,14 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated/project"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 	"github.com/pkg/errors"
 )
 
-func (r CreateProjectResponse) WaitHandler(ctx context.Context, c *project.ClientWithResponses, projectID string) *wait.Handler {
+func (r CreateProjectResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 
-		resp, err := c.GetProjectWithResponse(ctx, projectID)
+		resp, err := c.GetProject(ctx, projectID)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "failed during create request preparation")
 		}
@@ -26,23 +25,23 @@ func (r CreateProjectResponse) WaitHandler(ctx context.Context, c *project.Clien
 		}
 
 		switch *resp.JSON200.State {
-		case project.STATE_FAILED:
+		case STATE_FAILED:
 			fallthrough
-		case project.STATE_DELETING:
+		case STATE_DELETING:
 			return nil, false, fmt.Errorf("received state: %s for project ID: %s",
 				*resp.JSON200.State,
 				*resp.JSON200.ProjectID,
 			)
-		case project.STATE_CREATED:
+		case STATE_CREATED:
 			return nil, true, nil
 		}
 		return nil, false, nil
 	})
 }
 
-func (r DeleteProjectResponse) WaitHandler(ctx context.Context, c *project.ClientWithResponses, projectID string) *wait.Handler {
+func (r DeleteProjectResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		resp, err := c.GetProjectWithResponse(ctx, projectID)
+		resp, err := c.GetProject(ctx, projectID)
 		if err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusNotFound)) {
 				return nil, true, nil
