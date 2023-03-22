@@ -115,24 +115,24 @@ func NewRawClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// TriggerClusterHibernation request
-	TriggerClusterHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerHibernation request
+	TriggerHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterMaintenance request
-	TriggerClusterMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerMaintenance request
+	TriggerMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterReconciliation request
-	TriggerClusterReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerReconciliation request
+	TriggerReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterCredentialRotation request
-	TriggerClusterCredentialRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerCredentialRotation request
+	TriggerCredentialRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterWakeup request
-	TriggerClusterWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerWakeup request
+	TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) TriggerClusterHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterHibernationRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerHibernationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -143,8 +143,8 @@ func (c *Client) TriggerClusterHibernationRaw(ctx context.Context, projectID str
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterMaintenanceRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerMaintenanceRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -155,8 +155,8 @@ func (c *Client) TriggerClusterMaintenanceRaw(ctx context.Context, projectID str
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterReconciliationRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerReconciliationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -167,8 +167,8 @@ func (c *Client) TriggerClusterReconciliationRaw(ctx context.Context, projectID 
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterCredentialRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterCredentialRotationRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerCredentialRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerCredentialRotationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -179,8 +179,8 @@ func (c *Client) TriggerClusterCredentialRotationRaw(ctx context.Context, projec
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterWakeupRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerWakeupRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -191,8 +191,8 @@ func (c *Client) TriggerClusterWakeupRaw(ctx context.Context, projectID string, 
 	return c.Client.Do(req)
 }
 
-// NewTriggerClusterHibernationRequest generates requests for TriggerClusterHibernation
-func NewTriggerClusterHibernationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerHibernationRequest generates requests for TriggerHibernation
+func NewTriggerHibernationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -232,8 +232,8 @@ func NewTriggerClusterHibernationRequest(ctx context.Context, server string, pro
 	return req, nil
 }
 
-// NewTriggerClusterMaintenanceRequest generates requests for TriggerClusterMaintenance
-func NewTriggerClusterMaintenanceRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerMaintenanceRequest generates requests for TriggerMaintenance
+func NewTriggerMaintenanceRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -273,8 +273,8 @@ func NewTriggerClusterMaintenanceRequest(ctx context.Context, server string, pro
 	return req, nil
 }
 
-// NewTriggerClusterReconciliationRequest generates requests for TriggerClusterReconciliation
-func NewTriggerClusterReconciliationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerReconciliationRequest generates requests for TriggerReconciliation
+func NewTriggerReconciliationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -314,8 +314,8 @@ func NewTriggerClusterReconciliationRequest(ctx context.Context, server string, 
 	return req, nil
 }
 
-// NewTriggerClusterCredentialRotationRequest generates requests for TriggerClusterCredentialRotation
-func NewTriggerClusterCredentialRotationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerCredentialRotationRequest generates requests for TriggerCredentialRotation
+func NewTriggerCredentialRotationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -355,8 +355,8 @@ func NewTriggerClusterCredentialRotationRequest(ctx context.Context, server stri
 	return req, nil
 }
 
-// NewTriggerClusterWakeupRequest generates requests for TriggerClusterWakeup
-func NewTriggerClusterWakeupRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerWakeupRequest generates requests for TriggerWakeup
+func NewTriggerWakeupRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -418,23 +418,23 @@ func NewClient(server string, httpClient common.Client) *ClientWithResponses {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// TriggerClusterHibernation request
-	TriggerClusterHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterHibernationResponse, error)
+	// TriggerHibernation request
+	TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error)
 
-	// TriggerClusterMaintenance request
-	TriggerClusterMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterMaintenanceResponse, error)
+	// TriggerMaintenance request
+	TriggerMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerMaintenanceResponse, error)
 
-	// TriggerClusterReconciliation request
-	TriggerClusterReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterReconciliationResponse, error)
+	// TriggerReconciliation request
+	TriggerReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerReconciliationResponse, error)
 
-	// TriggerClusterCredentialRotation request
-	TriggerClusterCredentialRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterCredentialRotationResponse, error)
+	// TriggerCredentialRotation request
+	TriggerCredentialRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerCredentialRotationResponse, error)
 
-	// TriggerClusterWakeup request
-	TriggerClusterWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterWakeupResponse, error)
+	// TriggerWakeup request
+	TriggerWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerWakeupResponse, error)
 }
 
-type TriggerClusterHibernationResponse struct {
+type TriggerHibernationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -445,7 +445,7 @@ type TriggerClusterHibernationResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterHibernationResponse) Status() string {
+func (r TriggerHibernationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -453,14 +453,14 @@ func (r TriggerClusterHibernationResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterHibernationResponse) StatusCode() int {
+func (r TriggerHibernationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterMaintenanceResponse struct {
+type TriggerMaintenanceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -471,7 +471,7 @@ type TriggerClusterMaintenanceResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterMaintenanceResponse) Status() string {
+func (r TriggerMaintenanceResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -479,14 +479,14 @@ func (r TriggerClusterMaintenanceResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterMaintenanceResponse) StatusCode() int {
+func (r TriggerMaintenanceResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterReconciliationResponse struct {
+type TriggerReconciliationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -497,7 +497,7 @@ type TriggerClusterReconciliationResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterReconciliationResponse) Status() string {
+func (r TriggerReconciliationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -505,14 +505,14 @@ func (r TriggerClusterReconciliationResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterReconciliationResponse) StatusCode() int {
+func (r TriggerReconciliationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterCredentialRotationResponse struct {
+type TriggerCredentialRotationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -523,7 +523,7 @@ type TriggerClusterCredentialRotationResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterCredentialRotationResponse) Status() string {
+func (r TriggerCredentialRotationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -531,14 +531,14 @@ func (r TriggerClusterCredentialRotationResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterCredentialRotationResponse) StatusCode() int {
+func (r TriggerCredentialRotationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterWakeupResponse struct {
+type TriggerWakeupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -549,7 +549,7 @@ type TriggerClusterWakeupResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterWakeupResponse) Status() string {
+func (r TriggerWakeupResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -557,67 +557,67 @@ func (r TriggerClusterWakeupResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterWakeupResponse) StatusCode() int {
+func (r TriggerWakeupResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// TriggerClusterHibernation request returning *TriggerClusterHibernationResponse
-func (c *ClientWithResponses) TriggerClusterHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterHibernationResponse, error) {
-	rsp, err := c.TriggerClusterHibernationRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerHibernation request returning *TriggerHibernationResponse
+func (c *ClientWithResponses) TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error) {
+	rsp, err := c.TriggerHibernationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterHibernationResponse(rsp)
+	return c.ParseTriggerHibernationResponse(rsp)
 }
 
-// TriggerClusterMaintenance request returning *TriggerClusterMaintenanceResponse
-func (c *ClientWithResponses) TriggerClusterMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterMaintenanceResponse, error) {
-	rsp, err := c.TriggerClusterMaintenanceRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerMaintenance request returning *TriggerMaintenanceResponse
+func (c *ClientWithResponses) TriggerMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerMaintenanceResponse, error) {
+	rsp, err := c.TriggerMaintenanceRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterMaintenanceResponse(rsp)
+	return c.ParseTriggerMaintenanceResponse(rsp)
 }
 
-// TriggerClusterReconciliation request returning *TriggerClusterReconciliationResponse
-func (c *ClientWithResponses) TriggerClusterReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterReconciliationResponse, error) {
-	rsp, err := c.TriggerClusterReconciliationRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerReconciliation request returning *TriggerReconciliationResponse
+func (c *ClientWithResponses) TriggerReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerReconciliationResponse, error) {
+	rsp, err := c.TriggerReconciliationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterReconciliationResponse(rsp)
+	return c.ParseTriggerReconciliationResponse(rsp)
 }
 
-// TriggerClusterCredentialRotation request returning *TriggerClusterCredentialRotationResponse
-func (c *ClientWithResponses) TriggerClusterCredentialRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterCredentialRotationResponse, error) {
-	rsp, err := c.TriggerClusterCredentialRotationRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerCredentialRotation request returning *TriggerCredentialRotationResponse
+func (c *ClientWithResponses) TriggerCredentialRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerCredentialRotationResponse, error) {
+	rsp, err := c.TriggerCredentialRotationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterCredentialRotationResponse(rsp)
+	return c.ParseTriggerCredentialRotationResponse(rsp)
 }
 
-// TriggerClusterWakeup request returning *TriggerClusterWakeupResponse
-func (c *ClientWithResponses) TriggerClusterWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterWakeupResponse, error) {
-	rsp, err := c.TriggerClusterWakeupRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerWakeup request returning *TriggerWakeupResponse
+func (c *ClientWithResponses) TriggerWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerWakeupResponse, error) {
+	rsp, err := c.TriggerWakeupRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterWakeupResponse(rsp)
+	return c.ParseTriggerWakeupResponse(rsp)
 }
 
-// ParseTriggerClusterHibernationResponse parses an HTTP response from a TriggerClusterHibernation call
-func (c *ClientWithResponses) ParseTriggerClusterHibernationResponse(rsp *http.Response) (*TriggerClusterHibernationResponse, error) {
+// ParseTriggerHibernationResponse parses an HTTP response from a TriggerHibernation call
+func (c *ClientWithResponses) ParseTriggerHibernationResponse(rsp *http.Response) (*TriggerHibernationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterHibernationResponse{
+	response := &TriggerHibernationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -657,15 +657,15 @@ func (c *ClientWithResponses) ParseTriggerClusterHibernationResponse(rsp *http.R
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterMaintenanceResponse parses an HTTP response from a TriggerClusterMaintenance call
-func (c *ClientWithResponses) ParseTriggerClusterMaintenanceResponse(rsp *http.Response) (*TriggerClusterMaintenanceResponse, error) {
+// ParseTriggerMaintenanceResponse parses an HTTP response from a TriggerMaintenance call
+func (c *ClientWithResponses) ParseTriggerMaintenanceResponse(rsp *http.Response) (*TriggerMaintenanceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterMaintenanceResponse{
+	response := &TriggerMaintenanceResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -705,15 +705,15 @@ func (c *ClientWithResponses) ParseTriggerClusterMaintenanceResponse(rsp *http.R
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterReconciliationResponse parses an HTTP response from a TriggerClusterReconciliation call
-func (c *ClientWithResponses) ParseTriggerClusterReconciliationResponse(rsp *http.Response) (*TriggerClusterReconciliationResponse, error) {
+// ParseTriggerReconciliationResponse parses an HTTP response from a TriggerReconciliation call
+func (c *ClientWithResponses) ParseTriggerReconciliationResponse(rsp *http.Response) (*TriggerReconciliationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterReconciliationResponse{
+	response := &TriggerReconciliationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -753,15 +753,15 @@ func (c *ClientWithResponses) ParseTriggerClusterReconciliationResponse(rsp *htt
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterCredentialRotationResponse parses an HTTP response from a TriggerClusterCredentialRotation call
-func (c *ClientWithResponses) ParseTriggerClusterCredentialRotationResponse(rsp *http.Response) (*TriggerClusterCredentialRotationResponse, error) {
+// ParseTriggerCredentialRotationResponse parses an HTTP response from a TriggerCredentialRotation call
+func (c *ClientWithResponses) ParseTriggerCredentialRotationResponse(rsp *http.Response) (*TriggerCredentialRotationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterCredentialRotationResponse{
+	response := &TriggerCredentialRotationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -801,15 +801,15 @@ func (c *ClientWithResponses) ParseTriggerClusterCredentialRotationResponse(rsp 
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterWakeupResponse parses an HTTP response from a TriggerClusterWakeup call
-func (c *ClientWithResponses) ParseTriggerClusterWakeupResponse(rsp *http.Response) (*TriggerClusterWakeupResponse, error) {
+// ParseTriggerWakeupResponse parses an HTTP response from a TriggerWakeup call
+func (c *ClientWithResponses) ParseTriggerWakeupResponse(rsp *http.Response) (*TriggerWakeupResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterWakeupResponse{
+	response := &TriggerWakeupResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

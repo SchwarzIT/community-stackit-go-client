@@ -273,8 +273,8 @@ type Volume struct {
 	Type *string `json:"type,omitempty"`
 }
 
-// CreateOrUpdateClusterJSONRequestBody defines body for CreateOrUpdateCluster for application/json ContentType.
-type CreateOrUpdateClusterJSONRequestBody = SkeServiceCreateOrUpdateClusterRequest
+// CreateOrUpdateJSONRequestBody defines body for CreateOrUpdate for application/json ContentType.
+type CreateOrUpdateJSONRequestBody = SkeServiceCreateOrUpdateClusterRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -304,35 +304,35 @@ func NewRawClient(server string, httpClient common.Client) *Client {
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// ListClusters request
-	ListClustersRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteCluster request
-	DeleteClusterRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Delete request
+	DeleteRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetCluster request
-	GetClusterRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Get request
+	GetRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateOrUpdateCluster request with any body
-	CreateOrUpdateClusterRawWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateOrUpdate request with any body
+	CreateOrUpdateRawWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateOrUpdateClusterRaw(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateOrUpdateRaw(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterHibernation request
-	TriggerClusterHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerHibernation request
+	TriggerHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterMaintenance request
-	TriggerClusterMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerMaintenance request
+	TriggerMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterReconciliation request
-	TriggerClusterReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerReconciliation request
+	TriggerReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// TriggerClusterWakeup request
-	TriggerClusterWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// TriggerWakeup request
+	TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) ListClustersRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListClustersRequest(ctx, c.Server, projectID)
+func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -343,8 +343,8 @@ func (c *Client) ListClustersRaw(ctx context.Context, projectID string, reqEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteClusterRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteClusterRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) DeleteRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -355,8 +355,8 @@ func (c *Client) DeleteClusterRaw(ctx context.Context, projectID string, cluster
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetClusterRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetClusterRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) GetRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -367,8 +367,8 @@ func (c *Client) GetClusterRaw(ctx context.Context, projectID string, clusterNam
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateOrUpdateClusterRawWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateOrUpdateClusterRequestWithBody(ctx, c.Server, projectID, clusterName, contentType, body)
+func (c *Client) CreateOrUpdateRawWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOrUpdateRequestWithBody(ctx, c.Server, projectID, clusterName, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -379,8 +379,8 @@ func (c *Client) CreateOrUpdateClusterRawWithBody(ctx context.Context, projectID
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateOrUpdateClusterRaw(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateOrUpdateClusterRequest(ctx, c.Server, projectID, clusterName, body)
+func (c *Client) CreateOrUpdateRaw(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateOrUpdateRequest(ctx, c.Server, projectID, clusterName, body)
 	if err != nil {
 		return nil, err
 	}
@@ -391,8 +391,8 @@ func (c *Client) CreateOrUpdateClusterRaw(ctx context.Context, projectID string,
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterHibernationRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerHibernationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -403,8 +403,8 @@ func (c *Client) TriggerClusterHibernationRaw(ctx context.Context, projectID str
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterMaintenanceRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerMaintenanceRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -415,8 +415,8 @@ func (c *Client) TriggerClusterMaintenanceRaw(ctx context.Context, projectID str
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterReconciliationRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerReconciliationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -427,8 +427,8 @@ func (c *Client) TriggerClusterReconciliationRaw(ctx context.Context, projectID 
 	return c.Client.Do(req)
 }
 
-func (c *Client) TriggerClusterWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewTriggerClusterWakeupRequest(ctx, c.Server, projectID, clusterName)
+func (c *Client) TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewTriggerWakeupRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
 	}
@@ -439,8 +439,8 @@ func (c *Client) TriggerClusterWakeupRaw(ctx context.Context, projectID string, 
 	return c.Client.Do(req)
 }
 
-// NewListClustersRequest generates requests for ListClusters
-func NewListClustersRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -473,8 +473,8 @@ func NewListClustersRequest(ctx context.Context, server string, projectID string
 	return req, nil
 }
 
-// NewDeleteClusterRequest generates requests for DeleteCluster
-func NewDeleteClusterRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewDeleteRequest generates requests for Delete
+func NewDeleteRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -514,8 +514,8 @@ func NewDeleteClusterRequest(ctx context.Context, server string, projectID strin
 	return req, nil
 }
 
-// NewGetClusterRequest generates requests for GetCluster
-func NewGetClusterRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewGetRequest generates requests for Get
+func NewGetRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -555,19 +555,19 @@ func NewGetClusterRequest(ctx context.Context, server string, projectID string, 
 	return req, nil
 }
 
-// NewCreateOrUpdateClusterRequest calls the generic CreateOrUpdateCluster builder with application/json body
-func NewCreateOrUpdateClusterRequest(ctx context.Context, server string, projectID string, clusterName string, body CreateOrUpdateClusterJSONRequestBody) (*http.Request, error) {
+// NewCreateOrUpdateRequest calls the generic CreateOrUpdate builder with application/json body
+func NewCreateOrUpdateRequest(ctx context.Context, server string, projectID string, clusterName string, body CreateOrUpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateOrUpdateClusterRequestWithBody(ctx, server, projectID, clusterName, "application/json", bodyReader)
+	return NewCreateOrUpdateRequestWithBody(ctx, server, projectID, clusterName, "application/json", bodyReader)
 }
 
-// NewCreateOrUpdateClusterRequestWithBody generates requests for CreateOrUpdateCluster with any type of body
-func NewCreateOrUpdateClusterRequestWithBody(ctx context.Context, server string, projectID string, clusterName string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateOrUpdateRequestWithBody generates requests for CreateOrUpdate with any type of body
+func NewCreateOrUpdateRequestWithBody(ctx context.Context, server string, projectID string, clusterName string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -609,8 +609,8 @@ func NewCreateOrUpdateClusterRequestWithBody(ctx context.Context, server string,
 	return req, nil
 }
 
-// NewTriggerClusterHibernationRequest generates requests for TriggerClusterHibernation
-func NewTriggerClusterHibernationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerHibernationRequest generates requests for TriggerHibernation
+func NewTriggerHibernationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -650,8 +650,8 @@ func NewTriggerClusterHibernationRequest(ctx context.Context, server string, pro
 	return req, nil
 }
 
-// NewTriggerClusterMaintenanceRequest generates requests for TriggerClusterMaintenance
-func NewTriggerClusterMaintenanceRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerMaintenanceRequest generates requests for TriggerMaintenance
+func NewTriggerMaintenanceRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -691,8 +691,8 @@ func NewTriggerClusterMaintenanceRequest(ctx context.Context, server string, pro
 	return req, nil
 }
 
-// NewTriggerClusterReconciliationRequest generates requests for TriggerClusterReconciliation
-func NewTriggerClusterReconciliationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerReconciliationRequest generates requests for TriggerReconciliation
+func NewTriggerReconciliationRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -732,8 +732,8 @@ func NewTriggerClusterReconciliationRequest(ctx context.Context, server string, 
 	return req, nil
 }
 
-// NewTriggerClusterWakeupRequest generates requests for TriggerClusterWakeup
-func NewTriggerClusterWakeupRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
+// NewTriggerWakeupRequest generates requests for TriggerWakeup
+func NewTriggerWakeupRequest(ctx context.Context, server string, projectID string, clusterName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -795,34 +795,34 @@ func NewClient(server string, httpClient common.Client) *ClientWithResponses {
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// ListClusters request
-	ListClusters(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListClustersResponse, error)
+	// List request
+	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
-	// DeleteCluster request
-	DeleteCluster(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*DeleteClusterResponse, error)
+	// Delete request
+	Delete(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
-	// GetCluster request
-	GetCluster(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*GetClusterResponse, error)
+	// Get request
+	Get(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 
-	// CreateOrUpdateCluster request with any body
-	CreateOrUpdateClusterWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOrUpdateClusterResponse, error)
+	// CreateOrUpdate request with any body
+	CreateOrUpdateWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOrUpdateResponse, error)
 
-	CreateOrUpdateCluster(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOrUpdateClusterResponse, error)
+	CreateOrUpdate(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOrUpdateResponse, error)
 
-	// TriggerClusterHibernation request
-	TriggerClusterHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterHibernationResponse, error)
+	// TriggerHibernation request
+	TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error)
 
-	// TriggerClusterMaintenance request
-	TriggerClusterMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterMaintenanceResponse, error)
+	// TriggerMaintenance request
+	TriggerMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerMaintenanceResponse, error)
 
-	// TriggerClusterReconciliation request
-	TriggerClusterReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterReconciliationResponse, error)
+	// TriggerReconciliation request
+	TriggerReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerReconciliationResponse, error)
 
-	// TriggerClusterWakeup request
-	TriggerClusterWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterWakeupResponse, error)
+	// TriggerWakeup request
+	TriggerWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerWakeupResponse, error)
 }
 
-type ListClustersResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Clusters
@@ -833,7 +833,7 @@ type ListClustersResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ListClustersResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -841,14 +841,14 @@ func (r ListClustersResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ListClustersResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type DeleteClusterResponse struct {
+type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -858,7 +858,7 @@ type DeleteClusterResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteClusterResponse) Status() string {
+func (r DeleteResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -866,14 +866,14 @@ func (r DeleteClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteClusterResponse) StatusCode() int {
+func (r DeleteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetClusterResponse struct {
+type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Cluster
@@ -882,7 +882,7 @@ type GetClusterResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetClusterResponse) Status() string {
+func (r GetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -890,14 +890,14 @@ func (r GetClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetClusterResponse) StatusCode() int {
+func (r GetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateOrUpdateClusterResponse struct {
+type CreateOrUpdateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Cluster
@@ -909,7 +909,7 @@ type CreateOrUpdateClusterResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateOrUpdateClusterResponse) Status() string {
+func (r CreateOrUpdateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -917,14 +917,14 @@ func (r CreateOrUpdateClusterResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateOrUpdateClusterResponse) StatusCode() int {
+func (r CreateOrUpdateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterHibernationResponse struct {
+type TriggerHibernationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -935,7 +935,7 @@ type TriggerClusterHibernationResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterHibernationResponse) Status() string {
+func (r TriggerHibernationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -943,14 +943,14 @@ func (r TriggerClusterHibernationResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterHibernationResponse) StatusCode() int {
+func (r TriggerHibernationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterMaintenanceResponse struct {
+type TriggerMaintenanceResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -961,7 +961,7 @@ type TriggerClusterMaintenanceResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterMaintenanceResponse) Status() string {
+func (r TriggerMaintenanceResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -969,14 +969,14 @@ func (r TriggerClusterMaintenanceResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterMaintenanceResponse) StatusCode() int {
+func (r TriggerMaintenanceResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterReconciliationResponse struct {
+type TriggerReconciliationResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -987,7 +987,7 @@ type TriggerClusterReconciliationResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterReconciliationResponse) Status() string {
+func (r TriggerReconciliationResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -995,14 +995,14 @@ func (r TriggerClusterReconciliationResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterReconciliationResponse) StatusCode() int {
+func (r TriggerReconciliationResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type TriggerClusterWakeupResponse struct {
+type TriggerWakeupResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *map[string]interface{}
@@ -1013,7 +1013,7 @@ type TriggerClusterWakeupResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r TriggerClusterWakeupResponse) Status() string {
+func (r TriggerWakeupResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1021,102 +1021,102 @@ func (r TriggerClusterWakeupResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r TriggerClusterWakeupResponse) StatusCode() int {
+func (r TriggerWakeupResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// ListClusters request returning *ListClustersResponse
-func (c *ClientWithResponses) ListClusters(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListClustersResponse, error) {
-	rsp, err := c.ListClustersRaw(ctx, projectID, reqEditors...)
+// List request returning *ListResponse
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseListClustersResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// DeleteCluster request returning *DeleteClusterResponse
-func (c *ClientWithResponses) DeleteCluster(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*DeleteClusterResponse, error) {
-	rsp, err := c.DeleteClusterRaw(ctx, projectID, clusterName, reqEditors...)
+// Delete request returning *DeleteResponse
+func (c *ClientWithResponses) Delete(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+	rsp, err := c.DeleteRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseDeleteClusterResponse(rsp)
+	return c.ParseDeleteResponse(rsp)
 }
 
-// GetCluster request returning *GetClusterResponse
-func (c *ClientWithResponses) GetCluster(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*GetClusterResponse, error) {
-	rsp, err := c.GetClusterRaw(ctx, projectID, clusterName, reqEditors...)
+// Get request returning *GetResponse
+func (c *ClientWithResponses) Get(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.GetRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetClusterResponse(rsp)
+	return c.ParseGetResponse(rsp)
 }
 
-// CreateOrUpdateClusterWithBody request with arbitrary body returning *CreateOrUpdateClusterResponse
-func (c *ClientWithResponses) CreateOrUpdateClusterWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOrUpdateClusterResponse, error) {
-	rsp, err := c.CreateOrUpdateClusterRawWithBody(ctx, projectID, clusterName, contentType, body, reqEditors...)
+// CreateOrUpdateWithBody request with arbitrary body returning *CreateOrUpdateResponse
+func (c *ClientWithResponses) CreateOrUpdateWithBody(ctx context.Context, projectID string, clusterName string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateOrUpdateResponse, error) {
+	rsp, err := c.CreateOrUpdateRawWithBody(ctx, projectID, clusterName, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateOrUpdateClusterResponse(rsp)
+	return c.ParseCreateOrUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateOrUpdateCluster(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateClusterJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOrUpdateClusterResponse, error) {
-	rsp, err := c.CreateOrUpdateClusterRaw(ctx, projectID, clusterName, body, reqEditors...)
+func (c *ClientWithResponses) CreateOrUpdate(ctx context.Context, projectID string, clusterName string, body CreateOrUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateOrUpdateResponse, error) {
+	rsp, err := c.CreateOrUpdateRaw(ctx, projectID, clusterName, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateOrUpdateClusterResponse(rsp)
+	return c.ParseCreateOrUpdateResponse(rsp)
 }
 
-// TriggerClusterHibernation request returning *TriggerClusterHibernationResponse
-func (c *ClientWithResponses) TriggerClusterHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterHibernationResponse, error) {
-	rsp, err := c.TriggerClusterHibernationRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerHibernation request returning *TriggerHibernationResponse
+func (c *ClientWithResponses) TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error) {
+	rsp, err := c.TriggerHibernationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterHibernationResponse(rsp)
+	return c.ParseTriggerHibernationResponse(rsp)
 }
 
-// TriggerClusterMaintenance request returning *TriggerClusterMaintenanceResponse
-func (c *ClientWithResponses) TriggerClusterMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterMaintenanceResponse, error) {
-	rsp, err := c.TriggerClusterMaintenanceRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerMaintenance request returning *TriggerMaintenanceResponse
+func (c *ClientWithResponses) TriggerMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerMaintenanceResponse, error) {
+	rsp, err := c.TriggerMaintenanceRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterMaintenanceResponse(rsp)
+	return c.ParseTriggerMaintenanceResponse(rsp)
 }
 
-// TriggerClusterReconciliation request returning *TriggerClusterReconciliationResponse
-func (c *ClientWithResponses) TriggerClusterReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterReconciliationResponse, error) {
-	rsp, err := c.TriggerClusterReconciliationRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerReconciliation request returning *TriggerReconciliationResponse
+func (c *ClientWithResponses) TriggerReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerReconciliationResponse, error) {
+	rsp, err := c.TriggerReconciliationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterReconciliationResponse(rsp)
+	return c.ParseTriggerReconciliationResponse(rsp)
 }
 
-// TriggerClusterWakeup request returning *TriggerClusterWakeupResponse
-func (c *ClientWithResponses) TriggerClusterWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerClusterWakeupResponse, error) {
-	rsp, err := c.TriggerClusterWakeupRaw(ctx, projectID, clusterName, reqEditors...)
+// TriggerWakeup request returning *TriggerWakeupResponse
+func (c *ClientWithResponses) TriggerWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerWakeupResponse, error) {
+	rsp, err := c.TriggerWakeupRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseTriggerClusterWakeupResponse(rsp)
+	return c.ParseTriggerWakeupResponse(rsp)
 }
 
-// ParseListClustersResponse parses an HTTP response from a ListClusters call
-func (c *ClientWithResponses) ParseListClustersResponse(rsp *http.Response) (*ListClustersResponse, error) {
+// ParseListResponse parses an HTTP response from a List call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ListClustersResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1156,15 +1156,15 @@ func (c *ClientWithResponses) ParseListClustersResponse(rsp *http.Response) (*Li
 	return response, validate.ResponseObject(response)
 }
 
-// ParseDeleteClusterResponse parses an HTTP response from a DeleteCluster call
-func (c *ClientWithResponses) ParseDeleteClusterResponse(rsp *http.Response) (*DeleteClusterResponse, error) {
+// ParseDeleteResponse parses an HTTP response from a Delete call
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteClusterResponse{
+	response := &DeleteResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1197,15 +1197,15 @@ func (c *ClientWithResponses) ParseDeleteClusterResponse(rsp *http.Response) (*D
 	return response, validate.ResponseObject(response)
 }
 
-// ParseGetClusterResponse parses an HTTP response from a GetCluster call
-func (c *ClientWithResponses) ParseGetClusterResponse(rsp *http.Response) (*GetClusterResponse, error) {
+// ParseGetResponse parses an HTTP response from a Get call
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetClusterResponse{
+	response := &GetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1231,15 +1231,15 @@ func (c *ClientWithResponses) ParseGetClusterResponse(rsp *http.Response) (*GetC
 	return response, validate.ResponseObject(response)
 }
 
-// ParseCreateOrUpdateClusterResponse parses an HTTP response from a CreateOrUpdateCluster call
-func (c *ClientWithResponses) ParseCreateOrUpdateClusterResponse(rsp *http.Response) (*CreateOrUpdateClusterResponse, error) {
+// ParseCreateOrUpdateResponse parses an HTTP response from a CreateOrUpdate call
+func (c *ClientWithResponses) ParseCreateOrUpdateResponse(rsp *http.Response) (*CreateOrUpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateOrUpdateClusterResponse{
+	response := &CreateOrUpdateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1286,15 +1286,15 @@ func (c *ClientWithResponses) ParseCreateOrUpdateClusterResponse(rsp *http.Respo
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterHibernationResponse parses an HTTP response from a TriggerClusterHibernation call
-func (c *ClientWithResponses) ParseTriggerClusterHibernationResponse(rsp *http.Response) (*TriggerClusterHibernationResponse, error) {
+// ParseTriggerHibernationResponse parses an HTTP response from a TriggerHibernation call
+func (c *ClientWithResponses) ParseTriggerHibernationResponse(rsp *http.Response) (*TriggerHibernationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterHibernationResponse{
+	response := &TriggerHibernationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1334,15 +1334,15 @@ func (c *ClientWithResponses) ParseTriggerClusterHibernationResponse(rsp *http.R
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterMaintenanceResponse parses an HTTP response from a TriggerClusterMaintenance call
-func (c *ClientWithResponses) ParseTriggerClusterMaintenanceResponse(rsp *http.Response) (*TriggerClusterMaintenanceResponse, error) {
+// ParseTriggerMaintenanceResponse parses an HTTP response from a TriggerMaintenance call
+func (c *ClientWithResponses) ParseTriggerMaintenanceResponse(rsp *http.Response) (*TriggerMaintenanceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterMaintenanceResponse{
+	response := &TriggerMaintenanceResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1382,15 +1382,15 @@ func (c *ClientWithResponses) ParseTriggerClusterMaintenanceResponse(rsp *http.R
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterReconciliationResponse parses an HTTP response from a TriggerClusterReconciliation call
-func (c *ClientWithResponses) ParseTriggerClusterReconciliationResponse(rsp *http.Response) (*TriggerClusterReconciliationResponse, error) {
+// ParseTriggerReconciliationResponse parses an HTTP response from a TriggerReconciliation call
+func (c *ClientWithResponses) ParseTriggerReconciliationResponse(rsp *http.Response) (*TriggerReconciliationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterReconciliationResponse{
+	response := &TriggerReconciliationResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1430,15 +1430,15 @@ func (c *ClientWithResponses) ParseTriggerClusterReconciliationResponse(rsp *htt
 	return response, validate.ResponseObject(response)
 }
 
-// ParseTriggerClusterWakeupResponse parses an HTTP response from a TriggerClusterWakeup call
-func (c *ClientWithResponses) ParseTriggerClusterWakeupResponse(rsp *http.Response) (*TriggerClusterWakeupResponse, error) {
+// ParseTriggerWakeupResponse parses an HTTP response from a TriggerWakeup call
+func (c *ClientWithResponses) ParseTriggerWakeupResponse(rsp *http.Response) (*TriggerWakeupResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &TriggerClusterWakeupResponse{
+	response := &TriggerWakeupResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

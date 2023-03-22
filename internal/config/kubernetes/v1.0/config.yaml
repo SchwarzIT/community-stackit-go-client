@@ -45,6 +45,15 @@ tidy:
   - replace: SkeService
     with: 
     prefix: true
+  - replace: Clusters
+    with: 
+    suffix: true
+  - replace: Cluster
+    with: 
+    suffix: true
+  - replace: TriggerCluster
+    with: Trigger
+    prefix: true
   params:
   - replace: Id
     with: ID

@@ -5,10 +5,10 @@ package cluster
 
 import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/cluster"
 
-type CreateOrUpdateClusterResponse struct {
+type CreateOrUpdateResponse struct {
 	cluster.ClientWithResponsesInterface
 }
 
-type DeleteClusterResponse struct {
+type DeleteResponse struct {
 	cluster.ClientWithResponsesInterface
 }
