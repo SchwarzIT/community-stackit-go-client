@@ -1,0 +1,152 @@
+package: argus
+output: ../../../../pkg/services/argus/v1.0/argus.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+    - instances
+    - acl
+    - alert-config
+    - alert-groups
+    - alert-rules
+    - alert-records
+    - backup
+    - cert-check
+    - grafana-configs
+    - http-check
+    - logs
+    - metrics-storage-retention
+    - network-check
+    - ping-check
+    - scrape-config
+    - traces
+    - plans
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy:
+    - replace: "*argus."
+      with: "*"
+      all: true
+    - replace: " argus."
+      with: " "
+      all: true
+  - from: include/instances/wait.go
+    to: instances/wait.go
+    tidy:
+    - replace: "instances."
+      with:
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: V1ProjectsInstancesAcl
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesAlertconfigs
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesAlertgroups
+    with:
+    prefix: true
+  - replace: Records
+    with:
+    prefix: true
+  - replace: Alertrules
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesBackups
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesBackup
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesCertChecks
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesGrafanaConfigs
+    with:
+    prefix: true
+  - replace: V1ProjectsInstancesHttpChecks
+    with:
+    prefix: true
+  - replace: V1ProjectsInstances
+    with: Instance
+    prefix: true
+  - replace: V1SystemsProjects
+    with: System
+    prefix: true
+  - replace: InstanceLogsAlertgroups
+    with: 
+    prefix: true
+  - replace: InstanceLogsConfigs
+    with: Config
+    prefix: true
+  - replace: InstanceMetricsStorageRetentions
+    with:
+    prefix: true
+  - replace: InstanceNetworkChecks
+    with:
+    prefix: true
+  - replace: InstancePingChecks
+    with:
+    prefix: true
+  - replace: V1ProjectsOfferingsList
+    with: ListOfferings
+    prefix: true
+  - replace: V1ProjectsPlansList
+    with: ListPlans
+    prefix: true
+  - replace: InstanceScrapeconfigs
+    with: 
+    prefix: true
+  - replace: InstanceTracesConfigs
+    with:
+    prefix: true
+  - replace: InstanceCredentialsList
+    with: ListInstanceCredentials
+    prefix: true
+  - replace: Instance
+    with:
+    prefix: true
+  - replace: Read
+    with: Get
+    prefix: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: url
+    with: targetURL
+    all: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Api
+    with: API
+    all: true
+  - replace: Url
+    with: URL
+    all: true
+  - replace: ProjectInstanceFullStatus
+    with: PI
+    all: true

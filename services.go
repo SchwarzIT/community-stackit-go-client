@@ -1,7 +1,7 @@
 package client
 
 import (
-	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/generated"
+	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0/generated"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/generated"
