@@ -3,7 +3,7 @@
 
 package instances
 
-import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated/instances"
+import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/instances"
 
 type ProvisionResponse struct {
 	instances.ClientWithResponsesInterface

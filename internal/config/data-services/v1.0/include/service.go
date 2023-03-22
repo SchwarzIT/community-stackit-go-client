@@ -2,7 +2,7 @@ package dataservices
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/generated"
+	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -18,9 +18,10 @@ const (
 
 func NewService(c common.Client, serviceID int) *dataservices.ClientWithResponses {
 	url := GetBaseURLs(serviceID).GetURL(c)
-	nc, _ := dataservices.NewClientWithResponses(url, dataservices.WithHTTPClient(c))
+	nc, _ := dataservices.NewClient(url, dataservices.WithHTTPClient(c))
 	return nc
 }
+
 func GetBaseURLs(serviceID int) urls.ByEnvs {
 	switch serviceID {
 	case ElasticSearch:

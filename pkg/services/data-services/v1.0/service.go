@@ -17,9 +17,10 @@ const (
 
 func NewService(c common.Client, serviceID int) *ClientWithResponses {
 	url := GetBaseURLs(serviceID).GetURL(c)
-	nc, _ := NewClientWithResponses(url, WithHTTPClient(c))
+	nc, _ := NewClient(url, WithHTTPClient(c))
 	return nc
 }
+
 func GetBaseURLs(serviceID int) urls.ByEnvs {
 	switch serviceID {
 	case ElasticSearch:

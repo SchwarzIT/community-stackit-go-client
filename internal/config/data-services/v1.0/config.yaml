@@ -1,5 +1,5 @@
 package: dataservices
-output: generated/dataservices.gen.go
+output: ../../../../pkg/services/data-services/v1.0/dsa.go
 generate:
   models: true
   client: true
