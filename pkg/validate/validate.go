@@ -29,18 +29,31 @@ func Response(resp interface{}, requestError error, checkNullFields ...string) e
 		return err
 	}
 
-	for _, field := range checkNullFields {
-		sl := strings.Split(field, ".")
-		res := resp
-		for _, f := range sl {
-			a, err := reflections.GetField(res, f)
-			if err != nil {
-				return err
-			}
-			if a == nil || (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil()) {
-				return fmt.Errorf("field %s in response is nil", field)
-			}
-			res = a
+	return Fields(resp, checkNullFields...)
+}
+
+// Field validates that given field in the response object is set (not nil)
+func Field(resp interface{}, field string) error {
+	sl := strings.Split(field, ".")
+	res := resp
+	for _, f := range sl {
+		a, err := reflections.GetField(res, f)
+		if err != nil {
+			return err
+		}
+		if a == nil || (reflect.ValueOf(a).Kind() == reflect.Ptr && reflect.ValueOf(a).IsNil()) {
+			return fmt.Errorf("field %s in response is nil", field)
+		}
+		res = a
+	}
+	return nil
+}
+
+// Fields validates that given fields in the response object are set (not nil)
+func Fields(resp interface{}, fields ...string) error {
+	for _, field := range fields {
+		if err := Field(resp, field); err != nil {
+			return err
 		}
 	}
 	return nil

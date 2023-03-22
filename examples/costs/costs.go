@@ -28,9 +28,12 @@ func main() {
 		uuid.MustParse("Project ID"),          // update to relevant Project ID
 		params,
 	)
+	if err != nil {
+		panic(err)
+	}
 
-	// check for errors or empty response
-	if agg := validate.Response(res, err, "JSON200"); agg != nil {
+	// check for empty response
+	if err := validate.Field(res, "JSON200"); err != nil {
 		panic(err)
 	}
 

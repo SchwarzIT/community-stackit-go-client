@@ -212,6 +212,7 @@ func TestDuration(t *testing.T) {
 }
 
 func TestResponse(t *testing.T) {
+	abc := "abc"
 	type args struct {
 		resp            interface{}
 		requestError    error
@@ -239,6 +240,10 @@ func TestResponse(t *testing.T) {
 			Error   error
 			JSON200 struct{ ABC *string }
 		}{JSON200: struct{ ABC *string }{ABC: nil}}, checkNullFields: []string{"JSON200.ABC"}}, "field JSON200.ABC in response is nil"},
+		{"nil Error, nil fields", args{requestError: nil, resp: struct {
+			Error   error
+			JSON200 struct{ ABC *string }
+		}{JSON200: struct{ ABC *string }{ABC: &abc}}, checkNullFields: []string{"JSON200.ABC"}}, ""},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
