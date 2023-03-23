@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	project, ctx := "", context.Background()
 	c, err := client.New(ctx, client.Config{
 		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
 		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
@@ -19,12 +19,10 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.ElasticSearch.Offerings.Get(ctx, "{project-id}")
-	if err != nil {
-		panic(err)
-	}
-
-	if err := validate.Field(res, "JSON200"); err != nil {
+	fmt.Println("Enter Project ID:")
+	fmt.Scanln(&project)
+	res, err := c.ElasticSearch.Offerings.Get(ctx, project)
+	if err = validate.Response(res, err, "JSON200"); err != nil {
 		panic(err)
 	}
 

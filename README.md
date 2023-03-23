@@ -2,7 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/community-stackit-go-client)](https://goreportcard.com/report/github.com/SchwarzIT/community-stackit-go-client) [![Unit Tests](https://github.com/SchwarzIT/community-stackit-go-client/actions/workflows/tests.yml/badge.svg)](https://github.com/SchwarzIT/community-stackit-go-client/actions/workflows/tests.yml) [![Coverage Status](https://coveralls.io/repos/github/SchwarzIT/community-stackit-go-client/badge.svg?branch=main)](https://coveralls.io/github/SchwarzIT/community-stackit-go-client?branch=main) [![GoDoc reference](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/SchwarzIT/community-stackit-go-client) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0)
 
-<br />
+&nbsp;
 
 The client is community-supported and not an official STACKIT release, it is maintained by internal Schwarz IT teams integrating with STACKIT
 
@@ -32,7 +32,7 @@ import (
 )
 
 func main() {
-	ctx := context.Background()
+	project, ctx := "", context.Background()
 	c, err := client.New(ctx, client.Config{
 		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
 		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
@@ -41,9 +41,11 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, "{project-id}")
-	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
-		panic(aggregatedError)
+	fmt.Println("Enter Project ID:")
+	fmt.Scanln(&project)
+	res, err := c.ElasticSearch.Offerings.Get(ctx, project)
+	if err = validate.Response(res, err, "JSON200"); err != nil {
+		panic(err)
 	}
 
 	fmt.Println("Received the following offerings:")
@@ -59,7 +61,7 @@ func main() {
 2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
 
 
-<br />
+&nbsp;
 
 ## Working with API environments
 
