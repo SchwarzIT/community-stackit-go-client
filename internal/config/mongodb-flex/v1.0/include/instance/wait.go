@@ -2,13 +2,13 @@ package instance
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
@@ -40,18 +40,16 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 	outerfound := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.List(ctx, projectID, &instance.ListParams{})
-		if err != nil {
-			if strings.Contains(err.Error(), ClientTimeoutErr) {
+		if err = validate.Response(s, err, "JSON200.Items"); err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) ||
+				validate.StatusEquals(s,
+					http.StatusBadGateway,
+					http.StatusGatewayTimeout,
+					http.StatusInternalServerError,
+				) {
 				return nil, false, nil
 			}
 			return nil, false, err
-		}
-		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil {
-			return nil, false, nil
-		}
-
-		if s.JSON200.Items == nil {
-			return nil, false, errors.New("received an empty list of instances")
 		}
 
 		innerfound := false
@@ -77,17 +75,16 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		s, err := c.List(ctx, projectID, &instance.ListParams{})
-		if err != nil {
-			if strings.Contains(err.Error(), ClientTimeoutErr) {
+		if err = validate.Response(s, err, "JSON200.Items"); err != nil {
+			if strings.Contains(err.Error(), ClientTimeoutErr) ||
+				validate.StatusEquals(s,
+					http.StatusBadGateway,
+					http.StatusGatewayTimeout,
+					http.StatusInternalServerError,
+				) {
 				return nil, false, nil
 			}
 			return nil, false, err
-		}
-		if s.StatusCode() == http.StatusInternalServerError || s.JSON200 == nil {
-			return nil, false, nil
-		}
-		if s.JSON200.Items == nil {
-			return nil, true, nil
 		}
 		for _, v := range *s.JSON200.Items {
 			if v.ID == nil || *v.ID != instanceID {
