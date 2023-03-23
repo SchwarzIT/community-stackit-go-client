@@ -7,7 +7,7 @@ import (
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated/projects"
+	rm "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
@@ -22,7 +22,7 @@ func main() {
 	}
 	member := membership.Member{
 		Subject: "user@host.name",
-		Role:    string(projects.PROJECT_OWNER),
+		Role:    string(rm.PROJECT_OWNER),
 	}
 	body := membership.AddMembersJSONRequestBody{
 		ResourceType: membership.RESOURCE_TYPE_PROJECT,
