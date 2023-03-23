@@ -6,7 +6,7 @@ import (
 	"os"
 
 	client "github.com/SchwarzIT/community-stackit-go-client"
-	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0/generated"
+	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0/generated/projects"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
@@ -33,7 +33,7 @@ func main() {
 		"123-456-789",
 	}
 	for _, p := range projects {
-		res, err := c.Membership.AddMembersWithResponse(ctx, p, body)
+		res, err := c.Membership.AddMembers(ctx, p, body)
 		if agg := validate.Response(res, err); agg != nil {
 			fmt.Println(agg)
 			continue
