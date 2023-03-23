@@ -16,6 +16,8 @@ To install the community-stackit-go-client package, run the following command:
 go get github.com/SchwarzIT/community-stackit-go-client
 ```
 
+&nbsp;
+
 ## Usage
 
 Before you can start using the client, you will need to create a STACKIT Service Account and assign it the appropriate permissions.
