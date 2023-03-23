@@ -38,9 +38,6 @@ tidy:
   - replace: ServiceAccounts
     with: SA
     all: true
-  - replace: SAV2
-    with: SAv2
-    all: true
   - replace: Post
     with: Create
     prefix: true
@@ -59,15 +56,30 @@ tidy:
   - replace: DeleteSAServiceAccountID
     with: DeleteSA
     prefix: true
-  - replace: SAV2
-    with: SAv2
-    all: true
   - replace: SAServiceAccountID
     with: SA
     all: true
   - replace: AccessTokensAccessTokenID
     with: AccessTokens
     all: true
+  - replace: SAV2
+    with: 
+    all: true
+  - replace: SAv2
+    with: 
+    all: true
+  - replace: SA
+    with: 
+    all: true
+  - replace: V2
+    with: 
+    all: true
+  - replace: GetKeysKeyID
+    with: GeKey
+    prefix: true
+  - replace: Formdata
+    with: FormData
+    suffix: true
   params:
   - replace: Id
     with: ID

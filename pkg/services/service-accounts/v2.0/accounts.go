@@ -105,9 +105,9 @@ const (
 	BEARER TokenResponseBodyTokenType = "Bearer"
 )
 
-// Defines values for GetSAKeysKeyIDParamsFormat.
+// Defines values for GeKeyParamsFormat.
 const (
-	X509_PEM GetSAKeysKeyIDParamsFormat = "X509_PEM"
+	X509_PEM GeKeyParamsFormat = "X509_PEM"
 )
 
 // AccessTokenMetadataV2 Does not contain the actual token.
@@ -409,29 +409,29 @@ type TokenResponseBody struct {
 // TokenResponseBodyTokenType defines model for TokenResponseBody.TokenType.
 type TokenResponseBodyTokenType string
 
-// GetSAKeysKeyIDParams defines parameters for GetSAKeysKeyID.
-type GetSAKeysKeyIDParams struct {
+// GeKeyParams defines parameters for GeKey.
+type GeKeyParams struct {
 	// Format Requested format for the public key
-	Format *GetSAKeysKeyIDParamsFormat `form:"format,omitempty" json:"format,omitempty"`
+	Format *GeKeyParamsFormat `form:"format,omitempty" json:"format,omitempty"`
 }
 
-// GetSAKeysKeyIDParamsFormat defines parameters for GetSAKeysKeyID.
-type GetSAKeysKeyIDParamsFormat string
+// GeKeyParamsFormat defines parameters for GeKey.
+type GeKeyParamsFormat string
 
 // CreateTokenFormdataRequestBody defines body for CreateToken for application/x-www-form-urlencoded ContentType.
 type CreateTokenFormdataRequestBody = TokenRequestBody
 
-// CreateSAv2JSONRequestBody defines body for CreateSAv2 for application/json ContentType.
-type CreateSAv2JSONRequestBody = CreateServiceAccountRequestBodyV2
+// CreateJSONRequestBody defines body for Create for application/json ContentType.
+type CreateJSONRequestBody = CreateServiceAccountRequestBodyV2
 
-// CreateSAAccessTokensV2JSONRequestBody defines body for CreateSAAccessTokensV2 for application/json ContentType.
-type CreateSAAccessTokensV2JSONRequestBody = CreateAccessTokenRequestBody
+// CreateAccessTokensJSONRequestBody defines body for CreateAccessTokens for application/json ContentType.
+type CreateAccessTokensJSONRequestBody = CreateAccessTokenRequestBody
 
-// CreateSAKeysJSONRequestBody defines body for CreateSAKeys for application/json ContentType.
-type CreateSAKeysJSONRequestBody = ServiceAccountKeyRequest
+// CreateKeysJSONRequestBody defines body for CreateKeys for application/json ContentType.
+type CreateKeysJSONRequestBody = ServiceAccountKeyRequest
 
-// UpdateSAKeysJSONRequestBody defines body for UpdateSAKeys for application/json ContentType.
-type UpdateSAKeysJSONRequestBody = ServiceAccountKeyUpdateRequest
+// UpdateKeysJSONRequestBody defines body for UpdateKeys for application/json ContentType.
+type UpdateKeysJSONRequestBody = ServiceAccountKeyUpdateRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -466,49 +466,49 @@ type rawClientInterface interface {
 
 	CreateTokenWithFormdataBodyRaw(ctx context.Context, body CreateTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// List request
-	ListRaw(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Get request
+	GetRaw(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateSAv2 request with any body
-	CreateSAv2RawWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Create request with any body
+	CreateRawWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSAv2Raw(ctx context.Context, projectId string, body CreateSAv2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateRaw(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteSAv2 request
-	DeleteSAv2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Delete request
+	DeleteRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetAccessTokensV2 request
-	GetAccessTokensV2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetAccessTokens request
+	GetAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateSAAccessTokensV2 request with any body
-	CreateSAAccessTokensV2RawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateAccessTokens request with any body
+	CreateAccessTokensRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSAAccessTokensV2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAAccessTokensV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteSAAccessTokensV2 request
-	DeleteSAAccessTokensV2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteAccessTokens request
+	DeleteAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// GetServiceAccountJwks request
 	GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetSAKeys request
-	GetSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetKeys request
+	GetKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// CreateSAKeys request with any body
-	CreateSAKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// CreateKeys request with any body
+	CreateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	CreateSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	CreateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// DeleteSAKeys request
-	DeleteSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// DeleteKeys request
+	DeleteKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetSAKeysKeyID request
-	GetSAKeysKeyIDRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GetSAKeysKeyIDParams, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GeKey request
+	GeKeyRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// UpdateSAKeys request with any body
-	UpdateSAKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// UpdateKeys request with any body
+	UpdateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	UpdateSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) CreateTokenRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -535,8 +535,8 @@ func (c *Client) CreateTokenWithFormdataBodyRaw(ctx context.Context, body Create
 	return c.Client.Do(req)
 }
 
-func (c *Client) ListRaw(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewListRequest(ctx, c.Server, projectId)
+func (c *Client) GetRaw(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, projectId)
 	if err != nil {
 		return nil, err
 	}
@@ -547,8 +547,8 @@ func (c *Client) ListRaw(ctx context.Context, projectId string, reqEditors ...Re
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSAv2RawWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSAv2RequestWithBody(ctx, c.Server, projectId, contentType, body)
+func (c *Client) CreateRawWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequestWithBody(ctx, c.Server, projectId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -559,8 +559,8 @@ func (c *Client) CreateSAv2RawWithBody(ctx context.Context, projectId string, co
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSAv2Raw(ctx context.Context, projectId string, body CreateSAv2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSAv2Request(ctx, c.Server, projectId, body)
+func (c *Client) CreateRaw(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateRequest(ctx, c.Server, projectId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -571,8 +571,8 @@ func (c *Client) CreateSAv2Raw(ctx context.Context, projectId string, body Creat
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSAv2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSAv2Request(ctx, c.Server, projectId, serviceAccountEmail)
+func (c *Client) DeleteRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -583,8 +583,8 @@ func (c *Client) DeleteSAv2Raw(ctx context.Context, projectId string, serviceAcc
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetAccessTokensV2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetAccessTokensV2Request(ctx, c.Server, projectId, serviceAccountEmail)
+func (c *Client) GetAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetAccessTokensRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -595,8 +595,8 @@ func (c *Client) GetAccessTokensV2Raw(ctx context.Context, projectId string, ser
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSAAccessTokensV2RawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSAAccessTokensV2RequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, contentType, body)
+func (c *Client) CreateAccessTokensRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAccessTokensRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -607,8 +607,8 @@ func (c *Client) CreateSAAccessTokensV2RawWithBody(ctx context.Context, projectI
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSAAccessTokensV2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAAccessTokensV2JSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSAAccessTokensV2Request(ctx, c.Server, projectId, serviceAccountEmail, body)
+func (c *Client) CreateAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateAccessTokensRequest(ctx, c.Server, projectId, serviceAccountEmail, body)
 	if err != nil {
 		return nil, err
 	}
@@ -619,8 +619,8 @@ func (c *Client) CreateSAAccessTokensV2Raw(ctx context.Context, projectId string
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSAAccessTokensV2Raw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSAAccessTokensV2Request(ctx, c.Server, projectId, serviceAccountEmail, accessTokenId)
+func (c *Client) DeleteAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteAccessTokensRequest(ctx, c.Server, projectId, serviceAccountEmail, accessTokenId)
 	if err != nil {
 		return nil, err
 	}
@@ -643,8 +643,8 @@ func (c *Client) GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEma
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSAKeysRequest(ctx, c.Server, projectId, serviceAccountEmail)
+func (c *Client) GetKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetKeysRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -655,8 +655,8 @@ func (c *Client) GetSAKeysRaw(ctx context.Context, projectId string, serviceAcco
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSAKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSAKeysRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, contentType, body)
+func (c *Client) CreateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateKeysRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -667,8 +667,8 @@ func (c *Client) CreateSAKeysRawWithBody(ctx context.Context, projectId string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) CreateSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewCreateSAKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, body)
+func (c *Client) CreateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewCreateKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, body)
 	if err != nil {
 		return nil, err
 	}
@@ -679,8 +679,8 @@ func (c *Client) CreateSAKeysRaw(ctx context.Context, projectId string, serviceA
 	return c.Client.Do(req)
 }
 
-func (c *Client) DeleteSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewDeleteSAKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId)
+func (c *Client) DeleteKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId)
 	if err != nil {
 		return nil, err
 	}
@@ -691,8 +691,8 @@ func (c *Client) DeleteSAKeysRaw(ctx context.Context, projectId string, serviceA
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetSAKeysKeyIDRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GetSAKeysKeyIDParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetSAKeysKeyIDRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, params)
+func (c *Client) GeKeyRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGeKeyRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, params)
 	if err != nil {
 		return nil, err
 	}
@@ -703,8 +703,8 @@ func (c *Client) GetSAKeysKeyIDRaw(ctx context.Context, projectId string, servic
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateSAKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateSAKeysRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, keyId, contentType, body)
+func (c *Client) UpdateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateKeysRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, keyId, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -715,8 +715,8 @@ func (c *Client) UpdateSAKeysRawWithBody(ctx context.Context, projectId string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client) UpdateSAKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewUpdateSAKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, body)
+func (c *Client) UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, body)
 	if err != nil {
 		return nil, err
 	}
@@ -767,8 +767,8 @@ func NewCreateTokenRequestWithBody(ctx context.Context, server string, contentTy
 	return req, nil
 }
 
-// NewListRequest generates requests for List
-func NewListRequest(ctx context.Context, server string, projectId string) (*http.Request, error) {
+// NewGetRequest generates requests for Get
+func NewGetRequest(ctx context.Context, server string, projectId string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -801,19 +801,19 @@ func NewListRequest(ctx context.Context, server string, projectId string) (*http
 	return req, nil
 }
 
-// NewCreateSAv2Request calls the generic CreateSAv2 builder with application/json body
-func NewCreateSAv2Request(ctx context.Context, server string, projectId string, body CreateSAv2JSONRequestBody) (*http.Request, error) {
+// NewCreateRequest calls the generic Create builder with application/json body
+func NewCreateRequest(ctx context.Context, server string, projectId string, body CreateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSAv2RequestWithBody(ctx, server, projectId, "application/json", bodyReader)
+	return NewCreateRequestWithBody(ctx, server, projectId, "application/json", bodyReader)
 }
 
-// NewCreateSAv2RequestWithBody generates requests for CreateSAv2 with any type of body
-func NewCreateSAv2RequestWithBody(ctx context.Context, server string, projectId string, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateRequestWithBody generates requests for Create with any type of body
+func NewCreateRequestWithBody(ctx context.Context, server string, projectId string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -848,8 +848,8 @@ func NewCreateSAv2RequestWithBody(ctx context.Context, server string, projectId 
 	return req, nil
 }
 
-// NewDeleteSAv2Request generates requests for DeleteSAv2
-func NewDeleteSAv2Request(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email) (*http.Request, error) {
+// NewDeleteRequest generates requests for Delete
+func NewDeleteRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -889,8 +889,8 @@ func NewDeleteSAv2Request(ctx context.Context, server string, projectId string, 
 	return req, nil
 }
 
-// NewGetAccessTokensV2Request generates requests for GetAccessTokensV2
-func NewGetAccessTokensV2Request(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email) (*http.Request, error) {
+// NewGetAccessTokensRequest generates requests for GetAccessTokens
+func NewGetAccessTokensRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -930,19 +930,19 @@ func NewGetAccessTokensV2Request(ctx context.Context, server string, projectId s
 	return req, nil
 }
 
-// NewCreateSAAccessTokensV2Request calls the generic CreateSAAccessTokensV2 builder with application/json body
-func NewCreateSAAccessTokensV2Request(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAAccessTokensV2JSONRequestBody) (*http.Request, error) {
+// NewCreateAccessTokensRequest calls the generic CreateAccessTokens builder with application/json body
+func NewCreateAccessTokensRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, body CreateAccessTokensJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSAAccessTokensV2RequestWithBody(ctx, server, projectId, serviceAccountEmail, "application/json", bodyReader)
+	return NewCreateAccessTokensRequestWithBody(ctx, server, projectId, serviceAccountEmail, "application/json", bodyReader)
 }
 
-// NewCreateSAAccessTokensV2RequestWithBody generates requests for CreateSAAccessTokensV2 with any type of body
-func NewCreateSAAccessTokensV2RequestWithBody(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateAccessTokensRequestWithBody generates requests for CreateAccessTokens with any type of body
+func NewCreateAccessTokensRequestWithBody(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -984,8 +984,8 @@ func NewCreateSAAccessTokensV2RequestWithBody(ctx context.Context, server string
 	return req, nil
 }
 
-// NewDeleteSAAccessTokensV2Request generates requests for DeleteSAAccessTokensV2
-func NewDeleteSAAccessTokensV2Request(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID) (*http.Request, error) {
+// NewDeleteAccessTokensRequest generates requests for DeleteAccessTokens
+func NewDeleteAccessTokensRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1066,8 +1066,8 @@ func NewGetServiceAccountJwksRequest(ctx context.Context, server string, service
 	return req, nil
 }
 
-// NewGetSAKeysRequest generates requests for GetSAKeys
-func NewGetSAKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email) (*http.Request, error) {
+// NewGetKeysRequest generates requests for GetKeys
+func NewGetKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1107,19 +1107,19 @@ func NewGetSAKeysRequest(ctx context.Context, server string, projectId string, s
 	return req, nil
 }
 
-// NewCreateSAKeysRequest calls the generic CreateSAKeys builder with application/json body
-func NewCreateSAKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAKeysJSONRequestBody) (*http.Request, error) {
+// NewCreateKeysRequest calls the generic CreateKeys builder with application/json body
+func NewCreateKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, body CreateKeysJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewCreateSAKeysRequestWithBody(ctx, server, projectId, serviceAccountEmail, "application/json", bodyReader)
+	return NewCreateKeysRequestWithBody(ctx, server, projectId, serviceAccountEmail, "application/json", bodyReader)
 }
 
-// NewCreateSAKeysRequestWithBody generates requests for CreateSAKeys with any type of body
-func NewCreateSAKeysRequestWithBody(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader) (*http.Request, error) {
+// NewCreateKeysRequestWithBody generates requests for CreateKeys with any type of body
+func NewCreateKeysRequestWithBody(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1161,8 +1161,8 @@ func NewCreateSAKeysRequestWithBody(ctx context.Context, server string, projectI
 	return req, nil
 }
 
-// NewDeleteSAKeysRequest generates requests for DeleteSAKeys
-func NewDeleteSAKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID) (*http.Request, error) {
+// NewDeleteKeysRequest generates requests for DeleteKeys
+func NewDeleteKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1209,8 +1209,8 @@ func NewDeleteSAKeysRequest(ctx context.Context, server string, projectId string
 	return req, nil
 }
 
-// NewGetSAKeysKeyIDRequest generates requests for GetSAKeysKeyID
-func NewGetSAKeysKeyIDRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GetSAKeysKeyIDParams) (*http.Request, error) {
+// NewGeKeyRequest generates requests for GeKey
+func NewGeKeyRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GeKeyParams) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1277,19 +1277,19 @@ func NewGetSAKeysKeyIDRequest(ctx context.Context, server string, projectId stri
 	return req, nil
 }
 
-// NewUpdateSAKeysRequest calls the generic UpdateSAKeys builder with application/json body
-func NewUpdateSAKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateSAKeysJSONRequestBody) (*http.Request, error) {
+// NewUpdateKeysRequest calls the generic UpdateKeys builder with application/json body
+func NewUpdateKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateKeysJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewUpdateSAKeysRequestWithBody(ctx, server, projectId, serviceAccountEmail, keyId, "application/json", bodyReader)
+	return NewUpdateKeysRequestWithBody(ctx, server, projectId, serviceAccountEmail, keyId, "application/json", bodyReader)
 }
 
-// NewUpdateSAKeysRequestWithBody generates requests for UpdateSAKeys with any type of body
-func NewUpdateSAKeysRequestWithBody(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
+// NewUpdateKeysRequestWithBody generates requests for UpdateKeys with any type of body
+func NewUpdateKeysRequestWithBody(ctx context.Context, server string, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -1365,49 +1365,49 @@ type ClientWithResponsesInterface interface {
 
 	CreateTokenWithFormdataBody(ctx context.Context, body CreateTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error)
 
-	// List request
-	List(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*ListResponse, error)
+	// Get request
+	Get(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 
-	// CreateSAv2 request with any body
-	CreateSAv2WithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSAv2Response, error)
+	// Create request with any body
+	CreateWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
-	CreateSAv2(ctx context.Context, projectId string, body CreateSAv2JSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSAv2Response, error)
+	Create(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error)
 
-	// DeleteSAv2 request
-	DeleteSAv2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*DeleteSAv2Response, error)
+	// Delete request
+	Delete(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*DeleteResponse, error)
 
-	// GetAccessTokensV2 request
-	GetAccessTokensV2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetAccessTokensV2Response, error)
+	// GetAccessTokens request
+	GetAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetAccessTokensResponse, error)
 
-	// CreateSAAccessTokensV2 request with any body
-	CreateSAAccessTokensV2WithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSAAccessTokensV2Response, error)
+	// CreateAccessTokens request with any body
+	CreateAccessTokensWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error)
 
-	CreateSAAccessTokensV2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAAccessTokensV2JSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSAAccessTokensV2Response, error)
+	CreateAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error)
 
-	// DeleteSAAccessTokensV2 request
-	DeleteSAAccessTokensV2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteSAAccessTokensV2Response, error)
+	// DeleteAccessTokens request
+	DeleteAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteAccessTokensResponse, error)
 
 	// GetServiceAccountJwks request
 	GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error)
 
-	// GetSAKeys request
-	GetSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetSAKeysResponse, error)
+	// GetKeys request
+	GetKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetKeysResponse, error)
 
-	// CreateSAKeys request with any body
-	CreateSAKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSAKeysResponse, error)
+	// CreateKeys request with any body
+	CreateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error)
 
-	CreateSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSAKeysResponse, error)
+	CreateKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error)
 
-	// DeleteSAKeys request
-	DeleteSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteSAKeysResponse, error)
+	// DeleteKeys request
+	DeleteKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteKeysResponse, error)
 
-	// GetSAKeysKeyID request
-	GetSAKeysKeyID(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GetSAKeysKeyIDParams, reqEditors ...RequestEditorFn) (*GetSAKeysKeyIDResponse, error)
+	// GeKey request
+	GeKey(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*GeKeyResponse, error)
 
-	// UpdateSAKeys request with any body
-	UpdateSAKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSAKeysResponse, error)
+	// UpdateKeys request with any body
+	UpdateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error)
 
-	UpdateSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSAKeysResponse, error)
+	UpdateKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error)
 }
 
 type CreateTokenResponse struct {
@@ -1433,7 +1433,7 @@ func (r CreateTokenResponse) StatusCode() int {
 	return 0
 }
 
-type ListResponse struct {
+type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *GetServiceAccountsResponseBodyV2
@@ -1444,7 +1444,7 @@ type ListResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r ListResponse) Status() string {
+func (r GetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1452,14 +1452,14 @@ func (r ListResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r ListResponse) StatusCode() int {
+func (r GetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateSAv2Response struct {
+type CreateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ServiceAccountV2
@@ -1471,7 +1471,7 @@ type CreateSAv2Response struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateSAv2Response) Status() string {
+func (r CreateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1479,14 +1479,14 @@ func (r CreateSAv2Response) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateSAv2Response) StatusCode() int {
+func (r CreateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type DeleteSAv2Response struct {
+type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *Error
@@ -1497,7 +1497,7 @@ type DeleteSAv2Response struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteSAv2Response) Status() string {
+func (r DeleteResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1505,14 +1505,14 @@ func (r DeleteSAv2Response) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSAv2Response) StatusCode() int {
+func (r DeleteResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetAccessTokensV2Response struct {
+type GetAccessTokensResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *GetAccessTokensResponseBodyV2
@@ -1524,7 +1524,7 @@ type GetAccessTokensV2Response struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetAccessTokensV2Response) Status() string {
+func (r GetAccessTokensResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1532,14 +1532,14 @@ func (r GetAccessTokensV2Response) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetAccessTokensV2Response) StatusCode() int {
+func (r GetAccessTokensResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateSAAccessTokensV2Response struct {
+type CreateAccessTokensResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *AccessTokenV2
@@ -1551,7 +1551,7 @@ type CreateSAAccessTokensV2Response struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateSAAccessTokensV2Response) Status() string {
+func (r CreateAccessTokensResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1559,14 +1559,14 @@ func (r CreateSAAccessTokensV2Response) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateSAAccessTokensV2Response) StatusCode() int {
+func (r CreateAccessTokensResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type DeleteSAAccessTokensV2Response struct {
+type DeleteAccessTokensResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *Error
@@ -1578,7 +1578,7 @@ type DeleteSAAccessTokensV2Response struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteSAAccessTokensV2Response) Status() string {
+func (r DeleteAccessTokensResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1586,7 +1586,7 @@ func (r DeleteSAAccessTokensV2Response) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSAAccessTokensV2Response) StatusCode() int {
+func (r DeleteAccessTokensResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1616,7 +1616,7 @@ func (r GetServiceAccountJwksResponse) StatusCode() int {
 	return 0
 }
 
-type GetSAKeysResponse struct {
+type GetKeysResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *GetServiceAccountsKeysResponseBody
@@ -1627,7 +1627,7 @@ type GetSAKeysResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetSAKeysResponse) Status() string {
+func (r GetKeysResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1635,14 +1635,14 @@ func (r GetSAKeysResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetSAKeysResponse) StatusCode() int {
+func (r GetKeysResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type CreateSAKeysResponse struct {
+type CreateKeysResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ServiceAccountKeyPrivateResponse
@@ -1654,7 +1654,7 @@ type CreateSAKeysResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r CreateSAKeysResponse) Status() string {
+func (r CreateKeysResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1662,14 +1662,14 @@ func (r CreateSAKeysResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r CreateSAKeysResponse) StatusCode() int {
+func (r CreateKeysResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type DeleteSAKeysResponse struct {
+type DeleteKeysResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *Error
@@ -1679,7 +1679,7 @@ type DeleteSAKeysResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r DeleteSAKeysResponse) Status() string {
+func (r DeleteKeysResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1687,14 +1687,14 @@ func (r DeleteSAKeysResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r DeleteSAKeysResponse) StatusCode() int {
+func (r DeleteKeysResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type GetSAKeysKeyIDResponse struct {
+type GeKeyResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *ServiceAccountKeyResponseWithKey
@@ -1705,7 +1705,7 @@ type GetSAKeysKeyIDResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetSAKeysKeyIDResponse) Status() string {
+func (r GeKeyResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1713,14 +1713,14 @@ func (r GetSAKeysKeyIDResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetSAKeysKeyIDResponse) StatusCode() int {
+func (r GeKeyResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type UpdateSAKeysResponse struct {
+type UpdateKeysResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON201      *ServiceAccountKeyPatchResponse
@@ -1732,7 +1732,7 @@ type UpdateSAKeysResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r UpdateSAKeysResponse) Status() string {
+func (r UpdateKeysResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -1740,7 +1740,7 @@ func (r UpdateSAKeysResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r UpdateSAKeysResponse) StatusCode() int {
+func (r UpdateKeysResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1764,74 +1764,74 @@ func (c *ClientWithResponses) CreateTokenWithFormdataBody(ctx context.Context, b
 	return c.ParseCreateTokenResponse(rsp)
 }
 
-// List request returning *ListResponse
-func (c *ClientWithResponses) List(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
-	rsp, err := c.ListRaw(ctx, projectId, reqEditors...)
+// Get request returning *GetResponse
+func (c *ClientWithResponses) Get(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.GetRaw(ctx, projectId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseListResponse(rsp)
+	return c.ParseGetResponse(rsp)
 }
 
-// CreateSAv2WithBody request with arbitrary body returning *CreateSAv2Response
-func (c *ClientWithResponses) CreateSAv2WithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSAv2Response, error) {
-	rsp, err := c.CreateSAv2RawWithBody(ctx, projectId, contentType, body, reqEditors...)
+// CreateWithBody request with arbitrary body returning *CreateResponse
+func (c *ClientWithResponses) CreateWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateRawWithBody(ctx, projectId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateSAv2Response(rsp)
+	return c.ParseCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSAv2(ctx context.Context, projectId string, body CreateSAv2JSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSAv2Response, error) {
-	rsp, err := c.CreateSAv2Raw(ctx, projectId, body, reqEditors...)
+func (c *ClientWithResponses) Create(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+	rsp, err := c.CreateRaw(ctx, projectId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateSAv2Response(rsp)
+	return c.ParseCreateResponse(rsp)
 }
 
-// DeleteSAv2 request returning *DeleteSAv2Response
-func (c *ClientWithResponses) DeleteSAv2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*DeleteSAv2Response, error) {
-	rsp, err := c.DeleteSAv2Raw(ctx, projectId, serviceAccountEmail, reqEditors...)
+// Delete request returning *DeleteResponse
+func (c *ClientWithResponses) Delete(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+	rsp, err := c.DeleteRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseDeleteSAv2Response(rsp)
+	return c.ParseDeleteResponse(rsp)
 }
 
-// GetAccessTokensV2 request returning *GetAccessTokensV2Response
-func (c *ClientWithResponses) GetAccessTokensV2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetAccessTokensV2Response, error) {
-	rsp, err := c.GetAccessTokensV2Raw(ctx, projectId, serviceAccountEmail, reqEditors...)
+// GetAccessTokens request returning *GetAccessTokensResponse
+func (c *ClientWithResponses) GetAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetAccessTokensResponse, error) {
+	rsp, err := c.GetAccessTokensRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetAccessTokensV2Response(rsp)
+	return c.ParseGetAccessTokensResponse(rsp)
 }
 
-// CreateSAAccessTokensV2WithBody request with arbitrary body returning *CreateSAAccessTokensV2Response
-func (c *ClientWithResponses) CreateSAAccessTokensV2WithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSAAccessTokensV2Response, error) {
-	rsp, err := c.CreateSAAccessTokensV2RawWithBody(ctx, projectId, serviceAccountEmail, contentType, body, reqEditors...)
+// CreateAccessTokensWithBody request with arbitrary body returning *CreateAccessTokensResponse
+func (c *ClientWithResponses) CreateAccessTokensWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error) {
+	rsp, err := c.CreateAccessTokensRawWithBody(ctx, projectId, serviceAccountEmail, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateSAAccessTokensV2Response(rsp)
+	return c.ParseCreateAccessTokensResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSAAccessTokensV2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAAccessTokensV2JSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSAAccessTokensV2Response, error) {
-	rsp, err := c.CreateSAAccessTokensV2Raw(ctx, projectId, serviceAccountEmail, body, reqEditors...)
+func (c *ClientWithResponses) CreateAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error) {
+	rsp, err := c.CreateAccessTokensRaw(ctx, projectId, serviceAccountEmail, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateSAAccessTokensV2Response(rsp)
+	return c.ParseCreateAccessTokensResponse(rsp)
 }
 
-// DeleteSAAccessTokensV2 request returning *DeleteSAAccessTokensV2Response
-func (c *ClientWithResponses) DeleteSAAccessTokensV2(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteSAAccessTokensV2Response, error) {
-	rsp, err := c.DeleteSAAccessTokensV2Raw(ctx, projectId, serviceAccountEmail, accessTokenId, reqEditors...)
+// DeleteAccessTokens request returning *DeleteAccessTokensResponse
+func (c *ClientWithResponses) DeleteAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, accessTokenId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteAccessTokensResponse, error) {
+	rsp, err := c.DeleteAccessTokensRaw(ctx, projectId, serviceAccountEmail, accessTokenId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseDeleteSAAccessTokensV2Response(rsp)
+	return c.ParseDeleteAccessTokensResponse(rsp)
 }
 
 // GetServiceAccountJwks request returning *GetServiceAccountJwksResponse
@@ -1843,65 +1843,65 @@ func (c *ClientWithResponses) GetServiceAccountJwks(ctx context.Context, service
 	return c.ParseGetServiceAccountJwksResponse(rsp)
 }
 
-// GetSAKeys request returning *GetSAKeysResponse
-func (c *ClientWithResponses) GetSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetSAKeysResponse, error) {
-	rsp, err := c.GetSAKeysRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
+// GetKeys request returning *GetKeysResponse
+func (c *ClientWithResponses) GetKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, reqEditors ...RequestEditorFn) (*GetKeysResponse, error) {
+	rsp, err := c.GetKeysRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetSAKeysResponse(rsp)
+	return c.ParseGetKeysResponse(rsp)
 }
 
-// CreateSAKeysWithBody request with arbitrary body returning *CreateSAKeysResponse
-func (c *ClientWithResponses) CreateSAKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateSAKeysResponse, error) {
-	rsp, err := c.CreateSAKeysRawWithBody(ctx, projectId, serviceAccountEmail, contentType, body, reqEditors...)
+// CreateKeysWithBody request with arbitrary body returning *CreateKeysResponse
+func (c *ClientWithResponses) CreateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error) {
+	rsp, err := c.CreateKeysRawWithBody(ctx, projectId, serviceAccountEmail, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateSAKeysResponse(rsp)
+	return c.ParseCreateKeysResponse(rsp)
 }
 
-func (c *ClientWithResponses) CreateSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateSAKeysResponse, error) {
-	rsp, err := c.CreateSAKeysRaw(ctx, projectId, serviceAccountEmail, body, reqEditors...)
+func (c *ClientWithResponses) CreateKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error) {
+	rsp, err := c.CreateKeysRaw(ctx, projectId, serviceAccountEmail, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseCreateSAKeysResponse(rsp)
+	return c.ParseCreateKeysResponse(rsp)
 }
 
-// DeleteSAKeys request returning *DeleteSAKeysResponse
-func (c *ClientWithResponses) DeleteSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteSAKeysResponse, error) {
-	rsp, err := c.DeleteSAKeysRaw(ctx, projectId, serviceAccountEmail, keyId, reqEditors...)
+// DeleteKeys request returning *DeleteKeysResponse
+func (c *ClientWithResponses) DeleteKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, reqEditors ...RequestEditorFn) (*DeleteKeysResponse, error) {
+	rsp, err := c.DeleteKeysRaw(ctx, projectId, serviceAccountEmail, keyId, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseDeleteSAKeysResponse(rsp)
+	return c.ParseDeleteKeysResponse(rsp)
 }
 
-// GetSAKeysKeyID request returning *GetSAKeysKeyIDResponse
-func (c *ClientWithResponses) GetSAKeysKeyID(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GetSAKeysKeyIDParams, reqEditors ...RequestEditorFn) (*GetSAKeysKeyIDResponse, error) {
-	rsp, err := c.GetSAKeysKeyIDRaw(ctx, projectId, serviceAccountEmail, keyId, params, reqEditors...)
+// GeKey request returning *GeKeyResponse
+func (c *ClientWithResponses) GeKey(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*GeKeyResponse, error) {
+	rsp, err := c.GeKeyRaw(ctx, projectId, serviceAccountEmail, keyId, params, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetSAKeysKeyIDResponse(rsp)
+	return c.ParseGeKeyResponse(rsp)
 }
 
-// UpdateSAKeysWithBody request with arbitrary body returning *UpdateSAKeysResponse
-func (c *ClientWithResponses) UpdateSAKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateSAKeysResponse, error) {
-	rsp, err := c.UpdateSAKeysRawWithBody(ctx, projectId, serviceAccountEmail, keyId, contentType, body, reqEditors...)
+// UpdateKeysWithBody request with arbitrary body returning *UpdateKeysResponse
+func (c *ClientWithResponses) UpdateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error) {
+	rsp, err := c.UpdateKeysRawWithBody(ctx, projectId, serviceAccountEmail, keyId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseUpdateSAKeysResponse(rsp)
+	return c.ParseUpdateKeysResponse(rsp)
 }
 
-func (c *ClientWithResponses) UpdateSAKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateSAKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateSAKeysResponse, error) {
-	rsp, err := c.UpdateSAKeysRaw(ctx, projectId, serviceAccountEmail, keyId, body, reqEditors...)
+func (c *ClientWithResponses) UpdateKeys(ctx context.Context, projectId string, serviceAccountEmail openapi_types.Email, keyId openapi_types.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error) {
+	rsp, err := c.UpdateKeysRaw(ctx, projectId, serviceAccountEmail, keyId, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseUpdateSAKeysResponse(rsp)
+	return c.ParseUpdateKeysResponse(rsp)
 }
 
 // ParseCreateTokenResponse parses an HTTP response from a CreateToken call
@@ -1931,15 +1931,15 @@ func (c *ClientWithResponses) ParseCreateTokenResponse(rsp *http.Response) (*Cre
 	return response, validate.ResponseObject(response)
 }
 
-// ParseListResponse parses an HTTP response from a List call
-func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
+// ParseGetResponse parses an HTTP response from a Get call
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &ListResponse{
+	response := &GetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1979,15 +1979,15 @@ func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListRespon
 	return response, validate.ResponseObject(response)
 }
 
-// ParseCreateSAv2Response parses an HTTP response from a CreateSAv2 call
-func (c *ClientWithResponses) ParseCreateSAv2Response(rsp *http.Response) (*CreateSAv2Response, error) {
+// ParseCreateResponse parses an HTTP response from a Create call
+func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateSAv2Response{
+	response := &CreateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2034,15 +2034,15 @@ func (c *ClientWithResponses) ParseCreateSAv2Response(rsp *http.Response) (*Crea
 	return response, validate.ResponseObject(response)
 }
 
-// ParseDeleteSAv2Response parses an HTTP response from a DeleteSAv2 call
-func (c *ClientWithResponses) ParseDeleteSAv2Response(rsp *http.Response) (*DeleteSAv2Response, error) {
+// ParseDeleteResponse parses an HTTP response from a Delete call
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteSAv2Response{
+	response := &DeleteResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2082,15 +2082,15 @@ func (c *ClientWithResponses) ParseDeleteSAv2Response(rsp *http.Response) (*Dele
 	return response, validate.ResponseObject(response)
 }
 
-// ParseGetAccessTokensV2Response parses an HTTP response from a GetAccessTokensV2 call
-func (c *ClientWithResponses) ParseGetAccessTokensV2Response(rsp *http.Response) (*GetAccessTokensV2Response, error) {
+// ParseGetAccessTokensResponse parses an HTTP response from a GetAccessTokens call
+func (c *ClientWithResponses) ParseGetAccessTokensResponse(rsp *http.Response) (*GetAccessTokensResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetAccessTokensV2Response{
+	response := &GetAccessTokensResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2137,15 +2137,15 @@ func (c *ClientWithResponses) ParseGetAccessTokensV2Response(rsp *http.Response)
 	return response, validate.ResponseObject(response)
 }
 
-// ParseCreateSAAccessTokensV2Response parses an HTTP response from a CreateSAAccessTokensV2 call
-func (c *ClientWithResponses) ParseCreateSAAccessTokensV2Response(rsp *http.Response) (*CreateSAAccessTokensV2Response, error) {
+// ParseCreateAccessTokensResponse parses an HTTP response from a CreateAccessTokens call
+func (c *ClientWithResponses) ParseCreateAccessTokensResponse(rsp *http.Response) (*CreateAccessTokensResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateSAAccessTokensV2Response{
+	response := &CreateAccessTokensResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2192,15 +2192,15 @@ func (c *ClientWithResponses) ParseCreateSAAccessTokensV2Response(rsp *http.Resp
 	return response, validate.ResponseObject(response)
 }
 
-// ParseDeleteSAAccessTokensV2Response parses an HTTP response from a DeleteSAAccessTokensV2 call
-func (c *ClientWithResponses) ParseDeleteSAAccessTokensV2Response(rsp *http.Response) (*DeleteSAAccessTokensV2Response, error) {
+// ParseDeleteAccessTokensResponse parses an HTTP response from a DeleteAccessTokens call
+func (c *ClientWithResponses) ParseDeleteAccessTokensResponse(rsp *http.Response) (*DeleteAccessTokensResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteSAAccessTokensV2Response{
+	response := &DeleteAccessTokensResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2274,15 +2274,15 @@ func (c *ClientWithResponses) ParseGetServiceAccountJwksResponse(rsp *http.Respo
 	return response, validate.ResponseObject(response)
 }
 
-// ParseGetSAKeysResponse parses an HTTP response from a GetSAKeys call
-func (c *ClientWithResponses) ParseGetSAKeysResponse(rsp *http.Response) (*GetSAKeysResponse, error) {
+// ParseGetKeysResponse parses an HTTP response from a GetKeys call
+func (c *ClientWithResponses) ParseGetKeysResponse(rsp *http.Response) (*GetKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetSAKeysResponse{
+	response := &GetKeysResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2322,15 +2322,15 @@ func (c *ClientWithResponses) ParseGetSAKeysResponse(rsp *http.Response) (*GetSA
 	return response, validate.ResponseObject(response)
 }
 
-// ParseCreateSAKeysResponse parses an HTTP response from a CreateSAKeys call
-func (c *ClientWithResponses) ParseCreateSAKeysResponse(rsp *http.Response) (*CreateSAKeysResponse, error) {
+// ParseCreateKeysResponse parses an HTTP response from a CreateKeys call
+func (c *ClientWithResponses) ParseCreateKeysResponse(rsp *http.Response) (*CreateKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &CreateSAKeysResponse{
+	response := &CreateKeysResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2377,15 +2377,15 @@ func (c *ClientWithResponses) ParseCreateSAKeysResponse(rsp *http.Response) (*Cr
 	return response, validate.ResponseObject(response)
 }
 
-// ParseDeleteSAKeysResponse parses an HTTP response from a DeleteSAKeys call
-func (c *ClientWithResponses) ParseDeleteSAKeysResponse(rsp *http.Response) (*DeleteSAKeysResponse, error) {
+// ParseDeleteKeysResponse parses an HTTP response from a DeleteKeys call
+func (c *ClientWithResponses) ParseDeleteKeysResponse(rsp *http.Response) (*DeleteKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &DeleteSAKeysResponse{
+	response := &DeleteKeysResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2418,15 +2418,15 @@ func (c *ClientWithResponses) ParseDeleteSAKeysResponse(rsp *http.Response) (*De
 	return response, validate.ResponseObject(response)
 }
 
-// ParseGetSAKeysKeyIDResponse parses an HTTP response from a GetSAKeysKeyID call
-func (c *ClientWithResponses) ParseGetSAKeysKeyIDResponse(rsp *http.Response) (*GetSAKeysKeyIDResponse, error) {
+// ParseGeKeyResponse parses an HTTP response from a GeKey call
+func (c *ClientWithResponses) ParseGeKeyResponse(rsp *http.Response) (*GeKeyResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetSAKeysKeyIDResponse{
+	response := &GeKeyResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -2466,15 +2466,15 @@ func (c *ClientWithResponses) ParseGetSAKeysKeyIDResponse(rsp *http.Response) (*
 	return response, validate.ResponseObject(response)
 }
 
-// ParseUpdateSAKeysResponse parses an HTTP response from a UpdateSAKeys call
-func (c *ClientWithResponses) ParseUpdateSAKeysResponse(rsp *http.Response) (*UpdateSAKeysResponse, error) {
+// ParseUpdateKeysResponse parses an HTTP response from a UpdateKeys call
+func (c *ClientWithResponses) ParseUpdateKeysResponse(rsp *http.Response) (*UpdateKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &UpdateSAKeysResponse{
+	response := &UpdateKeysResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
