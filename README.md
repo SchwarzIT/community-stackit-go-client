@@ -20,9 +20,7 @@ go get github.com/SchwarzIT/community-stackit-go-client
 
 Before you can start using the client, you will need to create a STACKIT Service Account and assign it the appropriate permissions.
 
-This is a necessary step to ensure that the client can access the STACKIT APIs and perform the necessary actions on your behalf.
-
-Assuming we have a file `example.go`:
+Create a file called `example.go`:
 
 ```go
 import (
