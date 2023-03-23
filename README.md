@@ -66,9 +66,21 @@ Then, you can run the example with the following command:
 go run example.go
 ```
 
-&nbsp;
-
 ### Further Examples
 
 1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
 2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
+
+&nbsp;
+
+## Contributing
+
+If you find a bug or have an idea for a new feature, feel free to submit an issue or pull request!
+
+Please make sure to include tests for any new functionality you add, and to run the existing tests before submitting your changes.
+
+&nbsp;
+
+## License
+
+This project is licensed under the Apache-2.0 license - see the LICENSE file for details.
