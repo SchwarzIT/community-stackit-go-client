@@ -1,5 +1,5 @@
 package: membership
-output: generated/membership.gen.go
+output: ../../../../pkg/services/membership/v2.0/membership.go
 generate:
   models: true
   client: true

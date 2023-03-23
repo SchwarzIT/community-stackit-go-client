@@ -2,6 +2,7 @@ package membership
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -18,6 +19,6 @@ var BaseURLs = urls.Init(
 	"https://api-dev.stackit.cloud/membership/",
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	return NewClientWithResponses(BaseURLs.GetURL(c), c)
+func NewService(c common.Client) *membership.ClientWithResponses {
+	return membership.NewClient(BaseURLs.GetURL(c), c)
 }
