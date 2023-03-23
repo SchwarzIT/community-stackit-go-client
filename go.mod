@@ -4,7 +4,6 @@ go 1.18
 
 require (
 	dev.azure.com/schwarzit/schwarzit.odj.core/_git/stackit-client-generator.git v1.0.1
-	github.com/do87/oapi-codegen v0.0.1
 	github.com/google/uuid v1.3.0
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/oleiade/reflections v1.0.1

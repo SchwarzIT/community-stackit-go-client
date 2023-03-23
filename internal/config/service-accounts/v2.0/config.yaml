@@ -1,5 +1,5 @@
 package: serviceaccounts
-output: generated/service_accounts.gen.go
+output: ../../../../pkg/services/service-accounts/v2.0/accounts.go
 generate:
   models: true
   client: true

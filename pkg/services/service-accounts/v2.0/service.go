@@ -2,7 +2,6 @@ package serviceaccounts
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	serviceaccounts "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-accounts/v2.0/generated"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -13,6 +12,6 @@ var BaseURLs = urls.Init(
 	"https://api-dev.stackit.cloud/service-account/",
 )
 
-func NewService(c common.Client) *serviceaccounts.ClientWithResponses {
-	return serviceaccounts.NewClientWithResponses(BaseURLs.GetURL(c), c)
+func NewService(c common.Client) *ClientWithResponses {
+	return NewClient(BaseURLs.GetURL(c), c)
 }
