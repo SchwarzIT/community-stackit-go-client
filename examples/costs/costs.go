@@ -12,10 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := stackit.NewClient(ctx)
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 
 	params := &costs.GetProjectCostsParams{}
 	res, err := c.Costs.GetProjectCosts(

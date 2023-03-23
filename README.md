@@ -23,19 +23,29 @@ Before you can start using the client, you will need to create a STACKIT Service
 Create a file called `example.go`:
 
 ```go
+package main
+
 import (
+    "context"
     "fmt"
+
     stackit "github.com/SchwarzIT/community-stackit-go-client"
+    "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
-    client := stackit.NewClient(ctx)
-    response, err := client.ElasticSearch.Offerings.Get(ctx, "my-project-id")
-    if err != nil {
-        fmt.Println(err)
-        return
+    ctx := context.Background()
+    c := stackit.NewClient(ctx)
+
+    res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
+    if err = validate.Response(res, err, "JSON200"); err != nil {
+        panic(err)
     }
-    fmt.Printf("%+v", response)
+
+    fmt.Println("Received the following offerings:")
+    for _, o := range res.JSON200.Offerings {
+        fmt.Printf("- %s\n", o.Name)
+    }
 }
 ```
 

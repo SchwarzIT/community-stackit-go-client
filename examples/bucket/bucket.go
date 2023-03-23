@@ -10,10 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := stackit.NewClient(ctx)
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 
 	projectID := "123-456-789"
 	bucketName := "bucket"

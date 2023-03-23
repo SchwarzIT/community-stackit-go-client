@@ -10,10 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := stackit.NewClient(ctx)
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 
 	res, err := c.Kubernetes.ProviderOptions.List(ctx)
 	if err = validate.Response(res, err, "JSON200.AvailabilityZones"); err != nil {

@@ -9,15 +9,10 @@ import (
 )
 
 func main() {
-	project, ctx := "", context.Background()
-	c, err := stackit.NewClient(ctx)
-	if err != nil {
-		panic(err)
-	}
+	ctx := context.Background()
+	c := stackit.NewClient(ctx)
 
-	fmt.Println("Enter Project ID:")
-	fmt.Scanln(&project)
-	res, err := c.ElasticSearch.Offerings.Get(ctx, project)
+	res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
 	if err = validate.Response(res, err, "JSON200"); err != nil {
 		panic(err)
 	}

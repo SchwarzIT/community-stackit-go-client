@@ -12,10 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := stackit.NewClient(ctx)
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 	member := membership.Member{
 		Subject: "user@host.name",
 		Role:    string(rm.PROJECT_OWNER),

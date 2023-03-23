@@ -61,11 +61,14 @@ func NewClientWithConfig(ctx context.Context, cfg Config) (*Client, error) {
 	return c, nil
 }
 
-// NewClient returns a new client
-func NewClient(ctx context.Context) (*Client, error) {
+// NewClient returns a new client and
+// panics if there's an error
+// to avoid panics, use NewClientWithConfig instead
+func NewClient(ctx context.Context) *Client {
 	cfg := Config{}
-	if err := cfg.Validate(); err != nil {
-		return nil, err
+	err := cfg.Validate()
+	if err != nil {
+		panic(err)
 	}
 
 	c := &Client{
@@ -77,7 +80,7 @@ func NewClient(ctx context.Context) (*Client, error) {
 
 	c.setHttpClient(c.ctx)
 	c.initServices()
-	return c, nil
+	return c
 }
 
 // GetHTTPClient returns the HTTP client
