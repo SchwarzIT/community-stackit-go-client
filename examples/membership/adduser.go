@@ -34,8 +34,8 @@ func main() {
 	}
 	for _, p := range projects {
 		res, err := c.Membership.AddMembers(ctx, p, body)
-		if agg := validate.Response(res, err); agg != nil {
-			fmt.Println(agg)
+		if err = validate.Response(res, err); err != nil {
+			fmt.Println(err)
 			continue
 		}
 		fmt.Printf("added to project %s\n", p)
