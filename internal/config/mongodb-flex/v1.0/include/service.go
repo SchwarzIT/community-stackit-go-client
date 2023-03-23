@@ -2,6 +2,7 @@ package mongodbflex
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	mongodb "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -12,10 +13,10 @@ var BaseURLs = urls.Init(
 	"https://api-dev.stackit.cloud/mongodb/v1/",
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	nc, _ := NewClientWithResponses(
+func NewService(c common.Client) *mongodb.ClientWithResponses {
+	nc, _ := mongodb.NewClient(
 		BaseURLs.GetURL(c),
-		WithHTTPClient(c),
+		mongodb.WithHTTPClient(c),
 	)
 	return nc
 }

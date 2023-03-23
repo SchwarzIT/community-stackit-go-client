@@ -3,7 +3,7 @@
 
 package instance
 
-import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 
 type CreateResponse struct {
 	instance.ClientWithResponsesInterface

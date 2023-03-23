@@ -1,5 +1,5 @@
 package: mongodbflex
-output: generated/mongodbflex.gen.go
+output: ../../../../pkg/services/mongodb-flex/v1.0/mongodb.go
 generate:
   models: true
   client: true
@@ -14,7 +14,6 @@ output-options:
     include:
     - backup
     - user
-    - storage
     - versions
     - flavors
     - instance
@@ -29,7 +28,7 @@ output-options:
   - from: include/service.go
     to: service.go
     tidy: 
-    - replace: "mongodbflex."
+    - replace: "mongodb."
       all: true
   - from: include/instance/wait.go
     to: instance/wait.go
@@ -89,6 +88,15 @@ tidy:
   - replace: CreateUserIdReset
     with: ResetPassword
     prefix: true
+  - replace: GetFlavors
+    with: List
+    match: true
+  - replace: GetVersions
+    with: List
+    match: true
+  - replace: GetStoragesFlavor
+    with: GetStorageOptions
+    match: true
   params:
   - replace: Id
     with: ID

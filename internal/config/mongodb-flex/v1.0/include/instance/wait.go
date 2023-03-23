@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
@@ -39,7 +39,7 @@ func (r PatchResponse) WaitHandler(ctx context.Context, c *instance.ClientWithRe
 func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	outerfound := false
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.ListWithResponse(ctx, projectID, &instance.ListParams{})
+		s, err := c.List(ctx, projectID, &instance.ListParams{})
 		if err != nil {
 			if strings.Contains(err.Error(), ClientTimeoutErr) {
 				return nil, false, nil
@@ -76,7 +76,7 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		s, err := c.ListWithResponse(ctx, projectID, &instance.ListParams{})
+		s, err := c.List(ctx, projectID, &instance.ListParams{})
 		if err != nil {
 			if strings.Contains(err.Error(), ClientTimeoutErr) {
 				return nil, false, nil
