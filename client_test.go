@@ -3,6 +3,7 @@ package stackit
 import (
 	"context"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -11,6 +12,13 @@ import (
 )
 
 func TestNew(t *testing.T) {
+	eml := os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
+	tok := os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
+	env := os.Getenv("STACKIT_ENV")
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", "")
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", "")
+	os.Setenv("STACKIT_ENV", "")
+
 	cfg := Config{
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
@@ -41,6 +49,9 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", eml)
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", tok)
+	os.Setenv("STACKIT_ENV", env)
 }
 
 func TestClient_DoWithRetry(t *testing.T) {
