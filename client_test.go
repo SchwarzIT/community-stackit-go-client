@@ -12,9 +12,14 @@ import (
 )
 
 func TestNew(t *testing.T) {
+
+	tc := NewClient(context.Background())
 	eml := os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
 	tok := os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
 	env := os.Getenv("STACKIT_ENV")
+	if tc.GetConfig().ServiceAccountEmail != eml || tc.GetConfig().ServiceAccountToken != tok {
+		t.Errorf("NewClient config doesn't match env")
+	}
 	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", "")
 	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", "")
 	os.Setenv("STACKIT_ENV", "")

@@ -2,10 +2,17 @@ package stackit
 
 import (
 	"net/url"
+	"os"
 	"testing"
 )
 
 func TestConfig_Validate(t *testing.T) {
+	eml := os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
+	tok := os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
+	env := os.Getenv("STACKIT_ENV")
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", "")
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", "")
+	os.Setenv("STACKIT_ENV", "")
 	type fields struct {
 		BaseUrl             *url.URL
 		Token               string
@@ -32,4 +39,7 @@ func TestConfig_Validate(t *testing.T) {
 			}
 		})
 	}
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", eml)
+	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", tok)
+	os.Setenv("STACKIT_ENV", env)
 }
