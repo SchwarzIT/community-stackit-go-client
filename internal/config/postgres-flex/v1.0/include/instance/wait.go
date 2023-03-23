@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/instance"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
@@ -18,7 +18,7 @@ func (r CreateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithR
 
 // WaitHandler will wait for instance update to complete
 // returned interface is of *instance.InstanceSingleInstance
-func (r UpdateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r PutResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
@@ -26,7 +26,7 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithR
 
 // WaitHandler will wait for instance update to complete
 // returned interface is of *instance.InstanceSingleInstance
-func (r PatchUpdateResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r PatchResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
@@ -34,7 +34,7 @@ func (r PatchUpdateResponse) WaitHandler(ctx context.Context, c *instance.Client
 
 func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.GetWithResponse(ctx, projectID, instanceID)
+		s, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
 		}
@@ -58,7 +58,7 @@ func createOrUpdateWait(ctx context.Context, c *instance.ClientWithResponses, pr
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		res, err := c.GetWithResponse(ctx, projectID, instanceID)
+		res, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
 		}

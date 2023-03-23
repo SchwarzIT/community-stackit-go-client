@@ -1,5 +1,5 @@
 package: postgresflex
-output: generated/postgresflex.gen.go
+output: ../../../../pkg/services/postgres-flex/v1.0/postgres.go
 generate:
   models: true
   client: true
@@ -80,10 +80,10 @@ tidy:
     with: Create
     all: true
   - replace: PutInstance
-    with: Update
+    with: Put
     all: true
   - replace: PatchInstance
-    with: PatchUpdate
+    with: Patch
     all: true
   - replace: GetInstances
     with: List
@@ -94,17 +94,33 @@ tidy:
   - replace: DeleteInstance
     with: Delete
     all: true
-  - replace: PostInstanceUsers
-    with: CreateUser
   - replace: PostInstanceClone
     with: CreateClone
     prefix: true
   - replace: PostInstanceUsersUserIdReset
-    with: ResetUser
+    with: Reset
     prefix: true
   - replace: PostInstanceUsers
-    with: CreateUser
+    with: Create
     prefix: true
+  - replace: GetFlavors
+    with: List
+    match: true
+  - replace: GetVersions
+    with: List
+    match: true
+  - replace: GetFlavor
+    with: GetStorageOptions
+    match: true
+  - replace: GetUsers
+    with: List
+    match: true
+  - replace: DeleteUser
+    with: Delete
+    match: true
+  - replace: GetUser
+    with: Get
+    match: true
   params:
   - replace: Id
     with: ID

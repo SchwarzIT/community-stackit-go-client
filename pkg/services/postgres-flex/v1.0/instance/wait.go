@@ -17,7 +17,7 @@ func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 
 // WaitHandler will wait for instance update to complete
 // returned interface is of *InstanceSingleInstance
-func (r UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
@@ -25,7 +25,7 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 
 // WaitHandler will wait for instance update to complete
 // returned interface is of *InstanceSingleInstance
-func (r PatchUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (r PatchResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return createOrUpdateWait(ctx, c, projectID, instanceID)
@@ -33,7 +33,7 @@ func (r PatchUpdateResponse) WaitHandler(ctx context.Context, c *ClientWithRespo
 
 func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.GetWithResponse(ctx, projectID, instanceID)
+		s, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
 		}
@@ -57,7 +57,7 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 // returned value for deletion wait will always be nil
 func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		res, err := c.GetWithResponse(ctx, projectID, instanceID)
+		res, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {
 			return nil, false, err
 		}

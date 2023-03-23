@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/generated/users"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
@@ -14,18 +14,16 @@ const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
 // WaitHandler will wait for user deletion
 // returned value for deletion wait will always be nil
-func (r DeleteUserResponse) WaitHandler(ctx context.Context, c *users.ClientWithResponses, projectID, instanceID, userID string) *wait.Handler {
+func (r DeleteResponse) WaitHandler(ctx context.Context, c *users.ClientWithResponses, projectID, instanceID, userID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		s, err := c.GetUsersWithResponse(ctx, projectID, instanceID)
+		s, err := c.List(ctx, projectID, instanceID)
 		if agg := validate.Response(s, err, "JSON200.Items"); agg != nil {
-			if strings.Contains(agg.Error(), ClientTimeoutErr) {
-				return nil, false, nil
-			}
-			if validate.StatusEquals(s,
-				http.StatusBadGateway,
-				http.StatusGatewayTimeout,
-				http.StatusInternalServerError,
-			) {
+			if strings.Contains(agg.Error(), ClientTimeoutErr) ||
+				validate.StatusEquals(s,
+					http.StatusBadGateway,
+					http.StatusGatewayTimeout,
+					http.StatusInternalServerError,
+				) {
 				return nil, false, nil
 			}
 			return nil, false, agg
