@@ -3,7 +3,7 @@
 
 package bucket
 
-import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/generated/bucket"
+import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/bucket"
 
 type CreateResponse struct {
 	bucket.ClientWithResponsesInterface

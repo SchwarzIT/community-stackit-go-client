@@ -1,5 +1,5 @@
 package: objectstorage
-output: generated/objectstorage.gen.go
+output: ../../../../pkg/services/object-storage/v1.0.1/storage.go
 generate:
   models: true
   client: true

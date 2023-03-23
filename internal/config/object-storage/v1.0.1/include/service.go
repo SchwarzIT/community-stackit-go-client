@@ -2,6 +2,7 @@ package objectstorage
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -12,10 +13,10 @@ var BaseURLs = urls.Init(
 	"https://api-dev.stackit.cloud/object-storage-api/",
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	nc, _ := NewClientWithResponses(
+func NewService(c common.Client) *objectstorage.ClientWithResponses {
+	nc, _ := objectstorage.NewClient(
 		BaseURLs.GetURL(c),
-		WithHTTPClient(c),
+		objectstorage.WithHTTPClient(c),
 	)
 	return nc
 }
