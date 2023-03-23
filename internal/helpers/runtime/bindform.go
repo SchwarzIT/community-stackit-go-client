@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"dev.azure.com/schwarzit/schwarzit.odj.core/_git/stackit-client-generator.git/pkg/types"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
 )
 
 const tagName = "json"
