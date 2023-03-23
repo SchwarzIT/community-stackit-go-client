@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
+	stackit "github.com/SchwarzIT/community-stackit-go-client"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/google/uuid"
@@ -13,13 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := client.New(ctx, client.Config{
-		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
-		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-	})
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 
 	params := &costs.GetProjectCostsParams{}
 	res, err := c.Costs.GetProjectCosts(

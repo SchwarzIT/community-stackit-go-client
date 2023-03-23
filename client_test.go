@@ -1,8 +1,9 @@
-package client
+package stackit
 
 import (
 	"context"
 	"net/http"
+	"os"
 	"reflect"
 	"testing"
 	"time"
@@ -11,6 +12,29 @@ import (
 )
 
 func TestNew(t *testing.T) {
+
+	eml := os.Getenv(email)
+	tok := os.Getenv(token)
+	env := os.Getenv(apienv)
+
+	if tok == "" && eml == "" {
+		os.Setenv(email, "abc")
+		os.Setenv(token, "efg")
+		os.Setenv(apienv, "hij")
+		tc := NewClient(context.Background())
+		if tc.GetConfig().ServiceAccountEmail != "abc" || tc.GetConfig().ServiceAccountToken != "efg" || tc.GetConfig().Environment != "hij" {
+			t.Errorf("NewClient config doesn't match")
+		}
+	} else {
+		tc := NewClient(context.Background())
+		if tc.GetConfig().ServiceAccountEmail != eml || tc.GetConfig().ServiceAccountToken != tok {
+			t.Errorf("NewClient config doesn't match env")
+		}
+	}
+	os.Setenv(email, "")
+	os.Setenv(token, "")
+	os.Setenv(apienv, "")
+
 	cfg := Config{
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
@@ -31,7 +55,7 @@ func TestNew(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := New(tt.args.ctx, tt.args.cfg)
+			got, err := NewClientWithConfig(tt.args.ctx, tt.args.cfg)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("NewAuth() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -41,6 +65,9 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
+	os.Setenv(email, eml)
+	os.Setenv(token, tok)
+	os.Setenv(apienv, env)
 }
 
 func TestClient_DoWithRetry(t *testing.T) {

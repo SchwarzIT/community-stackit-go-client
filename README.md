@@ -2,55 +2,68 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/SchwarzIT/community-stackit-go-client)](https://goreportcard.com/report/github.com/SchwarzIT/community-stackit-go-client) [![Unit Tests](https://github.com/SchwarzIT/community-stackit-go-client/actions/workflows/tests.yml/badge.svg)](https://github.com/SchwarzIT/community-stackit-go-client/actions/workflows/tests.yml) [![Coverage Status](https://coveralls.io/repos/github/SchwarzIT/community-stackit-go-client/badge.svg?branch=main)](https://coveralls.io/github/SchwarzIT/community-stackit-go-client?branch=main) [![GoDoc reference](https://img.shields.io/badge/godoc-reference-blue.svg)](https://pkg.go.dev/github.com/SchwarzIT/community-stackit-go-client) [![License](https://img.shields.io/badge/License-Apache_2.0-lightgray.svg)](https://opensource.org/licenses/Apache-2.0)
 
-<br />
+This is a Go client designed to help developers interact with STACKIT APIs. It is maintained by the STACKIT community within Schwarz IT.
 
-The client is community-supported and not an official STACKIT release, it is maintained by internal Schwarz IT teams integrating with STACKIT
+&nbsp;
 
-## Install
+## Installation
 
-To install the latest stable release, run:
+To install the community-stackit-go-client package, run the following command:
 
 ```bash
-go get github.com/SchwarzIT/community-stackit-go-client@latest
+go get github.com/SchwarzIT/community-stackit-go-client
 ```
 
-## Usage Example
+&nbsp;
 
-In order to use the client, a STACKIT Service Account [must be created](https://api.stackit.schwarz/service-account/openapi.v1.html#operation/post-projects-projectId-service-accounts-v2) and have relevant roles [assigned to it](https://api.stackit.schwarz/membership-service/openapi.v1.html#operation/post-organizations-organizationId-projects-projectId-roles-roleName-service-accounts).<br />
-For further assistance, please contact [STACKIT support](https://support.stackit.cloud)
+## Usage
 
-```Go
+Before you can start using the client, you will need to create a STACKIT Service Account and assign it the appropriate permissions.
+
+Create a file called `example.go`:
+
+```go
 package main
 
 import (
-	"context"
-	"fmt"
-	"os"
+    "context"
+    "fmt"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+    stackit "github.com/SchwarzIT/community-stackit-go-client"
+    "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
-	ctx := context.Background()
-	c, err := client.New(ctx, client.Config{
-		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
-		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-	})
-	if err != nil {
-		panic(err)
-	}
+    ctx := context.Background()
+    c := stackit.NewClient(ctx)
 
-	res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, "{project-id}")
-	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
-		panic(aggregatedError)
-	}
+    res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
+    if err = validate.Response(res, err, "JSON200"); err != nil {
+        panic(err)
+    }
 
-	fmt.Println("Received the following offerings:")
-	for _, o := range res.JSON200.Offerings {
-		fmt.Printf("- %s\n", o.Name)
-	}
+    fmt.Println("Received the following offerings:")
+    for _, o := range res.JSON200.Offerings {
+        fmt.Printf("- %s\n", o.Name)
+    }
 }
+```
+
+Set the following environment variables:
+
+```bash
+export STACKIT_SERVICE_ACCOUNT_EMAIL=email
+export STACKIT_SERVICE_ACCOUNT_TOKEN=token
+
+# optional: modify the API environment
+# set `STACKIT_ENV` to one of `dev`, `qa` or `prod` (default)
+export STACKIT_ENV=prod
+```
+
+Then, you can run the example with the following command:
+
+```bash
+go run example.go
 ```
 
 ### Further Examples
@@ -58,19 +71,16 @@ func main() {
 1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
 2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
 
+&nbsp;
 
-<br />
+## Contributing
 
-## Working with API environments
+If you find a bug or have an idea for a new feature, feel free to submit an issue or pull request!
 
-In order to modify the API environment, set the `Environment` field to one of `dev`, `qa` or `prod`
+Please make sure to include tests for any new functionality you add, and to run the existing tests before submitting your changes.
 
-- The `Environment` field is optional
-- By default `prod` is being used
+&nbsp;
 
-```Go
-c, err := client.New(ctx, client.Config{
-	// ...
-	Environment: "qa"
-})
-```
+## License
+
+This project is licensed under the Apache-2.0 license - see the LICENSE file for details.

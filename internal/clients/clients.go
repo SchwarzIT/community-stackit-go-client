@@ -22,7 +22,7 @@ func LocalClient() (*client.Client, error) {
 		return nil, errors.New("STACKIT_SERVICE_ACCOUNT_TOKEN is missing from env variables")
 	}
 
-	return client.New(context.Background(), client.Config{
+	return client.NewClientWithConfig(context.Background(), client.Config{
 		ServiceAccountEmail: aid,
 		ServiceAccountToken: ato,
 	})

@@ -3,9 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
+	stackit "github.com/SchwarzIT/community-stackit-go-client"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0"
 	rm "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -13,13 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c, err := client.New(ctx, client.Config{
-		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
-		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-	})
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 	member := membership.Member{
 		Subject: "user@host.name",
 		Role:    string(rm.PROJECT_OWNER),

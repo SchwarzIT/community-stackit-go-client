@@ -4,7 +4,7 @@
 // All services must be initialized in the `init` method, and the client must be configured
 // during initialization
 
-package client
+package stackit
 
 import (
 	"context"
@@ -19,6 +19,12 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 	waitutil "k8s.io/apimachinery/pkg/util/wait"
+)
+
+const (
+	email  = "STACKIT_SERVICE_ACCOUNT_EMAIL"
+	token  = "STACKIT_SERVICE_ACCOUNT_TOKEN"
+	apienv = "STACKIT_ENV"
 )
 
 const (
@@ -43,8 +49,8 @@ type Client struct {
 	services
 }
 
-// New returns a new client
-func New(ctx context.Context, cfg Config) (*Client, error) {
+// NewClientWithConfig returns a new client
+func NewClientWithConfig(ctx context.Context, cfg Config) (*Client, error) {
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
@@ -59,6 +65,28 @@ func New(ctx context.Context, cfg Config) (*Client, error) {
 	c.setHttpClient(c.ctx)
 	c.initServices()
 	return c, nil
+}
+
+// NewClient returns a new client and
+// panics if there's an error
+// to avoid panics, use NewClientWithConfig instead
+func NewClient(ctx context.Context) *Client {
+	cfg := Config{}
+	err := cfg.Validate()
+	if err != nil {
+		panic(err)
+	}
+
+	c := &Client{
+		config:      cfg,
+		ctx:         ctx,
+		RetryTimout: 2 * time.Minute,
+		RetryWait:   30 * time.Second,
+	}
+
+	c.setHttpClient(c.ctx)
+	c.initServices()
+	return c
 }
 
 // GetHTTPClient returns the HTTP client
@@ -143,7 +171,7 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 
 	u, _ := url.Parse(server.URL)
 
-	c, err = New(context.Background(), Config{
+	c, err = NewClientWithConfig(context.Background(), Config{
 		BaseUrl:             u,
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",

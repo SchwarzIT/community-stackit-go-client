@@ -3,21 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 
-	client "github.com/SchwarzIT/community-stackit-go-client"
+	stackit "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
 	ctx := context.Background()
-	c, err := client.New(ctx, client.Config{
-		ServiceAccountEmail: os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL"),
-		ServiceAccountToken: os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN"),
-	})
-	if err != nil {
-		panic(err)
-	}
+	c := stackit.NewClient(ctx)
 
 	projectID := "123-456-789"
 	bucketName := "bucket"
