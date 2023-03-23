@@ -13,16 +13,17 @@ import (
 
 func TestNew(t *testing.T) {
 
-	eml := os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
-	tok := os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
-	env := os.Getenv("STACKIT_ENV")
+	eml := os.Getenv(email)
+	tok := os.Getenv(token)
+	env := os.Getenv(apienv)
 
 	if tok == "" && eml == "" {
-		os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", "abc")
-		os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", "efg")
+		os.Setenv(email, "abc")
+		os.Setenv(token, "efg")
+		os.Setenv(apienv, "hij")
 		tc := NewClient(context.Background())
-		if tc.GetConfig().ServiceAccountEmail != "abc" || tc.GetConfig().ServiceAccountToken != "efg" {
-			t.Errorf("NewClient config doesn't match env")
+		if tc.GetConfig().ServiceAccountEmail != "abc" || tc.GetConfig().ServiceAccountToken != "efg" || tc.GetConfig().Environment != "hij" {
+			t.Errorf("NewClient config doesn't match")
 		}
 	} else {
 		tc := NewClient(context.Background())
@@ -30,9 +31,9 @@ func TestNew(t *testing.T) {
 			t.Errorf("NewClient config doesn't match env")
 		}
 	}
-	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", "")
-	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", "")
-	os.Setenv("STACKIT_ENV", "")
+	os.Setenv(email, "")
+	os.Setenv(token, "")
+	os.Setenv(apienv, "")
 
 	cfg := Config{
 		ServiceAccountToken: "token",
@@ -64,9 +65,9 @@ func TestNew(t *testing.T) {
 			}
 		})
 	}
-	os.Setenv("STACKIT_SERVICE_ACCOUNT_EMAIL", eml)
-	os.Setenv("STACKIT_SERVICE_ACCOUNT_TOKEN", tok)
-	os.Setenv("STACKIT_ENV", env)
+	os.Setenv(email, eml)
+	os.Setenv(token, tok)
+	os.Setenv(apienv, env)
 }
 
 func TestClient_DoWithRetry(t *testing.T) {

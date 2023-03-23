@@ -22,6 +22,12 @@ import (
 )
 
 const (
+	email  = "STACKIT_SERVICE_ACCOUNT_EMAIL"
+	token  = "STACKIT_SERVICE_ACCOUNT_TOKEN"
+	apienv = "STACKIT_ENV"
+)
+
+const (
 	ClientTimeoutErr           = "Client.Timeout exceeded while awaiting headers"
 	ClientContextDeadlineErr   = "context deadline exceeded"
 	ClientConnectionRefusedErr = "connection refused"

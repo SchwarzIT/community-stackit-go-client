@@ -21,22 +21,22 @@ type Config struct {
 
 // Validate verifies that the given config is valid
 func (c *Config) Validate() error {
-	email := os.Getenv("STACKIT_SERVICE_ACCOUNT_EMAIL")
-	token := os.Getenv("STACKIT_SERVICE_ACCOUNT_TOKEN")
-	env := os.Getenv("STACKIT_ENV")
+	e := os.Getenv(email)
+	t := os.Getenv(token)
+	env := os.Getenv(apienv)
 
-	if c.ServiceAccountToken == "" && token == "" {
+	if c.ServiceAccountToken == "" && t == "" {
 		return errors.New("Service Account Access Token cannot be empty")
 	}
 	if c.ServiceAccountToken == "" {
-		c.ServiceAccountToken = token
+		c.ServiceAccountToken = t
 	}
 
-	if c.ServiceAccountEmail == "" && email == "" {
+	if c.ServiceAccountEmail == "" && e == "" {
 		return errors.New("Service Account Email cannot be empty")
 	}
 	if c.ServiceAccountEmail == "" {
-		c.ServiceAccountEmail = email
+		c.ServiceAccountEmail = e
 	}
 
 	if c.Environment == "" {
