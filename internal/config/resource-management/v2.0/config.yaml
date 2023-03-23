@@ -1,5 +1,5 @@
 package: resourcemanagement
-output: generated/resourcemanagement.gen.go
+output: ../../../../pkg/services/resource-management/v2.0/management.go
 generate:
   models: true
   client: true
@@ -10,10 +10,7 @@ output-options:
     name: "common.Client"
   split-by-tags:
     verbose: false
-    enabled: true
-    include:
-    - Projects
-    - Private
+    enabled: false
   extend-response:
   - field: Error
     type: error
@@ -27,15 +24,15 @@ output-options:
     tidy: 
     - replace: "resourcemanagement."
       all: true
-  - from: include/projects/validate.go
-    to: projects/validate.go
+  - from: include/validate.go
+    to: validate.go
     tidy: 
-    - replace: "projects."
+    - replace: "resourcemanagement."
       all: true
-  - from: include/projects/wait.go
-    to: projects/wait.go
+  - from: include/wait.go
+    to: wait.go
     tidy: 
-    - replace: "projects."
+    - replace: "resourcemanagement."
       all: true
 tidy:
   verbose: false
