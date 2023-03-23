@@ -1,4 +1,4 @@
-package client
+package stackit
 
 import (
 	"net/url"

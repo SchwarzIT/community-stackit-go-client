@@ -1,4 +1,4 @@
-package client
+package stackit
 
 import (
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"

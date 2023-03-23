@@ -4,7 +4,7 @@
 // All services must be initialized in the `init` method, and the client must be configured
 // during initialization
 
-package client
+package stackit
 
 import (
 	"context"
@@ -43,8 +43,27 @@ type Client struct {
 	services
 }
 
-// New returns a new client
-func New(ctx context.Context, cfg Config) (*Client, error) {
+// NewClientWithConfig returns a new client
+func NewClientWithConfig(ctx context.Context, cfg Config) (*Client, error) {
+	if err := cfg.Validate(); err != nil {
+		return nil, err
+	}
+
+	c := &Client{
+		config:      cfg,
+		ctx:         ctx,
+		RetryTimout: 2 * time.Minute,
+		RetryWait:   30 * time.Second,
+	}
+
+	c.setHttpClient(c.ctx)
+	c.initServices()
+	return c, nil
+}
+
+// NewClient returns a new client
+func NewClient(ctx context.Context) (*Client, error) {
+	cfg := Config{}
 	if err := cfg.Validate(); err != nil {
 		return nil, err
 	}
@@ -143,7 +162,7 @@ func MockServer() (c *Client, mux *http.ServeMux, teardown func(), err error) {
 
 	u, _ := url.Parse(server.URL)
 
-	c, err = New(context.Background(), Config{
+	c, err = NewClientWithConfig(context.Background(), Config{
 		BaseUrl:             u,
 		ServiceAccountToken: "token",
 		ServiceAccountEmail: "sa-id",
