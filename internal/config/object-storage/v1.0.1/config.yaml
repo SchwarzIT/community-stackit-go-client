@@ -1,0 +1,97 @@
+package: objectstorage
+output: ../../../../pkg/services/object-storage/v1.0.1/storage.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    # include:
+    # - 
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "objectstorage."
+      all: true
+  - from: include/bucket/wait.go
+    to: bucket/wait.go
+    tidy: 
+    - replace: "*bucket."
+      with: "*"
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  # Projects
+  - replace: DeleteProjectV1ProjectProjectIdDelete
+    with: Delete
+    prefix: true
+  - replace: GetProjectV1ProjectProjectIdGet
+    with: Get
+    prefix: true
+  - replace: CreateProjectV1ProjectProjectIdPost
+    with: Create
+    prefix: true
+  # credentials groups
+  - replace: DeleteCredentialsGroupV1ProjectProjectIdCredentialsGroupGroupIdDelete
+    with: Delete
+    prefix: true
+  - replace: GetCredentialsGroupsV1ProjectProjectIdCredentialsGroupsGet
+    with: Get
+    prefix: true
+  - replace: CreateCredentialsGroupV1ProjectProjectIdCredentialsGroupPost
+    with: Create
+    prefix: true
+  # bucket
+  - replace: DeleteBucketV1ProjectProjectIdBucketBucketNameDelete
+    with: Delete
+    prefix: true
+  - replace: GetBucketV1ProjectProjectIdBucketBucketNameGet
+    with: Get
+    prefix: true
+  - replace: CreateBucketV1ProjectProjectIdBucketBucketNamePost
+    with: Create
+    prefix: true
+  - replace: GetBucketsV1ProjectProjectIdBucketsGet
+    with: List
+    prefix: true
+  # access keys
+  - replace: DeleteAccessKeyV1ProjectProjectIdAccessKeyKeyIdDelete
+    with: Delete
+    prefix: true
+  - replace: GetAccessKeysV1ProjectProjectIdAccessKeysGet
+    with: Get
+    prefix: true
+  - replace: CreateAccessKeyV1ProjectProjectIdAccessKeyPost
+    with: Create
+    prefix: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Detail
+    with: Details
+    match: true
+  - replace: Urn
+    with: URN
+    match: true

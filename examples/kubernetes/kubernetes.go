@@ -19,9 +19,9 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.Kubernetes.ProviderOptions.GetProviderOptionsWithResponse(ctx)
-	if aggregatedError := validate.Response(res, err, "JSON200.AvailabilityZones"); aggregatedError != nil {
-		panic(aggregatedError)
+	res, err := c.Kubernetes.ProviderOptions.List(ctx)
+	if err = validate.Response(res, err, "JSON200.AvailabilityZones"); err != nil {
+		panic(err)
 	}
 
 	if len(*res.JSON200.AvailabilityZones) == 0 {
@@ -36,5 +36,4 @@ func main() {
 		}
 		fmt.Printf("- %s\n", *zone.Name)
 	}
-
 }

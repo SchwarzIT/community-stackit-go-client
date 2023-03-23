@@ -1,0 +1,137 @@
+package: postgresflex
+output: ../../../../pkg/services/postgres-flex/v1.0/postgres.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+    - backups
+    - users
+    - storage
+    - versions
+    - flavors
+    - instance
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "postgresflex."
+      all: true
+  - from: include/instance/wait.go
+    to: instance/wait.go
+    tidy: 
+    - replace: "instance."
+      all: true
+  - from: include/users/wait.go
+    to: users/wait.go
+    tidy: 
+    - replace: "users."
+      all: true
+  - from: include/instance/helper.go
+    to: instance/helper.go
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: V1ProjectsProjectId
+    with:
+    all: true
+  - replace: InstancesInstanceId
+    with: Instance
+    all: true
+  - replace: StoragesFlavorID
+    with: Flavor
+    all: true
+  - replace: UsersUserID
+    with: User
+    all: true
+  - replace: InstancesInstanceID
+    with: Instance
+    all: true
+  - replace: BackupsBackupID
+    with: Backup
+    all: true
+  - replace: GetInstanceBackups
+    with: List
+    prefix: true
+  - replace: PutInstanceBackups
+    with: Update
+    all: true
+  - replace: InstanceBackup
+    with: 
+    suffix: true
+  - replace: PostInstances
+    with: Create
+    all: true
+  - replace: PutInstance
+    with: Put
+    all: true
+  - replace: PatchInstance
+    with: Patch
+    all: true
+  - replace: GetInstances
+    with: List
+    all: true
+  - replace: GetInstance
+    with: Get
+    all: true
+  - replace: DeleteInstance
+    with: Delete
+    all: true
+  - replace: PostInstanceClone
+    with: CreateClone
+    prefix: true
+  - replace: PostInstanceUsersUserIdReset
+    with: Reset
+    prefix: true
+  - replace: PostInstanceUsers
+    with: Create
+    prefix: true
+  - replace: GetFlavors
+    with: List
+    match: true
+  - replace: GetVersions
+    with: List
+    match: true
+  - replace: GetFlavor
+    with: GetStorageOptions
+    match: true
+  - replace: GetUsers
+    with: List
+    match: true
+  - replace: DeleteUser
+    with: Delete
+    match: true
+  - replace: GetUser
+    with: Get
+    match: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Uri
+    with: URI
+    all: true
+  - replace: Acl
+    with: ACL
+    suffix: true

@@ -1,0 +1,113 @@
+package: mongodbflex
+output: ../../../../pkg/services/mongodb-flex/v1.0/mongodb.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
+    name: "common.Client"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+    - backup
+    - user
+    - versions
+    - flavors
+    - instance
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "mongodb."
+      all: true
+  - from: include/instance/wait.go
+    to: instance/wait.go
+    tidy: 
+    - replace: "instance."
+      all: true
+  - from: include/instance/helper.go
+    to: instance/helper.go
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: ProjectsProjectId
+    with:
+    all: true
+  - replace: PostInstances
+    with: Create
+    all: true
+  - replace: InstancesInstanceID
+    with: 
+    all: true
+  - replace: InstanceIdBackups
+    with: 
+    all: true
+  - replace: PutInstances
+    with: UpdateInstance
+    prefix: true
+  - replace: CreateInstanceId
+    with: Create
+    prefix: true
+  - replace: UpdateInstance
+    with: Update
+    prefix: true
+  - replace: GetInstances
+    with: List
+    all: true
+  - replace: ListBackupID
+    with: Get
+    prefix: true
+  - replace: ListInstanceIdUsers
+    with: List
+    prefix: true
+  - replace: CreateUsers
+    with: Create
+    prefix: true
+  - replace: InstancesInstanceIdUsersUserID
+    with: 
+    all: true
+  - replace: ListUserID
+    with: Get
+    prefix: true
+  - replace: UpdateInstanceIdUsersUserID
+    with: Update
+    prefix: true
+  - replace: CreateUserIdReset
+    with: ResetPassword
+    prefix: true
+  - replace: GetFlavors
+    with: List
+    match: true
+  - replace: GetVersions
+    with: List
+    match: true
+  - replace: GetStoragesFlavor
+    with: GetStorageOptions
+    match: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Acl
+    with: ACL
+    all: true
+  - replace: Cpu
+    with: CPU
+    all: true

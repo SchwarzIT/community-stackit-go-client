@@ -19,9 +19,13 @@ func main() {
 		panic(err)
 	}
 
-	res, err := c.ElasticSearch.Offerings.GetWithResponse(ctx, "{project-id}")
-	if aggregatedError := validate.Response(res, err, "JSON200"); aggregatedError != nil {
-		panic(aggregatedError)
+	res, err := c.ElasticSearch.Offerings.Get(ctx, "{project-id}")
+	if err != nil {
+		panic(err)
+	}
+
+	if err := validate.Field(res, "JSON200"); err != nil {
+		panic(err)
 	}
 
 	fmt.Println("Received the following offerings:")

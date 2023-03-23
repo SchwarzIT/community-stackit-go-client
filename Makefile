@@ -1,7 +1,7 @@
-TEST?=$$(go list ./... | grep -v -E 'generated|vendor' )
+TEST?=$$(go list ./... | grep -v -E 'services|vendor|config')
 
 test: 
-	@go test $(TEST) || exit 1                                                   
+	@GOPRIVATE=dev.azure.com go test $(TEST) || exit 1                                                   
 	@echo $(TEST) | xargs -t -n4 go test $(TESTARGS) -timeout=30s -parallel=4
 
 coverage:
@@ -13,4 +13,4 @@ quality:
 	@goreportcard-cli -v ./...
 
 generate:
-	go generate ./pkg/services/...
+	GOPRIVATE=dev.azure.com go generate ./internal/config/...
