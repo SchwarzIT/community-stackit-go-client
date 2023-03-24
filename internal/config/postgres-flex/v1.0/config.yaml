@@ -32,12 +32,12 @@ output-options:
     tidy: 
     - replace: "postgresflex."
       all: true
-  - from: include/instance/wait.go
+  - from: include/instance/wait
     to: instance/wait.go
     tidy: 
     - replace: "instance."
       all: true
-  - from: include/users/wait.go
+  - from: include/users/wait
     to: users/wait.go
     tidy: 
     - replace: "users."

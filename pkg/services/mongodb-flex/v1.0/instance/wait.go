@@ -13,29 +13,12 @@ import (
 
 const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
-// WaitHandler will wait for instance creation to complete
-// returned interface is of *InstanceSingleInstance
-func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	return createOrUpdateWait(ctx, c, projectID, instanceID)
-}
-
-// WaitHandler will wait for instance update to complete
+// WaitForCreateOrUpdate will wait for instance update to complete
 // returned interface is nil
-func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	// artificial wait for instance to change from status ready to updating
+func (c *ClientWithResponses[K]) WaitForCreateOrUpdate(ctx context.Context, projectID, instanceID string) *wait.Handler {
+	// artificial wait for instance to change status
 	time.Sleep(5 * time.Second)
-	return createOrUpdateWait(ctx, c, projectID, instanceID)
-}
 
-// WaitHandler will wait for instance update to complete
-// returned interface is nil
-func (r PatchResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	// artificial wait for instance to change from status ready to updating
-	time.Sleep(5 * time.Second)
-	return createOrUpdateWait(ctx, c, projectID, instanceID)
-}
-
-func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	outerfound := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.List(ctx, projectID, &ListParams{})
@@ -71,7 +54,7 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 
 // WaitHandler will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForDelete(ctx context.Context, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		s, err := c.List(ctx, projectID, &ListParams{})
 		if err = validate.Response(s, err, "JSON200.Items"); err != nil {

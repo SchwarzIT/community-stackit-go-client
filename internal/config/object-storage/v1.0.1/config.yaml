@@ -27,7 +27,7 @@ output-options:
     tidy: 
     - replace: "objectstorage."
       all: true
-  - from: include/bucket/wait.go
+  - from: include/bucket/wait
     to: bucket/wait.go
     tidy: 
     - replace: "*bucket."

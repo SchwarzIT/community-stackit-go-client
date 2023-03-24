@@ -9,29 +9,11 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
-// WaitHandler will wait for instance creation to complete
+// WaitForCreateOrUpdate will wait for instance create/update to complete
 // returned interface is of *InstanceSingleInstance
-func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	return createOrUpdateWait(ctx, c, projectID, instanceID)
-}
-
-// WaitHandler will wait for instance update to complete
-// returned interface is of *InstanceSingleInstance
-func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForCreateOrUpdate(ctx context.Context, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
-	return createOrUpdateWait(ctx, c, projectID, instanceID)
-}
-
-// WaitHandler will wait for instance update to complete
-// returned interface is of *InstanceSingleInstance
-func (r PatchResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	// artifical wait for instance to change from status ready to updating
-	time.Sleep(5 * time.Second)
-	return createOrUpdateWait(ctx, c, projectID, instanceID)
-}
-
-func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {
@@ -53,9 +35,9 @@ func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, 
 	})
 }
 
-// WaitHandler will wait for instance deletion
+// WaitForDelete will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForDelete(ctx context.Context, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {

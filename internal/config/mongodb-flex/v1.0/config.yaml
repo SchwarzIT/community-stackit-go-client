@@ -31,7 +31,7 @@ output-options:
     tidy: 
     - replace: "mongodb."
       all: true
-  - from: include/instance/wait.go
+  - from: include/instance/wait
     to: instance/wait.go
     tidy: 
     - replace: "instance."

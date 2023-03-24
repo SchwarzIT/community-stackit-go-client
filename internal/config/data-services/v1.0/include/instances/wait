@@ -39,7 +39,7 @@ func (c *instances.ClientWithResponses[K]) WaitForProvision(ctx context.Context,
 	})
 }
 
-func (c *instances.ClientWithResponses[K]) WaitForUpdate(ctx context.Context, r UpdateResponse, projectID, instanceID string) *wait.Handler {
+func (c *instances.ClientWithResponses[K]) WaitForUpdate(ctx context.Context, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
@@ -66,7 +66,7 @@ func (c *instances.ClientWithResponses[K]) WaitForUpdate(ctx context.Context, r 
 	})
 }
 
-func (c *instances.ClientWithResponses[K]) WaitForDeprovision(ctx context.Context, r DeprovisionResponse, projectID, instanceID string) *wait.Handler {
+func (c *instances.ClientWithResponses[K]) WaitForDeprovision(ctx context.Context, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
