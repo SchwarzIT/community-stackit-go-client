@@ -10,7 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewStaticTokenClient(ctx)
+	c := stackit.MustNewClientWithTokenAuth(ctx)
 
 	projectID := "123-456-789"
 	bucketName := "bucket"

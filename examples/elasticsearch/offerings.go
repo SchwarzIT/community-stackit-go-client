@@ -10,7 +10,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewStaticTokenClient(ctx)
+	c := stackit.MustNewClientWithTokenAuth(ctx)
 
 	res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
 	if err = validate.Response(res, err, "JSON200"); err != nil {
