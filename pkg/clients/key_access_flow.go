@@ -2,6 +2,7 @@ package clients
 
 import (
 	"context"
+	"crypto/rsa"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -13,28 +14,56 @@ import (
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
+// KeyAccessFlow handles auth with SA key
 type KeyAccessFlow struct {
-	client *http.Client
-	config *KeyAccessFlowConfig
+	client     *http.Client
+	config     *KeyAccessFlowConfig
+	key        *ServiceAccountKeyPrivateResponse
+	privateKey *rsa.PrivateKey
+	token      *TokenResponseBody
 }
 
+// KeyAccessFlowConfig is the flow config
 type KeyAccessFlowConfig struct {
 	ServiceAccountKeyPath string
 	PrivateKeyPath        string
 	ServiceAccountKey     []byte
 	PrivateKey            []byte
 	Environment           env.Environment
-	Token                 TokenResponseBody
 }
 
+// TokenResponseBody is the API response
+// when requesting a new token
 type TokenResponseBody struct {
 	AccessToken  string `json:"access_token"`
 	ExpiresIn    int    `json:"expires_in"`
 	RefreshToken string `json:"refresh_token"`
 	Scope        string `json:"scope"`
 	TokenType    string `json:"token_type"`
+}
+
+// ServiceAccountKeyPrivateResponse is the API response
+// when creating a new SA key
+type ServiceAccountKeyPrivateResponse struct {
+	Active      bool      `json:"active"`
+	CreatedAt   time.Time `json:"createdAt"`
+	Credentials struct {
+		Aud        string    `json:"aud"`
+		Iss        string    `json:"iss"`
+		Kid        string    `json:"kid"`
+		PrivateKey *string   `json:"privateKey,omitempty"`
+		Sub        uuid.UUID `json:"sub"`
+	} `json:"credentials"`
+	ID           uuid.UUID  `json:"id"`
+	KeyAlgorithm string     `json:"keyAlgorithm"`
+	KeyOrigin    string     `json:"keyOrigin"`
+	KeyType      string     `json:"keyType"`
+	PublicKey    string     `json:"publicKey"`
+	ValidUntil   *time.Time `json:"validUntil,omitempty"`
 }
 
 // GetEnvironment returns the defined API environment
@@ -124,7 +153,35 @@ func (c *KeyAccessFlow) loadFiles() error {
 		}
 		c.config.PrivateKey = b
 	}
+	c.key = new(ServiceAccountKeyPrivateResponse)
+	err := json.Unmarshal(c.config.ServiceAccountKey, c.key)
+	if err != nil {
+		return err
+	}
+	c.privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(c.config.PrivateKey)
+	if err != nil {
+		return err
+	}
 	return nil
+}
+
+// generateSelfSignedJWT generates JWT token
+func (c *KeyAccessFlow) generateSelfSignedJWT() (string, error) {
+	claims := jwt.MapClaims{
+		"iss": c.key.Credentials.Iss,
+		"sub": c.key.Credentials.Sub,
+		"jti": uuid.New(),
+		"aud": c.key.Credentials.Aud,
+		"iat": jwt.NewNumericDate(time.Now()),
+		"exp": jwt.NewNumericDate(time.Now().Add(10 * time.Minute)),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodRS512, claims)
+	token.Header["kid"] = c.key.Credentials.Kid
+	tokenString, err := token.SignedString(c.privateKey)
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func (c *KeyAccessFlow) Do(req *http.Request) (*http.Response, error) {
@@ -138,33 +195,30 @@ var tokenAPI = env.URLs(
 	"https://api-dev.stackit.cloud/service-account/token",
 )
 
-func (c *KeyAccessFlow) getTokens() (string, string, error) {
+func (c *KeyAccessFlow) getTokens() error {
 	grant := url.PathEscape("urn:ietf:params:oauth:grant-type:jwt-bearer")
-	assertion := ""
+	assertion, err := c.generateSelfSignedJWT()
+	if err != nil {
+		return err
+	}
 	payload := strings.NewReader(fmt.Sprintf("grant_type=%s&assertion=%s", grant, assertion))
-
-	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodPost, tokenAPI.GetURL(c.GetEnvironment()), payload)
 	if err != nil {
-		return "", "", err
+		return err
 	}
-
-	res, err := do(client, req, 3, time.Second, time.Second*60)
+	res, err := do(&http.Client{}, req, 3, time.Second, time.Minute)
 	if err != nil {
-		return "", "", err
+		return err
 	}
 	if res == nil || res.StatusCode != http.StatusOK {
-		return "", "", fmt.Errorf("received HTTP code %d when trying to get tokens", res.StatusCode)
+		return errors.New("received bad response from API")
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return "", "", err
+		return err
 	}
-	var v TokenResponseBody
-	if err := json.Unmarshal(body, &v); err != nil {
-		return "", "", err
-	}
-	return v.AccessToken, v.RefreshToken, nil
+	c.token = new(TokenResponseBody)
+	return json.Unmarshal(body, c.token)
 }
 
 func (c *KeyAccessFlow) makeRequest(httpClient *http.Client, accessToken string) (*http.Response, error) {

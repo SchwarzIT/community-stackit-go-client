@@ -11,11 +11,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+// StaticTokenFlow handles auth with SA static token
 type StaticTokenFlow struct {
 	client *http.Client
 	config *StaticTokenFlowConfig
 }
 
+// StaticTokenFlowConfig is the flow config
 type StaticTokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
@@ -83,6 +85,7 @@ func (c *StaticTokenFlow) validate() error {
 	return nil
 }
 
+// Do performs the request
 func (c *StaticTokenFlow) Do(req *http.Request) (*http.Response, error) {
 	return do(c.client, req, 3, time.Second, time.Minute*2)
 }
