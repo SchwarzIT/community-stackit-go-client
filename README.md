@@ -18,7 +18,44 @@ go get github.com/SchwarzIT/community-stackit-go-client
 
 ## Usage
 
-Before you can start using the client, you will need to create a STACKIT Service Account and assign it the appropriate permissions.
+### Authentication
+
+Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. `project.owner`).
+
+After the service account has been created, you can authenticate to the client using the `Key access flow` (recommended flow) or with the `Static token flow` (less secure as the token is long-lived).
+
+#### Key access flow
+
+1. Create an RSA key pair:
+
+   ```bash
+   openssl req -x509 -nodes -newkey rsa:2048 -days 365 -keyout private_key.pem -out public_key.pem -subj "/CN=unused"
+   ```
+
+2. Create a service account key:
+
+   1. copy the private key to `examples/service-accounts`
+
+   2. Modify `create_sa_key.go` (fill out the consts)
+
+   3. Run with:  
+
+        ```bash
+        go run create_sa_key.go
+        ```
+
+#### Static token flow
+
+Set the following environment variables:
+
+```bash
+export STACKIT_SERVICE_ACCOUNT_EMAIL=email
+export STACKIT_SERVICE_ACCOUNT_TOKEN=token
+
+# optional: modify the API environment
+# set `STACKIT_ENV` to one of `dev`, `qa` or `prod` (default)
+export STACKIT_ENV=prod
+```
 
 Create a file called `example.go`:
 
@@ -35,7 +72,7 @@ import (
 
 func main() {
     ctx := context.Background()
-    c := stackit.NewClient(ctx)
+    c := stackit.MustNewStaticTokenClient(ctx)
 
     res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
     if err = validate.Response(res, err, "JSON200"); err != nil {
@@ -47,17 +84,6 @@ func main() {
         fmt.Printf("- %s\n", o.Name)
     }
 }
-```
-
-Set the following environment variables:
-
-```bash
-export STACKIT_SERVICE_ACCOUNT_EMAIL=email
-export STACKIT_SERVICE_ACCOUNT_TOKEN=token
-
-# optional: modify the API environment
-# set `STACKIT_ENV` to one of `dev`, `qa` or `prod` (default)
-export STACKIT_ENV=prod
 ```
 
 Then, you can run the example with the following command:
