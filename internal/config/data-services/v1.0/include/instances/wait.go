@@ -78,7 +78,7 @@ func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *instances.Clien
 				) {
 				return nil, false, nil
 			}
-			if validate.StatusEquals(s, http.StatusNotFound, http.StatusGone) {
+			if validate.StatusEquals(s, http.StatusNotFound, http.StatusGone, http.StatusForbidden) {
 				return nil, true, nil
 			}
 			return nil, false, err
