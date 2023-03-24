@@ -84,5 +84,5 @@ func (c *StaticTokenFlow) validate() error {
 }
 
 func (c *StaticTokenFlow) Do(req *http.Request) (*http.Response, error) {
-	return nil, nil
+	return do(c.client, req, 3, time.Second, time.Minute*2)
 }

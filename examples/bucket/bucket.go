@@ -10,17 +10,18 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.NewClient(ctx)
+	c := stackit.MustNewStaticTokenClient(ctx)
 
 	projectID := "123-456-789"
 	bucketName := "bucket"
 
-	res, err := c.ObjectStorage.Bucket.Create(ctx, projectID, bucketName)
+	bucket := c.ObjectStorage.Bucket
+	res, err := bucket.Create(ctx, projectID, bucketName)
 	if agg := validate.Response(res, err); agg != nil {
 		panic(err)
 	}
 
-	process := res.WaitHandler(ctx, c.ObjectStorage.Bucket, projectID, bucketName)
+	process := bucket.WaitForeCreate(ctx, projectID, bucketName)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		panic(err)
 	}

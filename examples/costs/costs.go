@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.NewClient(ctx)
+	c := stackit.MustNewStaticTokenClient(ctx)
 
 	params := &costs.GetProjectCostsParams{}
 	res, err := c.Costs.GetProjectCosts(
