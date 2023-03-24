@@ -7,6 +7,7 @@ import (
 
 	stackit "github.com/SchwarzIT/community-stackit-go-client"
 	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
 	serviceaccounts "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-accounts/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
@@ -20,7 +21,10 @@ const (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewStaticTokenClient(ctx)
+	c := stackit.MustNewStaticTokenClient(ctx, clients.StaticTokenFlowConfig{
+		ServiceAccountEmail: serviceAccountEmail,
+		ServiceAccountToken: userToken,
+	})
 
 	// make sure to create an RSA key-pair
 	b, err := os.ReadFile("public_key.pem")
@@ -32,7 +36,7 @@ func main() {
 	res, err := c.ServiceAccounts.CreateKeys(
 		ctx,
 		projectID,
-		types.Email(serviceAccountEmail),
+		types.Email(c.Client.GetConfig().ServiceAccountEmail),
 		serviceaccounts.CreateKeysJSONRequestBody{
 			PublicKey: &pk,
 		},

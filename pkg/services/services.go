@@ -15,6 +15,7 @@ import (
 )
 
 type Services[K contracts.ClientFlowConfig] struct {
+	Client             contracts.ClientInterface[K]
 	Argus              *argus.ClientWithResponses[K]
 	Costs              *costs.ClientWithResponses[K]
 	Kubernetes         *kubernetes.ClientWithResponses[K]
@@ -37,6 +38,9 @@ type Services[K contracts.ClientFlowConfig] struct {
 
 func Init[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *Services[K] {
 	return &Services[K]{
+		Client: c,
+
+		// Services
 		Argus:              argus.NewService(c),
 		Costs:              costs.NewService(c),
 		Kubernetes:         kubernetes.NewService(c),
