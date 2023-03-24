@@ -2,6 +2,7 @@ package dataservices
 
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
@@ -15,7 +16,7 @@ const (
 	Redis
 )
 
-func NewService(c common.Client, serviceID int) *ClientWithResponses {
+func NewService(c common.Client, serviceID int) *ClientWithResponses[K] {
 	url := GetBaseURLs(serviceID).GetURL(c)
 	nc, _ := NewClient(url, WithHTTPClient(c))
 	return nc
@@ -40,7 +41,7 @@ func GetBaseURLs(serviceID int) urls.ByEnvs {
 }
 
 func setElasticSearchURLs() urls.ByEnvs {
-	return urls.Init(
+	return env.URLs(
 		"elasticsearch",
 		"https://elasticsearch.api.eu01.stackit.cloud",
 		"https://elasticsearch.api.eu01.qa.stackit.cloud",
@@ -49,7 +50,7 @@ func setElasticSearchURLs() urls.ByEnvs {
 }
 
 func setLogMeURLs() urls.ByEnvs {
-	return urls.Init(
+	return env.URLs(
 		"logme",
 		"https://logme.api.eu01.stackit.cloud",
 		"https://logme.api.eu01.qa.stackit.cloud",
@@ -58,7 +59,7 @@ func setLogMeURLs() urls.ByEnvs {
 }
 
 func setMariaDBURLs() urls.ByEnvs {
-	return urls.Init(
+	return env.URLs(
 		"mariadb",
 		"https://mariadb.api.eu01.stackit.cloud",
 		"https://mariadb.api.eu01.qa.stackit.cloud",
@@ -67,7 +68,7 @@ func setMariaDBURLs() urls.ByEnvs {
 }
 
 func setPostgresDBURLs() urls.ByEnvs {
-	return urls.Init(
+	return env.URLs(
 		"postgresql",
 		"https://postgresql.api.eu01.stackit.cloud",
 		"https://postgresql.api.eu01.qa.stackit.cloud",
@@ -76,7 +77,7 @@ func setPostgresDBURLs() urls.ByEnvs {
 }
 
 func setRabbitMQURLs() urls.ByEnvs {
-	return urls.Init(
+	return env.URLs(
 		"rabbitmq",
 		"https://rabbitmq.api.eu01.stackit.cloud",
 		"https://rabbitmq.api.eu01.qa.stackit.cloud",
@@ -85,7 +86,7 @@ func setRabbitMQURLs() urls.ByEnvs {
 }
 
 func setRedisURL() urls.ByEnvs {
-	return urls.Init(
+	return env.URLs(
 		"redis",
 		"https://redis.api.eu01.stackit.cloud",
 		"https://redis.api.eu01.qa.stackit.cloud",

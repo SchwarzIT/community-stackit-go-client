@@ -1,17 +1,17 @@
 package serviceaccounts
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 )
 
-var BaseURLs = urls.Init(
+var BaseURLs = env.URLs(
 	"service_accounts",
 	"https://api.stackit.cloud/service-account/",
 	"https://api-qa.stackit.cloud/service-account/",
 	"https://api-dev.stackit.cloud/service-account/",
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	return NewClient(BaseURLs.GetURL(c), c)
+func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *ClientWithResponses[K] {
+	return NewClient(BaseURLs.GetURL(c.GetEnvironment()), c)
 }

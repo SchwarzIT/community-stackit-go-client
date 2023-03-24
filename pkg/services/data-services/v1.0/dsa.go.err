@@ -1,0 +1,1 @@
+error parsing oapi-codegen templates: parsing template 'templates/client-factory.tmpl': template: client-factory.tmpl:71: bad character U+007D '}'

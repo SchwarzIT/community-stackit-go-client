@@ -1,18 +1,18 @@
 package argus
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 )
 
-var BaseURLs = urls.Init(
+var BaseURLs = env.URLs(
 	"argus",
 	"https://argus.api.stackit.cloud",
 	"https://argus.api.stg.stackit.cloud",
 	"https://argus.api.dev.stackit.cloud",
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	nc, _ := NewClient(BaseURLs.GetURL(c), WithHTTPClient(c))
+func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *ClientWithResponses[K] {
+	nc, _ := NewClient(BaseURLs.GetURL(c.GetEnvironment()), WithHTTPClient(c))
 	return nc
 }

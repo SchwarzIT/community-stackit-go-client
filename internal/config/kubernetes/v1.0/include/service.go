@@ -1,21 +1,21 @@
 package kubernetes
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
-var BaseURLs = urls.Init(
+var BaseURLs = env.URLs(
 	"kubernetes",
 	"https://ske.api.eu01.stackit.cloud/",
 	"https://ske.api.eu01.stg.stackit.cloud/",
 	"https://ske.api.eu01.dev.stackit.cloud/",
 )
 
-func NewService(c common.Client) *kubernetes.ClientWithResponses {
+func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *kubernetes.ClientWithResponses[K] {
 	nc, _ := kubernetes.NewClient(
-		BaseURLs.GetURL(c),
+		BaseURLs.GetURL(c.GetEnvironment()),
 		kubernetes.WithHTTPClient(c),
 	)
 	return nc
