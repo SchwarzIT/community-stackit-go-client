@@ -16,15 +16,13 @@ go get github.com/SchwarzIT/community-stackit-go-client
 
 &nbsp;
 
-## Usage
-
-### Authentication
+## Authentication
 
 Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. `project.owner`).
 
 After the service account has been created, you can authenticate to the client using the `Key access flow` (recommended flow) or with the `Static token flow` (less secure as the token is long-lived).
 
-#### Key access flow
+### Key access flow
 
 1. Create an RSA key pair:
 
@@ -44,7 +42,7 @@ After the service account has been created, you can authenticate to the client u
         go run create_sa_key.go
         ```
 
-#### Static token flow
+### Static token flow
 
 Set the following environment variables:
 
@@ -56,6 +54,8 @@ export STACKIT_SERVICE_ACCOUNT_TOKEN=token
 # set `STACKIT_ENV` to one of `dev`, `qa` or `prod` (default)
 export STACKIT_ENV=prod
 ```
+
+## Usage
 
 Create a file called `example.go`:
 
