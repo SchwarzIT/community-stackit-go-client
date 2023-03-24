@@ -14,7 +14,7 @@ const (
 	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
 )
 
-func (r ProvisionResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForProvision(ctx context.Context, r ProvisionResponse, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
@@ -38,7 +38,7 @@ func (r ProvisionResponse) WaitHandler(ctx context.Context, c *ClientWithRespons
 	})
 }
 
-func (r UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForUpdate(ctx context.Context, r UpdateResponse, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
@@ -65,7 +65,7 @@ func (r UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 	})
 }
 
-func (r DeprovisionResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForDeprovision(ctx context.Context, r DeprovisionResponse, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
