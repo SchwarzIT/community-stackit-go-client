@@ -10,7 +10,7 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
-func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, containerID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForCreate(ctx context.Context, containerID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		project, err := c.Get(ctx, containerID, &GetParams{})
 		if err != nil {
@@ -35,7 +35,7 @@ func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses,
 	})
 }
 
-func (r DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, containerID string) *wait.Handler {
+func (c *ClientWithResponses[K]) WaitForDelete(ctx context.Context, containerID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		project, err := c.Get(ctx, containerID, &GetParams{})
 		if err != nil {

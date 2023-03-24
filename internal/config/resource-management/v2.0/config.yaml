@@ -30,7 +30,7 @@ output-options:
     tidy: 
     - replace: "resourcemanagement."
       all: true
-  - from: include/wait.go
+  - from: include/wait
     to: wait.go
     tidy: 
     - replace: "resourcemanagement."
