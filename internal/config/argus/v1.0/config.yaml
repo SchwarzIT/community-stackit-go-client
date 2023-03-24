@@ -47,7 +47,7 @@ output-options:
     - replace: " argus."
       with: " "
       all: true
-  - from: include/instances/wait.go
+  - from: include/instances/wait
     to: instances/wait.go
     tidy:
     - replace: "instances."

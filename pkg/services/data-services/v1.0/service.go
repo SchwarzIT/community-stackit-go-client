@@ -1,9 +1,8 @@
 package dataservices
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
 const (
@@ -16,13 +15,13 @@ const (
 	Redis
 )
 
-func NewService(c common.Client, serviceID int) *ClientWithResponses[K] {
-	url := GetBaseURLs(serviceID).GetURL(c)
+func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K], serviceID int) *ClientWithResponses[K] {
+	url := GetBaseURLs(serviceID).GetURL(c.GetEnvironment())
 	nc, _ := NewClient(url, WithHTTPClient(c))
 	return nc
 }
 
-func GetBaseURLs(serviceID int) urls.ByEnvs {
+func GetBaseURLs(serviceID int) env.EnvironmentURLs {
 	switch serviceID {
 	case ElasticSearch:
 		return setElasticSearchURLs()
@@ -37,10 +36,10 @@ func GetBaseURLs(serviceID int) urls.ByEnvs {
 	case Redis:
 		return setRedisURL()
 	}
-	return urls.ByEnvs{}
+	return env.EnvironmentURLs{}
 }
 
-func setElasticSearchURLs() urls.ByEnvs {
+func setElasticSearchURLs() env.EnvironmentURLs {
 	return env.URLs(
 		"elasticsearch",
 		"https://elasticsearch.api.eu01.stackit.cloud",
@@ -49,7 +48,7 @@ func setElasticSearchURLs() urls.ByEnvs {
 	)
 }
 
-func setLogMeURLs() urls.ByEnvs {
+func setLogMeURLs() env.EnvironmentURLs {
 	return env.URLs(
 		"logme",
 		"https://logme.api.eu01.stackit.cloud",
@@ -58,7 +57,7 @@ func setLogMeURLs() urls.ByEnvs {
 	)
 }
 
-func setMariaDBURLs() urls.ByEnvs {
+func setMariaDBURLs() env.EnvironmentURLs {
 	return env.URLs(
 		"mariadb",
 		"https://mariadb.api.eu01.stackit.cloud",
@@ -67,7 +66,7 @@ func setMariaDBURLs() urls.ByEnvs {
 	)
 }
 
-func setPostgresDBURLs() urls.ByEnvs {
+func setPostgresDBURLs() env.EnvironmentURLs {
 	return env.URLs(
 		"postgresql",
 		"https://postgresql.api.eu01.stackit.cloud",
@@ -76,7 +75,7 @@ func setPostgresDBURLs() urls.ByEnvs {
 	)
 }
 
-func setRabbitMQURLs() urls.ByEnvs {
+func setRabbitMQURLs() env.EnvironmentURLs {
 	return env.URLs(
 		"rabbitmq",
 		"https://rabbitmq.api.eu01.stackit.cloud",
@@ -85,7 +84,7 @@ func setRabbitMQURLs() urls.ByEnvs {
 	)
 }
 
-func setRedisURL() urls.ByEnvs {
+func setRedisURL() env.EnvironmentURLs {
 	return env.URLs(
 		"redis",
 		"https://redis.api.eu01.stackit.cloud",
