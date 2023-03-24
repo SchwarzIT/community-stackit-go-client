@@ -27,7 +27,8 @@ After the service account has been created, you can authenticate to the client u
 1. Create an RSA key pair:
 
    ```bash
-   openssl req -x509 -nodes -newkey rsa:2048 -days 365 -keyout private_key.pem -out public_key.pem -subj "/CN=unused"
+   openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
+      -keyout private_key.pem -out public_key.pem -subj "/CN=unused"
    ```
 
 2. Create a service account key:
@@ -50,8 +51,8 @@ Set the following environment variables:
 export STACKIT_SERVICE_ACCOUNT_EMAIL=email
 export STACKIT_SERVICE_ACCOUNT_TOKEN=token
 
-# optional: modify the API environment
-# set `STACKIT_ENV` to one of `dev`, `qa` or `prod` (default)
+# optionally modify the API environment to one of:
+# `dev`, `qa` or `prod` (default)
 export STACKIT_ENV=prod
 ```
 
