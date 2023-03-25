@@ -4,6 +4,7 @@ go 1.18
 
 require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0
+	github.com/golang-jwt/jwt/v4 v4.5.0
 	github.com/google/uuid v1.3.0
 	github.com/karrick/tparse/v2 v2.8.2
 	github.com/oleiade/reflections v1.0.1

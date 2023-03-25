@@ -1,8 +1,8 @@
 package membership
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 )
 
 const (
@@ -11,13 +11,13 @@ const (
 	RESOURCE_TYPE_ORG     = "organization"
 )
 
-var BaseURLs = urls.Init(
+var BaseURLs = env.URLs(
 	"membership",
 	"https://api.stackit.cloud/membership/",
 	"https://api-qa.stackit.cloud/membership/",
 	"https://api-dev.stackit.cloud/membership/",
 )
 
-func NewService(c common.Client) *ClientWithResponses {
-	return NewClient(BaseURLs.GetURL(c), c)
+func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *ClientWithResponses[K] {
+	return NewClient(BaseURLs.GetURL(c.GetEnvironment()), c)
 }

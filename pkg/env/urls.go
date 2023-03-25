@@ -1,16 +1,12 @@
-// urls is used to manage base urls
-// for every STACKIT environment
-package urls
+package env
 
 import (
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
 )
 
-type ByEnvs struct {
+type EnvironmentURLs struct {
 	// Base URL for each environment
 	Prod string
 	QA   string
@@ -22,12 +18,12 @@ type ByEnvs struct {
 	OverrideWith string
 }
 
-// Init expects base URL strings for pkg, prod, qa, dev
+// URLs expects the package name and base URLs for prod, qa, dev
 // the package name is used fot setting OverrideWith
 // for example, for pkg=costs, OverrideWith will be
 // STACKIT_COSTS_BASEURL
-func Init(pkg, prod, qa, dev string) ByEnvs {
-	return ByEnvs{
+func URLs(pkg, prod, qa, dev string) EnvironmentURLs {
+	return EnvironmentURLs{
 		Prod:         prod,
 		QA:           qa,
 		Dev:          dev,
@@ -35,18 +31,16 @@ func Init(pkg, prod, qa, dev string) ByEnvs {
 	}
 }
 
-func (e ByEnvs) GetURL(c common.Client) string {
-	url := os.Getenv(e.OverrideWith)
+func (eu EnvironmentURLs) GetURL(e Environment) string {
+	url := os.Getenv(eu.OverrideWith)
 	if url != "" {
 		return url
 	}
-
-	switch c.GetEnvironment() {
-	case common.ENV_DEV:
-		return e.Dev
-	case common.ENV_QA:
-		return e.QA
-	default:
-		return e.Prod
+	if e.IsDev() {
+		return eu.Dev
 	}
+	if e.IsQA() {
+		return eu.QA
+	}
+	return eu.Prod
 }

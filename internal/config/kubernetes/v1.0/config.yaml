@@ -6,8 +6,9 @@ generate:
 output-options:
   custom-doer:
     enabled: true
-    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
-    name: "common.Client"
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+    name: "contracts.ClientInterface"
+    generics: "contracts.ClientFlowConfig"
   split-by-tags:
     verbose: false
     enabled: true
@@ -19,7 +20,7 @@ output-options:
     imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
     set: "validate.DefaultResponseErrorHandler(rsp)"
   copy:
-  - from: include/cluster/wait.go
+  - from: include/cluster/wait
     to: cluster/wait.go
     tidy: 
     - replace: "cluster."
@@ -34,7 +35,7 @@ output-options:
     tidy: 
     - replace: "kubernetes."
       all: true
-  - from: include/project/wait.go
+  - from: include/project/wait
     to: project/wait.go
     tidy: 
     - replace: "project."

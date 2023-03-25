@@ -1,21 +1,21 @@
 package resourcemanagement
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/common"
+	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/urls"
 )
 
-var BaseURLs = urls.Init(
+var BaseURLs = env.URLs(
 	"resource_management",
 	"https://api.stackit.cloud/resource-management/v2/",
 	"https://api-qa.stackit.cloud/resource-management/v2/",
 	"https://api-dev.stackit.cloud/resource-management/v2/",
 )
 
-func NewService(c common.Client) *resourcemanagement.ClientWithResponses {
+func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *resourcemanagement.ClientWithResponses[K] {
 	nc, _ := resourcemanagement.NewClient(
-		BaseURLs.GetURL(c),
+		BaseURLs.GetURL(c.GetEnvironment()),
 		resourcemanagement.WithHTTPClient(c),
 	)
 	return nc

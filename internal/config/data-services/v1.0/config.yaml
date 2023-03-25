@@ -6,8 +6,9 @@ generate:
 output-options:
   custom-doer:
     enabled: true
-    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
-    name: "common.Client"
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+    name: "contracts.ClientInterface"
+    generics: "contracts.ClientFlowConfig"
   split-by-tags:
     verbose: false
     enabled: true
@@ -24,7 +25,7 @@ output-options:
     tidy: 
     - replace: "dataservices."
       all: true
-  - from: include/instances/wait.go
+  - from: include/instances/wait
     to: instances/wait.go
     tidy: 
     - replace: "instances."

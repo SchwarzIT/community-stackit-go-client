@@ -6,8 +6,9 @@ generate:
 output-options:
   custom-doer:
     enabled: true
-    import: common "github.com/SchwarzIT/community-stackit-go-client/internal/common"
-    name: "common.Client"
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+    name: "contracts.ClientInterface"
+    generics: "contracts.ClientFlowConfig"
   split-by-tags:
     verbose: false
     enabled: true
@@ -30,7 +31,7 @@ output-options:
     tidy: 
     - replace: "mongodb."
       all: true
-  - from: include/instance/wait.go
+  - from: include/instance/wait
     to: instance/wait.go
     tidy: 
     - replace: "instance."

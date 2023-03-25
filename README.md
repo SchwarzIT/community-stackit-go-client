@@ -18,10 +18,6 @@ go get github.com/SchwarzIT/community-stackit-go-client
 
 ## Usage
 
-Before you can start using the client, you will need to create a STACKIT Service Account and assign it the appropriate permissions.
-
-Create a file called `example.go`:
-
 ```go
 package main
 
@@ -35,41 +31,135 @@ import (
 
 func main() {
     ctx := context.Background()
-    c := stackit.NewClient(ctx)
+    c := stackit.MustNewClientWithKeyAuth(ctx)
 
-    res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
-    if err = validate.Response(res, err, "JSON200"); err != nil {
-        panic(err)
+    res, err := c.Kubernetes.ProviderOptions.List(ctx)
+    if err = validate.Response(res, err, "JSON200.AvailabilityZones"); err != nil {
+        fmt.Println(err)
+        return
     }
 
-    fmt.Println("Received the following offerings:")
-    for _, o := range res.JSON200.Offerings {
-        fmt.Printf("- %s\n", o.Name)
+    fmt.Println("STACKIT Kubernetes Engine (SKE) availability zones:")
+    for _, zone := range *res.JSON200.AvailabilityZones {
+        if zone.Name == nil {
+            continue
+        }
+        fmt.Printf("- %s\n", *zone.Name)
     }
 }
 ```
 
-Set the following environment variables:
+1. Copy the code above to a file called `example.go`
 
-```bash
-export STACKIT_SERVICE_ACCOUNT_EMAIL=email
-export STACKIT_SERVICE_ACCOUNT_TOKEN=token
+2. Make sure environment variables for key flow are in place (read more in the `Authentication` section below)
 
-# optional: modify the API environment
-# set `STACKIT_ENV` to one of `dev`, `qa` or `prod` (default)
-export STACKIT_ENV=prod
-```
+3. Now you can run the example with the following command:
 
-Then, you can run the example with the following command:
+    ```bash
+    go run example.go
+    ```
 
-```bash
-go run example.go
-```
+    output should look similar to:
+
+    ```text
+    STACKIT Kubernetes Engine (SKE) availability zones:
+    - eu01-m
+    - eu01-1
+    - eu01-2
+    - eu01-3
+    ```
 
 ### Further Examples
 
 1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
 2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
+
+&nbsp;
+
+## Authentication
+
+Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. `project.owner`).
+
+After the service account has been created, you can authenticate to the client using the `Key` authentication flow (recommended) or with the static `Token` flow (less secure as the token is long-lived).
+
+### Key flow
+
+1. Create an RSA key pair:
+
+   ```bash
+   openssl req -x509 -nodes -newkey rsa:2048 -days 365 \
+      -keyout private_key.pem -out public_key.pem -subj "/CN=unused"
+   ```
+
+2. Create a service account key:
+
+   - copy the private key to `examples/service-accounts`
+
+   - Modify `create_sa_key.go` (fill out the consts)
+
+   - Run with:  
+
+        ```bash
+        go run create_sa_key.go
+        ```
+
+3. Set environment variables:
+
+   ```bash
+   export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
+   export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
+
+   # optionally modify the API environment to one of:
+   # `dev`, `qa` or `prod` (default)
+   export STACKIT_ENV=prod
+   ```
+
+4. Configure the client
+
+   ```go
+   package main
+
+   import (
+       "context"
+       stackit "github.com/SchwarzIT/community-stackit-go-client"
+   )
+
+   func main() {
+       ctx := context.Background()
+       c := stackit.MustNewClientWithTokenAuth(ctx)
+       // ...
+   }
+   ```
+
+### Token flow
+
+1. Set the following environment variables:
+
+    ```bash
+    export STACKIT_SERVICE_ACCOUNT_EMAIL=email
+    export STACKIT_SERVICE_ACCOUNT_TOKEN=token
+
+    # optionally modify the API environment to one of:
+    # `dev`, `qa` or `prod` (default)
+    export STACKIT_ENV=prod
+    ```
+
+2. Configure the client
+
+   ```go
+   package main
+
+   import (
+       "context"
+       stackit "github.com/SchwarzIT/community-stackit-go-client"
+   )
+
+   func main() {
+       ctx := context.Background()
+       c := stackit.MustNewClientWithTokenAuth(ctx)
+       // ...
+   }
+   ```
 
 &nbsp;
 
