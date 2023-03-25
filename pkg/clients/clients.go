@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
 )
@@ -31,7 +32,7 @@ func do(client *http.Client, req *http.Request, maxRetries int, retryWait, retry
 			resp, err = client.Do(req)
 			if err != nil {
 				if maxRetries > 0 {
-					if oneOfSubstr(err, ClientTimeoutErr, ClientContextDeadlineErr, ClientConnectionRefusedErr, ClientGWTimeoutFError) ||
+					if validate.ErrorHasAnySubstr(err, ClientTimeoutErr, ClientContextDeadlineErr, ClientConnectionRefusedErr, ClientGWTimeoutFError) ||
 						(req.Method == http.MethodGet && strings.Contains(err.Error(), ClientEOFError)) {
 
 						// reduce retries counter and retry
@@ -56,13 +57,4 @@ func do(client *http.Client, req *http.Request, maxRetries int, retryWait, retry
 	}
 
 	return resp, err
-}
-
-func oneOfSubstr(err error, msgs ...string) bool {
-	for _, m := range msgs {
-		if strings.Contains(err.Error(), m) {
-			return true
-		}
-	}
-	return false
 }

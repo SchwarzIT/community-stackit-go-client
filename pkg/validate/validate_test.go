@@ -276,3 +276,28 @@ func TestStatusEquals(t *testing.T) {
 		t.Error("expected false for a, got true")
 	}
 }
+
+func TestErrorHasAnySubstr(t *testing.T) {
+	type args struct {
+		err  error
+		msgs []string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"nil err", args{nil, nil}, false},
+		{"no match 1", args{errors.New("abcd"), []string{}}, false},
+		{"no match 2", args{errors.New("abcd"), []string{"efd"}}, false},
+		{"no match 3", args{errors.New("abcd"), []string{"efd", "hij"}}, false},
+		{"match", args{errors.New("abcd"), []string{"cd"}}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := validate.ErrorHasAnySubstr(tt.args.err, tt.args.msgs...); got != tt.want {
+				t.Errorf("ErrorHasAnySubstr() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
