@@ -19,11 +19,11 @@ import (
 )
 
 const (
-	// Key Access Flow (1)
+	// Key Flow optional env variable (1)
 	ServiceAccountKey = "STACKIT_SERVICE_ACCOUNT_KEY"
 	PrivateKey        = "STACKIT_PRIVATE_KEY"
 
-	// Key Access Flow (2) using file paths
+	// Key Flow optional env variable (2) using file paths
 	ServiceAccountKeyPath = "STACKIT_SERVICE_ACCOUNT_KEY_PATH"
 	PrivateKeyPath        = "STACKIT_PRIVATE_KEY_PATH"
 )
@@ -155,7 +155,7 @@ func (c *KeyFlow) GetAccessToken() (string, error) {
 func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
 	defaultCfg := c.getConfigFromEnvironment()
 	if len(cfg) > 0 {
-		c.config = mergeConfigs(&cfg[0], defaultCfg)
+		c.config = c.mergeConfigs(&cfg[0], defaultCfg)
 	} else {
 		c.config = defaultCfg
 	}
@@ -173,7 +173,7 @@ func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
 }
 
 // mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and defaultCfg.
-func mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
+func (c *KeyFlow) mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
 	merged := *defaultCfg
 
 	if cfg.ServiceAccountKeyPath != "" {

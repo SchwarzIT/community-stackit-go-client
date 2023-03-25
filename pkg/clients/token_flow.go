@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	// Auth flow options:
 	// Service Account Token Flow
+	// Auth flow env variables
 	ServiceAccountEmail = "STACKIT_SERVICE_ACCOUNT_EMAIL"
 	ServiceAccountToken = "STACKIT_SERVICE_ACCOUNT_TOKEN"
 )
@@ -57,23 +57,39 @@ func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 
 // processConfig processes the given configuration
 func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
-	nc := &TokenFlowConfig{
+	defaultCfg := c.getConfigFromEnvironment()
+
+	if len(cfg) > 0 {
+		c.config = c.mergeConfigs(&cfg[0], defaultCfg)
+	} else {
+		c.config = defaultCfg
+	}
+}
+
+// getConfigFromEnvironment returns a TokenFlowConfig populated with environment variables.
+func (c *TokenFlow) getConfigFromEnvironment() *TokenFlowConfig {
+	return &TokenFlowConfig{
 		ServiceAccountEmail: os.Getenv(ServiceAccountEmail),
 		ServiceAccountToken: os.Getenv(ServiceAccountToken),
 		Environment:         env.Parse(os.Getenv(Environment)),
 	}
-	for _, c := range cfg {
-		if c.ServiceAccountEmail != "" {
-			nc.ServiceAccountEmail = c.ServiceAccountEmail
-		}
-		if c.ServiceAccountToken != "" {
-			nc.ServiceAccountToken = c.ServiceAccountToken
-		}
-		if c.Environment != "" {
-			nc.Environment = c.Environment
-		}
+}
+
+// mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and defaultCfg.
+func (c *TokenFlow) mergeConfigs(cfg, defaultCfg *TokenFlowConfig) *TokenFlowConfig {
+	merged := *defaultCfg
+
+	if cfg.ServiceAccountEmail != "" {
+		merged.ServiceAccountEmail = cfg.ServiceAccountEmail
 	}
-	c.config = nc
+	if cfg.ServiceAccountToken != "" {
+		merged.ServiceAccountToken = cfg.ServiceAccountToken
+	}
+	if cfg.Environment != "" {
+		merged.Environment = cfg.Environment
+	}
+
+	return &merged
 }
 
 // configureHTTPClient configures the HTTP client
