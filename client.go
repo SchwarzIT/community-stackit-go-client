@@ -10,16 +10,16 @@ import (
 // NewClientWithKeyAuth creates a new client that authenticates itself with STACKIT APIs using a
 // service account key and a private RSA key
 // this is the recommended way of authenticating to STACKIT API
-func NewClientWithKeyAuth(ctx context.Context, cfg ...clients.KeyAccessFlowConfig) (*services.Services[clients.KeyAccessFlowConfig], error) {
-	client := &clients.KeyAccessFlow{}
+func NewClientWithKeyAuth(ctx context.Context, cfg ...clients.KeyFlowConfig) (*services.Services[clients.KeyFlowConfig], error) {
+	client := &clients.KeyFlow{}
 	if err := client.Init(ctx, cfg...); err != nil {
 		return nil, err
 	}
-	return services.Init[clients.KeyAccessFlowConfig](client), nil
+	return services.Init[clients.KeyFlowConfig](client), nil
 }
 
 // MustNewClientWithKeyAuth panics if client initialization failed
-func MustNewClientWithKeyAuth(ctx context.Context, cfg ...clients.KeyAccessFlowConfig) *services.Services[clients.KeyAccessFlowConfig] {
+func MustNewClientWithKeyAuth(ctx context.Context, cfg ...clients.KeyFlowConfig) *services.Services[clients.KeyFlowConfig] {
 	c, err := NewClientWithKeyAuth(ctx, cfg...)
 	if err != nil {
 		panic(err)
@@ -29,16 +29,16 @@ func MustNewClientWithKeyAuth(ctx context.Context, cfg ...clients.KeyAccessFlowC
 
 // NewClientWithTokenAuth creates a new client that authenticates itself with STACKIT APIs using a service account token
 // important: this approach is less secure, as the token has a long lifespan
-func NewClientWithTokenAuth(ctx context.Context, cfg ...clients.StaticTokenFlowConfig) (*services.Services[clients.StaticTokenFlowConfig], error) {
-	client := &clients.StaticTokenFlow{}
+func NewClientWithTokenAuth(ctx context.Context, cfg ...clients.TokenFlowConfig) (*services.Services[clients.TokenFlowConfig], error) {
+	client := &clients.TokenFlow{}
 	if err := client.Init(ctx, cfg...); err != nil {
 		return nil, err
 	}
-	return services.Init[clients.StaticTokenFlowConfig](client), nil
+	return services.Init[clients.TokenFlowConfig](client), nil
 }
 
 // MustNewClientWithTokenAuth panics if client initialization failed
-func MustNewClientWithTokenAuth(ctx context.Context, cfg ...clients.StaticTokenFlowConfig) *services.Services[clients.StaticTokenFlowConfig] {
+func MustNewClientWithTokenAuth(ctx context.Context, cfg ...clients.TokenFlowConfig) *services.Services[clients.TokenFlowConfig] {
 	c, err := NewClientWithTokenAuth(ctx, cfg...)
 	if err != nil {
 		panic(err)

@@ -11,41 +11,41 @@ import (
 	"golang.org/x/oauth2"
 )
 
-// StaticTokenFlow handles auth with SA static token
-type StaticTokenFlow struct {
+// TokenFlow handles auth with SA static token
+type TokenFlow struct {
 	client *http.Client
-	config *StaticTokenFlowConfig
+	config *TokenFlowConfig
 }
 
-// StaticTokenFlowConfig is the flow config
-type StaticTokenFlowConfig struct {
+// TokenFlowConfig is the flow config
+type TokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
 	Environment         env.Environment
 }
 
 // GetEnvironment returns the defined API environment
-func (c *StaticTokenFlow) GetEnvironment() env.Environment {
+func (c *TokenFlow) GetEnvironment() env.Environment {
 	return c.config.Environment
 }
 
 // GetConfig returns the flow configuration
-func (c *StaticTokenFlow) GetConfig() StaticTokenFlowConfig {
+func (c *TokenFlow) GetConfig() TokenFlowConfig {
 	if c.config == nil {
-		return StaticTokenFlowConfig{}
+		return TokenFlowConfig{}
 	}
 	return *c.config
 }
 
-func (c *StaticTokenFlow) Init(ctx context.Context, cfg ...StaticTokenFlowConfig) error {
+func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
 	return c.validate()
 }
 
 // processConfig processes the given configuration
-func (c *StaticTokenFlow) processConfig(cfg ...StaticTokenFlowConfig) {
-	nc := &StaticTokenFlowConfig{
+func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
+	nc := &TokenFlowConfig{
 		ServiceAccountEmail: os.Getenv(ServiceAccountEmail),
 		ServiceAccountToken: os.Getenv(ServiceAccountToken),
 		Environment:         env.Parse(os.Getenv(Environment)),
@@ -65,7 +65,7 @@ func (c *StaticTokenFlow) processConfig(cfg ...StaticTokenFlowConfig) {
 }
 
 // configureHTTPClient configures the HTTP client
-func (c *StaticTokenFlow) configureHTTPClient(ctx context.Context) {
+func (c *TokenFlow) configureHTTPClient(ctx context.Context) {
 	sts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: c.config.ServiceAccountToken},
 	)
@@ -75,7 +75,7 @@ func (c *StaticTokenFlow) configureHTTPClient(ctx context.Context) {
 }
 
 // validate the client is configured well
-func (c *StaticTokenFlow) validate() error {
+func (c *TokenFlow) validate() error {
 	if c.config.ServiceAccountToken == "" {
 		return errors.New("Service Account Access Token cannot be empty")
 	}
@@ -86,7 +86,7 @@ func (c *StaticTokenFlow) validate() error {
 }
 
 // Do performs the request
-func (c *StaticTokenFlow) Do(req *http.Request) (*http.Response, error) {
+func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}

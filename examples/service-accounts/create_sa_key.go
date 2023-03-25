@@ -21,7 +21,7 @@ const (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewClientWithTokenAuth(ctx, clients.StaticTokenFlowConfig{
+	c := stackit.MustNewClientWithTokenAuth(ctx, clients.TokenFlowConfig{
 		ServiceAccountEmail: serviceAccountEmail,
 		ServiceAccountToken: userToken,
 	})

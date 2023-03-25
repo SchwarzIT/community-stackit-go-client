@@ -11,7 +11,7 @@ import (
 )
 
 type ClientFlowConfig interface {
-	clients.StaticTokenFlowConfig | clients.KeyAccessFlowConfig
+	clients.TokenFlowConfig | clients.KeyFlowConfig
 }
 
 type ClientInterface[f ClientFlowConfig] interface {

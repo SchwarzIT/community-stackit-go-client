@@ -18,17 +18,17 @@ import (
 	"github.com/google/uuid"
 )
 
-// KeyAccessFlow handles auth with SA key
-type KeyAccessFlow struct {
+// KeyFlow handles auth with SA key
+type KeyFlow struct {
 	client     *http.Client
-	config     *KeyAccessFlowConfig
+	config     *KeyFlowConfig
 	key        *ServiceAccountKeyPrivateResponse
 	privateKey *rsa.PrivateKey
 	token      *TokenResponseBody
 }
 
-// KeyAccessFlowConfig is the flow config
-type KeyAccessFlowConfig struct {
+// KeyFlowConfig is the flow config
+type KeyFlowConfig struct {
 	ServiceAccountKeyPath string
 	PrivateKeyPath        string
 	ServiceAccountKey     []byte
@@ -67,19 +67,20 @@ type ServiceAccountKeyPrivateResponse struct {
 }
 
 // GetEnvironment returns the defined API environment
-func (c *KeyAccessFlow) GetEnvironment() env.Environment {
+func (c *KeyFlow) GetEnvironment() env.Environment {
 	return c.config.Environment
 }
 
 // GetConfig returns the flow configuration
-func (c *KeyAccessFlow) GetConfig() KeyAccessFlowConfig {
+func (c *KeyFlow) GetConfig() KeyFlowConfig {
 	if c.config == nil {
-		return KeyAccessFlowConfig{}
+		return KeyFlowConfig{}
 	}
 	return *c.config
 }
 
-func (c *KeyAccessFlow) Init(ctx context.Context, cfg ...KeyAccessFlowConfig) error {
+// Init intializes the flow
+func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	c.client = &http.Client{}
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
@@ -92,7 +93,8 @@ func (c *KeyAccessFlow) Init(ctx context.Context, cfg ...KeyAccessFlowConfig) er
 	return nil
 }
 
-func (c *KeyAccessFlow) Do(req *http.Request) (*http.Response, error) {
+// Do performs the reuqest
+func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 	accessToken, err := c.GetAccessToken()
 	if err != nil {
 		return nil, err
@@ -102,43 +104,58 @@ func (c *KeyAccessFlow) Do(req *http.Request) (*http.Response, error) {
 }
 
 // processConfig processes the given configuration
-func (c *KeyAccessFlow) processConfig(cfg ...KeyAccessFlowConfig) {
-	nc := &KeyAccessFlowConfig{
+func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
+	defaultCfg := c.getConfigFromEnvironment()
+	if len(cfg) > 0 {
+		c.config = mergeConfigs(&cfg[0], defaultCfg)
+	} else {
+		c.config = defaultCfg
+	}
+}
+
+// getConfigFromEnvironment returns a KeyFlowConfig populated with environment variables.
+func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
+	return &KeyFlowConfig{
 		ServiceAccountKeyPath: os.Getenv(ServiceAccountKeyPath),
 		PrivateKeyPath:        os.Getenv(PrivateKeyPath),
 		ServiceAccountKey:     []byte(os.Getenv(ServiceAccountKey)),
 		PrivateKey:            []byte(os.Getenv(PrivateKey)),
 		Environment:           env.Parse(os.Getenv(Environment)),
 	}
-	for _, c := range cfg {
-		if c.ServiceAccountKeyPath != "" {
-			nc.ServiceAccountKeyPath = c.ServiceAccountKeyPath
-		}
-		if c.PrivateKeyPath != "" {
-			nc.PrivateKeyPath = c.PrivateKeyPath
-		}
-		if len(c.ServiceAccountKey) != 0 {
-			nc.ServiceAccountKey = c.ServiceAccountKey
-		}
-		if len(c.PrivateKey) != 0 {
-			nc.PrivateKey = c.PrivateKey
-		}
-		if c.Environment != "" {
-			nc.Environment = c.Environment
-		}
+}
+
+// mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and defaultCfg.
+func mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
+	merged := *defaultCfg
+
+	if cfg.ServiceAccountKeyPath != "" {
+		merged.ServiceAccountKeyPath = cfg.ServiceAccountKeyPath
 	}
-	c.config = nc
+	if cfg.PrivateKeyPath != "" {
+		merged.PrivateKeyPath = cfg.PrivateKeyPath
+	}
+	if len(cfg.ServiceAccountKey) != 0 {
+		merged.ServiceAccountKey = cfg.ServiceAccountKey
+	}
+	if len(cfg.PrivateKey) != 0 {
+		merged.PrivateKey = cfg.PrivateKey
+	}
+	if cfg.Environment != "" {
+		merged.Environment = cfg.Environment
+	}
+
+	return &merged
 }
 
 // configureHTTPClient configures the HTTP client
-func (c *KeyAccessFlow) configureHTTPClient(ctx context.Context) {
+func (c *KeyFlow) configureHTTPClient(ctx context.Context) {
 	client := &http.Client{}
 	client.Timeout = time.Second * 10
 	c.client = client
 }
 
 // validate the client is configured well
-func (c *KeyAccessFlow) validateConfig() error {
+func (c *KeyFlow) validateConfig() error {
 	if len(c.config.ServiceAccountKey) == 0 && c.config.ServiceAccountKeyPath == "" {
 		return errors.New("Service Account Key or Key path must be specified")
 	}
@@ -150,7 +167,7 @@ func (c *KeyAccessFlow) validateConfig() error {
 
 // loadFiles checks if files need to be loaded from specified paths
 // and sets them accordingly
-func (c *KeyAccessFlow) loadFiles() error {
+func (c *KeyFlow) loadFiles() error {
 	if len(c.config.ServiceAccountKey) == 0 {
 		b, err := os.ReadFile(c.config.ServiceAccountKeyPath)
 		if err != nil {
@@ -178,7 +195,7 @@ func (c *KeyAccessFlow) loadFiles() error {
 }
 
 // generateSelfSignedJWT generates JWT token
-func (c *KeyAccessFlow) generateSelfSignedJWT() (string, error) {
+func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	claims := jwt.MapClaims{
 		"iss": c.key.Credentials.Iss,
 		"sub": c.key.Credentials.Sub,
@@ -203,7 +220,7 @@ var tokenAPI = env.URLs(
 	"https://api-dev.stackit.cloud/service-account/token",
 )
 
-func (c *KeyAccessFlow) CreateAccessToken() error {
+func (c *KeyFlow) CreateAccessToken() error {
 	grant := url.PathEscape("urn:ietf:params:oauth:grant-type:jwt-bearer")
 	assertion, err := c.generateSelfSignedJWT()
 	if err != nil {
@@ -216,7 +233,7 @@ func (c *KeyAccessFlow) CreateAccessToken() error {
 	return c.parseTokenResponse(res)
 }
 
-func (c *KeyAccessFlow) CreateAccessTokenWithRefreshToken() error {
+func (c *KeyFlow) CreateAccessTokenWithRefreshToken() error {
 	res, err := c.requestToken("refresh_token", c.token.RefreshToken)
 	if err != nil {
 		return err
@@ -225,13 +242,13 @@ func (c *KeyAccessFlow) CreateAccessTokenWithRefreshToken() error {
 }
 
 // validateToken parses and validates a JWT token
-func (c *KeyAccessFlow) parseToken(token string) (*jwt.Token, error) {
+func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
 		return c.config.PrivateKey, nil
 	})
 }
 
-func (c *KeyAccessFlow) validateToken(token string) (bool, error) {
+func (c *KeyFlow) validateToken(token string) (bool, error) {
 	if token == "" {
 		return false, nil
 	}
@@ -241,7 +258,7 @@ func (c *KeyAccessFlow) validateToken(token string) (bool, error) {
 	return true, nil
 }
 
-func (c *KeyAccessFlow) GetAccessToken() (string, error) {
+func (c *KeyFlow) GetAccessToken() (string, error) {
 	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
 	if err != nil {
 		return "", err
@@ -256,7 +273,7 @@ func (c *KeyAccessFlow) GetAccessToken() (string, error) {
 	return c.token.AccessToken, nil
 }
 
-func (c *KeyAccessFlow) recreateAccessToken() error {
+func (c *KeyFlow) recreateAccessToken() error {
 	refreshTokenIsValid, err := c.validateToken(c.token.RefreshToken)
 	if err != nil {
 		return err
@@ -267,7 +284,7 @@ func (c *KeyAccessFlow) recreateAccessToken() error {
 	return c.CreateAccessToken()
 }
 
-func (c *KeyAccessFlow) requestToken(grant, assertion string) (*http.Response, error) {
+func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) {
 	payload := strings.NewReader(fmt.Sprintf("grant_type=%s&assertion=%s", grant, assertion))
 	req, err := http.NewRequest(http.MethodPost, tokenAPI.GetURL(c.GetEnvironment()), payload)
 	if err != nil {
@@ -276,7 +293,7 @@ func (c *KeyAccessFlow) requestToken(grant, assertion string) (*http.Response, e
 	return do(&http.Client{}, req, 3, time.Second, time.Minute)
 }
 
-func (c *KeyAccessFlow) parseTokenResponse(res *http.Response) error {
+func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
 	if res == nil || res.StatusCode != http.StatusOK {
 		return errors.New("received bad response from API")
 	}
