@@ -33,39 +33,39 @@ After the service account has been created, you can authenticate to the client u
 
 2. Create a service account key:
 
-   1. copy the private key to `examples/service-accounts`
+   2.1. copy the private key to `examples/service-accounts`
 
-   2. Modify `create_sa_key.go` (fill out the consts)
+   2.2. Modify `create_sa_key.go` (fill out the consts)
 
-   3. Run with:  
+   2.3. Run with:  
 
-        ```bash
-        go run create_sa_key.go
-        ```
+    ```bash
+    go run create_sa_key.go
+    ```
 
-   4. Set environment variables:
+   2.4. Set environment variables:
 
-        ```bash
-        export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
-        export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
-        ```
+    ```bash
+    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
+    export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
+    ```
 
-   5. Configure the client
+   2.5. Configure the client
 
-        ```go
-        package main
+    ```go
+    package main
+    
+    import (
+        "context"
+        stackit "github.com/SchwarzIT/community-stackit-go-client"
+    )
 
-        import (
-            "context"
-            stackit "github.com/SchwarzIT/community-stackit-go-client"
-        )
-
-        func main() {
-            ctx := context.Background()
-            c := stackit.MustNewClientWithTokenAuth(ctx)
-            // ...
-        }
-        ```
+    func main() {
+        ctx := context.Background()
+        c := stackit.MustNewClientWithTokenAuth(ctx)
+        // ...
+    }
+    ```
 
 ### Token flow
 
