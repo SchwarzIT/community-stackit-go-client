@@ -110,6 +110,24 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 	return do(c.client, req, 3, time.Second, time.Minute*2)
 }
 
+// GetAccessToken returns short-lived access token
+func (c *KeyFlow) GetAccessToken() (string, error) {
+	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
+	if err != nil {
+		return "", err
+	}
+	if accessTokenIsValid {
+		return c.token.AccessToken, nil
+	}
+
+	if err := c.recreateAccessToken(); err != nil {
+		return "", err
+	}
+	return c.token.AccessToken, nil
+}
+
+// Flow Configuration
+
 // processConfig processes the given configuration
 func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
 	defaultCfg := c.getConfigFromEnvironment()
@@ -201,6 +219,45 @@ func (c *KeyFlow) loadFiles() error {
 	return nil
 }
 
+// Flow auth functions
+
+// recreateAccessToken is used to create a new access token
+// when the existing one isn't valid anymore
+func (c *KeyFlow) recreateAccessToken() error {
+	refreshTokenIsValid, err := c.validateToken(c.token.RefreshToken)
+	if err != nil {
+		return err
+	}
+	if refreshTokenIsValid {
+		return c.createAccessTokenWithRefreshToken()
+	}
+	return c.createAccessToken()
+}
+
+// createAccessToken creates an access token using self signed JWT
+func (c *KeyFlow) createAccessToken() error {
+	grant := url.PathEscape("urn:ietf:params:oauth:grant-type:jwt-bearer")
+	assertion, err := c.generateSelfSignedJWT()
+	if err != nil {
+		return err
+	}
+	res, err := c.requestToken(grant, assertion)
+	if err != nil {
+		return err
+	}
+	return c.parseTokenResponse(res)
+}
+
+// createAccessTokenWithRefreshToken creates an access token using
+// an existing pre-validated refresh token
+func (c *KeyFlow) createAccessTokenWithRefreshToken() error {
+	res, err := c.requestToken("refresh_token", c.token.RefreshToken)
+	if err != nil {
+		return err
+	}
+	return c.parseTokenResponse(res)
+}
+
 // generateSelfSignedJWT generates JWT token
 func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	claims := jwt.MapClaims{
@@ -220,27 +277,6 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	return tokenString, nil
 }
 
-func (c *KeyFlow) CreateAccessToken() error {
-	grant := url.PathEscape("urn:ietf:params:oauth:grant-type:jwt-bearer")
-	assertion, err := c.generateSelfSignedJWT()
-	if err != nil {
-		return err
-	}
-	res, err := c.requestToken(grant, assertion)
-	if err != nil {
-		return err
-	}
-	return c.parseTokenResponse(res)
-}
-
-func (c *KeyFlow) CreateAccessTokenWithRefreshToken() error {
-	res, err := c.requestToken("refresh_token", c.token.RefreshToken)
-	if err != nil {
-		return err
-	}
-	return c.parseTokenResponse(res)
-}
-
 // validateToken parses and validates a JWT token
 func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
@@ -248,6 +284,7 @@ func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 	})
 }
 
+// validateToken returns true if tokeb is valid
 func (c *KeyFlow) validateToken(token string) (bool, error) {
 	if token == "" {
 		return false, nil
@@ -258,32 +295,7 @@ func (c *KeyFlow) validateToken(token string) (bool, error) {
 	return true, nil
 }
 
-func (c *KeyFlow) GetAccessToken() (string, error) {
-	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
-	if err != nil {
-		return "", err
-	}
-	if accessTokenIsValid {
-		return c.token.AccessToken, nil
-	}
-
-	if err := c.recreateAccessToken(); err != nil {
-		return "", err
-	}
-	return c.token.AccessToken, nil
-}
-
-func (c *KeyFlow) recreateAccessToken() error {
-	refreshTokenIsValid, err := c.validateToken(c.token.RefreshToken)
-	if err != nil {
-		return err
-	}
-	if refreshTokenIsValid {
-		return c.CreateAccessTokenWithRefreshToken()
-	}
-	return c.CreateAccessToken()
-}
-
+// requestToken makes a request to the SA token API
 func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) {
 	payload := strings.NewReader(fmt.Sprintf("grant_type=%s&assertion=%s", grant, assertion))
 	req, err := http.NewRequest(http.MethodPost, tokenAPI.GetURL(c.GetEnvironment()), payload)
@@ -293,6 +305,7 @@ func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) 
 	return do(&http.Client{}, req, 3, time.Second, time.Minute)
 }
 
+// parseTokenResponse parses the response from the server
 func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
 	if res == nil || res.StatusCode != http.StatusOK {
 		return errors.New("received bad response from API")
