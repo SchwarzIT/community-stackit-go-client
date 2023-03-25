@@ -33,12 +33,12 @@ type TokenFlowConfig struct {
 
 // GetEnvironment returns the defined API environment
 func (c *TokenFlow) GetEnvironment() env.Environment {
-	return c.config.Environment
+	return c.GetConfig().Environment
 }
 
 // GetServiceAccountEmail returns the service account email
 func (c *TokenFlow) GetServiceAccountEmail() string {
-	return c.config.ServiceAccountEmail
+	return c.GetConfig().ServiceAccountEmail
 }
 
 // GetConfig returns the flow configuration

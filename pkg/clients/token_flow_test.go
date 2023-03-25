@@ -67,14 +67,44 @@ func TestTokenFlow_Init(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{"ok", args{context.Background(), []TokenFlowConfig{
+			{
+				ServiceAccountEmail: "abc",
+				ServiceAccountToken: "efg",
+			},
+		}}, false},
+		{"error 1", args{context.Background(), []TokenFlowConfig{
+			{
+				ServiceAccountEmail: "",
+				ServiceAccountToken: "",
+			},
+		}}, true},
+		{"error 2", args{context.Background(), []TokenFlowConfig{
+			{
+				ServiceAccountEmail: "",
+				ServiceAccountToken: "efg",
+			},
+		}}, true},
 	}
+	a := os.Getenv(ServiceAccountEmail)
+	b := os.Getenv(ServiceAccountToken)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &TokenFlow{}
+			assert.EqualValues(t, "", c.GetEnvironment())
+
+			os.Setenv(ServiceAccountEmail, "")
+			os.Setenv(ServiceAccountToken, "")
 			if err := c.Init(tt.args.ctx, tt.args.cfg...); (err != nil) != tt.wantErr {
 				t.Errorf("TokenFlow.Init() error = %v, wantErr %v", err, tt.wantErr)
 			}
+			os.Setenv(ServiceAccountEmail, a)
+			os.Setenv(ServiceAccountToken, b)
+			if c.config == nil {
+				t.Error("config is nil")
+			}
+			assert.EqualValues(t, "prod", c.GetEnvironment())
+			assert.EqualValues(t, c.config.ServiceAccountEmail, c.GetServiceAccountEmail())
 		})
 	}
 }
