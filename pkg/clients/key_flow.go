@@ -18,6 +18,13 @@ import (
 	"github.com/google/uuid"
 )
 
+var tokenAPI = env.URLs(
+	"token",
+	"https://api.stackit.cloud/service-account/token",
+	"https://api-qa.stackit.cloud/service-account/token",
+	"https://api-dev.stackit.cloud/service-account/token",
+)
+
 // KeyFlow handles auth with SA key
 type KeyFlow struct {
 	client     *http.Client
@@ -212,13 +219,6 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	}
 	return tokenString, nil
 }
-
-var tokenAPI = env.URLs(
-	"token",
-	"https://api.stackit.cloud/service-account/token",
-	"https://api-qa.stackit.cloud/service-account/token",
-	"https://api-dev.stackit.cloud/service-account/token",
-)
 
 func (c *KeyFlow) CreateAccessToken() error {
 	grant := url.PathEscape("urn:ietf:params:oauth:grant-type:jwt-bearer")
