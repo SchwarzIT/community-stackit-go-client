@@ -55,6 +55,7 @@ type KeyFlowConfig struct {
 	ServiceAccountKey     []byte
 	PrivateKey            []byte
 	Environment           env.Environment
+	ClientRetry           *RetryConfig
 }
 
 // TokenResponseBody is the API response
@@ -114,6 +115,9 @@ func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	c.token = new(TokenResponseBody)
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
+	if c.config.ClientRetry == nil {
+		c.config.ClientRetry = NewRetryConfig()
+	}
 	if err := c.validateConfig(); err != nil {
 		return err
 	}
@@ -130,7 +134,7 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	return do(c.client, req, 3, time.Second, time.Minute*2)
+	return do(c.client, req, c.config.ClientRetry)
 }
 
 // GetAccessToken returns short-lived access token
@@ -198,7 +202,7 @@ func (c *KeyFlow) mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
 // configureHTTPClient configures the HTTP client
 func (c *KeyFlow) configureHTTPClient(ctx context.Context) {
 	client := &http.Client{}
-	client.Timeout = time.Second * 10
+	client.Timeout = DefaultClientTimeout
 	c.client = client
 }
 
@@ -330,7 +334,7 @@ func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) 
 		return nil, err
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	return do(&http.Client{}, req, 3, time.Second, time.Minute)
+	return do(&http.Client{}, req, c.config.ClientRetry)
 }
 
 // parseTokenResponse parses the response from the server

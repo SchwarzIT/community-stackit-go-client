@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"golang.org/x/oauth2"
@@ -29,6 +28,7 @@ type TokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
 	Environment         env.Environment
+	ClientRetry         *RetryConfig
 }
 
 // GetEnvironment returns the defined API environment
@@ -52,6 +52,9 @@ func (c *TokenFlow) GetConfig() TokenFlowConfig {
 func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
+	if c.config.ClientRetry == nil {
+		c.config.ClientRetry = NewRetryConfig()
+	}
 	return c.validate()
 }
 
@@ -98,7 +101,7 @@ func (c *TokenFlow) configureHTTPClient(ctx context.Context) {
 		&oauth2.Token{AccessToken: c.config.ServiceAccountToken},
 	)
 	o2nc := oauth2.NewClient(ctx, sts)
-	o2nc.Timeout = time.Second * 10
+	o2nc.Timeout = DefaultClientTimeout
 	c.client = o2nc
 }
 
@@ -118,5 +121,5 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}
-	return do(c.client, req, 3, time.Second, time.Minute*2)
+	return do(c.client, req, c.config.ClientRetry)
 }
