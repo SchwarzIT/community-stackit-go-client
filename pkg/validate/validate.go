@@ -196,9 +196,9 @@ func Duration(s string) (time.Duration, error) {
 	return parse.AbsoluteDuration(time.Now(), s)
 }
 
-// ErrorHasAnySubstr checks checks if a given error message
+// ErrorIsOneOf checks checks if a given error message
 // has one of the provided sub strings
-func ErrorHasAnySubstr(err error, msgs ...string) bool {
+func ErrorIsOneOf(err error, msgs ...string) bool {
 	if err == nil {
 		return false
 	}

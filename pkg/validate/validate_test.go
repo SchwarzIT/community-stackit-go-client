@@ -277,7 +277,7 @@ func TestStatusEquals(t *testing.T) {
 	}
 }
 
-func TestErrorHasAnySubstr(t *testing.T) {
+func TestErrorIsOneOf(t *testing.T) {
 	type args struct {
 		err  error
 		msgs []string
@@ -295,7 +295,7 @@ func TestErrorHasAnySubstr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := validate.ErrorHasAnySubstr(tt.args.err, tt.args.msgs...); got != tt.want {
+			if got := validate.ErrorIsOneOf(tt.args.err, tt.args.msgs...); got != tt.want {
 				t.Errorf("ErrorHasAnySubstr() = %v, want %v", got, tt.want)
 			}
 		})

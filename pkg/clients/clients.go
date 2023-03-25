@@ -32,7 +32,7 @@ func do(client *http.Client, req *http.Request, maxRetries int, retryWait, retry
 			resp, err = client.Do(req)
 			if err != nil {
 				if maxRetries > 0 {
-					if validate.ErrorHasAnySubstr(err, ClientTimeoutErr, ClientContextDeadlineErr, ClientConnectionRefusedErr, ClientGWTimeoutFError) ||
+					if validate.ErrorIsOneOf(err, ClientTimeoutErr, ClientContextDeadlineErr, ClientConnectionRefusedErr, ClientGWTimeoutFError) ||
 						(req.Method == http.MethodGet && strings.Contains(err.Error(), ClientEOFError)) {
 
 						// reduce retries counter and retry
