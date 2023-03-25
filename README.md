@@ -161,6 +161,8 @@ After the service account has been created, you can authenticate to the client u
    }
    ```
 
+&nbsp;
+
 ## Contributing
 
 If you find a bug or have an idea for a new feature, feel free to submit an issue or pull request!
