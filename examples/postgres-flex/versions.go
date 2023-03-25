@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewClientWithTokenAuth(ctx)
+	c := stackit.MustNewClientWithKeyAuth(ctx)
 
 	res, err := c.PostgresFlex.Versions.List(ctx, os.Getenv("STACKIT_PROJECT_ID"))
 	if err = validate.Response(res, err, "JSON200.Versions"); err != nil {

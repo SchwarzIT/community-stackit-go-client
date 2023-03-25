@@ -3,7 +3,9 @@ package clients
 import (
 	"context"
 	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -33,6 +35,10 @@ var tokenAPI = env.URLs(
 	"https://api.stackit.cloud/service-account/token",
 	"https://api-qa.stackit.cloud/service-account/token",
 	"https://api-dev.stackit.cloud/service-account/token",
+)
+
+const (
+	PrivateKeyBlockType = "PRIVATE KEY"
 )
 
 // KeyFlow handles auth with SA key
@@ -107,6 +113,7 @@ func (c *KeyFlow) GetServiceAccountEmail() string {
 // Init intializes the flow
 func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	c.client = &http.Client{}
+	c.token = new(TokenResponseBody)
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
 	if err := c.validateConfig(); err != nil {
@@ -218,7 +225,7 @@ func (c *KeyFlow) loadFiles() error {
 		}
 		c.config.ServiceAccountKey = b
 	}
-	if len(c.config.ServiceAccountKey) == 0 {
+	if len(c.config.PrivateKey) == 0 {
 		b, err := os.ReadFile(c.config.PrivateKeyPath)
 		if err != nil {
 			return err
@@ -230,11 +237,62 @@ func (c *KeyFlow) loadFiles() error {
 	if err != nil {
 		return err
 	}
+
+	// privateKey, err := c.parsePrivateKeyPEM(c.config.PrivateKey)
+	// if err != nil {
+	// 	return err
+	// }
+	// pem, err := c.encodePrivateKeyToPEM(privateKey)
+	// if err != nil {
+	// 	return err
+	// }
 	c.privateKey, err = jwt.ParseRSAPrivateKeyFromPEM(c.config.PrivateKey)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// parsePrivateKeyPEM returns a RSA private key parsed from a PEM block in the supplied data.
+func (c *KeyFlow) parsePrivateKeyPEM(keyData []byte) (*rsa.PrivateKey, error) {
+	var privateKeyPemBlock *pem.Block
+	for {
+		privateKeyPemBlock, keyData = pem.Decode(keyData)
+
+		// The service account API returns a private key of type "PRIVATE KEY"
+		// so here that's the only accepted pem block type
+		if privateKeyPemBlock == nil || privateKeyPemBlock.Type != PrivateKeyBlockType {
+			break
+		}
+
+		// RSA Private Key in unencrypted PKCS#8 format
+		key, err := x509.ParsePKCS8PrivateKey(privateKeyPemBlock.Bytes)
+		if err == nil {
+			return key.(*rsa.PrivateKey), nil
+		}
+	}
+
+	// we read all the PEM blocks and didn't recognize one
+	return nil, fmt.Errorf("data does not contain a valid RSA private key")
+}
+
+func (c *KeyFlow) encodePrivateKeyToPEM(privateKey *rsa.PrivateKey) ([]byte, error) {
+	// Get ASN.1 DER format
+	privDER, err := x509.MarshalPKCS8PrivateKey(privateKey)
+	if err != nil {
+		return nil, err
+	}
+
+	// pem.Block
+	privBlock := pem.Block{
+		Type:    "PRIVATE KEY",
+		Headers: nil,
+		Bytes:   privDER,
+	}
+
+	// Private key in PEM format
+	privatePEM := pem.EncodeToMemory(&privBlock)
+	return privatePEM, nil
 }
 
 // Flow auth functions
@@ -325,8 +383,11 @@ func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) 
 
 // parseTokenResponse parses the response from the server
 func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
-	if res == nil || res.StatusCode != http.StatusOK {
+	if res == nil {
 		return errors.New("received bad response from API")
+	}
+	if res.StatusCode != http.StatusOK {
+		return fmt.Errorf("received: %+v", res)
 	}
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {

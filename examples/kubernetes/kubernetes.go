@@ -10,19 +10,15 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewClientWithTokenAuth(ctx)
+	c := stackit.MustNewClientWithKeyAuth(ctx)
 
 	res, err := c.Kubernetes.ProviderOptions.List(ctx)
 	if err = validate.Response(res, err, "JSON200.AvailabilityZones"); err != nil {
-		panic(err)
-	}
-
-	if len(*res.JSON200.AvailabilityZones) == 0 {
-		fmt.Println("No Kubernetes availability zones found")
+		fmt.Println(err)
 		return
 	}
 
-	fmt.Println("We found the following Kubernetes availability zones:")
+	fmt.Println("STACKIT Kubernetes Engine (SKE) availability zones:")
 	for _, zone := range *res.JSON200.AvailabilityZones {
 		if zone.Name == nil {
 			continue
