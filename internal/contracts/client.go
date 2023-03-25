@@ -16,6 +16,7 @@ type ClientFlowConfig interface {
 
 type ClientInterface[f ClientFlowConfig] interface {
 	Do(req *http.Request) (*http.Response, error)
-	GetEnvironment() env.Environment
 	GetConfig() f
+	GetEnvironment() env.Environment
+	GetServiceAccountEmail() string
 }

@@ -11,6 +11,13 @@ import (
 	"golang.org/x/oauth2"
 )
 
+const (
+	// Auth flow options:
+	// Service Account Token Flow
+	ServiceAccountEmail = "STACKIT_SERVICE_ACCOUNT_EMAIL"
+	ServiceAccountToken = "STACKIT_SERVICE_ACCOUNT_TOKEN"
+)
+
 // TokenFlow handles auth with SA static token
 type TokenFlow struct {
 	client *http.Client
@@ -27,6 +34,11 @@ type TokenFlowConfig struct {
 // GetEnvironment returns the defined API environment
 func (c *TokenFlow) GetEnvironment() env.Environment {
 	return c.config.Environment
+}
+
+// GetServiceAccountEmail returns the service account email
+func (c *TokenFlow) GetServiceAccountEmail() string {
+	return c.config.ServiceAccountEmail
 }
 
 // GetConfig returns the flow configuration

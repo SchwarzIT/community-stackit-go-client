@@ -13,19 +13,6 @@ import (
 const (
 	// API configuration options:
 	Environment = "STACKIT_ENV"
-
-	// Auth flow options:
-	// Service Account Token Flow
-	ServiceAccountEmail = "STACKIT_SERVICE_ACCOUNT_EMAIL"
-	ServiceAccountToken = "STACKIT_SERVICE_ACCOUNT_TOKEN"
-
-	// Key Access Flow (1)
-	ServiceAccountKey = "STACKIT_SERVICE_ACCOUNT_KEY"
-	PrivateKey        = "STACKIT_PRIVATE_KEY"
-
-	// Key Access Flow (2) using file paths
-	ServiceAccountKeyPath = "STACKIT_SERVICE_ACCOUNT_KEY_PATH"
-	PrivateKeyPath        = "STACKIT_PRIVATE_KEY_PATH"
 )
 
 const (

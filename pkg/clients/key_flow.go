@@ -18,6 +18,16 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	// Key Access Flow (1)
+	ServiceAccountKey = "STACKIT_SERVICE_ACCOUNT_KEY"
+	PrivateKey        = "STACKIT_PRIVATE_KEY"
+
+	// Key Access Flow (2) using file paths
+	ServiceAccountKeyPath = "STACKIT_SERVICE_ACCOUNT_KEY_PATH"
+	PrivateKeyPath        = "STACKIT_PRIVATE_KEY_PATH"
+)
+
 var tokenAPI = env.URLs(
 	"token",
 	"https://api.stackit.cloud/service-account/token",
@@ -84,6 +94,14 @@ func (c *KeyFlow) GetConfig() KeyFlowConfig {
 		return KeyFlowConfig{}
 	}
 	return *c.config
+}
+
+// GetServiceAccountEmail returns the service account email
+func (c *KeyFlow) GetServiceAccountEmail() string {
+	if c.key == nil {
+		return ""
+	}
+	return c.key.Credentials.Iss
 }
 
 // Init intializes the flow

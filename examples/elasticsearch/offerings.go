@@ -5,12 +5,16 @@ import (
 	"fmt"
 
 	stackit "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewClientWithTokenAuth(ctx)
+	c, err := stackit.NewClientWithKeyAuth(ctx, clients.KeyFlowConfig{})
+	if err != nil {
+		panic(err)
+	}
 
 	res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
 	if err = validate.Response(res, err, "JSON200"); err != nil {
