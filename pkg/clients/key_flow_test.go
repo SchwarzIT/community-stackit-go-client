@@ -21,7 +21,7 @@ func TestKeyFlow_processConfig(t *testing.T) {
 	os.Setenv(ServiceAccountKeyPath, "test 2")
 	os.Setenv(PrivateKey, "test 3")
 	os.Setenv(ServiceAccountKey, "test 4")
-	os.Setenv(Environment, "dev")
+	os.Setenv(Environment, "qa")
 
 	kf := &KeyFlow{}
 	kf.processConfig()
@@ -31,7 +31,7 @@ func TestKeyFlow_processConfig(t *testing.T) {
 		ServiceAccountKeyPath: "test 2",
 		PrivateKey:            []byte("test 3"),
 		ServiceAccountKey:     []byte("test 4"),
-		Environment:           env.Parse("dev"),
+		Environment:           env.Parse("qa"),
 	}
 	assert.EqualValues(t, want, *kf.config)
 
@@ -54,7 +54,7 @@ func TestKeyFlow_processConfig(t *testing.T) {
 			{ServiceAccountKeyPath: "test 2"},
 			{PrivateKey: []byte("test 3")},
 			{ServiceAccountKey: []byte("test 4")},
-			{Environment: "dev"},
+			{Environment: "qa"},
 		}}},
 	}
 	for _, tt := range tests {
