@@ -60,12 +60,9 @@ func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 
 // processConfig processes the given configuration
 func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
-	defaultCfg := c.getConfigFromEnvironment()
-
-	if len(cfg) > 0 {
-		c.config = c.mergeConfigs(&cfg[0], defaultCfg)
-	} else {
-		c.config = defaultCfg
+	c.config = c.getConfigFromEnvironment()
+	for _, m := range cfg {
+		c.config = c.mergeConfigs(&m, c.config)
 	}
 }
 
@@ -78,9 +75,9 @@ func (c *TokenFlow) getConfigFromEnvironment() *TokenFlowConfig {
 	}
 }
 
-// mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and defaultCfg.
-func (c *TokenFlow) mergeConfigs(cfg, defaultCfg *TokenFlowConfig) *TokenFlowConfig {
-	merged := *defaultCfg
+// mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and currentCfg.
+func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowConfig {
+	merged := *currentCfg
 
 	if cfg.ServiceAccountEmail != "" {
 		merged.ServiceAccountEmail = cfg.ServiceAccountEmail

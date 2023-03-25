@@ -157,11 +157,9 @@ func (c *KeyFlow) GetAccessToken() (string, error) {
 
 // processConfig processes the given configuration
 func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
-	defaultCfg := c.getConfigFromEnvironment()
-	if len(cfg) > 0 {
-		c.config = c.mergeConfigs(&cfg[0], defaultCfg)
-	} else {
-		c.config = defaultCfg
+	c.config = c.getConfigFromEnvironment()
+	for _, m := range cfg {
+		c.config = c.mergeConfigs(&m, c.config)
 	}
 }
 
@@ -176,9 +174,9 @@ func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
 	}
 }
 
-// mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and defaultCfg.
-func (c *KeyFlow) mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
-	merged := *defaultCfg
+// mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and currentCfg.
+func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
+	merged := *currentCfg
 
 	if cfg.ServiceAccountKeyPath != "" {
 		merged.ServiceAccountKeyPath = cfg.ServiceAccountKeyPath
