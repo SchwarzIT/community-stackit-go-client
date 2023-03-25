@@ -16,6 +16,66 @@ go get github.com/SchwarzIT/community-stackit-go-client
 
 &nbsp;
 
+## Usage
+
+1. Create a file called `example.go`:
+
+    ```go
+    package main
+
+    import (
+        "context"
+        "fmt"
+
+        stackit "github.com/SchwarzIT/community-stackit-go-client"
+        "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+    )
+
+    func main() {
+        ctx := context.Background()
+        c := stackit.MustNewClientWithKeyAuth(ctx)
+
+        res, err := c.Kubernetes.ProviderOptions.List(ctx)
+        if err = validate.Response(res, err, "JSON200.AvailabilityZones"); err != nil {
+            fmt.Println(err)
+            return
+        }
+
+        fmt.Println("STACKIT Kubernetes Engine (SKE) availability zones:")
+        for _, zone := range *res.JSON200.AvailabilityZones {
+            if zone.Name == nil {
+                continue
+            }
+            fmt.Printf("- %s\n", *zone.Name)
+        }
+    }
+    ```
+
+2. Make sure environment variables for key flow are in place (read more in the `Authentication` section below)
+
+3. Now you can run the example with the following command:
+
+    ```bash
+    go run example.go
+    ```
+
+    output should look similar to:
+
+    ```text
+    STACKIT Kubernetes Engine (SKE) availability zones:
+    - eu01-m
+    - eu01-1
+    - eu01-2
+    - eu01-3
+    ```
+
+### Further Examples
+
+1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
+2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
+
+&nbsp;
+
 ## Authentication
 
 Before you can start using the client, you will need to create a STACKIT Service Account in your project and assign it the appropriate permissions (i.e. `project.owner`).
@@ -100,50 +160,6 @@ After the service account has been created, you can authenticate to the client u
        // ...
    }
    ```
-
-## Usage
-
-Create a file called `example.go`:
-
-```go
-package main
-
-import (
-    "context"
-    "fmt"
-
-    stackit "github.com/SchwarzIT/community-stackit-go-client"
-    "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
-)
-
-func main() {
-    ctx := context.Background()
-    c := stackit.MustNewClientWithTokenAuth(ctx)
-
-    res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
-    if err = validate.Response(res, err, "JSON200"); err != nil {
-        panic(err)
-    }
-
-    fmt.Println("Received the following offerings:")
-    for _, o := range res.JSON200.Offerings {
-        fmt.Printf("- %s\n", o.Name)
-    }
-}
-```
-
-Then, you can run the example with the following command:
-
-```bash
-go run example.go
-```
-
-### Further Examples
-
-1. Under [`/examples`](https://github.com/SchwarzIT/community-stackit-go-client/tree/main/examples) directory
-2. In our [`terraform-provider-stackit`](https://github.com/SchwarzIT/terraform-provider-stackit)
-
-&nbsp;
 
 ## Contributing
 
