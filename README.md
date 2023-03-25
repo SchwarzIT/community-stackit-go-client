@@ -33,11 +33,11 @@ After the service account has been created, you can authenticate to the client u
 
 2. Create a service account key:
 
-   2.1. copy the private key to `examples/service-accounts`
+   - copy the private key to `examples/service-accounts`
 
-   2.2. Modify `create_sa_key.go` (fill out the consts)
+   - Modify `create_sa_key.go` (fill out the consts)
 
-   2.3. Run with:  
+   - Run with:  
 
     ```bash
     go run create_sa_key.go
@@ -50,11 +50,11 @@ After the service account has been created, you can authenticate to the client u
     export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
     ```
 
-   2.5. Configure the client
+   - Configure the client
 
     ```go
     package main
-    
+
     import (
         "context"
         stackit "github.com/SchwarzIT/community-stackit-go-client"
