@@ -43,7 +43,7 @@ After the service account has been created, you can authenticate to the client u
     go run create_sa_key.go
     ```
 
-   2.4. Set environment variables:
+   - Set environment variables:
 
     ```bash
     export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
