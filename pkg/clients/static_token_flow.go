@@ -87,5 +87,8 @@ func (c *StaticTokenFlow) validate() error {
 
 // Do performs the request
 func (c *StaticTokenFlow) Do(req *http.Request) (*http.Response, error) {
+	if c.client == nil {
+		return nil, errors.New("please run Init()")
+	}
 	return do(c.client, req, 3, time.Second, time.Minute*2)
 }

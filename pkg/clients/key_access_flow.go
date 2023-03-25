@@ -80,15 +80,25 @@ func (c *KeyAccessFlow) GetConfig() KeyAccessFlowConfig {
 }
 
 func (c *KeyAccessFlow) Init(ctx context.Context, cfg ...KeyAccessFlowConfig) error {
+	c.client = &http.Client{}
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
-	if err := c.validate(); err != nil {
+	if err := c.validateConfig(); err != nil {
 		return err
 	}
 	if err := c.loadFiles(); err != nil {
 		return err
 	}
 	return nil
+}
+
+func (c *KeyAccessFlow) Do(req *http.Request) (*http.Response, error) {
+	accessToken, err := c.GetAccessToken()
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	return do(c.client, req, 3, time.Second, time.Minute*2)
 }
 
 // processConfig processes the given configuration
@@ -122,11 +132,13 @@ func (c *KeyAccessFlow) processConfig(cfg ...KeyAccessFlowConfig) {
 
 // configureHTTPClient configures the HTTP client
 func (c *KeyAccessFlow) configureHTTPClient(ctx context.Context) {
-
+	client := &http.Client{}
+	client.Timeout = time.Second * 10
+	c.client = client
 }
 
 // validate the client is configured well
-func (c *KeyAccessFlow) validate() error {
+func (c *KeyAccessFlow) validateConfig() error {
 	if len(c.config.ServiceAccountKey) == 0 && c.config.ServiceAccountKeyPath == "" {
 		return errors.New("Service Account Key or Key path must be specified")
 	}
@@ -184,10 +196,6 @@ func (c *KeyAccessFlow) generateSelfSignedJWT() (string, error) {
 	return tokenString, nil
 }
 
-func (c *KeyAccessFlow) Do(req *http.Request) (*http.Response, error) {
-	return nil, nil
-}
-
 var tokenAPI = env.URLs(
 	"token",
 	"https://api.stackit.cloud/service-account/token",
@@ -195,21 +203,80 @@ var tokenAPI = env.URLs(
 	"https://api-dev.stackit.cloud/service-account/token",
 )
 
-func (c *KeyAccessFlow) getTokens() error {
+func (c *KeyAccessFlow) CreateAccessToken() error {
 	grant := url.PathEscape("urn:ietf:params:oauth:grant-type:jwt-bearer")
 	assertion, err := c.generateSelfSignedJWT()
 	if err != nil {
 		return err
 	}
+	res, err := c.requestToken(grant, assertion)
+	if err != nil {
+		return err
+	}
+	return c.parseTokenResponse(res)
+}
+
+func (c *KeyAccessFlow) CreateAccessTokenWithRefreshToken() error {
+	res, err := c.requestToken("refresh_token", c.token.RefreshToken)
+	if err != nil {
+		return err
+	}
+	return c.parseTokenResponse(res)
+}
+
+// validateToken parses and validates a JWT token
+func (c *KeyAccessFlow) parseToken(token string) (*jwt.Token, error) {
+	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
+		return c.config.PrivateKey, nil
+	})
+}
+
+func (c *KeyAccessFlow) validateToken(token string) (bool, error) {
+	if token == "" {
+		return false, nil
+	}
+	if _, err := c.parseToken(token); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (c *KeyAccessFlow) GetAccessToken() (string, error) {
+	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
+	if err != nil {
+		return "", err
+	}
+	if accessTokenIsValid {
+		return c.token.AccessToken, nil
+	}
+
+	if err := c.recreateAccessToken(); err != nil {
+		return "", err
+	}
+	return c.token.AccessToken, nil
+}
+
+func (c *KeyAccessFlow) recreateAccessToken() error {
+	refreshTokenIsValid, err := c.validateToken(c.token.RefreshToken)
+	if err != nil {
+		return err
+	}
+	if refreshTokenIsValid {
+		return c.CreateAccessTokenWithRefreshToken()
+	}
+	return c.CreateAccessToken()
+}
+
+func (c *KeyAccessFlow) requestToken(grant, assertion string) (*http.Response, error) {
 	payload := strings.NewReader(fmt.Sprintf("grant_type=%s&assertion=%s", grant, assertion))
 	req, err := http.NewRequest(http.MethodPost, tokenAPI.GetURL(c.GetEnvironment()), payload)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	res, err := do(&http.Client{}, req, 3, time.Second, time.Minute)
-	if err != nil {
-		return err
-	}
+	return do(&http.Client{}, req, 3, time.Second, time.Minute)
+}
+
+func (c *KeyAccessFlow) parseTokenResponse(res *http.Response) error {
 	if res == nil || res.StatusCode != http.StatusOK {
 		return errors.New("received bad response from API")
 	}
@@ -219,22 +286,4 @@ func (c *KeyAccessFlow) getTokens() error {
 	}
 	c.token = new(TokenResponseBody)
 	return json.Unmarshal(body, c.token)
-}
-
-func (c *KeyAccessFlow) makeRequest(httpClient *http.Client, accessToken string) (*http.Response, error) {
-	// Make request using access token
-	// ...
-
-	// Return response or error
-	return nil, nil
-}
-
-func (c *KeyAccessFlow) refreshAccessToken(httpClient *http.Client, refreshToken string) (string, error) {
-	// Make request to refresh access token
-	// ...
-
-	// Parse response to get new access token
-	newAccessToken := "..."
-
-	return newAccessToken, nil
 }
