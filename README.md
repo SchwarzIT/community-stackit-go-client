@@ -39,46 +39,67 @@ After the service account has been created, you can authenticate to the client u
 
    - Run with:  
 
-    ```bash
-    go run create_sa_key.go
-    ```
+        ```bash
+        go run create_sa_key.go
+        ```
 
-   - Set environment variables:
+3. Set environment variables:
 
-    ```bash
-    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
-    export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
-    ```
+   ```bash
+   export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
+   export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
 
-   - Configure the client
+   # optionally modify the API environment to one of:
+   # `dev`, `qa` or `prod` (default)
+   export STACKIT_ENV=prod
+   ```
 
-    ```go
-    package main
+4. Configure the client
 
-    import (
-        "context"
-        stackit "github.com/SchwarzIT/community-stackit-go-client"
-    )
+   ```go
+   package main
 
-    func main() {
-        ctx := context.Background()
-        c := stackit.MustNewClientWithTokenAuth(ctx)
-        // ...
-    }
-    ```
+   import (
+       "context"
+       stackit "github.com/SchwarzIT/community-stackit-go-client"
+   )
+
+   func main() {
+       ctx := context.Background()
+       c := stackit.MustNewClientWithTokenAuth(ctx)
+       // ...
+   }
+   ```
 
 ### Token flow
 
-Set the following environment variables:
+1. Set the following environment variables:
 
-```bash
-export STACKIT_SERVICE_ACCOUNT_EMAIL=email
-export STACKIT_SERVICE_ACCOUNT_TOKEN=token
+    ```bash
+    export STACKIT_SERVICE_ACCOUNT_EMAIL=email
+    export STACKIT_SERVICE_ACCOUNT_TOKEN=token
 
-# optionally modify the API environment to one of:
-# `dev`, `qa` or `prod` (default)
-export STACKIT_ENV=prod
-```
+    # optionally modify the API environment to one of:
+    # `dev`, `qa` or `prod` (default)
+    export STACKIT_ENV=prod
+    ```
+
+2. Configure the client
+
+   ```go
+   package main
+
+   import (
+       "context"
+       stackit "github.com/SchwarzIT/community-stackit-go-client"
+   )
+
+   func main() {
+       ctx := context.Background()
+       c := stackit.MustNewClientWithTokenAuth(ctx)
+       // ...
+   }
+   ```
 
 ## Usage
 
