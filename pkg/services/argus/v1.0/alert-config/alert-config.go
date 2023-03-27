@@ -667,7 +667,7 @@ type RoutesUpdateJSONRequestBody RoutesUpdateJSONBody
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -676,13 +676,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -738,7 +738,7 @@ type rawClientInterface interface {
 	RoutesUpdateRaw(ctx context.Context, projectID string, instanceID string, receiver string, body RoutesUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) ListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -750,7 +750,7 @@ func (c *Client[K]) ListRaw(ctx context.Context, projectID string, instanceID st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -762,7 +762,7 @@ func (c *Client[K]) UpdateRawWithBody(ctx context.Context, projectID string, ins
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -774,7 +774,7 @@ func (c *Client[K]) UpdateRaw(ctx context.Context, projectID string, instanceID 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -786,7 +786,7 @@ func (c *Client[K]) ReceiversListRaw(ctx context.Context, projectID string, inst
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversCreateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversCreateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversCreateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -798,7 +798,7 @@ func (c *Client[K]) ReceiversCreateRawWithBody(ctx context.Context, projectID st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversCreateRaw(ctx context.Context, projectID string, instanceID string, body ReceiversCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversCreateRaw(ctx context.Context, projectID string, instanceID string, body ReceiversCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversCreateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -810,7 +810,7 @@ func (c *Client[K]) ReceiversCreateRaw(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversDeleteRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversDeleteRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversDeleteRequest(ctx, c.Server, projectID, instanceID, receiver)
 	if err != nil {
 		return nil, err
@@ -822,7 +822,7 @@ func (c *Client[K]) ReceiversDeleteRaw(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversReadRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversReadRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversReadRequest(ctx, c.Server, projectID, instanceID, receiver)
 	if err != nil {
 		return nil, err
@@ -834,7 +834,7 @@ func (c *Client[K]) ReceiversReadRaw(ctx context.Context, projectID string, inst
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, receiver, contentType, body)
 	if err != nil {
 		return nil, err
@@ -846,7 +846,7 @@ func (c *Client[K]) ReceiversUpdateRawWithBody(ctx context.Context, projectID st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReceiversUpdateRaw(ctx context.Context, projectID string, instanceID string, receiver string, body ReceiversUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReceiversUpdateRaw(ctx context.Context, projectID string, instanceID string, receiver string, body ReceiversUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReceiversUpdateRequest(ctx, c.Server, projectID, instanceID, receiver, body)
 	if err != nil {
 		return nil, err
@@ -858,7 +858,7 @@ func (c *Client[K]) ReceiversUpdateRaw(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -870,7 +870,7 @@ func (c *Client[K]) RoutesListRaw(ctx context.Context, projectID string, instanc
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesCreateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesCreateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesCreateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -882,7 +882,7 @@ func (c *Client[K]) RoutesCreateRawWithBody(ctx context.Context, projectID strin
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesCreateRaw(ctx context.Context, projectID string, instanceID string, body RoutesCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesCreateRaw(ctx context.Context, projectID string, instanceID string, body RoutesCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesCreateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -894,7 +894,7 @@ func (c *Client[K]) RoutesCreateRaw(ctx context.Context, projectID string, insta
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesDeleteRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesDeleteRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesDeleteRequest(ctx, c.Server, projectID, instanceID, receiver)
 	if err != nil {
 		return nil, err
@@ -906,7 +906,7 @@ func (c *Client[K]) RoutesDeleteRaw(ctx context.Context, projectID string, insta
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesReadRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesReadRaw(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesReadRequest(ctx, c.Server, projectID, instanceID, receiver)
 	if err != nil {
 		return nil, err
@@ -918,7 +918,7 @@ func (c *Client[K]) RoutesReadRaw(ctx context.Context, projectID string, instanc
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, receiver, contentType, body)
 	if err != nil {
 		return nil, err
@@ -930,7 +930,7 @@ func (c *Client[K]) RoutesUpdateRawWithBody(ctx context.Context, projectID strin
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RoutesUpdateRaw(ctx context.Context, projectID string, instanceID string, receiver string, body RoutesUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RoutesUpdateRaw(ctx context.Context, projectID string, instanceID string, receiver string, body RoutesUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRoutesUpdateRequest(ctx, c.Server, projectID, instanceID, receiver, body)
 	if err != nil {
 		return nil, err
@@ -1541,7 +1541,7 @@ func NewRoutesUpdateRequestWithBody(ctx context.Context, server string, projectI
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -1551,18 +1551,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// List request
 	List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
@@ -1909,7 +1909,7 @@ func (r RoutesUpdateResponse) StatusCode() int {
 }
 
 // List request returning *ListResponse
-func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1918,7 +1918,7 @@ func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, ins
 }
 
 // UpdateWithBody request with arbitrary body returning *UpdateResponse
-func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1926,7 +1926,7 @@ func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, projectID s
 	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1935,7 +1935,7 @@ func (c *ClientWithResponses[K]) Update(ctx context.Context, projectID string, i
 }
 
 // ReceiversList request returning *ReceiversListResponse
-func (c *ClientWithResponses[K]) ReceiversList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ReceiversListResponse, error) {
+func (c *ClientWithResponses) ReceiversList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ReceiversListResponse, error) {
 	rsp, err := c.ReceiversListRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1944,7 +1944,7 @@ func (c *ClientWithResponses[K]) ReceiversList(ctx context.Context, projectID st
 }
 
 // ReceiversCreateWithBody request with arbitrary body returning *ReceiversCreateResponse
-func (c *ClientWithResponses[K]) ReceiversCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReceiversCreateResponse, error) {
+func (c *ClientWithResponses) ReceiversCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReceiversCreateResponse, error) {
 	rsp, err := c.ReceiversCreateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1952,7 +1952,7 @@ func (c *ClientWithResponses[K]) ReceiversCreateWithBody(ctx context.Context, pr
 	return c.ParseReceiversCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) ReceiversCreate(ctx context.Context, projectID string, instanceID string, body ReceiversCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ReceiversCreateResponse, error) {
+func (c *ClientWithResponses) ReceiversCreate(ctx context.Context, projectID string, instanceID string, body ReceiversCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*ReceiversCreateResponse, error) {
 	rsp, err := c.ReceiversCreateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1961,7 +1961,7 @@ func (c *ClientWithResponses[K]) ReceiversCreate(ctx context.Context, projectID 
 }
 
 // ReceiversDelete request returning *ReceiversDeleteResponse
-func (c *ClientWithResponses[K]) ReceiversDelete(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*ReceiversDeleteResponse, error) {
+func (c *ClientWithResponses) ReceiversDelete(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*ReceiversDeleteResponse, error) {
 	rsp, err := c.ReceiversDeleteRaw(ctx, projectID, instanceID, receiver, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1970,7 +1970,7 @@ func (c *ClientWithResponses[K]) ReceiversDelete(ctx context.Context, projectID 
 }
 
 // ReceiversRead request returning *ReceiversReadResponse
-func (c *ClientWithResponses[K]) ReceiversRead(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*ReceiversReadResponse, error) {
+func (c *ClientWithResponses) ReceiversRead(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*ReceiversReadResponse, error) {
 	rsp, err := c.ReceiversReadRaw(ctx, projectID, instanceID, receiver, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1979,7 +1979,7 @@ func (c *ClientWithResponses[K]) ReceiversRead(ctx context.Context, projectID st
 }
 
 // ReceiversUpdateWithBody request with arbitrary body returning *ReceiversUpdateResponse
-func (c *ClientWithResponses[K]) ReceiversUpdateWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReceiversUpdateResponse, error) {
+func (c *ClientWithResponses) ReceiversUpdateWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReceiversUpdateResponse, error) {
 	rsp, err := c.ReceiversUpdateRawWithBody(ctx, projectID, instanceID, receiver, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1987,7 +1987,7 @@ func (c *ClientWithResponses[K]) ReceiversUpdateWithBody(ctx context.Context, pr
 	return c.ParseReceiversUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) ReceiversUpdate(ctx context.Context, projectID string, instanceID string, receiver string, body ReceiversUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ReceiversUpdateResponse, error) {
+func (c *ClientWithResponses) ReceiversUpdate(ctx context.Context, projectID string, instanceID string, receiver string, body ReceiversUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*ReceiversUpdateResponse, error) {
 	rsp, err := c.ReceiversUpdateRaw(ctx, projectID, instanceID, receiver, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1996,7 +1996,7 @@ func (c *ClientWithResponses[K]) ReceiversUpdate(ctx context.Context, projectID 
 }
 
 // RoutesList request returning *RoutesListResponse
-func (c *ClientWithResponses[K]) RoutesList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*RoutesListResponse, error) {
+func (c *ClientWithResponses) RoutesList(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*RoutesListResponse, error) {
 	rsp, err := c.RoutesListRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2005,7 +2005,7 @@ func (c *ClientWithResponses[K]) RoutesList(ctx context.Context, projectID strin
 }
 
 // RoutesCreateWithBody request with arbitrary body returning *RoutesCreateResponse
-func (c *ClientWithResponses[K]) RoutesCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RoutesCreateResponse, error) {
+func (c *ClientWithResponses) RoutesCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RoutesCreateResponse, error) {
 	rsp, err := c.RoutesCreateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2013,7 +2013,7 @@ func (c *ClientWithResponses[K]) RoutesCreateWithBody(ctx context.Context, proje
 	return c.ParseRoutesCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) RoutesCreate(ctx context.Context, projectID string, instanceID string, body RoutesCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RoutesCreateResponse, error) {
+func (c *ClientWithResponses) RoutesCreate(ctx context.Context, projectID string, instanceID string, body RoutesCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*RoutesCreateResponse, error) {
 	rsp, err := c.RoutesCreateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2022,7 +2022,7 @@ func (c *ClientWithResponses[K]) RoutesCreate(ctx context.Context, projectID str
 }
 
 // RoutesDelete request returning *RoutesDeleteResponse
-func (c *ClientWithResponses[K]) RoutesDelete(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*RoutesDeleteResponse, error) {
+func (c *ClientWithResponses) RoutesDelete(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*RoutesDeleteResponse, error) {
 	rsp, err := c.RoutesDeleteRaw(ctx, projectID, instanceID, receiver, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2031,7 +2031,7 @@ func (c *ClientWithResponses[K]) RoutesDelete(ctx context.Context, projectID str
 }
 
 // RoutesRead request returning *RoutesReadResponse
-func (c *ClientWithResponses[K]) RoutesRead(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*RoutesReadResponse, error) {
+func (c *ClientWithResponses) RoutesRead(ctx context.Context, projectID string, instanceID string, receiver string, reqEditors ...RequestEditorFn) (*RoutesReadResponse, error) {
 	rsp, err := c.RoutesReadRaw(ctx, projectID, instanceID, receiver, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2040,7 +2040,7 @@ func (c *ClientWithResponses[K]) RoutesRead(ctx context.Context, projectID strin
 }
 
 // RoutesUpdateWithBody request with arbitrary body returning *RoutesUpdateResponse
-func (c *ClientWithResponses[K]) RoutesUpdateWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RoutesUpdateResponse, error) {
+func (c *ClientWithResponses) RoutesUpdateWithBody(ctx context.Context, projectID string, instanceID string, receiver string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RoutesUpdateResponse, error) {
 	rsp, err := c.RoutesUpdateRawWithBody(ctx, projectID, instanceID, receiver, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2048,7 +2048,7 @@ func (c *ClientWithResponses[K]) RoutesUpdateWithBody(ctx context.Context, proje
 	return c.ParseRoutesUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) RoutesUpdate(ctx context.Context, projectID string, instanceID string, receiver string, body RoutesUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RoutesUpdateResponse, error) {
+func (c *ClientWithResponses) RoutesUpdate(ctx context.Context, projectID string, instanceID string, receiver string, body RoutesUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*RoutesUpdateResponse, error) {
 	rsp, err := c.RoutesUpdateRaw(ctx, projectID, instanceID, receiver, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2057,7 +2057,7 @@ func (c *ClientWithResponses[K]) RoutesUpdate(ctx context.Context, projectID str
 }
 
 // ParseListResponse parses an HTTP response from a List call
-func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2091,7 +2091,7 @@ func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListRes
 }
 
 // ParseUpdateResponse parses an HTTP response from a Update call
-func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
+func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2132,7 +2132,7 @@ func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*Updat
 }
 
 // ParseReceiversListResponse parses an HTTP response from a ReceiversList call
-func (c *ClientWithResponses[K]) ParseReceiversListResponse(rsp *http.Response) (*ReceiversListResponse, error) {
+func (c *ClientWithResponses) ParseReceiversListResponse(rsp *http.Response) (*ReceiversListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2166,7 +2166,7 @@ func (c *ClientWithResponses[K]) ParseReceiversListResponse(rsp *http.Response) 
 }
 
 // ParseReceiversCreateResponse parses an HTTP response from a ReceiversCreate call
-func (c *ClientWithResponses[K]) ParseReceiversCreateResponse(rsp *http.Response) (*ReceiversCreateResponse, error) {
+func (c *ClientWithResponses) ParseReceiversCreateResponse(rsp *http.Response) (*ReceiversCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2207,7 +2207,7 @@ func (c *ClientWithResponses[K]) ParseReceiversCreateResponse(rsp *http.Response
 }
 
 // ParseReceiversDeleteResponse parses an HTTP response from a ReceiversDelete call
-func (c *ClientWithResponses[K]) ParseReceiversDeleteResponse(rsp *http.Response) (*ReceiversDeleteResponse, error) {
+func (c *ClientWithResponses) ParseReceiversDeleteResponse(rsp *http.Response) (*ReceiversDeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2248,7 +2248,7 @@ func (c *ClientWithResponses[K]) ParseReceiversDeleteResponse(rsp *http.Response
 }
 
 // ParseReceiversReadResponse parses an HTTP response from a ReceiversRead call
-func (c *ClientWithResponses[K]) ParseReceiversReadResponse(rsp *http.Response) (*ReceiversReadResponse, error) {
+func (c *ClientWithResponses) ParseReceiversReadResponse(rsp *http.Response) (*ReceiversReadResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2289,7 +2289,7 @@ func (c *ClientWithResponses[K]) ParseReceiversReadResponse(rsp *http.Response) 
 }
 
 // ParseReceiversUpdateResponse parses an HTTP response from a ReceiversUpdate call
-func (c *ClientWithResponses[K]) ParseReceiversUpdateResponse(rsp *http.Response) (*ReceiversUpdateResponse, error) {
+func (c *ClientWithResponses) ParseReceiversUpdateResponse(rsp *http.Response) (*ReceiversUpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2337,7 +2337,7 @@ func (c *ClientWithResponses[K]) ParseReceiversUpdateResponse(rsp *http.Response
 }
 
 // ParseRoutesListResponse parses an HTTP response from a RoutesList call
-func (c *ClientWithResponses[K]) ParseRoutesListResponse(rsp *http.Response) (*RoutesListResponse, error) {
+func (c *ClientWithResponses) ParseRoutesListResponse(rsp *http.Response) (*RoutesListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2371,7 +2371,7 @@ func (c *ClientWithResponses[K]) ParseRoutesListResponse(rsp *http.Response) (*R
 }
 
 // ParseRoutesCreateResponse parses an HTTP response from a RoutesCreate call
-func (c *ClientWithResponses[K]) ParseRoutesCreateResponse(rsp *http.Response) (*RoutesCreateResponse, error) {
+func (c *ClientWithResponses) ParseRoutesCreateResponse(rsp *http.Response) (*RoutesCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2412,7 +2412,7 @@ func (c *ClientWithResponses[K]) ParseRoutesCreateResponse(rsp *http.Response) (
 }
 
 // ParseRoutesDeleteResponse parses an HTTP response from a RoutesDelete call
-func (c *ClientWithResponses[K]) ParseRoutesDeleteResponse(rsp *http.Response) (*RoutesDeleteResponse, error) {
+func (c *ClientWithResponses) ParseRoutesDeleteResponse(rsp *http.Response) (*RoutesDeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2453,7 +2453,7 @@ func (c *ClientWithResponses[K]) ParseRoutesDeleteResponse(rsp *http.Response) (
 }
 
 // ParseRoutesReadResponse parses an HTTP response from a RoutesRead call
-func (c *ClientWithResponses[K]) ParseRoutesReadResponse(rsp *http.Response) (*RoutesReadResponse, error) {
+func (c *ClientWithResponses) ParseRoutesReadResponse(rsp *http.Response) (*RoutesReadResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2487,7 +2487,7 @@ func (c *ClientWithResponses[K]) ParseRoutesReadResponse(rsp *http.Response) (*R
 }
 
 // ParseRoutesUpdateResponse parses an HTTP response from a RoutesUpdate call
-func (c *ClientWithResponses[K]) ParseRoutesUpdateResponse(rsp *http.Response) (*RoutesUpdateResponse, error) {
+func (c *ClientWithResponses) ParseRoutesUpdateResponse(rsp *http.Response) (*RoutesUpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
