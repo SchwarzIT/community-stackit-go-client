@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -346,7 +346,7 @@ func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("received: %+v", res)
 	}
-	body, err := io.ReadAll(res.Body)
+	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return err
 	}
