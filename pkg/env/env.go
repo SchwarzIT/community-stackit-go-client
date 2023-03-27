@@ -16,7 +16,7 @@ func Parse(env string) Environment {
 		return Dev
 	}
 	if strings.EqualFold(env, "qa") {
-		return Dev
+		return QA
 	}
 	return Production
 }

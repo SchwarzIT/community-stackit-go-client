@@ -55,6 +55,7 @@ type KeyFlowConfig struct {
 	ServiceAccountKey     []byte
 	PrivateKey            []byte
 	Environment           env.Environment
+	ClientRetry           *RetryConfig
 }
 
 // TokenResponseBody is the API response
@@ -89,6 +90,9 @@ type ServiceAccountKeyPrivateResponse struct {
 
 // GetEnvironment returns the defined API environment
 func (c *KeyFlow) GetEnvironment() env.Environment {
+	if c.config == nil {
+		return ""
+	}
 	return c.config.Environment
 }
 
@@ -114,6 +118,9 @@ func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	c.token = new(TokenResponseBody)
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
+	if c.config.ClientRetry == nil {
+		c.config.ClientRetry = NewRetryConfig()
+	}
 	if err := c.validateConfig(); err != nil {
 		return err
 	}
@@ -130,7 +137,7 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	return do(c.client, req, 3, time.Second, time.Minute*2)
+	return do(c.client, req, c.config.ClientRetry)
 }
 
 // GetAccessToken returns short-lived access token
@@ -153,11 +160,9 @@ func (c *KeyFlow) GetAccessToken() (string, error) {
 
 // processConfig processes the given configuration
 func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
-	defaultCfg := c.getConfigFromEnvironment()
-	if len(cfg) > 0 {
-		c.config = c.mergeConfigs(&cfg[0], defaultCfg)
-	} else {
-		c.config = defaultCfg
+	c.config = c.getConfigFromEnvironment()
+	for _, m := range cfg {
+		c.config = c.mergeConfigs(&m, c.config)
 	}
 }
 
@@ -172,9 +177,9 @@ func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
 	}
 }
 
-// mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and defaultCfg.
-func (c *KeyFlow) mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
-	merged := *defaultCfg
+// mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and currentCfg.
+func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
+	merged := *currentCfg
 
 	if cfg.ServiceAccountKeyPath != "" {
 		merged.ServiceAccountKeyPath = cfg.ServiceAccountKeyPath
@@ -198,7 +203,7 @@ func (c *KeyFlow) mergeConfigs(cfg, defaultCfg *KeyFlowConfig) *KeyFlowConfig {
 // configureHTTPClient configures the HTTP client
 func (c *KeyFlow) configureHTTPClient(ctx context.Context) {
 	client := &http.Client{}
-	client.Timeout = time.Second * 10
+	client.Timeout = DefaultClientTimeout
 	c.client = client
 }
 
@@ -330,7 +335,7 @@ func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) 
 		return nil, err
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	return do(&http.Client{}, req, 3, time.Second, time.Minute)
+	return do(&http.Client{}, req, c.config.ClientRetry)
 }
 
 // parseTokenResponse parses the response from the server

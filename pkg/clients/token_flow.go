@@ -5,7 +5,6 @@ import (
 	"errors"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"golang.org/x/oauth2"
@@ -29,16 +28,17 @@ type TokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
 	Environment         env.Environment
+	ClientRetry         *RetryConfig
 }
 
 // GetEnvironment returns the defined API environment
 func (c *TokenFlow) GetEnvironment() env.Environment {
-	return c.config.Environment
+	return c.GetConfig().Environment
 }
 
 // GetServiceAccountEmail returns the service account email
 func (c *TokenFlow) GetServiceAccountEmail() string {
-	return c.config.ServiceAccountEmail
+	return c.GetConfig().ServiceAccountEmail
 }
 
 // GetConfig returns the flow configuration
@@ -52,17 +52,17 @@ func (c *TokenFlow) GetConfig() TokenFlowConfig {
 func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
+	if c.config.ClientRetry == nil {
+		c.config.ClientRetry = NewRetryConfig()
+	}
 	return c.validate()
 }
 
 // processConfig processes the given configuration
 func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
-	defaultCfg := c.getConfigFromEnvironment()
-
-	if len(cfg) > 0 {
-		c.config = c.mergeConfigs(&cfg[0], defaultCfg)
-	} else {
-		c.config = defaultCfg
+	c.config = c.getConfigFromEnvironment()
+	for _, m := range cfg {
+		c.config = c.mergeConfigs(&m, c.config)
 	}
 }
 
@@ -75,9 +75,9 @@ func (c *TokenFlow) getConfigFromEnvironment() *TokenFlowConfig {
 	}
 }
 
-// mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and defaultCfg.
-func (c *TokenFlow) mergeConfigs(cfg, defaultCfg *TokenFlowConfig) *TokenFlowConfig {
-	merged := *defaultCfg
+// mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and currentCfg.
+func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowConfig {
+	merged := *currentCfg
 
 	if cfg.ServiceAccountEmail != "" {
 		merged.ServiceAccountEmail = cfg.ServiceAccountEmail
@@ -98,7 +98,7 @@ func (c *TokenFlow) configureHTTPClient(ctx context.Context) {
 		&oauth2.Token{AccessToken: c.config.ServiceAccountToken},
 	)
 	o2nc := oauth2.NewClient(ctx, sts)
-	o2nc.Timeout = time.Second * 10
+	o2nc.Timeout = DefaultClientTimeout
 	c.client = o2nc
 }
 
@@ -118,5 +118,5 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}
-	return do(c.client, req, 3, time.Second, time.Minute*2)
+	return do(c.client, req, c.config.ClientRetry)
 }
