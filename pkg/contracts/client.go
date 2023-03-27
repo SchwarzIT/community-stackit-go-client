@@ -20,3 +20,9 @@ type ClientInterface[f ClientFlowConfig] interface {
 	GetEnvironment() env.Environment
 	GetServiceAccountEmail() string
 }
+
+type BaseClientInterface interface {
+	Do(req *http.Request) (*http.Response, error)
+	GetEnvironment() env.Environment
+	GetServiceAccountEmail() string
+}
