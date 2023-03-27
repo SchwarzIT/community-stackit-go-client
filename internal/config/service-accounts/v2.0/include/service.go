@@ -13,6 +13,6 @@ var BaseURLs = env.URLs(
 	"https://api-dev.stackit.cloud/service-account/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *serviceaccounts.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *serviceaccounts.ClientWithResponses {
 	return serviceaccounts.NewClient(BaseURLs.GetURL(c.GetEnvironment()), c)
 }

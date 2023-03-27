@@ -7,8 +7,7 @@ output-options:
   custom-doer:
     enabled: true
     import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-    name: "contracts.ClientInterface"
-    generics: "contracts.ClientFlowConfig"
+    name: "contracts.BaseClientInterface"
   split-by-tags:
     verbose: false
     enabled: false
@@ -30,7 +29,7 @@ output-options:
     tidy: 
     - replace: "resourcemanagement."
       all: true
-  - from: include/wait
+  - from: include/wait.go
     to: wait.go
     tidy: 
     - replace: "resourcemanagement."

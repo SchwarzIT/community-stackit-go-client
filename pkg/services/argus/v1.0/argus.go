@@ -28,25 +28,25 @@ import (
 )
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// list of connected client services
-	Instances               *instances.Client[K]
-	Acl                     *acl.Client[K]
-	AlertConfig             *alertconfig.Client[K]
-	AlertGroups             *alertgroups.Client[K]
-	AlertRules              *alertrules.Client[K]
-	AlertRecords            *alertrecords.Client[K]
-	Backup                  *backup.Client[K]
-	CertCheck               *certcheck.Client[K]
-	GrafanaConfigs          *grafanaconfigs.Client[K]
-	HttpCheck               *httpcheck.Client[K]
-	Logs                    *logs.Client[K]
-	MetricsStorageRetention *metricsstorageretention.Client[K]
-	NetworkCheck            *networkcheck.Client[K]
-	PingCheck               *pingcheck.Client[K]
-	ScrapeConfig            *scrapeconfig.Client[K]
-	Traces                  *traces.Client[K]
-	Plans                   *plans.Client[K]
+	Instances               *instances.Client
+	Acl                     *acl.Client
+	AlertConfig             *alertconfig.Client
+	AlertGroups             *alertgroups.Client
+	AlertRules              *alertrules.Client
+	AlertRecords            *alertrecords.Client
+	Backup                  *backup.Client
+	CertCheck               *certcheck.Client
+	GrafanaConfigs          *grafanaconfigs.Client
+	HttpCheck               *httpcheck.Client
+	Logs                    *logs.Client
+	MetricsStorageRetention *metricsstorageretention.Client
+	NetworkCheck            *networkcheck.Client
+	PingCheck               *pingcheck.Client
+	ScrapeConfig            *scrapeconfig.Client
+	Traces                  *traces.Client
+	Plans                   *plans.Client
 
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
@@ -56,15 +56,15 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // ClientOption allows setting custom parameters during construction
-type ClientOption[K contracts.ClientFlowConfig] func(*Client[K]) error
+type ClientOption func(*Client) error
 
-func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*Client[K], error) {
+func NewRawClient(server string, opts ...ClientOption) (*Client, error) {
 	// create a factory client
-	client := Client[K]{
+	client := Client{
 		Server: server,
 	}
 	// mutate client and add all optional params
@@ -101,16 +101,16 @@ func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOpt
 
 // WithHTTPClient allows overriding the default Doer, which is
 // automatically created using http.Client. This is useful for tests.
-func WithHTTPClient[K contracts.ClientFlowConfig](doer contracts.ClientInterface[K]) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithHTTPClient(doer contracts.BaseClientInterface) ClientOption {
+	return func(c *Client) error {
 		c.Client = doer
 		return nil
 	}
 }
 
 // WithBaseURL overrides the baseURL.
-func WithBaseURL[K contracts.ClientFlowConfig](baseURL string) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
 		newBaseURL, err := url.Parse(baseURL)
 		if err != nil {
 			return err
@@ -121,38 +121,38 @@ func WithBaseURL[K contracts.ClientFlowConfig](baseURL string) ClientOption[K] {
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
-	Client *Client[K]
+type ClientWithResponses struct {
+	Client *Client
 
 	// list of connected client services
-	Instances               *instances.ClientWithResponses[K]
-	Acl                     *acl.ClientWithResponses[K]
-	AlertConfig             *alertconfig.ClientWithResponses[K]
-	AlertGroups             *alertgroups.ClientWithResponses[K]
-	AlertRules              *alertrules.ClientWithResponses[K]
-	AlertRecords            *alertrecords.ClientWithResponses[K]
-	Backup                  *backup.ClientWithResponses[K]
-	CertCheck               *certcheck.ClientWithResponses[K]
-	GrafanaConfigs          *grafanaconfigs.ClientWithResponses[K]
-	HttpCheck               *httpcheck.ClientWithResponses[K]
-	Logs                    *logs.ClientWithResponses[K]
-	MetricsStorageRetention *metricsstorageretention.ClientWithResponses[K]
-	NetworkCheck            *networkcheck.ClientWithResponses[K]
-	PingCheck               *pingcheck.ClientWithResponses[K]
-	ScrapeConfig            *scrapeconfig.ClientWithResponses[K]
-	Traces                  *traces.ClientWithResponses[K]
-	Plans                   *plans.ClientWithResponses[K]
+	Instances               *instances.ClientWithResponses
+	Acl                     *acl.ClientWithResponses
+	AlertConfig             *alertconfig.ClientWithResponses
+	AlertGroups             *alertgroups.ClientWithResponses
+	AlertRules              *alertrules.ClientWithResponses
+	AlertRecords            *alertrecords.ClientWithResponses
+	Backup                  *backup.ClientWithResponses
+	CertCheck               *certcheck.ClientWithResponses
+	GrafanaConfigs          *grafanaconfigs.ClientWithResponses
+	HttpCheck               *httpcheck.ClientWithResponses
+	Logs                    *logs.ClientWithResponses
+	MetricsStorageRetention *metricsstorageretention.ClientWithResponses
+	NetworkCheck            *networkcheck.ClientWithResponses
+	PingCheck               *pingcheck.ClientWithResponses
+	ScrapeConfig            *scrapeconfig.ClientWithResponses
+	Traces                  *traces.ClientWithResponses
+	Plans                   *plans.ClientWithResponses
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*ClientWithResponses[K], error) {
-	client, err := NewRawClient[K](server, opts...)
+func NewClient(server string, opts ...ClientOption) (*ClientWithResponses, error) {
+	client, err := NewRawClient(server, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	cwr := &ClientWithResponses[K]{Client: client}
+	cwr := &ClientWithResponses{Client: client}
 	cwr.Instances = instances.NewClient(server, client.Client)
 	cwr.Acl = acl.NewClient(server, client.Client)
 	cwr.AlertConfig = alertconfig.NewClient(server, client.Client)

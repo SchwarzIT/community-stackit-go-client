@@ -98,7 +98,7 @@ type CreateRestoreJSONRequestBody = InstanceCreateRestoreInstanceRequest
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -107,13 +107,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -144,7 +144,7 @@ type rawClientInterface interface {
 	CreateRestoreRaw(ctx context.Context, projectID string, instanceID string, body CreateRestoreJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) ListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ListRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func (c *Client[K]) ListRaw(ctx context.Context, projectID string, instanceID st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -168,7 +168,7 @@ func (c *Client[K]) UpdateRawWithBody(ctx context.Context, projectID string, ins
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -180,7 +180,7 @@ func (c *Client[K]) UpdateRaw(ctx context.Context, projectID string, instanceID 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetRaw(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetRaw(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID, backupID)
 	if err != nil {
 		return nil, err
@@ -192,7 +192,7 @@ func (c *Client[K]) GetRaw(ctx context.Context, projectID string, instanceID str
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateCloneRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateCloneRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateCloneRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -204,7 +204,7 @@ func (c *Client[K]) CreateCloneRawWithBody(ctx context.Context, projectID string
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateCloneRaw(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateCloneRaw(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateCloneRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -216,7 +216,7 @@ func (c *Client[K]) CreateCloneRaw(ctx context.Context, projectID string, instan
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRestoreRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRestoreRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRestoreRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -228,7 +228,7 @@ func (c *Client[K]) CreateRestoreRawWithBody(ctx context.Context, projectID stri
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRestoreRaw(ctx context.Context, projectID string, instanceID string, body CreateRestoreJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRestoreRaw(ctx context.Context, projectID string, instanceID string, body CreateRestoreJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRestoreRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -491,7 +491,7 @@ func NewCreateRestoreRequestWithBody(ctx context.Context, server string, project
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -501,18 +501,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// List request
 	List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
@@ -661,7 +661,7 @@ func (r CreateRestoreResponse) StatusCode() int {
 }
 
 // List request returning *ListResponse
-func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -670,7 +670,7 @@ func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, ins
 }
 
 // UpdateWithBody request with arbitrary body returning *UpdateResponse
-func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -678,7 +678,7 @@ func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, projectID s
 	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -687,7 +687,7 @@ func (c *ClientWithResponses[K]) Update(ctx context.Context, projectID string, i
 }
 
 // Get request returning *GetResponse
-func (c *ClientWithResponses[K]) Get(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+func (c *ClientWithResponses) Get(ctx context.Context, projectID string, instanceID string, backupID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
 	rsp, err := c.GetRaw(ctx, projectID, instanceID, backupID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -696,7 +696,7 @@ func (c *ClientWithResponses[K]) Get(ctx context.Context, projectID string, inst
 }
 
 // CreateCloneWithBody request with arbitrary body returning *CreateCloneResponse
-func (c *ClientWithResponses[K]) CreateCloneWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error) {
+func (c *ClientWithResponses) CreateCloneWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error) {
 	rsp, err := c.CreateCloneRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -704,7 +704,7 @@ func (c *ClientWithResponses[K]) CreateCloneWithBody(ctx context.Context, projec
 	return c.ParseCreateCloneResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) CreateClone(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error) {
+func (c *ClientWithResponses) CreateClone(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error) {
 	rsp, err := c.CreateCloneRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -713,7 +713,7 @@ func (c *ClientWithResponses[K]) CreateClone(ctx context.Context, projectID stri
 }
 
 // CreateRestoreWithBody request with arbitrary body returning *CreateRestoreResponse
-func (c *ClientWithResponses[K]) CreateRestoreWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRestoreResponse, error) {
+func (c *ClientWithResponses) CreateRestoreWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateRestoreResponse, error) {
 	rsp, err := c.CreateRestoreRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -721,7 +721,7 @@ func (c *ClientWithResponses[K]) CreateRestoreWithBody(ctx context.Context, proj
 	return c.ParseCreateRestoreResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) CreateRestore(ctx context.Context, projectID string, instanceID string, body CreateRestoreJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRestoreResponse, error) {
+func (c *ClientWithResponses) CreateRestore(ctx context.Context, projectID string, instanceID string, body CreateRestoreJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateRestoreResponse, error) {
 	rsp, err := c.CreateRestoreRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -730,7 +730,7 @@ func (c *ClientWithResponses[K]) CreateRestore(ctx context.Context, projectID st
 }
 
 // ParseListResponse parses an HTTP response from a List call
-func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -771,7 +771,7 @@ func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListRes
 }
 
 // ParseUpdateResponse parses an HTTP response from a Update call
-func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
+func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -812,7 +812,7 @@ func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*Updat
 }
 
 // ParseGetResponse parses an HTTP response from a Get call
-func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -853,7 +853,7 @@ func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetRespo
 }
 
 // ParseCreateCloneResponse parses an HTTP response from a CreateClone call
-func (c *ClientWithResponses[K]) ParseCreateCloneResponse(rsp *http.Response) (*CreateCloneResponse, error) {
+func (c *ClientWithResponses) ParseCreateCloneResponse(rsp *http.Response) (*CreateCloneResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -894,7 +894,7 @@ func (c *ClientWithResponses[K]) ParseCreateCloneResponse(rsp *http.Response) (*
 }
 
 // ParseCreateRestoreResponse parses an HTTP response from a CreateRestore call
-func (c *ClientWithResponses[K]) ParseCreateRestoreResponse(rsp *http.Response) (*CreateRestoreResponse, error) {
+func (c *ClientWithResponses) ParseCreateRestoreResponse(rsp *http.Response) (*CreateRestoreResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

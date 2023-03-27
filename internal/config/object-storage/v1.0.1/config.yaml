@@ -7,8 +7,7 @@ output-options:
   custom-doer:
     enabled: true
     import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-    name: "contracts.ClientInterface"
-    generics: "contracts.ClientFlowConfig"
+    name: "contracts.BaseClientInterface"
   split-by-tags:
     verbose: false
     enabled: true
@@ -27,7 +26,7 @@ output-options:
     tidy: 
     - replace: "objectstorage."
       all: true
-  - from: include/bucket/wait
+  - from: include/bucket/wait.go
     to: bucket/wait.go
     tidy: 
     - replace: "*bucket."

@@ -15,7 +15,7 @@ const (
 	Redis
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K], serviceID int) *ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface, serviceID int) *ClientWithResponses {
 	url := GetBaseURLs(serviceID).GetURL(c.GetEnvironment())
 	nc, _ := NewClient(url, WithHTTPClient(c))
 	return nc

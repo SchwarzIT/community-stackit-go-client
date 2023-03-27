@@ -17,14 +17,14 @@ import (
 )
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// list of connected client services
-	Backups  *backups.Client[K]
-	Users    *users.Client[K]
-	Storage  *storage.Client[K]
-	Versions *versions.Client[K]
-	Flavors  *flavors.Client[K]
-	Instance *instance.Client[K]
+	Backups  *backups.Client
+	Users    *users.Client
+	Storage  *storage.Client
+	Versions *versions.Client
+	Flavors  *flavors.Client
+	Instance *instance.Client
 
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
@@ -34,15 +34,15 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // ClientOption allows setting custom parameters during construction
-type ClientOption[K contracts.ClientFlowConfig] func(*Client[K]) error
+type ClientOption func(*Client) error
 
-func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*Client[K], error) {
+func NewRawClient(server string, opts ...ClientOption) (*Client, error) {
 	// create a factory client
-	client := Client[K]{
+	client := Client{
 		Server: server,
 	}
 	// mutate client and add all optional params
@@ -68,16 +68,16 @@ func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOpt
 
 // WithHTTPClient allows overriding the default Doer, which is
 // automatically created using http.Client. This is useful for tests.
-func WithHTTPClient[K contracts.ClientFlowConfig](doer contracts.ClientInterface[K]) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithHTTPClient(doer contracts.BaseClientInterface) ClientOption {
+	return func(c *Client) error {
 		c.Client = doer
 		return nil
 	}
 }
 
 // WithBaseURL overrides the baseURL.
-func WithBaseURL[K contracts.ClientFlowConfig](baseURL string) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
 		newBaseURL, err := url.Parse(baseURL)
 		if err != nil {
 			return err
@@ -88,27 +88,27 @@ func WithBaseURL[K contracts.ClientFlowConfig](baseURL string) ClientOption[K] {
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
-	Client *Client[K]
+type ClientWithResponses struct {
+	Client *Client
 
 	// list of connected client services
-	Backups  *backups.ClientWithResponses[K]
-	Users    *users.ClientWithResponses[K]
-	Storage  *storage.ClientWithResponses[K]
-	Versions *versions.ClientWithResponses[K]
-	Flavors  *flavors.ClientWithResponses[K]
-	Instance *instance.ClientWithResponses[K]
+	Backups  *backups.ClientWithResponses
+	Users    *users.ClientWithResponses
+	Storage  *storage.ClientWithResponses
+	Versions *versions.ClientWithResponses
+	Flavors  *flavors.ClientWithResponses
+	Instance *instance.ClientWithResponses
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*ClientWithResponses[K], error) {
-	client, err := NewRawClient[K](server, opts...)
+func NewClient(server string, opts ...ClientOption) (*ClientWithResponses, error) {
+	client, err := NewRawClient(server, opts...)
 	if err != nil {
 		return nil, err
 	}
 
-	cwr := &ClientWithResponses[K]{Client: client}
+	cwr := &ClientWithResponses{Client: client}
 	cwr.Backups = backups.NewClient(server, client.Client)
 	cwr.Users = users.NewClient(server, client.Client)
 	cwr.Storage = storage.NewClient(server, client.Client)

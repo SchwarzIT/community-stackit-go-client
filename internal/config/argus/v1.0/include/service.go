@@ -13,7 +13,7 @@ var BaseURLs = env.URLs(
 	"https://argus.api.dev.stackit.cloud",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *argus.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *argus.ClientWithResponses {
 	nc, _ := argus.NewClient(BaseURLs.GetURL(c.GetEnvironment()), argus.WithHTTPClient(c))
 	return nc
 }

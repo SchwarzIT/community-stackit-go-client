@@ -13,7 +13,7 @@ var BaseURLs = env.URLs(
 	"https://api-dev.stackit.cloud/resource-management/v2/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *resourcemanagement.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *resourcemanagement.ClientWithResponses {
 	nc, _ := resourcemanagement.NewClient(
 		BaseURLs.GetURL(c.GetEnvironment()),
 		resourcemanagement.WithHTTPClient(c),

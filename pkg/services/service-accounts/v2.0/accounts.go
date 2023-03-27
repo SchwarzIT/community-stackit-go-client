@@ -437,7 +437,7 @@ type UpdateKeysJSONRequestBody = ServiceAccountKeyUpdateRequest
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -446,13 +446,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -511,7 +511,7 @@ type rawClientInterface interface {
 	UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) CreateTokenRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateTokenRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTokenRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -523,7 +523,7 @@ func (c *Client[K]) CreateTokenRawWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateTokenWithFormdataBodyRaw(ctx context.Context, body CreateTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateTokenWithFormdataBodyRaw(ctx context.Context, body CreateTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateTokenRequestWithFormdataBody(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -535,7 +535,7 @@ func (c *Client[K]) CreateTokenWithFormdataBodyRaw(ctx context.Context, body Cre
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetRaw(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetRaw(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, projectId)
 	if err != nil {
 		return nil, err
@@ -547,7 +547,7 @@ func (c *Client[K]) GetRaw(ctx context.Context, projectId string, reqEditors ...
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRawWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRawWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequestWithBody(ctx, c.Server, projectId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -559,7 +559,7 @@ func (c *Client[K]) CreateRawWithBody(ctx context.Context, projectId string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRaw(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRaw(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequest(ctx, c.Server, projectId, body)
 	if err != nil {
 		return nil, err
@@ -571,7 +571,7 @@ func (c *Client[K]) CreateRaw(ctx context.Context, projectId string, body Create
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
 		return nil, err
@@ -583,7 +583,7 @@ func (c *Client[K]) DeleteRaw(ctx context.Context, projectId string, serviceAcco
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAccessTokensRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
 		return nil, err
@@ -595,7 +595,7 @@ func (c *Client[K]) GetAccessTokensRaw(ctx context.Context, projectId string, se
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateAccessTokensRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateAccessTokensRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateAccessTokensRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, contentType, body)
 	if err != nil {
 		return nil, err
@@ -607,7 +607,7 @@ func (c *Client[K]) CreateAccessTokensRawWithBody(ctx context.Context, projectId
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateAccessTokensRequest(ctx, c.Server, projectId, serviceAccountEmail, body)
 	if err != nil {
 		return nil, err
@@ -619,7 +619,7 @@ func (c *Client[K]) CreateAccessTokensRaw(ctx context.Context, projectId string,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, accessTokenId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, accessTokenId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteAccessTokensRequest(ctx, c.Server, projectId, serviceAccountEmail, accessTokenId)
 	if err != nil {
 		return nil, err
@@ -631,7 +631,7 @@ func (c *Client[K]) DeleteAccessTokensRaw(ctx context.Context, projectId string,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetServiceAccountJwksRequest(ctx, c.Server, serviceAccountEmail)
 	if err != nil {
 		return nil, err
@@ -643,7 +643,7 @@ func (c *Client[K]) GetServiceAccountJwksRaw(ctx context.Context, serviceAccount
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKeysRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
 		return nil, err
@@ -655,7 +655,7 @@ func (c *Client[K]) GetKeysRaw(ctx context.Context, projectId string, serviceAcc
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateKeysRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, contentType, body)
 	if err != nil {
 		return nil, err
@@ -667,7 +667,7 @@ func (c *Client[K]) CreateKeysRawWithBody(ctx context.Context, projectId string,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, body)
 	if err != nil {
 		return nil, err
@@ -679,7 +679,7 @@ func (c *Client[K]) CreateKeysRaw(ctx context.Context, projectId string, service
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId)
 	if err != nil {
 		return nil, err
@@ -691,7 +691,7 @@ func (c *Client[K]) DeleteKeysRaw(ctx context.Context, projectId string, service
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GeKeyRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GeKeyRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGeKeyRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, params)
 	if err != nil {
 		return nil, err
@@ -703,7 +703,7 @@ func (c *Client[K]) GeKeyRaw(ctx context.Context, projectId string, serviceAccou
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateKeysRequestWithBody(ctx, c.Server, projectId, serviceAccountEmail, keyId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -715,7 +715,7 @@ func (c *Client[K]) UpdateKeysRawWithBody(ctx context.Context, projectId string,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, body)
 	if err != nil {
 		return nil, err
@@ -1338,7 +1338,7 @@ func NewUpdateKeysRequestWithBody(ctx context.Context, server string, projectId 
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -1348,18 +1348,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// CreateToken request with any body
 	CreateTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error)
 
@@ -1748,7 +1748,7 @@ func (r UpdateKeysResponse) StatusCode() int {
 }
 
 // CreateTokenWithBody request with arbitrary body returning *CreateTokenResponse
-func (c *ClientWithResponses[K]) CreateTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
+func (c *ClientWithResponses) CreateTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
 	rsp, err := c.CreateTokenRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1756,7 +1756,7 @@ func (c *ClientWithResponses[K]) CreateTokenWithBody(ctx context.Context, conten
 	return c.ParseCreateTokenResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) CreateTokenWithFormdataBody(ctx context.Context, body CreateTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
+func (c *ClientWithResponses) CreateTokenWithFormdataBody(ctx context.Context, body CreateTokenFormdataRequestBody, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
 	rsp, err := c.CreateTokenWithFormdataBodyRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1765,7 +1765,7 @@ func (c *ClientWithResponses[K]) CreateTokenWithFormdataBody(ctx context.Context
 }
 
 // Get request returning *GetResponse
-func (c *ClientWithResponses[K]) Get(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+func (c *ClientWithResponses) Get(ctx context.Context, projectId string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
 	rsp, err := c.GetRaw(ctx, projectId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1774,7 +1774,7 @@ func (c *ClientWithResponses[K]) Get(ctx context.Context, projectId string, reqE
 }
 
 // CreateWithBody request with arbitrary body returning *CreateResponse
-func (c *ClientWithResponses[K]) CreateWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+func (c *ClientWithResponses) CreateWithBody(ctx context.Context, projectId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
 	rsp, err := c.CreateRawWithBody(ctx, projectId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1782,7 +1782,7 @@ func (c *ClientWithResponses[K]) CreateWithBody(ctx context.Context, projectId s
 	return c.ParseCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Create(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+func (c *ClientWithResponses) Create(ctx context.Context, projectId string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
 	rsp, err := c.CreateRaw(ctx, projectId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1791,7 +1791,7 @@ func (c *ClientWithResponses[K]) Create(ctx context.Context, projectId string, b
 }
 
 // Delete request returning *DeleteResponse
-func (c *ClientWithResponses[K]) Delete(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+func (c *ClientWithResponses) Delete(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
 	rsp, err := c.DeleteRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1800,7 +1800,7 @@ func (c *ClientWithResponses[K]) Delete(ctx context.Context, projectId string, s
 }
 
 // GetAccessTokens request returning *GetAccessTokensResponse
-func (c *ClientWithResponses[K]) GetAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetAccessTokensResponse, error) {
+func (c *ClientWithResponses) GetAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetAccessTokensResponse, error) {
 	rsp, err := c.GetAccessTokensRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1809,7 +1809,7 @@ func (c *ClientWithResponses[K]) GetAccessTokens(ctx context.Context, projectId 
 }
 
 // CreateAccessTokensWithBody request with arbitrary body returning *CreateAccessTokensResponse
-func (c *ClientWithResponses[K]) CreateAccessTokensWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error) {
+func (c *ClientWithResponses) CreateAccessTokensWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error) {
 	rsp, err := c.CreateAccessTokensRawWithBody(ctx, projectId, serviceAccountEmail, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1817,7 +1817,7 @@ func (c *ClientWithResponses[K]) CreateAccessTokensWithBody(ctx context.Context,
 	return c.ParseCreateAccessTokensResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) CreateAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error) {
+func (c *ClientWithResponses) CreateAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateAccessTokensJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateAccessTokensResponse, error) {
 	rsp, err := c.CreateAccessTokensRaw(ctx, projectId, serviceAccountEmail, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1826,7 +1826,7 @@ func (c *ClientWithResponses[K]) CreateAccessTokens(ctx context.Context, project
 }
 
 // DeleteAccessTokens request returning *DeleteAccessTokensResponse
-func (c *ClientWithResponses[K]) DeleteAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, accessTokenId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*DeleteAccessTokensResponse, error) {
+func (c *ClientWithResponses) DeleteAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, accessTokenId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*DeleteAccessTokensResponse, error) {
 	rsp, err := c.DeleteAccessTokensRaw(ctx, projectId, serviceAccountEmail, accessTokenId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1835,7 +1835,7 @@ func (c *ClientWithResponses[K]) DeleteAccessTokens(ctx context.Context, project
 }
 
 // GetServiceAccountJwks request returning *GetServiceAccountJwksResponse
-func (c *ClientWithResponses[K]) GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error) {
+func (c *ClientWithResponses) GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error) {
 	rsp, err := c.GetServiceAccountJwksRaw(ctx, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1844,7 +1844,7 @@ func (c *ClientWithResponses[K]) GetServiceAccountJwks(ctx context.Context, serv
 }
 
 // GetKeys request returning *GetKeysResponse
-func (c *ClientWithResponses[K]) GetKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetKeysResponse, error) {
+func (c *ClientWithResponses) GetKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetKeysResponse, error) {
 	rsp, err := c.GetKeysRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1853,7 +1853,7 @@ func (c *ClientWithResponses[K]) GetKeys(ctx context.Context, projectId string, 
 }
 
 // CreateKeysWithBody request with arbitrary body returning *CreateKeysResponse
-func (c *ClientWithResponses[K]) CreateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error) {
+func (c *ClientWithResponses) CreateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error) {
 	rsp, err := c.CreateKeysRawWithBody(ctx, projectId, serviceAccountEmail, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1861,7 +1861,7 @@ func (c *ClientWithResponses[K]) CreateKeysWithBody(ctx context.Context, project
 	return c.ParseCreateKeysResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) CreateKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error) {
+func (c *ClientWithResponses) CreateKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, body CreateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateKeysResponse, error) {
 	rsp, err := c.CreateKeysRaw(ctx, projectId, serviceAccountEmail, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1870,7 +1870,7 @@ func (c *ClientWithResponses[K]) CreateKeys(ctx context.Context, projectId strin
 }
 
 // DeleteKeys request returning *DeleteKeysResponse
-func (c *ClientWithResponses[K]) DeleteKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*DeleteKeysResponse, error) {
+func (c *ClientWithResponses) DeleteKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*DeleteKeysResponse, error) {
 	rsp, err := c.DeleteKeysRaw(ctx, projectId, serviceAccountEmail, keyId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1879,7 +1879,7 @@ func (c *ClientWithResponses[K]) DeleteKeys(ctx context.Context, projectId strin
 }
 
 // GeKey request returning *GeKeyResponse
-func (c *ClientWithResponses[K]) GeKey(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*GeKeyResponse, error) {
+func (c *ClientWithResponses) GeKey(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, params *GeKeyParams, reqEditors ...RequestEditorFn) (*GeKeyResponse, error) {
 	rsp, err := c.GeKeyRaw(ctx, projectId, serviceAccountEmail, keyId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1888,7 +1888,7 @@ func (c *ClientWithResponses[K]) GeKey(ctx context.Context, projectId string, se
 }
 
 // UpdateKeysWithBody request with arbitrary body returning *UpdateKeysResponse
-func (c *ClientWithResponses[K]) UpdateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error) {
+func (c *ClientWithResponses) UpdateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error) {
 	rsp, err := c.UpdateKeysRawWithBody(ctx, projectId, serviceAccountEmail, keyId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1896,7 +1896,7 @@ func (c *ClientWithResponses[K]) UpdateKeysWithBody(ctx context.Context, project
 	return c.ParseUpdateKeysResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) UpdateKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error) {
+func (c *ClientWithResponses) UpdateKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error) {
 	rsp, err := c.UpdateKeysRaw(ctx, projectId, serviceAccountEmail, keyId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1905,7 +1905,7 @@ func (c *ClientWithResponses[K]) UpdateKeys(ctx context.Context, projectId strin
 }
 
 // ParseCreateTokenResponse parses an HTTP response from a CreateToken call
-func (c *ClientWithResponses[K]) ParseCreateTokenResponse(rsp *http.Response) (*CreateTokenResponse, error) {
+func (c *ClientWithResponses) ParseCreateTokenResponse(rsp *http.Response) (*CreateTokenResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1932,7 +1932,7 @@ func (c *ClientWithResponses[K]) ParseCreateTokenResponse(rsp *http.Response) (*
 }
 
 // ParseGetResponse parses an HTTP response from a Get call
-func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1980,7 +1980,7 @@ func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetRespo
 }
 
 // ParseCreateResponse parses an HTTP response from a Create call
-func (c *ClientWithResponses[K]) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
+func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2035,7 +2035,7 @@ func (c *ClientWithResponses[K]) ParseCreateResponse(rsp *http.Response) (*Creat
 }
 
 // ParseDeleteResponse parses an HTTP response from a Delete call
-func (c *ClientWithResponses[K]) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2083,7 +2083,7 @@ func (c *ClientWithResponses[K]) ParseDeleteResponse(rsp *http.Response) (*Delet
 }
 
 // ParseGetAccessTokensResponse parses an HTTP response from a GetAccessTokens call
-func (c *ClientWithResponses[K]) ParseGetAccessTokensResponse(rsp *http.Response) (*GetAccessTokensResponse, error) {
+func (c *ClientWithResponses) ParseGetAccessTokensResponse(rsp *http.Response) (*GetAccessTokensResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2138,7 +2138,7 @@ func (c *ClientWithResponses[K]) ParseGetAccessTokensResponse(rsp *http.Response
 }
 
 // ParseCreateAccessTokensResponse parses an HTTP response from a CreateAccessTokens call
-func (c *ClientWithResponses[K]) ParseCreateAccessTokensResponse(rsp *http.Response) (*CreateAccessTokensResponse, error) {
+func (c *ClientWithResponses) ParseCreateAccessTokensResponse(rsp *http.Response) (*CreateAccessTokensResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2193,7 +2193,7 @@ func (c *ClientWithResponses[K]) ParseCreateAccessTokensResponse(rsp *http.Respo
 }
 
 // ParseDeleteAccessTokensResponse parses an HTTP response from a DeleteAccessTokens call
-func (c *ClientWithResponses[K]) ParseDeleteAccessTokensResponse(rsp *http.Response) (*DeleteAccessTokensResponse, error) {
+func (c *ClientWithResponses) ParseDeleteAccessTokensResponse(rsp *http.Response) (*DeleteAccessTokensResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2248,7 +2248,7 @@ func (c *ClientWithResponses[K]) ParseDeleteAccessTokensResponse(rsp *http.Respo
 }
 
 // ParseGetServiceAccountJwksResponse parses an HTTP response from a GetServiceAccountJwks call
-func (c *ClientWithResponses[K]) ParseGetServiceAccountJwksResponse(rsp *http.Response) (*GetServiceAccountJwksResponse, error) {
+func (c *ClientWithResponses) ParseGetServiceAccountJwksResponse(rsp *http.Response) (*GetServiceAccountJwksResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2275,7 +2275,7 @@ func (c *ClientWithResponses[K]) ParseGetServiceAccountJwksResponse(rsp *http.Re
 }
 
 // ParseGetKeysResponse parses an HTTP response from a GetKeys call
-func (c *ClientWithResponses[K]) ParseGetKeysResponse(rsp *http.Response) (*GetKeysResponse, error) {
+func (c *ClientWithResponses) ParseGetKeysResponse(rsp *http.Response) (*GetKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2323,7 +2323,7 @@ func (c *ClientWithResponses[K]) ParseGetKeysResponse(rsp *http.Response) (*GetK
 }
 
 // ParseCreateKeysResponse parses an HTTP response from a CreateKeys call
-func (c *ClientWithResponses[K]) ParseCreateKeysResponse(rsp *http.Response) (*CreateKeysResponse, error) {
+func (c *ClientWithResponses) ParseCreateKeysResponse(rsp *http.Response) (*CreateKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2378,7 +2378,7 @@ func (c *ClientWithResponses[K]) ParseCreateKeysResponse(rsp *http.Response) (*C
 }
 
 // ParseDeleteKeysResponse parses an HTTP response from a DeleteKeys call
-func (c *ClientWithResponses[K]) ParseDeleteKeysResponse(rsp *http.Response) (*DeleteKeysResponse, error) {
+func (c *ClientWithResponses) ParseDeleteKeysResponse(rsp *http.Response) (*DeleteKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2419,7 +2419,7 @@ func (c *ClientWithResponses[K]) ParseDeleteKeysResponse(rsp *http.Response) (*D
 }
 
 // ParseGeKeyResponse parses an HTTP response from a GeKey call
-func (c *ClientWithResponses[K]) ParseGeKeyResponse(rsp *http.Response) (*GeKeyResponse, error) {
+func (c *ClientWithResponses) ParseGeKeyResponse(rsp *http.Response) (*GeKeyResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2467,7 +2467,7 @@ func (c *ClientWithResponses[K]) ParseGeKeyResponse(rsp *http.Response) (*GeKeyR
 }
 
 // ParseUpdateKeysResponse parses an HTTP response from a UpdateKeys call
-func (c *ClientWithResponses[K]) ParseUpdateKeysResponse(rsp *http.Response) (*UpdateKeysResponse, error) {
+func (c *ClientWithResponses) ParseUpdateKeysResponse(rsp *http.Response) (*UpdateKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

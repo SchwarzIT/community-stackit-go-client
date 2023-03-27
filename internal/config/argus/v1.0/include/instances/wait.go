@@ -17,9 +17,9 @@ const (
 	gateway_timeout  = "Gateway Timeout"
 )
 
-// WaitForCreate will wait for  creation
+// Wait will wait for  creation
 // returned interface is nil or *instances.ProjectInstanceUI
-func (c *instances.ClientWithResponses[K]) WaitForCreate(ctx context.Context, projectID, instanceID string) *wait.Handler {
+func (*CreateResponse) Wait(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if agg := validate.Response(s, err, "JSON200"); agg != nil {
@@ -44,9 +44,9 @@ func (c *instances.ClientWithResponses[K]) WaitForCreate(ctx context.Context, pr
 	})
 }
 
-// WaitForUpdate will wait for  update
+// Wait will wait for  update
 // returned interface is nil or *instances.ProjectInstanceUI
-func (c *instances.ClientWithResponses[K]) WaitForUpdate(ctx context.Context, projectID, instanceID string) *wait.Handler {
+func (*UpdateResponse) Wait(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	seenUpdating := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
@@ -110,9 +110,9 @@ func (c *instances.ClientWithResponses[K]) WaitForUpdate(ctx context.Context, pr
 	})
 }
 
-// WaitForDelete will wait for  deletion
+// Wait will wait for  deletion
 // returned interface is nil
-func (c *instances.ClientWithResponses[K]) WaitForDelete(ctx context.Context, projectID, instanceID string) *wait.Handler {
+func (*DeleteResponse) Wait(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if agg := validate.Response(s, err, "JSON200"); agg != nil {

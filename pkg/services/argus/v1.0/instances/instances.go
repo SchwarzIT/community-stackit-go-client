@@ -297,7 +297,7 @@ type SystemInstancesCredentialsCreateJSONRequestBody SystemInstancesCredentialsC
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -306,13 +306,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -375,7 +375,7 @@ type rawClientInterface interface {
 	SystemInstancesCredentialsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
@@ -387,7 +387,7 @@ func (c *Client[K]) ListRaw(ctx context.Context, projectID string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRawWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRawWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequestWithBody(ctx, c.Server, projectID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -399,7 +399,7 @@ func (c *Client[K]) CreateRawWithBody(ctx context.Context, projectID string, con
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRaw(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRaw(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequest(ctx, c.Server, projectID, body)
 	if err != nil {
 		return nil, err
@@ -411,7 +411,7 @@ func (c *Client[K]) CreateRaw(ctx context.Context, projectID string, body Create
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -423,7 +423,7 @@ func (c *Client[K]) DeleteRaw(ctx context.Context, projectID string, instanceID 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -435,7 +435,7 @@ func (c *Client[K]) GetRaw(ctx context.Context, projectID string, instanceID str
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -447,7 +447,7 @@ func (c *Client[K]) UpdateRawWithBody(ctx context.Context, projectID string, ins
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -459,7 +459,7 @@ func (c *Client[K]) UpdateRaw(ctx context.Context, projectID string, instanceID 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ListInstanceCredentialsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ListInstanceCredentialsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListInstanceCredentialsRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -471,7 +471,7 @@ func (c *Client[K]) ListInstanceCredentialsRaw(ctx context.Context, projectID st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsCreateRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsCreateRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsCreateRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -483,7 +483,7 @@ func (c *Client[K]) CredentialsCreateRaw(ctx context.Context, projectID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
@@ -495,7 +495,7 @@ func (c *Client[K]) CredentialsDeleteRaw(ctx context.Context, projectID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsReadRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsReadRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsReadRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
@@ -507,7 +507,7 @@ func (c *Client[K]) CredentialsReadRaw(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsRemoteWriteLimitsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsRemoteWriteLimitsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsRemoteWriteLimitsDeleteRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
@@ -519,7 +519,7 @@ func (c *Client[K]) CredentialsRemoteWriteLimitsDeleteRaw(ctx context.Context, p
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsRemoteWriteLimitsListRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsRemoteWriteLimitsListRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsRemoteWriteLimitsListRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
@@ -531,7 +531,7 @@ func (c *Client[K]) CredentialsRemoteWriteLimitsListRaw(ctx context.Context, pro
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsRemoteWriteLimitsUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsRemoteWriteLimitsUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsRemoteWriteLimitsUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, username, contentType, body)
 	if err != nil {
 		return nil, err
@@ -543,7 +543,7 @@ func (c *Client[K]) CredentialsRemoteWriteLimitsUpdateRawWithBody(ctx context.Co
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CredentialsRemoteWriteLimitsUpdateRaw(ctx context.Context, projectID string, instanceID string, username string, body CredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CredentialsRemoteWriteLimitsUpdateRaw(ctx context.Context, projectID string, instanceID string, username string, body CredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCredentialsRemoteWriteLimitsUpdateRequest(ctx, c.Server, projectID, instanceID, username, body)
 	if err != nil {
 		return nil, err
@@ -555,7 +555,7 @@ func (c *Client[K]) CredentialsRemoteWriteLimitsUpdateRaw(ctx context.Context, p
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) SystemInstancesReadRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) SystemInstancesReadRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSystemInstancesReadRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
@@ -567,7 +567,7 @@ func (c *Client[K]) SystemInstancesReadRaw(ctx context.Context, projectID string
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) SystemInstancesCredentialsCreateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) SystemInstancesCredentialsCreateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSystemInstancesCredentialsCreateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -579,7 +579,7 @@ func (c *Client[K]) SystemInstancesCredentialsCreateRawWithBody(ctx context.Cont
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) SystemInstancesCredentialsCreateRaw(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) SystemInstancesCredentialsCreateRaw(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSystemInstancesCredentialsCreateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
@@ -591,7 +591,7 @@ func (c *Client[K]) SystemInstancesCredentialsCreateRaw(ctx context.Context, pro
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) SystemInstancesCredentialsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) SystemInstancesCredentialsDeleteRaw(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewSystemInstancesCredentialsDeleteRequest(ctx, c.Server, projectID, instanceID, username)
 	if err != nil {
 		return nil, err
@@ -1298,7 +1298,7 @@ func NewSystemInstancesCredentialsDeleteRequest(ctx context.Context, server stri
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -1308,18 +1308,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// List request
 	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
@@ -1751,7 +1751,7 @@ func (r SystemInstancesCredentialsDeleteResponse) StatusCode() int {
 }
 
 // List request returning *ListResponse
-func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1760,7 +1760,7 @@ func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, req
 }
 
 // CreateWithBody request with arbitrary body returning *CreateResponse
-func (c *ClientWithResponses[K]) CreateWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+func (c *ClientWithResponses) CreateWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
 	rsp, err := c.CreateRawWithBody(ctx, projectID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1768,7 +1768,7 @@ func (c *ClientWithResponses[K]) CreateWithBody(ctx context.Context, projectID s
 	return c.ParseCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Create(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+func (c *ClientWithResponses) Create(ctx context.Context, projectID string, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
 	rsp, err := c.CreateRaw(ctx, projectID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1777,7 +1777,7 @@ func (c *ClientWithResponses[K]) Create(ctx context.Context, projectID string, b
 }
 
 // Delete request returning *DeleteResponse
-func (c *ClientWithResponses[K]) Delete(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+func (c *ClientWithResponses) Delete(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
 	rsp, err := c.DeleteRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1786,7 +1786,7 @@ func (c *ClientWithResponses[K]) Delete(ctx context.Context, projectID string, i
 }
 
 // Get request returning *GetResponse
-func (c *ClientWithResponses[K]) Get(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+func (c *ClientWithResponses) Get(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
 	rsp, err := c.GetRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1795,7 +1795,7 @@ func (c *ClientWithResponses[K]) Get(ctx context.Context, projectID string, inst
 }
 
 // UpdateWithBody request with arbitrary body returning *UpdateResponse
-func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1803,7 +1803,7 @@ func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, projectID s
 	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1812,7 +1812,7 @@ func (c *ClientWithResponses[K]) Update(ctx context.Context, projectID string, i
 }
 
 // ListInstanceCredentials request returning *ListInstanceCredentialsResponse
-func (c *ClientWithResponses[K]) ListInstanceCredentials(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListInstanceCredentialsResponse, error) {
+func (c *ClientWithResponses) ListInstanceCredentials(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*ListInstanceCredentialsResponse, error) {
 	rsp, err := c.ListInstanceCredentialsRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1821,7 +1821,7 @@ func (c *ClientWithResponses[K]) ListInstanceCredentials(ctx context.Context, pr
 }
 
 // CredentialsCreate request returning *CredentialsCreateResponse
-func (c *ClientWithResponses[K]) CredentialsCreate(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*CredentialsCreateResponse, error) {
+func (c *ClientWithResponses) CredentialsCreate(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*CredentialsCreateResponse, error) {
 	rsp, err := c.CredentialsCreateRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1830,7 +1830,7 @@ func (c *ClientWithResponses[K]) CredentialsCreate(ctx context.Context, projectI
 }
 
 // CredentialsDelete request returning *CredentialsDeleteResponse
-func (c *ClientWithResponses[K]) CredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsDeleteResponse, error) {
+func (c *ClientWithResponses) CredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsDeleteResponse, error) {
 	rsp, err := c.CredentialsDeleteRaw(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1839,7 +1839,7 @@ func (c *ClientWithResponses[K]) CredentialsDelete(ctx context.Context, projectI
 }
 
 // CredentialsRead request returning *CredentialsReadResponse
-func (c *ClientWithResponses[K]) CredentialsRead(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsReadResponse, error) {
+func (c *ClientWithResponses) CredentialsRead(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsReadResponse, error) {
 	rsp, err := c.CredentialsReadRaw(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1848,7 +1848,7 @@ func (c *ClientWithResponses[K]) CredentialsRead(ctx context.Context, projectID 
 }
 
 // CredentialsRemoteWriteLimitsDelete request returning *CredentialsRemoteWriteLimitsDeleteResponse
-func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsDeleteResponse, error) {
+func (c *ClientWithResponses) CredentialsRemoteWriteLimitsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsDeleteResponse, error) {
 	rsp, err := c.CredentialsRemoteWriteLimitsDeleteRaw(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1857,7 +1857,7 @@ func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsDelete(ctx context.
 }
 
 // CredentialsRemoteWriteLimitsList request returning *CredentialsRemoteWriteLimitsListResponse
-func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsList(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsListResponse, error) {
+func (c *ClientWithResponses) CredentialsRemoteWriteLimitsList(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsListResponse, error) {
 	rsp, err := c.CredentialsRemoteWriteLimitsListRaw(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1866,7 +1866,7 @@ func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsList(ctx context.Co
 }
 
 // CredentialsRemoteWriteLimitsUpdateWithBody request with arbitrary body returning *CredentialsRemoteWriteLimitsUpdateResponse
-func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsUpdateWithBody(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsUpdateResponse, error) {
+func (c *ClientWithResponses) CredentialsRemoteWriteLimitsUpdateWithBody(ctx context.Context, projectID string, instanceID string, username string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsUpdateResponse, error) {
 	rsp, err := c.CredentialsRemoteWriteLimitsUpdateRawWithBody(ctx, projectID, instanceID, username, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1874,7 +1874,7 @@ func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsUpdateWithBody(ctx 
 	return c.ParseCredentialsRemoteWriteLimitsUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsUpdate(ctx context.Context, projectID string, instanceID string, username string, body CredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsUpdateResponse, error) {
+func (c *ClientWithResponses) CredentialsRemoteWriteLimitsUpdate(ctx context.Context, projectID string, instanceID string, username string, body CredentialsRemoteWriteLimitsUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*CredentialsRemoteWriteLimitsUpdateResponse, error) {
 	rsp, err := c.CredentialsRemoteWriteLimitsUpdateRaw(ctx, projectID, instanceID, username, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1883,7 +1883,7 @@ func (c *ClientWithResponses[K]) CredentialsRemoteWriteLimitsUpdate(ctx context.
 }
 
 // SystemInstancesRead request returning *SystemInstancesReadResponse
-func (c *ClientWithResponses[K]) SystemInstancesRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error) {
+func (c *ClientWithResponses) SystemInstancesRead(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*SystemInstancesReadResponse, error) {
 	rsp, err := c.SystemInstancesReadRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1892,7 +1892,7 @@ func (c *ClientWithResponses[K]) SystemInstancesRead(ctx context.Context, projec
 }
 
 // SystemInstancesCredentialsCreateWithBody request with arbitrary body returning *SystemInstancesCredentialsCreateResponse
-func (c *ClientWithResponses[K]) SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
+func (c *ClientWithResponses) SystemInstancesCredentialsCreateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
 	rsp, err := c.SystemInstancesCredentialsCreateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1900,7 +1900,7 @@ func (c *ClientWithResponses[K]) SystemInstancesCredentialsCreateWithBody(ctx co
 	return c.ParseSystemInstancesCredentialsCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) SystemInstancesCredentialsCreate(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
+func (c *ClientWithResponses) SystemInstancesCredentialsCreate(ctx context.Context, projectID string, instanceID string, body SystemInstancesCredentialsCreateJSONRequestBody, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsCreateResponse, error) {
 	rsp, err := c.SystemInstancesCredentialsCreateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1909,7 +1909,7 @@ func (c *ClientWithResponses[K]) SystemInstancesCredentialsCreate(ctx context.Co
 }
 
 // SystemInstancesCredentialsDelete request returning *SystemInstancesCredentialsDeleteResponse
-func (c *ClientWithResponses[K]) SystemInstancesCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsDeleteResponse, error) {
+func (c *ClientWithResponses) SystemInstancesCredentialsDelete(ctx context.Context, projectID string, instanceID string, username string, reqEditors ...RequestEditorFn) (*SystemInstancesCredentialsDeleteResponse, error) {
 	rsp, err := c.SystemInstancesCredentialsDeleteRaw(ctx, projectID, instanceID, username, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1918,7 +1918,7 @@ func (c *ClientWithResponses[K]) SystemInstancesCredentialsDelete(ctx context.Co
 }
 
 // ParseListResponse parses an HTTP response from a List call
-func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1952,7 +1952,7 @@ func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListRes
 }
 
 // ParseCreateResponse parses an HTTP response from a Create call
-func (c *ClientWithResponses[K]) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
+func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1993,7 +1993,7 @@ func (c *ClientWithResponses[K]) ParseCreateResponse(rsp *http.Response) (*Creat
 }
 
 // ParseDeleteResponse parses an HTTP response from a Delete call
-func (c *ClientWithResponses[K]) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2027,7 +2027,7 @@ func (c *ClientWithResponses[K]) ParseDeleteResponse(rsp *http.Response) (*Delet
 }
 
 // ParseGetResponse parses an HTTP response from a Get call
-func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2061,7 +2061,7 @@ func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetRespo
 }
 
 // ParseUpdateResponse parses an HTTP response from a Update call
-func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
+func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2102,7 +2102,7 @@ func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*Updat
 }
 
 // ParseListInstanceCredentialsResponse parses an HTTP response from a ListInstanceCredentials call
-func (c *ClientWithResponses[K]) ParseListInstanceCredentialsResponse(rsp *http.Response) (*ListInstanceCredentialsResponse, error) {
+func (c *ClientWithResponses) ParseListInstanceCredentialsResponse(rsp *http.Response) (*ListInstanceCredentialsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2136,7 +2136,7 @@ func (c *ClientWithResponses[K]) ParseListInstanceCredentialsResponse(rsp *http.
 }
 
 // ParseCredentialsCreateResponse parses an HTTP response from a CredentialsCreate call
-func (c *ClientWithResponses[K]) ParseCredentialsCreateResponse(rsp *http.Response) (*CredentialsCreateResponse, error) {
+func (c *ClientWithResponses) ParseCredentialsCreateResponse(rsp *http.Response) (*CredentialsCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2170,7 +2170,7 @@ func (c *ClientWithResponses[K]) ParseCredentialsCreateResponse(rsp *http.Respon
 }
 
 // ParseCredentialsDeleteResponse parses an HTTP response from a CredentialsDelete call
-func (c *ClientWithResponses[K]) ParseCredentialsDeleteResponse(rsp *http.Response) (*CredentialsDeleteResponse, error) {
+func (c *ClientWithResponses) ParseCredentialsDeleteResponse(rsp *http.Response) (*CredentialsDeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2218,7 +2218,7 @@ func (c *ClientWithResponses[K]) ParseCredentialsDeleteResponse(rsp *http.Respon
 }
 
 // ParseCredentialsReadResponse parses an HTTP response from a CredentialsRead call
-func (c *ClientWithResponses[K]) ParseCredentialsReadResponse(rsp *http.Response) (*CredentialsReadResponse, error) {
+func (c *ClientWithResponses) ParseCredentialsReadResponse(rsp *http.Response) (*CredentialsReadResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2259,7 +2259,7 @@ func (c *ClientWithResponses[K]) ParseCredentialsReadResponse(rsp *http.Response
 }
 
 // ParseCredentialsRemoteWriteLimitsDeleteResponse parses an HTTP response from a CredentialsRemoteWriteLimitsDelete call
-func (c *ClientWithResponses[K]) ParseCredentialsRemoteWriteLimitsDeleteResponse(rsp *http.Response) (*CredentialsRemoteWriteLimitsDeleteResponse, error) {
+func (c *ClientWithResponses) ParseCredentialsRemoteWriteLimitsDeleteResponse(rsp *http.Response) (*CredentialsRemoteWriteLimitsDeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2314,7 +2314,7 @@ func (c *ClientWithResponses[K]) ParseCredentialsRemoteWriteLimitsDeleteResponse
 }
 
 // ParseCredentialsRemoteWriteLimitsListResponse parses an HTTP response from a CredentialsRemoteWriteLimitsList call
-func (c *ClientWithResponses[K]) ParseCredentialsRemoteWriteLimitsListResponse(rsp *http.Response) (*CredentialsRemoteWriteLimitsListResponse, error) {
+func (c *ClientWithResponses) ParseCredentialsRemoteWriteLimitsListResponse(rsp *http.Response) (*CredentialsRemoteWriteLimitsListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2362,7 +2362,7 @@ func (c *ClientWithResponses[K]) ParseCredentialsRemoteWriteLimitsListResponse(r
 }
 
 // ParseCredentialsRemoteWriteLimitsUpdateResponse parses an HTTP response from a CredentialsRemoteWriteLimitsUpdate call
-func (c *ClientWithResponses[K]) ParseCredentialsRemoteWriteLimitsUpdateResponse(rsp *http.Response) (*CredentialsRemoteWriteLimitsUpdateResponse, error) {
+func (c *ClientWithResponses) ParseCredentialsRemoteWriteLimitsUpdateResponse(rsp *http.Response) (*CredentialsRemoteWriteLimitsUpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2417,7 +2417,7 @@ func (c *ClientWithResponses[K]) ParseCredentialsRemoteWriteLimitsUpdateResponse
 }
 
 // ParseSystemInstancesReadResponse parses an HTTP response from a SystemInstancesRead call
-func (c *ClientWithResponses[K]) ParseSystemInstancesReadResponse(rsp *http.Response) (*SystemInstancesReadResponse, error) {
+func (c *ClientWithResponses) ParseSystemInstancesReadResponse(rsp *http.Response) (*SystemInstancesReadResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2458,7 +2458,7 @@ func (c *ClientWithResponses[K]) ParseSystemInstancesReadResponse(rsp *http.Resp
 }
 
 // ParseSystemInstancesCredentialsCreateResponse parses an HTTP response from a SystemInstancesCredentialsCreate call
-func (c *ClientWithResponses[K]) ParseSystemInstancesCredentialsCreateResponse(rsp *http.Response) (*SystemInstancesCredentialsCreateResponse, error) {
+func (c *ClientWithResponses) ParseSystemInstancesCredentialsCreateResponse(rsp *http.Response) (*SystemInstancesCredentialsCreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2492,7 +2492,7 @@ func (c *ClientWithResponses[K]) ParseSystemInstancesCredentialsCreateResponse(r
 }
 
 // ParseSystemInstancesCredentialsDeleteResponse parses an HTTP response from a SystemInstancesCredentialsDelete call
-func (c *ClientWithResponses[K]) ParseSystemInstancesCredentialsDeleteResponse(rsp *http.Response) (*SystemInstancesCredentialsDeleteResponse, error) {
+func (c *ClientWithResponses) ParseSystemInstancesCredentialsDeleteResponse(rsp *http.Response) (*SystemInstancesCredentialsDeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

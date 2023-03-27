@@ -239,7 +239,7 @@ type GetForecastCustomerAccountParamsAccept string
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -248,7 +248,7 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 
 	// A list of callbacks for modifying requests which are generated before sending over
 	// the network.
@@ -256,12 +256,12 @@ type Client[K contracts.ClientFlowConfig] struct {
 }
 
 // ClientOption allows setting custom parameters during construction
-type ClientOption[K contracts.ClientFlowConfig] func(*Client[K]) error
+type ClientOption func(*Client) error
 
 // NewRawClient creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*Client[K], error) {
+func NewRawClient(server string, opts ...ClientOption) (*Client, error) {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 	}
 	// mutate client and add all optional params
@@ -279,8 +279,8 @@ func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOpt
 
 // WithHTTPClient allows overriding the default Doer, which is
 // automatically created using http.Client. This is useful for tests.
-func WithHTTPClient[K contracts.ClientFlowConfig](doer contracts.ClientInterface[K]) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithHTTPClient(doer contracts.BaseClientInterface) ClientOption {
+	return func(c *Client) error {
 		c.Client = doer
 		return nil
 	}
@@ -288,8 +288,8 @@ func WithHTTPClient[K contracts.ClientFlowConfig](doer contracts.ClientInterface
 
 // WithRequestEditorFn allows setting up a callback function, which will be
 // called right before sending the request. This can be used to mutate the request.
-func WithRequestEditorFn[K contracts.ClientFlowConfig](fn RequestEditorFn) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
+	return func(c *Client) error {
 		c.RequestEditors = append(c.RequestEditors, fn)
 		return nil
 	}
@@ -310,7 +310,7 @@ type rawClientInterface interface {
 	GetForecastCustomerAccountRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetForecastCustomerAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) GetCostsForAllProjectsInCustomerAccountRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInCustomerAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetCostsForAllProjectsInCustomerAccountRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInCustomerAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetCostsForAllProjectsInCustomerAccountRequest(ctx, c.Server, customerAccountId, params)
 	if err != nil {
 		return nil, err
@@ -322,7 +322,7 @@ func (c *Client[K]) GetCostsForAllProjectsInCustomerAccountRaw(ctx context.Conte
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetCostsForAllProjectsInAllSubCustomerAccountsRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInAllSubCustomerAccountsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetCostsForAllProjectsInAllSubCustomerAccountsRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInAllSubCustomerAccountsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetCostsForAllProjectsInAllSubCustomerAccountsRequest(ctx, c.Server, customerAccountId, params)
 	if err != nil {
 		return nil, err
@@ -334,7 +334,7 @@ func (c *Client[K]) GetCostsForAllProjectsInAllSubCustomerAccountsRaw(ctx contex
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetProjectCostsRaw(ctx context.Context, customerAccountId openapiTypes.UUID, projectId openapiTypes.UUID, params *GetProjectCostsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetProjectCostsRaw(ctx context.Context, customerAccountId openapiTypes.UUID, projectId openapiTypes.UUID, params *GetProjectCostsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetProjectCostsRequest(ctx, c.Server, customerAccountId, projectId, params)
 	if err != nil {
 		return nil, err
@@ -346,7 +346,7 @@ func (c *Client[K]) GetProjectCostsRaw(ctx context.Context, customerAccountId op
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetForecastCustomerAccountRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetForecastCustomerAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetForecastCustomerAccountRaw(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetForecastCustomerAccountParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetForecastCustomerAccountRequest(ctx, c.Server, customerAccountId, params)
 	if err != nil {
 		return nil, err
@@ -817,7 +817,7 @@ func NewGetForecastCustomerAccountRequest(ctx context.Context, server string, cu
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -832,23 +832,23 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on ClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*ClientWithResponses[K], error) {
+func NewClient(server string, opts ...ClientOption) (*ClientWithResponses, error) {
 	client, err := NewRawClient(server, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &ClientWithResponses[K]{client}, nil
+	return &ClientWithResponses{client}, nil
 }
 
 // WithBaseURL overrides the baseURL.
-func WithBaseURL[K contracts.ClientFlowConfig](baseURL string) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
 		newBaseURL, err := url.Parse(baseURL)
 		if err != nil {
 			return err
@@ -1211,7 +1211,7 @@ func (r GetForecastCustomerAccountResponse) StatusCode() int {
 }
 
 // GetCostsForAllProjectsInCustomerAccount request returning *GetCostsForAllProjectsInCustomerAccountResponse
-func (c *ClientWithResponses[K]) GetCostsForAllProjectsInCustomerAccount(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInCustomerAccountParams, reqEditors ...RequestEditorFn) (*GetCostsForAllProjectsInCustomerAccountResponse, error) {
+func (c *ClientWithResponses) GetCostsForAllProjectsInCustomerAccount(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInCustomerAccountParams, reqEditors ...RequestEditorFn) (*GetCostsForAllProjectsInCustomerAccountResponse, error) {
 	rsp, err := c.GetCostsForAllProjectsInCustomerAccountRaw(ctx, customerAccountId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1220,7 +1220,7 @@ func (c *ClientWithResponses[K]) GetCostsForAllProjectsInCustomerAccount(ctx con
 }
 
 // GetCostsForAllProjectsInAllSubCustomerAccounts request returning *GetCostsForAllProjectsInAllSubCustomerAccountsResponse
-func (c *ClientWithResponses[K]) GetCostsForAllProjectsInAllSubCustomerAccounts(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInAllSubCustomerAccountsParams, reqEditors ...RequestEditorFn) (*GetCostsForAllProjectsInAllSubCustomerAccountsResponse, error) {
+func (c *ClientWithResponses) GetCostsForAllProjectsInAllSubCustomerAccounts(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetCostsForAllProjectsInAllSubCustomerAccountsParams, reqEditors ...RequestEditorFn) (*GetCostsForAllProjectsInAllSubCustomerAccountsResponse, error) {
 	rsp, err := c.GetCostsForAllProjectsInAllSubCustomerAccountsRaw(ctx, customerAccountId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1229,7 +1229,7 @@ func (c *ClientWithResponses[K]) GetCostsForAllProjectsInAllSubCustomerAccounts(
 }
 
 // GetProjectCosts request returning *GetProjectCostsResponse
-func (c *ClientWithResponses[K]) GetProjectCosts(ctx context.Context, customerAccountId openapiTypes.UUID, projectId openapiTypes.UUID, params *GetProjectCostsParams, reqEditors ...RequestEditorFn) (*GetProjectCostsResponse, error) {
+func (c *ClientWithResponses) GetProjectCosts(ctx context.Context, customerAccountId openapiTypes.UUID, projectId openapiTypes.UUID, params *GetProjectCostsParams, reqEditors ...RequestEditorFn) (*GetProjectCostsResponse, error) {
 	rsp, err := c.GetProjectCostsRaw(ctx, customerAccountId, projectId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1238,7 +1238,7 @@ func (c *ClientWithResponses[K]) GetProjectCosts(ctx context.Context, customerAc
 }
 
 // GetForecastCustomerAccount request returning *GetForecastCustomerAccountResponse
-func (c *ClientWithResponses[K]) GetForecastCustomerAccount(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetForecastCustomerAccountParams, reqEditors ...RequestEditorFn) (*GetForecastCustomerAccountResponse, error) {
+func (c *ClientWithResponses) GetForecastCustomerAccount(ctx context.Context, customerAccountId openapiTypes.UUID, params *GetForecastCustomerAccountParams, reqEditors ...RequestEditorFn) (*GetForecastCustomerAccountResponse, error) {
 	rsp, err := c.GetForecastCustomerAccountRaw(ctx, customerAccountId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -1247,7 +1247,7 @@ func (c *ClientWithResponses[K]) GetForecastCustomerAccount(ctx context.Context,
 }
 
 // ParseGetCostsForAllProjectsInCustomerAccountResponse parses an HTTP response from a GetCostsForAllProjectsInCustomerAccount call
-func (c *ClientWithResponses[K]) ParseGetCostsForAllProjectsInCustomerAccountResponse(rsp *http.Response) (*GetCostsForAllProjectsInCustomerAccountResponse, error) {
+func (c *ClientWithResponses) ParseGetCostsForAllProjectsInCustomerAccountResponse(rsp *http.Response) (*GetCostsForAllProjectsInCustomerAccountResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1357,7 +1357,7 @@ func (c *ClientWithResponses[K]) ParseGetCostsForAllProjectsInCustomerAccountRes
 }
 
 // ParseGetCostsForAllProjectsInAllSubCustomerAccountsResponse parses an HTTP response from a GetCostsForAllProjectsInAllSubCustomerAccounts call
-func (c *ClientWithResponses[K]) ParseGetCostsForAllProjectsInAllSubCustomerAccountsResponse(rsp *http.Response) (*GetCostsForAllProjectsInAllSubCustomerAccountsResponse, error) {
+func (c *ClientWithResponses) ParseGetCostsForAllProjectsInAllSubCustomerAccountsResponse(rsp *http.Response) (*GetCostsForAllProjectsInAllSubCustomerAccountsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1467,7 +1467,7 @@ func (c *ClientWithResponses[K]) ParseGetCostsForAllProjectsInAllSubCustomerAcco
 }
 
 // ParseGetProjectCostsResponse parses an HTTP response from a GetProjectCosts call
-func (c *ClientWithResponses[K]) ParseGetProjectCostsResponse(rsp *http.Response) (*GetProjectCostsResponse, error) {
+func (c *ClientWithResponses) ParseGetProjectCostsResponse(rsp *http.Response) (*GetProjectCostsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -1580,7 +1580,7 @@ func (c *ClientWithResponses[K]) ParseGetProjectCostsResponse(rsp *http.Response
 }
 
 // ParseGetForecastCustomerAccountResponse parses an HTTP response from a GetForecastCustomerAccount call
-func (c *ClientWithResponses[K]) ParseGetForecastCustomerAccountResponse(rsp *http.Response) (*GetForecastCustomerAccountResponse, error) {
+func (c *ClientWithResponses) ParseGetForecastCustomerAccountResponse(rsp *http.Response) (*GetForecastCustomerAccountResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

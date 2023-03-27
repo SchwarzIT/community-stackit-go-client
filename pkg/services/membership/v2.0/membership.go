@@ -324,7 +324,7 @@ type RemoveRolesJSONRequestBody = RemoveRolesPayload
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -333,13 +333,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -428,7 +428,7 @@ type rawClientInterface interface {
 	GetRolesRaw(ctx context.Context, resourceType string, resourceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) GetPermissionsRaw(ctx context.Context, params *GetPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetPermissionsRaw(ctx context.Context, params *GetPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetPermissionsRequest(ctx, c.Server, params)
 	if err != nil {
 		return nil, err
@@ -440,7 +440,7 @@ func (c *Client[K]) GetPermissionsRaw(ctx context.Context, params *GetPermission
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddPermissionsRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddPermissionsRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddPermissionsRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -452,7 +452,7 @@ func (c *Client[K]) AddPermissionsRawWithBody(ctx context.Context, contentType s
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddPermissionsRaw(ctx context.Context, body AddPermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddPermissionsRaw(ctx context.Context, body AddPermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddPermissionsRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -464,7 +464,7 @@ func (c *Client[K]) AddPermissionsRaw(ctx context.Context, body AddPermissionsJS
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemovePermissionsRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemovePermissionsRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemovePermissionsRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -476,7 +476,7 @@ func (c *Client[K]) RemovePermissionsRawWithBody(ctx context.Context, contentTyp
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemovePermissionsRaw(ctx context.Context, body RemovePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemovePermissionsRaw(ctx context.Context, body RemovePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemovePermissionsRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -488,7 +488,7 @@ func (c *Client[K]) RemovePermissionsRaw(ctx context.Context, body RemovePermiss
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetDefaultRolesRaw(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetDefaultRolesRaw(ctx context.Context, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetDefaultRolesRequest(ctx, c.Server)
 	if err != nil {
 		return nil, err
@@ -500,7 +500,7 @@ func (c *Client[K]) GetDefaultRolesRaw(ctx context.Context, reqEditors ...Reques
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddDefaultRolesRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddDefaultRolesRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddDefaultRolesRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -512,7 +512,7 @@ func (c *Client[K]) AddDefaultRolesRawWithBody(ctx context.Context, contentType 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddDefaultRolesRaw(ctx context.Context, body AddDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddDefaultRolesRaw(ctx context.Context, body AddDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddDefaultRolesRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -524,7 +524,7 @@ func (c *Client[K]) AddDefaultRolesRaw(ctx context.Context, body AddDefaultRoles
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemoveDefaultRolesRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveDefaultRolesRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveDefaultRolesRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -536,7 +536,7 @@ func (c *Client[K]) RemoveDefaultRolesRawWithBody(ctx context.Context, contentTy
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemoveDefaultRolesRaw(ctx context.Context, body RemoveDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveDefaultRolesRaw(ctx context.Context, body RemoveDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveDefaultRolesRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -548,7 +548,7 @@ func (c *Client[K]) RemoveDefaultRolesRaw(ctx context.Context, body RemoveDefaul
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetSubjectsRaw(ctx context.Context, params *GetSubjectsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetSubjectsRaw(ctx context.Context, params *GetSubjectsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetSubjectsRequest(ctx, c.Server, params)
 	if err != nil {
 		return nil, err
@@ -560,7 +560,7 @@ func (c *Client[K]) GetSubjectsRaw(ctx context.Context, params *GetSubjectsParam
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetUserMembershipsRaw(ctx context.Context, email string, params *GetUserMembershipsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetUserMembershipsRaw(ctx context.Context, email string, params *GetUserMembershipsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserMembershipsRequest(ctx, c.Server, email, params)
 	if err != nil {
 		return nil, err
@@ -572,7 +572,7 @@ func (c *Client[K]) GetUserMembershipsRaw(ctx context.Context, email string, par
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetUserPermissionsRaw(ctx context.Context, email string, params *GetUserPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetUserPermissionsRaw(ctx context.Context, email string, params *GetUserPermissionsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserPermissionsRequest(ctx, c.Server, email, params)
 	if err != nil {
 		return nil, err
@@ -584,7 +584,7 @@ func (c *Client[K]) GetUserPermissionsRaw(ctx context.Context, email string, par
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetUserResourcesRaw(ctx context.Context, email string, params *GetUserResourcesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetUserResourcesRaw(ctx context.Context, email string, params *GetUserResourcesParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetUserResourcesRequest(ctx, c.Server, email, params)
 	if err != nil {
 		return nil, err
@@ -596,7 +596,7 @@ func (c *Client[K]) GetUserResourcesRaw(ctx context.Context, email string, param
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ValidateChildMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ValidateChildMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewValidateChildMembersRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -608,7 +608,7 @@ func (c *Client[K]) ValidateChildMembersRawWithBody(ctx context.Context, resourc
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ValidateChildMembersRaw(ctx context.Context, resourceID string, body ValidateChildMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ValidateChildMembersRaw(ctx context.Context, resourceID string, body ValidateChildMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewValidateChildMembersRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -620,7 +620,7 @@ func (c *Client[K]) ValidateChildMembersRaw(ctx context.Context, resourceID stri
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddMembersRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -632,7 +632,7 @@ func (c *Client[K]) AddMembersRawWithBody(ctx context.Context, resourceID string
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddMembersRaw(ctx context.Context, resourceID string, body AddMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddMembersRaw(ctx context.Context, resourceID string, body AddMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddMembersRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -644,7 +644,7 @@ func (c *Client[K]) AddMembersRaw(ctx context.Context, resourceID string, body A
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReplaceMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReplaceMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReplaceMembersRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -656,7 +656,7 @@ func (c *Client[K]) ReplaceMembersRawWithBody(ctx context.Context, resourceID st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ReplaceMembersRaw(ctx context.Context, resourceID string, body ReplaceMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ReplaceMembersRaw(ctx context.Context, resourceID string, body ReplaceMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewReplaceMembersRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -668,7 +668,7 @@ func (c *Client[K]) ReplaceMembersRaw(ctx context.Context, resourceID string, bo
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemoveMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveMembersRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -680,7 +680,7 @@ func (c *Client[K]) RemoveMembersRawWithBody(ctx context.Context, resourceID str
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemoveMembersRaw(ctx context.Context, resourceID string, body RemoveMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveMembersRaw(ctx context.Context, resourceID string, body RemoveMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveMembersRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -692,7 +692,7 @@ func (c *Client[K]) RemoveMembersRaw(ctx context.Context, resourceID string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ValidateMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ValidateMembersRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewValidateMembersRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -704,7 +704,7 @@ func (c *Client[K]) ValidateMembersRawWithBody(ctx context.Context, resourceID s
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ValidateMembersRaw(ctx context.Context, resourceID string, body ValidateMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ValidateMembersRaw(ctx context.Context, resourceID string, body ValidateMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewValidateMembersRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -716,7 +716,7 @@ func (c *Client[K]) ValidateMembersRaw(ctx context.Context, resourceID string, b
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddRolesRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddRolesRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddRolesRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -728,7 +728,7 @@ func (c *Client[K]) AddRolesRawWithBody(ctx context.Context, resourceID string, 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) AddRolesRaw(ctx context.Context, resourceID string, body AddRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) AddRolesRaw(ctx context.Context, resourceID string, body AddRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewAddRolesRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -740,7 +740,7 @@ func (c *Client[K]) AddRolesRaw(ctx context.Context, resourceID string, body Add
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemoveRolesRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveRolesRawWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveRolesRequestWithBody(ctx, c.Server, resourceID, contentType, body)
 	if err != nil {
 		return nil, err
@@ -752,7 +752,7 @@ func (c *Client[K]) RemoveRolesRawWithBody(ctx context.Context, resourceID strin
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) RemoveRolesRaw(ctx context.Context, resourceID string, body RemoveRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) RemoveRolesRaw(ctx context.Context, resourceID string, body RemoveRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewRemoveRolesRequest(ctx, c.Server, resourceID, body)
 	if err != nil {
 		return nil, err
@@ -764,7 +764,7 @@ func (c *Client[K]) RemoveRolesRaw(ctx context.Context, resourceID string, body 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetMembersRaw(ctx context.Context, resourceType string, resourceID string, params *GetMembersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetMembersRaw(ctx context.Context, resourceType string, resourceID string, params *GetMembersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetMembersRequest(ctx, c.Server, resourceType, resourceID, params)
 	if err != nil {
 		return nil, err
@@ -776,7 +776,7 @@ func (c *Client[K]) GetMembersRaw(ctx context.Context, resourceType string, reso
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetRolesRaw(ctx context.Context, resourceType string, resourceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetRolesRaw(ctx context.Context, resourceType string, resourceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRolesRequest(ctx, c.Server, resourceType, resourceID)
 	if err != nil {
 		return nil, err
@@ -1838,7 +1838,7 @@ func NewGetRolesRequest(ctx context.Context, server string, resourceType string,
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -1848,18 +1848,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// GetPermissions request
 	GetPermissions(ctx context.Context, params *GetPermissionsParams, reqEditors ...RequestEditorFn) (*GetPermissionsResponse, error)
 
@@ -2432,7 +2432,7 @@ func (r GetRolesResponse) StatusCode() int {
 }
 
 // GetPermissions request returning *GetPermissionsResponse
-func (c *ClientWithResponses[K]) GetPermissions(ctx context.Context, params *GetPermissionsParams, reqEditors ...RequestEditorFn) (*GetPermissionsResponse, error) {
+func (c *ClientWithResponses) GetPermissions(ctx context.Context, params *GetPermissionsParams, reqEditors ...RequestEditorFn) (*GetPermissionsResponse, error) {
 	rsp, err := c.GetPermissionsRaw(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2441,7 +2441,7 @@ func (c *ClientWithResponses[K]) GetPermissions(ctx context.Context, params *Get
 }
 
 // AddPermissionsWithBody request with arbitrary body returning *AddPermissionsResponse
-func (c *ClientWithResponses[K]) AddPermissionsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddPermissionsResponse, error) {
+func (c *ClientWithResponses) AddPermissionsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddPermissionsResponse, error) {
 	rsp, err := c.AddPermissionsRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2449,7 +2449,7 @@ func (c *ClientWithResponses[K]) AddPermissionsWithBody(ctx context.Context, con
 	return c.ParseAddPermissionsResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) AddPermissions(ctx context.Context, body AddPermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*AddPermissionsResponse, error) {
+func (c *ClientWithResponses) AddPermissions(ctx context.Context, body AddPermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*AddPermissionsResponse, error) {
 	rsp, err := c.AddPermissionsRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2458,7 +2458,7 @@ func (c *ClientWithResponses[K]) AddPermissions(ctx context.Context, body AddPer
 }
 
 // RemovePermissionsWithBody request with arbitrary body returning *RemovePermissionsResponse
-func (c *ClientWithResponses[K]) RemovePermissionsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemovePermissionsResponse, error) {
+func (c *ClientWithResponses) RemovePermissionsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemovePermissionsResponse, error) {
 	rsp, err := c.RemovePermissionsRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2466,7 +2466,7 @@ func (c *ClientWithResponses[K]) RemovePermissionsWithBody(ctx context.Context, 
 	return c.ParseRemovePermissionsResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) RemovePermissions(ctx context.Context, body RemovePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*RemovePermissionsResponse, error) {
+func (c *ClientWithResponses) RemovePermissions(ctx context.Context, body RemovePermissionsJSONRequestBody, reqEditors ...RequestEditorFn) (*RemovePermissionsResponse, error) {
 	rsp, err := c.RemovePermissionsRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2475,7 +2475,7 @@ func (c *ClientWithResponses[K]) RemovePermissions(ctx context.Context, body Rem
 }
 
 // GetDefaultRoles request returning *GetDefaultRolesResponse
-func (c *ClientWithResponses[K]) GetDefaultRoles(ctx context.Context, reqEditors ...RequestEditorFn) (*GetDefaultRolesResponse, error) {
+func (c *ClientWithResponses) GetDefaultRoles(ctx context.Context, reqEditors ...RequestEditorFn) (*GetDefaultRolesResponse, error) {
 	rsp, err := c.GetDefaultRolesRaw(ctx, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2484,7 +2484,7 @@ func (c *ClientWithResponses[K]) GetDefaultRoles(ctx context.Context, reqEditors
 }
 
 // AddDefaultRolesWithBody request with arbitrary body returning *AddDefaultRolesResponse
-func (c *ClientWithResponses[K]) AddDefaultRolesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddDefaultRolesResponse, error) {
+func (c *ClientWithResponses) AddDefaultRolesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddDefaultRolesResponse, error) {
 	rsp, err := c.AddDefaultRolesRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2492,7 +2492,7 @@ func (c *ClientWithResponses[K]) AddDefaultRolesWithBody(ctx context.Context, co
 	return c.ParseAddDefaultRolesResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) AddDefaultRoles(ctx context.Context, body AddDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*AddDefaultRolesResponse, error) {
+func (c *ClientWithResponses) AddDefaultRoles(ctx context.Context, body AddDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*AddDefaultRolesResponse, error) {
 	rsp, err := c.AddDefaultRolesRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2501,7 +2501,7 @@ func (c *ClientWithResponses[K]) AddDefaultRoles(ctx context.Context, body AddDe
 }
 
 // RemoveDefaultRolesWithBody request with arbitrary body returning *RemoveDefaultRolesResponse
-func (c *ClientWithResponses[K]) RemoveDefaultRolesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveDefaultRolesResponse, error) {
+func (c *ClientWithResponses) RemoveDefaultRolesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveDefaultRolesResponse, error) {
 	rsp, err := c.RemoveDefaultRolesRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2509,7 +2509,7 @@ func (c *ClientWithResponses[K]) RemoveDefaultRolesWithBody(ctx context.Context,
 	return c.ParseRemoveDefaultRolesResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) RemoveDefaultRoles(ctx context.Context, body RemoveDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveDefaultRolesResponse, error) {
+func (c *ClientWithResponses) RemoveDefaultRoles(ctx context.Context, body RemoveDefaultRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveDefaultRolesResponse, error) {
 	rsp, err := c.RemoveDefaultRolesRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2518,7 +2518,7 @@ func (c *ClientWithResponses[K]) RemoveDefaultRoles(ctx context.Context, body Re
 }
 
 // GetSubjects request returning *GetSubjectsResponse
-func (c *ClientWithResponses[K]) GetSubjects(ctx context.Context, params *GetSubjectsParams, reqEditors ...RequestEditorFn) (*GetSubjectsResponse, error) {
+func (c *ClientWithResponses) GetSubjects(ctx context.Context, params *GetSubjectsParams, reqEditors ...RequestEditorFn) (*GetSubjectsResponse, error) {
 	rsp, err := c.GetSubjectsRaw(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2527,7 +2527,7 @@ func (c *ClientWithResponses[K]) GetSubjects(ctx context.Context, params *GetSub
 }
 
 // GetUserMemberships request returning *GetUserMembershipsResponse
-func (c *ClientWithResponses[K]) GetUserMemberships(ctx context.Context, email string, params *GetUserMembershipsParams, reqEditors ...RequestEditorFn) (*GetUserMembershipsResponse, error) {
+func (c *ClientWithResponses) GetUserMemberships(ctx context.Context, email string, params *GetUserMembershipsParams, reqEditors ...RequestEditorFn) (*GetUserMembershipsResponse, error) {
 	rsp, err := c.GetUserMembershipsRaw(ctx, email, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2536,7 +2536,7 @@ func (c *ClientWithResponses[K]) GetUserMemberships(ctx context.Context, email s
 }
 
 // GetUserPermissions request returning *GetUserPermissionsResponse
-func (c *ClientWithResponses[K]) GetUserPermissions(ctx context.Context, email string, params *GetUserPermissionsParams, reqEditors ...RequestEditorFn) (*GetUserPermissionsResponse, error) {
+func (c *ClientWithResponses) GetUserPermissions(ctx context.Context, email string, params *GetUserPermissionsParams, reqEditors ...RequestEditorFn) (*GetUserPermissionsResponse, error) {
 	rsp, err := c.GetUserPermissionsRaw(ctx, email, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2545,7 +2545,7 @@ func (c *ClientWithResponses[K]) GetUserPermissions(ctx context.Context, email s
 }
 
 // GetUserResources request returning *GetUserResourcesResponse
-func (c *ClientWithResponses[K]) GetUserResources(ctx context.Context, email string, params *GetUserResourcesParams, reqEditors ...RequestEditorFn) (*GetUserResourcesResponse, error) {
+func (c *ClientWithResponses) GetUserResources(ctx context.Context, email string, params *GetUserResourcesParams, reqEditors ...RequestEditorFn) (*GetUserResourcesResponse, error) {
 	rsp, err := c.GetUserResourcesRaw(ctx, email, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2554,7 +2554,7 @@ func (c *ClientWithResponses[K]) GetUserResources(ctx context.Context, email str
 }
 
 // ValidateChildMembersWithBody request with arbitrary body returning *ValidateChildMembersResponse
-func (c *ClientWithResponses[K]) ValidateChildMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ValidateChildMembersResponse, error) {
+func (c *ClientWithResponses) ValidateChildMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ValidateChildMembersResponse, error) {
 	rsp, err := c.ValidateChildMembersRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2562,7 +2562,7 @@ func (c *ClientWithResponses[K]) ValidateChildMembersWithBody(ctx context.Contex
 	return c.ParseValidateChildMembersResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) ValidateChildMembers(ctx context.Context, resourceID string, body ValidateChildMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ValidateChildMembersResponse, error) {
+func (c *ClientWithResponses) ValidateChildMembers(ctx context.Context, resourceID string, body ValidateChildMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ValidateChildMembersResponse, error) {
 	rsp, err := c.ValidateChildMembersRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2571,7 +2571,7 @@ func (c *ClientWithResponses[K]) ValidateChildMembers(ctx context.Context, resou
 }
 
 // AddMembersWithBody request with arbitrary body returning *AddMembersResponse
-func (c *ClientWithResponses[K]) AddMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddMembersResponse, error) {
+func (c *ClientWithResponses) AddMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddMembersResponse, error) {
 	rsp, err := c.AddMembersRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2579,7 +2579,7 @@ func (c *ClientWithResponses[K]) AddMembersWithBody(ctx context.Context, resourc
 	return c.ParseAddMembersResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) AddMembers(ctx context.Context, resourceID string, body AddMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*AddMembersResponse, error) {
+func (c *ClientWithResponses) AddMembers(ctx context.Context, resourceID string, body AddMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*AddMembersResponse, error) {
 	rsp, err := c.AddMembersRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2588,7 +2588,7 @@ func (c *ClientWithResponses[K]) AddMembers(ctx context.Context, resourceID stri
 }
 
 // ReplaceMembersWithBody request with arbitrary body returning *ReplaceMembersResponse
-func (c *ClientWithResponses[K]) ReplaceMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceMembersResponse, error) {
+func (c *ClientWithResponses) ReplaceMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ReplaceMembersResponse, error) {
 	rsp, err := c.ReplaceMembersRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2596,7 +2596,7 @@ func (c *ClientWithResponses[K]) ReplaceMembersWithBody(ctx context.Context, res
 	return c.ParseReplaceMembersResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) ReplaceMembers(ctx context.Context, resourceID string, body ReplaceMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceMembersResponse, error) {
+func (c *ClientWithResponses) ReplaceMembers(ctx context.Context, resourceID string, body ReplaceMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ReplaceMembersResponse, error) {
 	rsp, err := c.ReplaceMembersRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2605,7 +2605,7 @@ func (c *ClientWithResponses[K]) ReplaceMembers(ctx context.Context, resourceID 
 }
 
 // RemoveMembersWithBody request with arbitrary body returning *RemoveMembersResponse
-func (c *ClientWithResponses[K]) RemoveMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveMembersResponse, error) {
+func (c *ClientWithResponses) RemoveMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveMembersResponse, error) {
 	rsp, err := c.RemoveMembersRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2613,7 +2613,7 @@ func (c *ClientWithResponses[K]) RemoveMembersWithBody(ctx context.Context, reso
 	return c.ParseRemoveMembersResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) RemoveMembers(ctx context.Context, resourceID string, body RemoveMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveMembersResponse, error) {
+func (c *ClientWithResponses) RemoveMembers(ctx context.Context, resourceID string, body RemoveMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveMembersResponse, error) {
 	rsp, err := c.RemoveMembersRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2622,7 +2622,7 @@ func (c *ClientWithResponses[K]) RemoveMembers(ctx context.Context, resourceID s
 }
 
 // ValidateMembersWithBody request with arbitrary body returning *ValidateMembersResponse
-func (c *ClientWithResponses[K]) ValidateMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ValidateMembersResponse, error) {
+func (c *ClientWithResponses) ValidateMembersWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ValidateMembersResponse, error) {
 	rsp, err := c.ValidateMembersRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2630,7 +2630,7 @@ func (c *ClientWithResponses[K]) ValidateMembersWithBody(ctx context.Context, re
 	return c.ParseValidateMembersResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) ValidateMembers(ctx context.Context, resourceID string, body ValidateMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ValidateMembersResponse, error) {
+func (c *ClientWithResponses) ValidateMembers(ctx context.Context, resourceID string, body ValidateMembersJSONRequestBody, reqEditors ...RequestEditorFn) (*ValidateMembersResponse, error) {
 	rsp, err := c.ValidateMembersRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2639,7 +2639,7 @@ func (c *ClientWithResponses[K]) ValidateMembers(ctx context.Context, resourceID
 }
 
 // AddRolesWithBody request with arbitrary body returning *AddRolesResponse
-func (c *ClientWithResponses[K]) AddRolesWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolesResponse, error) {
+func (c *ClientWithResponses) AddRolesWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*AddRolesResponse, error) {
 	rsp, err := c.AddRolesRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2647,7 +2647,7 @@ func (c *ClientWithResponses[K]) AddRolesWithBody(ctx context.Context, resourceI
 	return c.ParseAddRolesResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) AddRoles(ctx context.Context, resourceID string, body AddRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolesResponse, error) {
+func (c *ClientWithResponses) AddRoles(ctx context.Context, resourceID string, body AddRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*AddRolesResponse, error) {
 	rsp, err := c.AddRolesRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2656,7 +2656,7 @@ func (c *ClientWithResponses[K]) AddRoles(ctx context.Context, resourceID string
 }
 
 // RemoveRolesWithBody request with arbitrary body returning *RemoveRolesResponse
-func (c *ClientWithResponses[K]) RemoveRolesWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolesResponse, error) {
+func (c *ClientWithResponses) RemoveRolesWithBody(ctx context.Context, resourceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*RemoveRolesResponse, error) {
 	rsp, err := c.RemoveRolesRawWithBody(ctx, resourceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2664,7 +2664,7 @@ func (c *ClientWithResponses[K]) RemoveRolesWithBody(ctx context.Context, resour
 	return c.ParseRemoveRolesResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) RemoveRoles(ctx context.Context, resourceID string, body RemoveRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolesResponse, error) {
+func (c *ClientWithResponses) RemoveRoles(ctx context.Context, resourceID string, body RemoveRolesJSONRequestBody, reqEditors ...RequestEditorFn) (*RemoveRolesResponse, error) {
 	rsp, err := c.RemoveRolesRaw(ctx, resourceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2673,7 +2673,7 @@ func (c *ClientWithResponses[K]) RemoveRoles(ctx context.Context, resourceID str
 }
 
 // GetMembers request returning *GetMembersResponse
-func (c *ClientWithResponses[K]) GetMembers(ctx context.Context, resourceType string, resourceID string, params *GetMembersParams, reqEditors ...RequestEditorFn) (*GetMembersResponse, error) {
+func (c *ClientWithResponses) GetMembers(ctx context.Context, resourceType string, resourceID string, params *GetMembersParams, reqEditors ...RequestEditorFn) (*GetMembersResponse, error) {
 	rsp, err := c.GetMembersRaw(ctx, resourceType, resourceID, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2682,7 +2682,7 @@ func (c *ClientWithResponses[K]) GetMembers(ctx context.Context, resourceType st
 }
 
 // GetRoles request returning *GetRolesResponse
-func (c *ClientWithResponses[K]) GetRoles(ctx context.Context, resourceType string, resourceID string, reqEditors ...RequestEditorFn) (*GetRolesResponse, error) {
+func (c *ClientWithResponses) GetRoles(ctx context.Context, resourceType string, resourceID string, reqEditors ...RequestEditorFn) (*GetRolesResponse, error) {
 	rsp, err := c.GetRolesRaw(ctx, resourceType, resourceID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -2691,7 +2691,7 @@ func (c *ClientWithResponses[K]) GetRoles(ctx context.Context, resourceType stri
 }
 
 // ParseGetPermissionsResponse parses an HTTP response from a GetPermissions call
-func (c *ClientWithResponses[K]) ParseGetPermissionsResponse(rsp *http.Response) (*GetPermissionsResponse, error) {
+func (c *ClientWithResponses) ParseGetPermissionsResponse(rsp *http.Response) (*GetPermissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2739,7 +2739,7 @@ func (c *ClientWithResponses[K]) ParseGetPermissionsResponse(rsp *http.Response)
 }
 
 // ParseAddPermissionsResponse parses an HTTP response from a AddPermissions call
-func (c *ClientWithResponses[K]) ParseAddPermissionsResponse(rsp *http.Response) (*AddPermissionsResponse, error) {
+func (c *ClientWithResponses) ParseAddPermissionsResponse(rsp *http.Response) (*AddPermissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2787,7 +2787,7 @@ func (c *ClientWithResponses[K]) ParseAddPermissionsResponse(rsp *http.Response)
 }
 
 // ParseRemovePermissionsResponse parses an HTTP response from a RemovePermissions call
-func (c *ClientWithResponses[K]) ParseRemovePermissionsResponse(rsp *http.Response) (*RemovePermissionsResponse, error) {
+func (c *ClientWithResponses) ParseRemovePermissionsResponse(rsp *http.Response) (*RemovePermissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2835,7 +2835,7 @@ func (c *ClientWithResponses[K]) ParseRemovePermissionsResponse(rsp *http.Respon
 }
 
 // ParseGetDefaultRolesResponse parses an HTTP response from a GetDefaultRoles call
-func (c *ClientWithResponses[K]) ParseGetDefaultRolesResponse(rsp *http.Response) (*GetDefaultRolesResponse, error) {
+func (c *ClientWithResponses) ParseGetDefaultRolesResponse(rsp *http.Response) (*GetDefaultRolesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2876,7 +2876,7 @@ func (c *ClientWithResponses[K]) ParseGetDefaultRolesResponse(rsp *http.Response
 }
 
 // ParseAddDefaultRolesResponse parses an HTTP response from a AddDefaultRoles call
-func (c *ClientWithResponses[K]) ParseAddDefaultRolesResponse(rsp *http.Response) (*AddDefaultRolesResponse, error) {
+func (c *ClientWithResponses) ParseAddDefaultRolesResponse(rsp *http.Response) (*AddDefaultRolesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2924,7 +2924,7 @@ func (c *ClientWithResponses[K]) ParseAddDefaultRolesResponse(rsp *http.Response
 }
 
 // ParseRemoveDefaultRolesResponse parses an HTTP response from a RemoveDefaultRoles call
-func (c *ClientWithResponses[K]) ParseRemoveDefaultRolesResponse(rsp *http.Response) (*RemoveDefaultRolesResponse, error) {
+func (c *ClientWithResponses) ParseRemoveDefaultRolesResponse(rsp *http.Response) (*RemoveDefaultRolesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -2972,7 +2972,7 @@ func (c *ClientWithResponses[K]) ParseRemoveDefaultRolesResponse(rsp *http.Respo
 }
 
 // ParseGetSubjectsResponse parses an HTTP response from a GetSubjects call
-func (c *ClientWithResponses[K]) ParseGetSubjectsResponse(rsp *http.Response) (*GetSubjectsResponse, error) {
+func (c *ClientWithResponses) ParseGetSubjectsResponse(rsp *http.Response) (*GetSubjectsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3020,7 +3020,7 @@ func (c *ClientWithResponses[K]) ParseGetSubjectsResponse(rsp *http.Response) (*
 }
 
 // ParseGetUserMembershipsResponse parses an HTTP response from a GetUserMemberships call
-func (c *ClientWithResponses[K]) ParseGetUserMembershipsResponse(rsp *http.Response) (*GetUserMembershipsResponse, error) {
+func (c *ClientWithResponses) ParseGetUserMembershipsResponse(rsp *http.Response) (*GetUserMembershipsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3068,7 +3068,7 @@ func (c *ClientWithResponses[K]) ParseGetUserMembershipsResponse(rsp *http.Respo
 }
 
 // ParseGetUserPermissionsResponse parses an HTTP response from a GetUserPermissions call
-func (c *ClientWithResponses[K]) ParseGetUserPermissionsResponse(rsp *http.Response) (*GetUserPermissionsResponse, error) {
+func (c *ClientWithResponses) ParseGetUserPermissionsResponse(rsp *http.Response) (*GetUserPermissionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3116,7 +3116,7 @@ func (c *ClientWithResponses[K]) ParseGetUserPermissionsResponse(rsp *http.Respo
 }
 
 // ParseGetUserResourcesResponse parses an HTTP response from a GetUserResources call
-func (c *ClientWithResponses[K]) ParseGetUserResourcesResponse(rsp *http.Response) (*GetUserResourcesResponse, error) {
+func (c *ClientWithResponses) ParseGetUserResourcesResponse(rsp *http.Response) (*GetUserResourcesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3164,7 +3164,7 @@ func (c *ClientWithResponses[K]) ParseGetUserResourcesResponse(rsp *http.Respons
 }
 
 // ParseValidateChildMembersResponse parses an HTTP response from a ValidateChildMembers call
-func (c *ClientWithResponses[K]) ParseValidateChildMembersResponse(rsp *http.Response) (*ValidateChildMembersResponse, error) {
+func (c *ClientWithResponses) ParseValidateChildMembersResponse(rsp *http.Response) (*ValidateChildMembersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3205,7 +3205,7 @@ func (c *ClientWithResponses[K]) ParseValidateChildMembersResponse(rsp *http.Res
 }
 
 // ParseAddMembersResponse parses an HTTP response from a AddMembers call
-func (c *ClientWithResponses[K]) ParseAddMembersResponse(rsp *http.Response) (*AddMembersResponse, error) {
+func (c *ClientWithResponses) ParseAddMembersResponse(rsp *http.Response) (*AddMembersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3253,7 +3253,7 @@ func (c *ClientWithResponses[K]) ParseAddMembersResponse(rsp *http.Response) (*A
 }
 
 // ParseReplaceMembersResponse parses an HTTP response from a ReplaceMembers call
-func (c *ClientWithResponses[K]) ParseReplaceMembersResponse(rsp *http.Response) (*ReplaceMembersResponse, error) {
+func (c *ClientWithResponses) ParseReplaceMembersResponse(rsp *http.Response) (*ReplaceMembersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3301,7 +3301,7 @@ func (c *ClientWithResponses[K]) ParseReplaceMembersResponse(rsp *http.Response)
 }
 
 // ParseRemoveMembersResponse parses an HTTP response from a RemoveMembers call
-func (c *ClientWithResponses[K]) ParseRemoveMembersResponse(rsp *http.Response) (*RemoveMembersResponse, error) {
+func (c *ClientWithResponses) ParseRemoveMembersResponse(rsp *http.Response) (*RemoveMembersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3349,7 +3349,7 @@ func (c *ClientWithResponses[K]) ParseRemoveMembersResponse(rsp *http.Response) 
 }
 
 // ParseValidateMembersResponse parses an HTTP response from a ValidateMembers call
-func (c *ClientWithResponses[K]) ParseValidateMembersResponse(rsp *http.Response) (*ValidateMembersResponse, error) {
+func (c *ClientWithResponses) ParseValidateMembersResponse(rsp *http.Response) (*ValidateMembersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3390,7 +3390,7 @@ func (c *ClientWithResponses[K]) ParseValidateMembersResponse(rsp *http.Response
 }
 
 // ParseAddRolesResponse parses an HTTP response from a AddRoles call
-func (c *ClientWithResponses[K]) ParseAddRolesResponse(rsp *http.Response) (*AddRolesResponse, error) {
+func (c *ClientWithResponses) ParseAddRolesResponse(rsp *http.Response) (*AddRolesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3438,7 +3438,7 @@ func (c *ClientWithResponses[K]) ParseAddRolesResponse(rsp *http.Response) (*Add
 }
 
 // ParseRemoveRolesResponse parses an HTTP response from a RemoveRoles call
-func (c *ClientWithResponses[K]) ParseRemoveRolesResponse(rsp *http.Response) (*RemoveRolesResponse, error) {
+func (c *ClientWithResponses) ParseRemoveRolesResponse(rsp *http.Response) (*RemoveRolesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3486,7 +3486,7 @@ func (c *ClientWithResponses[K]) ParseRemoveRolesResponse(rsp *http.Response) (*
 }
 
 // ParseGetMembersResponse parses an HTTP response from a GetMembers call
-func (c *ClientWithResponses[K]) ParseGetMembersResponse(rsp *http.Response) (*GetMembersResponse, error) {
+func (c *ClientWithResponses) ParseGetMembersResponse(rsp *http.Response) (*GetMembersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3534,7 +3534,7 @@ func (c *ClientWithResponses[K]) ParseGetMembersResponse(rsp *http.Response) (*G
 }
 
 // ParseGetRolesResponse parses an HTTP response from a GetRoles call
-func (c *ClientWithResponses[K]) ParseGetRolesResponse(rsp *http.Response) (*GetRolesResponse, error) {
+func (c *ClientWithResponses) ParseGetRolesResponse(rsp *http.Response) (*GetRolesResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

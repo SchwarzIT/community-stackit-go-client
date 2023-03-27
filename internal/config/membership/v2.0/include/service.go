@@ -19,6 +19,6 @@ var BaseURLs = env.URLs(
 	"https://api-dev.stackit.cloud/membership/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *membership.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *membership.ClientWithResponses {
 	return membership.NewClient(BaseURLs.GetURL(c.GetEnvironment()), c)
 }

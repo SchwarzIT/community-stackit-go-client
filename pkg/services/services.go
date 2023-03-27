@@ -14,30 +14,30 @@ import (
 	serviceaccounts "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-accounts/v2.0"
 )
 
-type Services[K contracts.ClientFlowConfig] struct {
-	Client             contracts.ClientInterface[K]
-	Argus              *argus.ClientWithResponses[K]
-	Costs              *costs.ClientWithResponses[K]
-	Kubernetes         *kubernetes.ClientWithResponses[K]
-	Membership         *membership.ClientWithResponses[K]
-	MongoDBFlex        *mongodbflex.ClientWithResponses[K]
-	ObjectStorage      *objectstorage.ClientWithResponses[K]
-	PostgresFlex       *postgresflex.ClientWithResponses[K]
-	ResourceManagement *resourcemanagement.ClientWithResponses[K]
-	ServiceAccounts    *serviceaccounts.ClientWithResponses[K]
+type Services struct {
+	Client             contracts.BaseClientInterface
+	Argus              *argus.ClientWithResponses
+	Costs              *costs.ClientWithResponses
+	Kubernetes         *kubernetes.ClientWithResponses
+	Membership         *membership.ClientWithResponses
+	MongoDBFlex        *mongodbflex.ClientWithResponses
+	ObjectStorage      *objectstorage.ClientWithResponses
+	PostgresFlex       *postgresflex.ClientWithResponses
+	ResourceManagement *resourcemanagement.ClientWithResponses
+	ServiceAccounts    *serviceaccounts.ClientWithResponses
 
 	// DSA
-	ElasticSearch *dataservices.ClientWithResponses[K]
-	LogMe         *dataservices.ClientWithResponses[K]
-	MariaDB       *dataservices.ClientWithResponses[K]
-	MongoDB       *dataservices.ClientWithResponses[K]
-	PostgresDB    *dataservices.ClientWithResponses[K]
-	RabbitMQ      *dataservices.ClientWithResponses[K]
-	Redis         *dataservices.ClientWithResponses[K]
+	ElasticSearch *dataservices.ClientWithResponses
+	LogMe         *dataservices.ClientWithResponses
+	MariaDB       *dataservices.ClientWithResponses
+	MongoDB       *dataservices.ClientWithResponses
+	PostgresDB    *dataservices.ClientWithResponses
+	RabbitMQ      *dataservices.ClientWithResponses
+	Redis         *dataservices.ClientWithResponses
 }
 
-func Init[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *Services[K] {
-	return &Services[K]{
+func Init[K contracts.ClientFlowConfig](c contracts.BaseClientInterface) *Services {
+	return &Services{
 		Client: c,
 
 		// Services
