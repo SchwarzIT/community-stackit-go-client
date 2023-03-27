@@ -90,6 +90,9 @@ type ServiceAccountKeyPrivateResponse struct {
 
 // GetEnvironment returns the defined API environment
 func (c *KeyFlow) GetEnvironment() env.Environment {
+	if c.config == nil {
+		return ""
+	}
 	return c.config.Environment
 }
 
