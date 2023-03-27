@@ -14,9 +14,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/runtime"
 	openapiTypes "github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
+	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
