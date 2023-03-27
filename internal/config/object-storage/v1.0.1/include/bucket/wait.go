@@ -9,8 +9,8 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
-// WaitForeCreate waits for creation. in case there are no errors, the returned interface is of *GetResponse
-func (c *bucket.ClientWithResponses[K]) WaitForeCreate(ctx context.Context, projectID, bucketName string) *wait.Handler {
+// Wait waits for creation. in case there are no errors, the returned interface is of *GetResponse
+func (*CreateResponse) Wait(ctx context.Context, c *bucket.ClientWithResponses, projectID, bucketName string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.Get(ctx, projectID, bucketName)
 		if err = validate.Response(res, err); err != nil {
@@ -28,8 +28,8 @@ func (c *bucket.ClientWithResponses[K]) WaitForeCreate(ctx context.Context, proj
 	})
 }
 
-// WaitForeDelete waits for deletion
-func (c *bucket.ClientWithResponses[K]) WaitForeDelete(ctx context.Context, projectID, bucketName string) *wait.Handler {
+// Wait waits for deletion
+func (*DeleteResponse) Wait(ctx context.Context, c *bucket.ClientWithResponses, projectID, bucketName string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.Get(ctx, projectID, bucketName)
 		if err = validate.Response(res, err); err != nil {

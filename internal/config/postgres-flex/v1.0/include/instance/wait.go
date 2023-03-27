@@ -10,9 +10,21 @@ import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
+func (*CreateResponse) Wait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	return waitForCreateOrUpdate(ctx, c, projectID, instanceID)
+}
+
+func (*PutResponse) Wait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	return waitForCreateOrUpdate(ctx, c, projectID, instanceID)
+}
+
+func (*PatchResponse) Wait(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	return waitForCreateOrUpdate(ctx, c, projectID, instanceID)
+}
+
 // WaitForCreateOrUpdate will wait for instance create/update to complete
 // returned interface is of *instance.InstanceSingleInstance
-func (c *instance.ClientWithResponses[K]) WaitForCreateOrUpdate(ctx context.Context, projectID, instanceID string) *wait.Handler {
+func waitForCreateOrUpdate(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
 	return wait.New(func() (res interface{}, done bool, err error) {
@@ -38,7 +50,7 @@ func (c *instance.ClientWithResponses[K]) WaitForCreateOrUpdate(ctx context.Cont
 
 // WaitForDelete will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (c *instance.ClientWithResponses[K]) WaitForDelete(ctx context.Context, projectID, instanceID string) *wait.Handler {
+func (DeleteResponse) WaitForDelete(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {

@@ -12,7 +12,7 @@ var BaseURLs = env.URLs(
 	"https://api-dev.stackit.cloud/object-storage-api/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *ClientWithResponses {
 	nc, _ := NewClient(
 		BaseURLs.GetURL(c.GetEnvironment()),
 		WithHTTPClient(c),

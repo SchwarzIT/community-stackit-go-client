@@ -61,7 +61,7 @@ type InstanceStorageRange struct {
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -70,13 +70,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -92,7 +92,7 @@ type rawClientInterface interface {
 	GetStorageOptionsRaw(ctx context.Context, projectID string, flavor string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
@@ -104,7 +104,7 @@ func (c *Client[K]) ListRaw(ctx context.Context, projectID string, reqEditors ..
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetStorageOptionsRaw(ctx context.Context, projectID string, flavor string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetStorageOptionsRaw(ctx context.Context, projectID string, flavor string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetStorageOptionsRequest(ctx, c.Server, projectID, flavor)
 	if err != nil {
 		return nil, err
@@ -191,7 +191,7 @@ func NewGetStorageOptionsRequest(ctx context.Context, server string, projectID s
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -201,18 +201,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// List request
 	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
@@ -271,7 +271,7 @@ func (r GetStorageOptionsResponse) StatusCode() int {
 }
 
 // List request returning *ListResponse
-func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -280,7 +280,7 @@ func (c *ClientWithResponses[K]) List(ctx context.Context, projectID string, req
 }
 
 // GetStorageOptions request returning *GetStorageOptionsResponse
-func (c *ClientWithResponses[K]) GetStorageOptions(ctx context.Context, projectID string, flavor string, reqEditors ...RequestEditorFn) (*GetStorageOptionsResponse, error) {
+func (c *ClientWithResponses) GetStorageOptions(ctx context.Context, projectID string, flavor string, reqEditors ...RequestEditorFn) (*GetStorageOptionsResponse, error) {
 	rsp, err := c.GetStorageOptionsRaw(ctx, projectID, flavor, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -289,7 +289,7 @@ func (c *ClientWithResponses[K]) GetStorageOptions(ctx context.Context, projectI
 }
 
 // ParseListResponse parses an HTTP response from a List call
-func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -330,7 +330,7 @@ func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListRes
 }
 
 // ParseGetStorageOptionsResponse parses an HTTP response from a GetStorageOptions call
-func (c *ClientWithResponses[K]) ParseGetStorageOptionsResponse(rsp *http.Response) (*GetStorageOptionsResponse, error) {
+func (c *ClientWithResponses) ParseGetStorageOptionsResponse(rsp *http.Response) (*GetStorageOptionsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

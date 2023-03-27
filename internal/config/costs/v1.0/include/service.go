@@ -13,7 +13,7 @@ var BaseURLs = env.URLs(
 	"https://api-dev.stackit.cloud/costs-service/v1/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *costs.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *costs.ClientWithResponses {
 	s, _ := costs.NewClient(BaseURLs.GetURL(c.GetEnvironment()), costs.WithHTTPClient(c))
 	return s
 }

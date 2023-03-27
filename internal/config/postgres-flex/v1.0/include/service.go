@@ -13,7 +13,7 @@ var BaseURLs = env.URLs(
 	"https://postgres-flex-service.api.eu01.dev.stackit.cloud/v1/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *postgresflex.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *postgresflex.ClientWithResponses {
 	nc, _ := postgresflex.NewClient(
 		BaseURLs.GetURL(c.GetEnvironment()),
 		postgresflex.WithHTTPClient(c),

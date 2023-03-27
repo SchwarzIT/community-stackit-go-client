@@ -7,12 +7,11 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/wait"
 )
 
-func (c *resourcemanagement.ClientWithResponses[K]) WaitForCreate(ctx context.Context, containerID string) *wait.Handler {
+func (*CreateResponse) WaitForCreate(ctx context.Context, c *resourcemanagement.ClientWithResponses, containerID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		project, err := c.Get(ctx, containerID, &resourcemanagement.GetParams{})
 		if err != nil {
@@ -37,7 +36,7 @@ func (c *resourcemanagement.ClientWithResponses[K]) WaitForCreate(ctx context.Co
 	})
 }
 
-func (c *resourcemanagement.ClientWithResponses[K]) WaitForDelete(ctx context.Context, containerID string) *wait.Handler {
+func (*DeleteResponse) WaitForDelete(ctx context.Context, c *resourcemanagement.ClientWithResponses, containerID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		project, err := c.Get(ctx, containerID, &resourcemanagement.GetParams{})
 		if err != nil {

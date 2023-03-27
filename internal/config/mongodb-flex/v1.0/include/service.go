@@ -13,7 +13,7 @@ var BaseURLs = env.URLs(
 	"https://api-dev.stackit.cloud/mongodb/v1/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *mongodb.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *mongodb.ClientWithResponses {
 	nc, _ := mongodb.NewClient(
 		BaseURLs.GetURL(c.GetEnvironment()),
 		mongodb.WithHTTPClient(c),

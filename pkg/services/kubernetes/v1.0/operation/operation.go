@@ -91,7 +91,7 @@ type RuntimeErrorCode string
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -100,13 +100,13 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 }
 
 // NewRawClient Creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *Client[K] {
+func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Client {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 		Client: httpClient,
 	}
@@ -131,7 +131,7 @@ type rawClientInterface interface {
 	TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) TriggerHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) TriggerHibernationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTriggerHibernationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
@@ -143,7 +143,7 @@ func (c *Client[K]) TriggerHibernationRaw(ctx context.Context, projectID string,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) TriggerMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) TriggerMaintenanceRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTriggerMaintenanceRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
@@ -155,7 +155,7 @@ func (c *Client[K]) TriggerMaintenanceRaw(ctx context.Context, projectID string,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) TriggerReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) TriggerReconciliationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTriggerReconciliationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
@@ -167,7 +167,7 @@ func (c *Client[K]) TriggerReconciliationRaw(ctx context.Context, projectID stri
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) TriggerRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) TriggerRotationRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTriggerRotationRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
@@ -179,7 +179,7 @@ func (c *Client[K]) TriggerRotationRaw(ctx context.Context, projectID string, cl
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) TriggerWakeupRaw(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewTriggerWakeupRequest(ctx, c.Server, projectID, clusterName)
 	if err != nil {
 		return nil, err
@@ -396,7 +396,7 @@ func NewTriggerWakeupRequest(ctx context.Context, server string, projectID strin
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -406,18 +406,18 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on rawClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, httpClient contracts.ClientInterface[K]) *ClientWithResponses[K] {
-	return &ClientWithResponses[K]{NewRawClient(server, httpClient)}
+func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientWithResponses {
+	return &ClientWithResponses{NewRawClient(server, httpClient)}
 }
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
-type ClientWithResponsesInterface[K contracts.ClientFlowConfig] interface {
+type ClientWithResponsesInterface interface {
 	// TriggerHibernation request
 	TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error)
 
@@ -565,7 +565,7 @@ func (r TriggerWakeupResponse) StatusCode() int {
 }
 
 // TriggerHibernation request returning *TriggerHibernationResponse
-func (c *ClientWithResponses[K]) TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error) {
+func (c *ClientWithResponses) TriggerHibernation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerHibernationResponse, error) {
 	rsp, err := c.TriggerHibernationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -574,7 +574,7 @@ func (c *ClientWithResponses[K]) TriggerHibernation(ctx context.Context, project
 }
 
 // TriggerMaintenance request returning *TriggerMaintenanceResponse
-func (c *ClientWithResponses[K]) TriggerMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerMaintenanceResponse, error) {
+func (c *ClientWithResponses) TriggerMaintenance(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerMaintenanceResponse, error) {
 	rsp, err := c.TriggerMaintenanceRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -583,7 +583,7 @@ func (c *ClientWithResponses[K]) TriggerMaintenance(ctx context.Context, project
 }
 
 // TriggerReconciliation request returning *TriggerReconciliationResponse
-func (c *ClientWithResponses[K]) TriggerReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerReconciliationResponse, error) {
+func (c *ClientWithResponses) TriggerReconciliation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerReconciliationResponse, error) {
 	rsp, err := c.TriggerReconciliationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -592,7 +592,7 @@ func (c *ClientWithResponses[K]) TriggerReconciliation(ctx context.Context, proj
 }
 
 // TriggerRotation request returning *TriggerRotationResponse
-func (c *ClientWithResponses[K]) TriggerRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerRotationResponse, error) {
+func (c *ClientWithResponses) TriggerRotation(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerRotationResponse, error) {
 	rsp, err := c.TriggerRotationRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -601,7 +601,7 @@ func (c *ClientWithResponses[K]) TriggerRotation(ctx context.Context, projectID 
 }
 
 // TriggerWakeup request returning *TriggerWakeupResponse
-func (c *ClientWithResponses[K]) TriggerWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerWakeupResponse, error) {
+func (c *ClientWithResponses) TriggerWakeup(ctx context.Context, projectID string, clusterName string, reqEditors ...RequestEditorFn) (*TriggerWakeupResponse, error) {
 	rsp, err := c.TriggerWakeupRaw(ctx, projectID, clusterName, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -610,7 +610,7 @@ func (c *ClientWithResponses[K]) TriggerWakeup(ctx context.Context, projectID st
 }
 
 // ParseTriggerHibernationResponse parses an HTTP response from a TriggerHibernation call
-func (c *ClientWithResponses[K]) ParseTriggerHibernationResponse(rsp *http.Response) (*TriggerHibernationResponse, error) {
+func (c *ClientWithResponses) ParseTriggerHibernationResponse(rsp *http.Response) (*TriggerHibernationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -658,7 +658,7 @@ func (c *ClientWithResponses[K]) ParseTriggerHibernationResponse(rsp *http.Respo
 }
 
 // ParseTriggerMaintenanceResponse parses an HTTP response from a TriggerMaintenance call
-func (c *ClientWithResponses[K]) ParseTriggerMaintenanceResponse(rsp *http.Response) (*TriggerMaintenanceResponse, error) {
+func (c *ClientWithResponses) ParseTriggerMaintenanceResponse(rsp *http.Response) (*TriggerMaintenanceResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -706,7 +706,7 @@ func (c *ClientWithResponses[K]) ParseTriggerMaintenanceResponse(rsp *http.Respo
 }
 
 // ParseTriggerReconciliationResponse parses an HTTP response from a TriggerReconciliation call
-func (c *ClientWithResponses[K]) ParseTriggerReconciliationResponse(rsp *http.Response) (*TriggerReconciliationResponse, error) {
+func (c *ClientWithResponses) ParseTriggerReconciliationResponse(rsp *http.Response) (*TriggerReconciliationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -754,7 +754,7 @@ func (c *ClientWithResponses[K]) ParseTriggerReconciliationResponse(rsp *http.Re
 }
 
 // ParseTriggerRotationResponse parses an HTTP response from a TriggerRotation call
-func (c *ClientWithResponses[K]) ParseTriggerRotationResponse(rsp *http.Response) (*TriggerRotationResponse, error) {
+func (c *ClientWithResponses) ParseTriggerRotationResponse(rsp *http.Response) (*TriggerRotationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -802,7 +802,7 @@ func (c *ClientWithResponses[K]) ParseTriggerRotationResponse(rsp *http.Response
 }
 
 // ParseTriggerWakeupResponse parses an HTTP response from a TriggerWakeup call
-func (c *ClientWithResponses[K]) ParseTriggerWakeupResponse(rsp *http.Response) (*TriggerWakeupResponse, error) {
+func (c *ClientWithResponses) ParseTriggerWakeupResponse(rsp *http.Response) (*TriggerWakeupResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {

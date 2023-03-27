@@ -13,7 +13,7 @@ var BaseURLs = env.URLs(
 	"https://ske.api.eu01.dev.stackit.cloud/",
 )
 
-func NewService[K contracts.ClientFlowConfig](c contracts.ClientInterface[K]) *kubernetes.ClientWithResponses[K] {
+func NewService(c contracts.BaseClientInterface) *kubernetes.ClientWithResponses {
 	nc, _ := kubernetes.NewClient(
 		BaseURLs.GetURL(c.GetEnvironment()),
 		kubernetes.WithHTTPClient(c),

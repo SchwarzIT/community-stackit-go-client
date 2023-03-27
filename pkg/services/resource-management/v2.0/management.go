@@ -722,7 +722,7 @@ type UpdateJSONRequestBody = PatchFolderOrProject
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
 
 // Client which conforms to the OpenAPI3 specification for this service.
-type Client[K contracts.ClientFlowConfig] struct {
+type Client struct {
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
 	// to the server, such as https://api.deepmap.com/dev-test, and all the
@@ -731,7 +731,7 @@ type Client[K contracts.ClientFlowConfig] struct {
 
 	// Doer for performing requests, typically a *http.Client with any
 	// customized settings, such as certificate chains.
-	Client contracts.ClientInterface[K]
+	Client contracts.BaseClientInterface
 
 	// A list of callbacks for modifying requests which are generated before sending over
 	// the network.
@@ -739,12 +739,12 @@ type Client[K contracts.ClientFlowConfig] struct {
 }
 
 // ClientOption allows setting custom parameters during construction
-type ClientOption[K contracts.ClientFlowConfig] func(*Client[K]) error
+type ClientOption func(*Client) error
 
 // NewRawClient creates a new Client, with reasonable defaults
-func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*Client[K], error) {
+func NewRawClient(server string, opts ...ClientOption) (*Client, error) {
 	// create a client with sane default values
-	client := Client[K]{
+	client := Client{
 		Server: server,
 	}
 	// mutate client and add all optional params
@@ -762,8 +762,8 @@ func NewRawClient[K contracts.ClientFlowConfig](server string, opts ...ClientOpt
 
 // WithHTTPClient allows overriding the default Doer, which is
 // automatically created using http.Client. This is useful for tests.
-func WithHTTPClient[K contracts.ClientFlowConfig](doer contracts.ClientInterface[K]) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithHTTPClient(doer contracts.BaseClientInterface) ClientOption {
+	return func(c *Client) error {
 		c.Client = doer
 		return nil
 	}
@@ -771,8 +771,8 @@ func WithHTTPClient[K contracts.ClientFlowConfig](doer contracts.ClientInterface
 
 // WithRequestEditorFn allows setting up a callback function, which will be
 // called right before sending the request. This can be used to mutate the request.
-func WithRequestEditorFn[K contracts.ClientFlowConfig](fn RequestEditorFn) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithRequestEditorFn(fn RequestEditorFn) ClientOption {
+	return func(c *Client) error {
 		c.RequestEditors = append(c.RequestEditors, fn)
 		return nil
 	}
@@ -856,7 +856,7 @@ type rawClientInterface interface {
 	DeleteProjectContainerIDLabelsRaw(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client[K]) GetFoldersRaw(ctx context.Context, params *GetFoldersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetFoldersRaw(ctx context.Context, params *GetFoldersParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetFoldersRequest(ctx, c.Server, params)
 	if err != nil {
 		return nil, err
@@ -868,7 +868,7 @@ func (c *Client[K]) GetFoldersRaw(ctx context.Context, params *GetFoldersParams,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PostFoldersRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PostFoldersRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostFoldersRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -880,7 +880,7 @@ func (c *Client[K]) PostFoldersRawWithBody(ctx context.Context, contentType stri
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PostFoldersRaw(ctx context.Context, body PostFoldersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PostFoldersRaw(ctx context.Context, body PostFoldersJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostFoldersRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -892,7 +892,7 @@ func (c *Client[K]) PostFoldersRaw(ctx context.Context, body PostFoldersJSONRequ
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteFoldersContainerIDRaw(ctx context.Context, containerId string, params *DeleteFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteFoldersContainerIDRaw(ctx context.Context, containerId string, params *DeleteFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteFoldersContainerIDRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -904,7 +904,7 @@ func (c *Client[K]) DeleteFoldersContainerIDRaw(ctx context.Context, containerId
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetFoldersContainerIDRaw(ctx context.Context, containerId string, params *GetFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetFoldersContainerIDRaw(ctx context.Context, containerId string, params *GetFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetFoldersContainerIDRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -916,7 +916,7 @@ func (c *Client[K]) GetFoldersContainerIDRaw(ctx context.Context, containerId st
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PatchFoldersContainerIDRawWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PatchFoldersContainerIDRawWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPatchFoldersContainerIDRequestWithBody(ctx, c.Server, containerId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -928,7 +928,7 @@ func (c *Client[K]) PatchFoldersContainerIDRawWithBody(ctx context.Context, cont
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PatchFoldersContainerIDRaw(ctx context.Context, containerId string, body PatchFoldersContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PatchFoldersContainerIDRaw(ctx context.Context, containerId string, body PatchFoldersContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPatchFoldersContainerIDRequest(ctx, c.Server, containerId, body)
 	if err != nil {
 		return nil, err
@@ -940,7 +940,7 @@ func (c *Client[K]) PatchFoldersContainerIDRaw(ctx context.Context, containerId 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetContainersOfAFolderRaw(ctx context.Context, containerId string, params *GetContainersOfAFolderParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetContainersOfAFolderRaw(ctx context.Context, containerId string, params *GetContainersOfAFolderParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetContainersOfAFolderRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -952,7 +952,7 @@ func (c *Client[K]) GetContainersOfAFolderRaw(ctx context.Context, containerId s
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteFolderLabelsRaw(ctx context.Context, containerId string, params *DeleteFolderLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteFolderLabelsRaw(ctx context.Context, containerId string, params *DeleteFolderLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteFolderLabelsRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -964,7 +964,7 @@ func (c *Client[K]) DeleteFolderLabelsRaw(ctx context.Context, containerId strin
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetAllOrganizationsRaw(ctx context.Context, params *GetAllOrganizationsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetAllOrganizationsRaw(ctx context.Context, params *GetAllOrganizationsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetAllOrganizationsRequest(ctx, c.Server, params)
 	if err != nil {
 		return nil, err
@@ -976,7 +976,7 @@ func (c *Client[K]) GetAllOrganizationsRaw(ctx context.Context, params *GetAllOr
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PostOrganizationsRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PostOrganizationsRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostOrganizationsRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -988,7 +988,7 @@ func (c *Client[K]) PostOrganizationsRawWithBody(ctx context.Context, contentTyp
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PostOrganizationsRaw(ctx context.Context, body PostOrganizationsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PostOrganizationsRaw(ctx context.Context, body PostOrganizationsJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostOrganizationsRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -1000,7 +1000,7 @@ func (c *Client[K]) PostOrganizationsRaw(ctx context.Context, body PostOrganizat
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteOrganizationsContainerIDRaw(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteOrganizationsContainerIDRaw(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteOrganizationsContainerIDRequest(ctx, c.Server, containerId)
 	if err != nil {
 		return nil, err
@@ -1012,7 +1012,7 @@ func (c *Client[K]) DeleteOrganizationsContainerIDRaw(ctx context.Context, conta
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetOrganizationsContainerIDRaw(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetOrganizationsContainerIDRaw(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetOrganizationsContainerIDRequest(ctx, c.Server, containerId)
 	if err != nil {
 		return nil, err
@@ -1024,7 +1024,7 @@ func (c *Client[K]) GetOrganizationsContainerIDRaw(ctx context.Context, containe
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PatchOrganizationsContainerIDRawWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PatchOrganizationsContainerIDRawWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPatchOrganizationsContainerIDRequestWithBody(ctx, c.Server, containerId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -1036,7 +1036,7 @@ func (c *Client[K]) PatchOrganizationsContainerIDRawWithBody(ctx context.Context
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) PatchOrganizationsContainerIDRaw(ctx context.Context, containerId string, body PatchOrganizationsContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) PatchOrganizationsContainerIDRaw(ctx context.Context, containerId string, body PatchOrganizationsContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPatchOrganizationsContainerIDRequest(ctx, c.Server, containerId, body)
 	if err != nil {
 		return nil, err
@@ -1048,7 +1048,7 @@ func (c *Client[K]) PatchOrganizationsContainerIDRaw(ctx context.Context, contai
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetOrganizationsContainerIDSupportRaw(ctx context.Context, containerId string, params *GetOrganizationsContainerIDSupportParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetOrganizationsContainerIDSupportRaw(ctx context.Context, containerId string, params *GetOrganizationsContainerIDSupportParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetOrganizationsContainerIDSupportRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -1060,7 +1060,7 @@ func (c *Client[K]) GetOrganizationsContainerIDSupportRaw(ctx context.Context, c
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetContainersOfAnOrganizationRaw(ctx context.Context, containerId string, params *GetContainersOfAnOrganizationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetContainersOfAnOrganizationRaw(ctx context.Context, containerId string, params *GetContainersOfAnOrganizationParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetContainersOfAnOrganizationRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -1072,7 +1072,7 @@ func (c *Client[K]) GetContainersOfAnOrganizationRaw(ctx context.Context, contai
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteOrganizationsContainerIDLabelsRaw(ctx context.Context, containerId string, params *DeleteOrganizationsContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteOrganizationsContainerIDLabelsRaw(ctx context.Context, containerId string, params *DeleteOrganizationsContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteOrganizationsContainerIDLabelsRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -1084,7 +1084,7 @@ func (c *Client[K]) DeleteOrganizationsContainerIDLabelsRaw(ctx context.Context,
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) ListRaw(ctx context.Context, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) ListRaw(ctx context.Context, params *ListParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewListRequest(ctx, c.Server, params)
 	if err != nil {
 		return nil, err
@@ -1096,7 +1096,7 @@ func (c *Client[K]) ListRaw(ctx context.Context, params *ListParams, reqEditors 
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequestWithBody(ctx, c.Server, contentType, body)
 	if err != nil {
 		return nil, err
@@ -1108,7 +1108,7 @@ func (c *Client[K]) CreateRawWithBody(ctx context.Context, contentType string, b
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) CreateRaw(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) CreateRaw(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewCreateRequest(ctx, c.Server, body)
 	if err != nil {
 		return nil, err
@@ -1120,7 +1120,7 @@ func (c *Client[K]) CreateRaw(ctx context.Context, body CreateJSONRequestBody, r
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteRaw(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteRaw(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteRequest(ctx, c.Server, containerId)
 	if err != nil {
 		return nil, err
@@ -1132,7 +1132,7 @@ func (c *Client[K]) DeleteRaw(ctx context.Context, containerId string, reqEditor
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) GetRaw(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) GetRaw(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -1144,7 +1144,7 @@ func (c *Client[K]) GetRaw(ctx context.Context, containerId string, params *GetP
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRawWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRawWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequestWithBody(ctx, c.Server, containerId, contentType, body)
 	if err != nil {
 		return nil, err
@@ -1156,7 +1156,7 @@ func (c *Client[K]) UpdateRawWithBody(ctx context.Context, containerId string, c
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) UpdateRaw(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) UpdateRaw(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateRequest(ctx, c.Server, containerId, body)
 	if err != nil {
 		return nil, err
@@ -1168,7 +1168,7 @@ func (c *Client[K]) UpdateRaw(ctx context.Context, containerId string, body Upda
 	return c.Client.Do(req)
 }
 
-func (c *Client[K]) DeleteProjectContainerIDLabelsRaw(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
+func (c *Client) DeleteProjectContainerIDLabelsRaw(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewDeleteProjectContainerIDLabelsRequest(ctx, c.Server, containerId, params)
 	if err != nil {
 		return nil, err
@@ -2554,7 +2554,7 @@ func NewDeleteProjectContainerIDLabelsRequest(ctx context.Context, server string
 	return req, nil
 }
 
-func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
+func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
 			return err
@@ -2569,23 +2569,23 @@ func (c *Client[K]) applyEditors(ctx context.Context, req *http.Request, additio
 }
 
 // ClientWithResponses builds on ClientInterface to offer response payloads
-type ClientWithResponses[K contracts.ClientFlowConfig] struct {
+type ClientWithResponses struct {
 	rawClientInterface
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
 // Client with return type handling
-func NewClient[K contracts.ClientFlowConfig](server string, opts ...ClientOption[K]) (*ClientWithResponses[K], error) {
+func NewClient(server string, opts ...ClientOption) (*ClientWithResponses, error) {
 	client, err := NewRawClient(server, opts...)
 	if err != nil {
 		return nil, err
 	}
-	return &ClientWithResponses[K]{client}, nil
+	return &ClientWithResponses{client}, nil
 }
 
 // WithBaseURL overrides the baseURL.
-func WithBaseURL[K contracts.ClientFlowConfig](baseURL string) ClientOption[K] {
-	return func(c *Client[K]) error {
+func WithBaseURL(baseURL string) ClientOption {
+	return func(c *Client) error {
 		newBaseURL, err := url.Parse(baseURL)
 		if err != nil {
 			return err
@@ -3190,7 +3190,7 @@ func (r DeleteProjectContainerIDLabelsResponse) StatusCode() int {
 }
 
 // GetFolders request returning *GetFoldersResponse
-func (c *ClientWithResponses[K]) GetFolders(ctx context.Context, params *GetFoldersParams, reqEditors ...RequestEditorFn) (*GetFoldersResponse, error) {
+func (c *ClientWithResponses) GetFolders(ctx context.Context, params *GetFoldersParams, reqEditors ...RequestEditorFn) (*GetFoldersResponse, error) {
 	rsp, err := c.GetFoldersRaw(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3199,7 +3199,7 @@ func (c *ClientWithResponses[K]) GetFolders(ctx context.Context, params *GetFold
 }
 
 // PostFoldersWithBody request with arbitrary body returning *PostFoldersResponse
-func (c *ClientWithResponses[K]) PostFoldersWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostFoldersResponse, error) {
+func (c *ClientWithResponses) PostFoldersWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostFoldersResponse, error) {
 	rsp, err := c.PostFoldersRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3207,7 +3207,7 @@ func (c *ClientWithResponses[K]) PostFoldersWithBody(ctx context.Context, conten
 	return c.ParsePostFoldersResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) PostFolders(ctx context.Context, body PostFoldersJSONRequestBody, reqEditors ...RequestEditorFn) (*PostFoldersResponse, error) {
+func (c *ClientWithResponses) PostFolders(ctx context.Context, body PostFoldersJSONRequestBody, reqEditors ...RequestEditorFn) (*PostFoldersResponse, error) {
 	rsp, err := c.PostFoldersRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3216,7 +3216,7 @@ func (c *ClientWithResponses[K]) PostFolders(ctx context.Context, body PostFolde
 }
 
 // DeleteFoldersContainerID request returning *DeleteFoldersContainerIDResponse
-func (c *ClientWithResponses[K]) DeleteFoldersContainerID(ctx context.Context, containerId string, params *DeleteFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*DeleteFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) DeleteFoldersContainerID(ctx context.Context, containerId string, params *DeleteFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*DeleteFoldersContainerIDResponse, error) {
 	rsp, err := c.DeleteFoldersContainerIDRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3225,7 +3225,7 @@ func (c *ClientWithResponses[K]) DeleteFoldersContainerID(ctx context.Context, c
 }
 
 // GetFoldersContainerID request returning *GetFoldersContainerIDResponse
-func (c *ClientWithResponses[K]) GetFoldersContainerID(ctx context.Context, containerId string, params *GetFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*GetFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) GetFoldersContainerID(ctx context.Context, containerId string, params *GetFoldersContainerIDParams, reqEditors ...RequestEditorFn) (*GetFoldersContainerIDResponse, error) {
 	rsp, err := c.GetFoldersContainerIDRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3234,7 +3234,7 @@ func (c *ClientWithResponses[K]) GetFoldersContainerID(ctx context.Context, cont
 }
 
 // PatchFoldersContainerIDWithBody request with arbitrary body returning *PatchFoldersContainerIDResponse
-func (c *ClientWithResponses[K]) PatchFoldersContainerIDWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) PatchFoldersContainerIDWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchFoldersContainerIDResponse, error) {
 	rsp, err := c.PatchFoldersContainerIDRawWithBody(ctx, containerId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3242,7 +3242,7 @@ func (c *ClientWithResponses[K]) PatchFoldersContainerIDWithBody(ctx context.Con
 	return c.ParsePatchFoldersContainerIDResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) PatchFoldersContainerID(ctx context.Context, containerId string, body PatchFoldersContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) PatchFoldersContainerID(ctx context.Context, containerId string, body PatchFoldersContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchFoldersContainerIDResponse, error) {
 	rsp, err := c.PatchFoldersContainerIDRaw(ctx, containerId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3251,7 +3251,7 @@ func (c *ClientWithResponses[K]) PatchFoldersContainerID(ctx context.Context, co
 }
 
 // GetContainersOfAFolder request returning *GetContainersOfAFolderResponse
-func (c *ClientWithResponses[K]) GetContainersOfAFolder(ctx context.Context, containerId string, params *GetContainersOfAFolderParams, reqEditors ...RequestEditorFn) (*GetContainersOfAFolderResponse, error) {
+func (c *ClientWithResponses) GetContainersOfAFolder(ctx context.Context, containerId string, params *GetContainersOfAFolderParams, reqEditors ...RequestEditorFn) (*GetContainersOfAFolderResponse, error) {
 	rsp, err := c.GetContainersOfAFolderRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3260,7 +3260,7 @@ func (c *ClientWithResponses[K]) GetContainersOfAFolder(ctx context.Context, con
 }
 
 // DeleteFolderLabels request returning *DeleteFolderLabelsResponse
-func (c *ClientWithResponses[K]) DeleteFolderLabels(ctx context.Context, containerId string, params *DeleteFolderLabelsParams, reqEditors ...RequestEditorFn) (*DeleteFolderLabelsResponse, error) {
+func (c *ClientWithResponses) DeleteFolderLabels(ctx context.Context, containerId string, params *DeleteFolderLabelsParams, reqEditors ...RequestEditorFn) (*DeleteFolderLabelsResponse, error) {
 	rsp, err := c.DeleteFolderLabelsRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3269,7 +3269,7 @@ func (c *ClientWithResponses[K]) DeleteFolderLabels(ctx context.Context, contain
 }
 
 // GetAllOrganizations request returning *GetAllOrganizationsResponse
-func (c *ClientWithResponses[K]) GetAllOrganizations(ctx context.Context, params *GetAllOrganizationsParams, reqEditors ...RequestEditorFn) (*GetAllOrganizationsResponse, error) {
+func (c *ClientWithResponses) GetAllOrganizations(ctx context.Context, params *GetAllOrganizationsParams, reqEditors ...RequestEditorFn) (*GetAllOrganizationsResponse, error) {
 	rsp, err := c.GetAllOrganizationsRaw(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3278,7 +3278,7 @@ func (c *ClientWithResponses[K]) GetAllOrganizations(ctx context.Context, params
 }
 
 // PostOrganizationsWithBody request with arbitrary body returning *PostOrganizationsResponse
-func (c *ClientWithResponses[K]) PostOrganizationsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostOrganizationsResponse, error) {
+func (c *ClientWithResponses) PostOrganizationsWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostOrganizationsResponse, error) {
 	rsp, err := c.PostOrganizationsRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3286,7 +3286,7 @@ func (c *ClientWithResponses[K]) PostOrganizationsWithBody(ctx context.Context, 
 	return c.ParsePostOrganizationsResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) PostOrganizations(ctx context.Context, body PostOrganizationsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostOrganizationsResponse, error) {
+func (c *ClientWithResponses) PostOrganizations(ctx context.Context, body PostOrganizationsJSONRequestBody, reqEditors ...RequestEditorFn) (*PostOrganizationsResponse, error) {
 	rsp, err := c.PostOrganizationsRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3295,7 +3295,7 @@ func (c *ClientWithResponses[K]) PostOrganizations(ctx context.Context, body Pos
 }
 
 // DeleteOrganizationsContainerID request returning *DeleteOrganizationsContainerIDResponse
-func (c *ClientWithResponses[K]) DeleteOrganizationsContainerID(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*DeleteOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) DeleteOrganizationsContainerID(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*DeleteOrganizationsContainerIDResponse, error) {
 	rsp, err := c.DeleteOrganizationsContainerIDRaw(ctx, containerId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3304,7 +3304,7 @@ func (c *ClientWithResponses[K]) DeleteOrganizationsContainerID(ctx context.Cont
 }
 
 // GetOrganizationsContainerID request returning *GetOrganizationsContainerIDResponse
-func (c *ClientWithResponses[K]) GetOrganizationsContainerID(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*GetOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) GetOrganizationsContainerID(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*GetOrganizationsContainerIDResponse, error) {
 	rsp, err := c.GetOrganizationsContainerIDRaw(ctx, containerId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3313,7 +3313,7 @@ func (c *ClientWithResponses[K]) GetOrganizationsContainerID(ctx context.Context
 }
 
 // PatchOrganizationsContainerIDWithBody request with arbitrary body returning *PatchOrganizationsContainerIDResponse
-func (c *ClientWithResponses[K]) PatchOrganizationsContainerIDWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) PatchOrganizationsContainerIDWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchOrganizationsContainerIDResponse, error) {
 	rsp, err := c.PatchOrganizationsContainerIDRawWithBody(ctx, containerId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3321,7 +3321,7 @@ func (c *ClientWithResponses[K]) PatchOrganizationsContainerIDWithBody(ctx conte
 	return c.ParsePatchOrganizationsContainerIDResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) PatchOrganizationsContainerID(ctx context.Context, containerId string, body PatchOrganizationsContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) PatchOrganizationsContainerID(ctx context.Context, containerId string, body PatchOrganizationsContainerIDJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchOrganizationsContainerIDResponse, error) {
 	rsp, err := c.PatchOrganizationsContainerIDRaw(ctx, containerId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3330,7 +3330,7 @@ func (c *ClientWithResponses[K]) PatchOrganizationsContainerID(ctx context.Conte
 }
 
 // GetOrganizationsContainerIDSupport request returning *GetOrganizationsContainerIDSupportResponse
-func (c *ClientWithResponses[K]) GetOrganizationsContainerIDSupport(ctx context.Context, containerId string, params *GetOrganizationsContainerIDSupportParams, reqEditors ...RequestEditorFn) (*GetOrganizationsContainerIDSupportResponse, error) {
+func (c *ClientWithResponses) GetOrganizationsContainerIDSupport(ctx context.Context, containerId string, params *GetOrganizationsContainerIDSupportParams, reqEditors ...RequestEditorFn) (*GetOrganizationsContainerIDSupportResponse, error) {
 	rsp, err := c.GetOrganizationsContainerIDSupportRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3339,7 +3339,7 @@ func (c *ClientWithResponses[K]) GetOrganizationsContainerIDSupport(ctx context.
 }
 
 // GetContainersOfAnOrganization request returning *GetContainersOfAnOrganizationResponse
-func (c *ClientWithResponses[K]) GetContainersOfAnOrganization(ctx context.Context, containerId string, params *GetContainersOfAnOrganizationParams, reqEditors ...RequestEditorFn) (*GetContainersOfAnOrganizationResponse, error) {
+func (c *ClientWithResponses) GetContainersOfAnOrganization(ctx context.Context, containerId string, params *GetContainersOfAnOrganizationParams, reqEditors ...RequestEditorFn) (*GetContainersOfAnOrganizationResponse, error) {
 	rsp, err := c.GetContainersOfAnOrganizationRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3348,7 +3348,7 @@ func (c *ClientWithResponses[K]) GetContainersOfAnOrganization(ctx context.Conte
 }
 
 // DeleteOrganizationsContainerIDLabels request returning *DeleteOrganizationsContainerIDLabelsResponse
-func (c *ClientWithResponses[K]) DeleteOrganizationsContainerIDLabels(ctx context.Context, containerId string, params *DeleteOrganizationsContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteOrganizationsContainerIDLabelsResponse, error) {
+func (c *ClientWithResponses) DeleteOrganizationsContainerIDLabels(ctx context.Context, containerId string, params *DeleteOrganizationsContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteOrganizationsContainerIDLabelsResponse, error) {
 	rsp, err := c.DeleteOrganizationsContainerIDLabelsRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3357,7 +3357,7 @@ func (c *ClientWithResponses[K]) DeleteOrganizationsContainerIDLabels(ctx contex
 }
 
 // List request returning *ListResponse
-func (c *ClientWithResponses[K]) List(ctx context.Context, params *ListParams, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+func (c *ClientWithResponses) List(ctx context.Context, params *ListParams, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3366,7 +3366,7 @@ func (c *ClientWithResponses[K]) List(ctx context.Context, params *ListParams, r
 }
 
 // CreateWithBody request with arbitrary body returning *CreateResponse
-func (c *ClientWithResponses[K]) CreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+func (c *ClientWithResponses) CreateWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
 	rsp, err := c.CreateRawWithBody(ctx, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3374,7 +3374,7 @@ func (c *ClientWithResponses[K]) CreateWithBody(ctx context.Context, contentType
 	return c.ParseCreateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
+func (c *ClientWithResponses) Create(ctx context.Context, body CreateJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateResponse, error) {
 	rsp, err := c.CreateRaw(ctx, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3383,7 +3383,7 @@ func (c *ClientWithResponses[K]) Create(ctx context.Context, body CreateJSONRequ
 }
 
 // Delete request returning *DeleteResponse
-func (c *ClientWithResponses[K]) Delete(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
+func (c *ClientWithResponses) Delete(ctx context.Context, containerId string, reqEditors ...RequestEditorFn) (*DeleteResponse, error) {
 	rsp, err := c.DeleteRaw(ctx, containerId, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3392,7 +3392,7 @@ func (c *ClientWithResponses[K]) Delete(ctx context.Context, containerId string,
 }
 
 // Get request returning *GetResponse
-func (c *ClientWithResponses[K]) Get(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+func (c *ClientWithResponses) Get(ctx context.Context, containerId string, params *GetParams, reqEditors ...RequestEditorFn) (*GetResponse, error) {
 	rsp, err := c.GetRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3401,7 +3401,7 @@ func (c *ClientWithResponses[K]) Get(ctx context.Context, containerId string, pa
 }
 
 // UpdateWithBody request with arbitrary body returning *UpdateResponse
-func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) UpdateWithBody(ctx context.Context, containerId string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRawWithBody(ctx, containerId, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3409,7 +3409,7 @@ func (c *ClientWithResponses[K]) UpdateWithBody(ctx context.Context, containerId
 	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses[K]) Update(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+func (c *ClientWithResponses) Update(ctx context.Context, containerId string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
 	rsp, err := c.UpdateRaw(ctx, containerId, body, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3418,7 +3418,7 @@ func (c *ClientWithResponses[K]) Update(ctx context.Context, containerId string,
 }
 
 // DeleteProjectContainerIDLabels request returning *DeleteProjectContainerIDLabelsResponse
-func (c *ClientWithResponses[K]) DeleteProjectContainerIDLabels(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteProjectContainerIDLabelsResponse, error) {
+func (c *ClientWithResponses) DeleteProjectContainerIDLabels(ctx context.Context, containerId string, params *DeleteProjectContainerIDLabelsParams, reqEditors ...RequestEditorFn) (*DeleteProjectContainerIDLabelsResponse, error) {
 	rsp, err := c.DeleteProjectContainerIDLabelsRaw(ctx, containerId, params, reqEditors...)
 	if err != nil {
 		return nil, err
@@ -3427,7 +3427,7 @@ func (c *ClientWithResponses[K]) DeleteProjectContainerIDLabels(ctx context.Cont
 }
 
 // ParseGetFoldersResponse parses an HTTP response from a GetFolders call
-func (c *ClientWithResponses[K]) ParseGetFoldersResponse(rsp *http.Response) (*GetFoldersResponse, error) {
+func (c *ClientWithResponses) ParseGetFoldersResponse(rsp *http.Response) (*GetFoldersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3475,7 +3475,7 @@ func (c *ClientWithResponses[K]) ParseGetFoldersResponse(rsp *http.Response) (*G
 }
 
 // ParsePostFoldersResponse parses an HTTP response from a PostFolders call
-func (c *ClientWithResponses[K]) ParsePostFoldersResponse(rsp *http.Response) (*PostFoldersResponse, error) {
+func (c *ClientWithResponses) ParsePostFoldersResponse(rsp *http.Response) (*PostFoldersResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3523,7 +3523,7 @@ func (c *ClientWithResponses[K]) ParsePostFoldersResponse(rsp *http.Response) (*
 }
 
 // ParseDeleteFoldersContainerIDResponse parses an HTTP response from a DeleteFoldersContainerID call
-func (c *ClientWithResponses[K]) ParseDeleteFoldersContainerIDResponse(rsp *http.Response) (*DeleteFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) ParseDeleteFoldersContainerIDResponse(rsp *http.Response) (*DeleteFoldersContainerIDResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3557,7 +3557,7 @@ func (c *ClientWithResponses[K]) ParseDeleteFoldersContainerIDResponse(rsp *http
 }
 
 // ParseGetFoldersContainerIDResponse parses an HTTP response from a GetFoldersContainerID call
-func (c *ClientWithResponses[K]) ParseGetFoldersContainerIDResponse(rsp *http.Response) (*GetFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) ParseGetFoldersContainerIDResponse(rsp *http.Response) (*GetFoldersContainerIDResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3598,7 +3598,7 @@ func (c *ClientWithResponses[K]) ParseGetFoldersContainerIDResponse(rsp *http.Re
 }
 
 // ParsePatchFoldersContainerIDResponse parses an HTTP response from a PatchFoldersContainerID call
-func (c *ClientWithResponses[K]) ParsePatchFoldersContainerIDResponse(rsp *http.Response) (*PatchFoldersContainerIDResponse, error) {
+func (c *ClientWithResponses) ParsePatchFoldersContainerIDResponse(rsp *http.Response) (*PatchFoldersContainerIDResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3646,7 +3646,7 @@ func (c *ClientWithResponses[K]) ParsePatchFoldersContainerIDResponse(rsp *http.
 }
 
 // ParseGetContainersOfAFolderResponse parses an HTTP response from a GetContainersOfAFolder call
-func (c *ClientWithResponses[K]) ParseGetContainersOfAFolderResponse(rsp *http.Response) (*GetContainersOfAFolderResponse, error) {
+func (c *ClientWithResponses) ParseGetContainersOfAFolderResponse(rsp *http.Response) (*GetContainersOfAFolderResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3680,7 +3680,7 @@ func (c *ClientWithResponses[K]) ParseGetContainersOfAFolderResponse(rsp *http.R
 }
 
 // ParseDeleteFolderLabelsResponse parses an HTTP response from a DeleteFolderLabels call
-func (c *ClientWithResponses[K]) ParseDeleteFolderLabelsResponse(rsp *http.Response) (*DeleteFolderLabelsResponse, error) {
+func (c *ClientWithResponses) ParseDeleteFolderLabelsResponse(rsp *http.Response) (*DeleteFolderLabelsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3707,7 +3707,7 @@ func (c *ClientWithResponses[K]) ParseDeleteFolderLabelsResponse(rsp *http.Respo
 }
 
 // ParseGetAllOrganizationsResponse parses an HTTP response from a GetAllOrganizations call
-func (c *ClientWithResponses[K]) ParseGetAllOrganizationsResponse(rsp *http.Response) (*GetAllOrganizationsResponse, error) {
+func (c *ClientWithResponses) ParseGetAllOrganizationsResponse(rsp *http.Response) (*GetAllOrganizationsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3748,7 +3748,7 @@ func (c *ClientWithResponses[K]) ParseGetAllOrganizationsResponse(rsp *http.Resp
 }
 
 // ParsePostOrganizationsResponse parses an HTTP response from a PostOrganizations call
-func (c *ClientWithResponses[K]) ParsePostOrganizationsResponse(rsp *http.Response) (*PostOrganizationsResponse, error) {
+func (c *ClientWithResponses) ParsePostOrganizationsResponse(rsp *http.Response) (*PostOrganizationsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3789,7 +3789,7 @@ func (c *ClientWithResponses[K]) ParsePostOrganizationsResponse(rsp *http.Respon
 }
 
 // ParseDeleteOrganizationsContainerIDResponse parses an HTTP response from a DeleteOrganizationsContainerID call
-func (c *ClientWithResponses[K]) ParseDeleteOrganizationsContainerIDResponse(rsp *http.Response) (*DeleteOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) ParseDeleteOrganizationsContainerIDResponse(rsp *http.Response) (*DeleteOrganizationsContainerIDResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3816,7 +3816,7 @@ func (c *ClientWithResponses[K]) ParseDeleteOrganizationsContainerIDResponse(rsp
 }
 
 // ParseGetOrganizationsContainerIDResponse parses an HTTP response from a GetOrganizationsContainerID call
-func (c *ClientWithResponses[K]) ParseGetOrganizationsContainerIDResponse(rsp *http.Response) (*GetOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) ParseGetOrganizationsContainerIDResponse(rsp *http.Response) (*GetOrganizationsContainerIDResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3850,7 +3850,7 @@ func (c *ClientWithResponses[K]) ParseGetOrganizationsContainerIDResponse(rsp *h
 }
 
 // ParsePatchOrganizationsContainerIDResponse parses an HTTP response from a PatchOrganizationsContainerID call
-func (c *ClientWithResponses[K]) ParsePatchOrganizationsContainerIDResponse(rsp *http.Response) (*PatchOrganizationsContainerIDResponse, error) {
+func (c *ClientWithResponses) ParsePatchOrganizationsContainerIDResponse(rsp *http.Response) (*PatchOrganizationsContainerIDResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3891,7 +3891,7 @@ func (c *ClientWithResponses[K]) ParsePatchOrganizationsContainerIDResponse(rsp 
 }
 
 // ParseGetOrganizationsContainerIDSupportResponse parses an HTTP response from a GetOrganizationsContainerIDSupport call
-func (c *ClientWithResponses[K]) ParseGetOrganizationsContainerIDSupportResponse(rsp *http.Response) (*GetOrganizationsContainerIDSupportResponse, error) {
+func (c *ClientWithResponses) ParseGetOrganizationsContainerIDSupportResponse(rsp *http.Response) (*GetOrganizationsContainerIDSupportResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3925,7 +3925,7 @@ func (c *ClientWithResponses[K]) ParseGetOrganizationsContainerIDSupportResponse
 }
 
 // ParseGetContainersOfAnOrganizationResponse parses an HTTP response from a GetContainersOfAnOrganization call
-func (c *ClientWithResponses[K]) ParseGetContainersOfAnOrganizationResponse(rsp *http.Response) (*GetContainersOfAnOrganizationResponse, error) {
+func (c *ClientWithResponses) ParseGetContainersOfAnOrganizationResponse(rsp *http.Response) (*GetContainersOfAnOrganizationResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3959,7 +3959,7 @@ func (c *ClientWithResponses[K]) ParseGetContainersOfAnOrganizationResponse(rsp 
 }
 
 // ParseDeleteOrganizationsContainerIDLabelsResponse parses an HTTP response from a DeleteOrganizationsContainerIDLabels call
-func (c *ClientWithResponses[K]) ParseDeleteOrganizationsContainerIDLabelsResponse(rsp *http.Response) (*DeleteOrganizationsContainerIDLabelsResponse, error) {
+func (c *ClientWithResponses) ParseDeleteOrganizationsContainerIDLabelsResponse(rsp *http.Response) (*DeleteOrganizationsContainerIDLabelsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -3986,7 +3986,7 @@ func (c *ClientWithResponses[K]) ParseDeleteOrganizationsContainerIDLabelsRespon
 }
 
 // ParseListResponse parses an HTTP response from a List call
-func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -4034,7 +4034,7 @@ func (c *ClientWithResponses[K]) ParseListResponse(rsp *http.Response) (*ListRes
 }
 
 // ParseCreateResponse parses an HTTP response from a Create call
-func (c *ClientWithResponses[K]) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
+func (c *ClientWithResponses) ParseCreateResponse(rsp *http.Response) (*CreateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -4082,7 +4082,7 @@ func (c *ClientWithResponses[K]) ParseCreateResponse(rsp *http.Response) (*Creat
 }
 
 // ParseDeleteResponse parses an HTTP response from a Delete call
-func (c *ClientWithResponses[K]) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
+func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -4109,7 +4109,7 @@ func (c *ClientWithResponses[K]) ParseDeleteResponse(rsp *http.Response) (*Delet
 }
 
 // ParseGetResponse parses an HTTP response from a Get call
-func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -4150,7 +4150,7 @@ func (c *ClientWithResponses[K]) ParseGetResponse(rsp *http.Response) (*GetRespo
 }
 
 // ParseUpdateResponse parses an HTTP response from a Update call
-func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
+func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
@@ -4198,7 +4198,7 @@ func (c *ClientWithResponses[K]) ParseUpdateResponse(rsp *http.Response) (*Updat
 }
 
 // ParseDeleteProjectContainerIDLabelsResponse parses an HTTP response from a DeleteProjectContainerIDLabels call
-func (c *ClientWithResponses[K]) ParseDeleteProjectContainerIDLabelsResponse(rsp *http.Response) (*DeleteProjectContainerIDLabelsResponse, error) {
+func (c *ClientWithResponses) ParseDeleteProjectContainerIDLabelsResponse(rsp *http.Response) (*DeleteProjectContainerIDLabelsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
