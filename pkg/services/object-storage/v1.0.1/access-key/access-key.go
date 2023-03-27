@@ -16,7 +16,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	contracts "github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/runtime"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )

@@ -1,7 +1,7 @@
 package argus
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 )
