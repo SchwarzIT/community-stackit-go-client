@@ -22,7 +22,6 @@ const (
 	ClientContextDeadlineErr   = "context deadline exceeded"
 	ClientConnectionRefusedErr = "connection refused"
 	ClientEOFError             = "unexpected EOF"
-	ClientGWTimeoutFError      = "Gateway Timeout"
 )
 
 const (
@@ -49,12 +48,12 @@ func NewRetryConfig() *RetryConfig {
 // do performs the request
 func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Response, err error) {
 	maxRetries := cfg.MaxRetries
-	if err := wait.PollImmediate(cfg.WaitBetweenCalls, cfg.Timeout, wait.ConditionFunc(
+	err = wait.PollImmediate(cfg.WaitBetweenCalls, cfg.Timeout, wait.ConditionFunc(
 		func() (bool, error) {
 			resp, err = client.Do(req)
 			if err != nil {
 				if maxRetries > 0 {
-					if validate.ErrorIsOneOf(err, ClientTimeoutErr, ClientContextDeadlineErr, ClientConnectionRefusedErr, ClientGWTimeoutFError) ||
+					if validate.ErrorIsOneOf(err, ClientTimeoutErr, ClientContextDeadlineErr, ClientConnectionRefusedErr) ||
 						(req.Method == http.MethodGet && strings.Contains(err.Error(), ClientEOFError)) {
 
 						// reduce retries counter and retry
@@ -75,7 +74,8 @@ func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Re
 			}
 			return true, nil
 		}),
-	); err != nil {
+	)
+	if err != nil {
 		return resp, errors.Wrap(err, fmt.Sprintf("url: %s\nmethod: %s", req.URL.String(), req.Method))
 	}
 
