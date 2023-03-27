@@ -82,7 +82,6 @@ func Test_do(t *testing.T) {
 			if server != nil {
 				server.Close()
 			}
-			t.Logf("error: %v, %+v", err, (err != nil) != tt.wantErr)
 			if (err != nil) != tt.wantErr && (err != nil && !strings.Contains(err.Error(), tt.errMsg)) {
 				body := []byte{}
 				if gotResp != nil {

@@ -2,6 +2,10 @@ package clients
 
 import (
 	"context"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
 	"testing"
 
@@ -105,6 +109,57 @@ func TestTokenFlow_Init(t *testing.T) {
 			}
 			assert.EqualValues(t, "prod", c.GetEnvironment())
 			assert.EqualValues(t, c.config.ServiceAccountEmail, c.GetServiceAccountEmail())
+		})
+	}
+}
+
+func TestTokenFlow_Do(t *testing.T) {
+	type fields struct {
+		client *http.Client
+		config *TokenFlowConfig
+	}
+	type args struct {
+		req *http.Request
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    int
+		wantErr bool
+	}{
+		{"fail", fields{nil, nil}, args{}, 0, true},
+		{"success", fields{&http.Client{}, &TokenFlowConfig{ClientRetry: &RetryConfig{}}}, args{}, http.StatusOK, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &TokenFlow{
+				client: tt.fields.client,
+				config: tt.fields.config,
+			}
+			handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusOK)
+				fmt.Fprintln(w, `{"status":"ok"}`)
+			})
+			server := httptest.NewServer(handler)
+			defer server.Close()
+			u, err := url.Parse(server.URL)
+			if err != nil {
+				t.Error(err)
+				return
+			}
+			req := &http.Request{
+				URL: u,
+			}
+			got, err := c.Do(req)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("TokenFlow.Do() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != nil && got.StatusCode != tt.want {
+				t.Errorf("TokenFlow.Do() = %v, want %v", got.StatusCode, tt.want)
+			}
 		})
 	}
 }
