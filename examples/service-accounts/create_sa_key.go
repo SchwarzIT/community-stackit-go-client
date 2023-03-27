@@ -36,7 +36,7 @@ func main() {
 	res, err := c.ServiceAccounts.CreateKeys(
 		ctx,
 		projectID,
-		types.Email(c.Client.GetConfig().ServiceAccountEmail),
+		types.Email(serviceAccountEmail),
 		serviceaccounts.CreateKeysJSONRequestBody{
 			PublicKey: &pk,
 		},

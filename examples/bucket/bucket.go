@@ -21,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	process := bucket.WaitForeCreate(ctx, projectID, bucketName)
+	process := res.Wait(ctx, bucket, projectID, bucketName)
 	if _, err := process.WaitWithContext(ctx); err != nil {
 		panic(err)
 	}
