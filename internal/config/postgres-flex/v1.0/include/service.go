@@ -1,7 +1,7 @@
 package postgresflex
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0"
 )

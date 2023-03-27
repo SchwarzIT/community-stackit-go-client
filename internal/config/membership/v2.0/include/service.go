@@ -1,7 +1,7 @@
 package membership
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0"
 )

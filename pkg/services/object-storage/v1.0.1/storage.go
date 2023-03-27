@@ -7,7 +7,7 @@ import (
 	"net/url"
 	"strings"
 
-	contracts "github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
 	accesskey "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/access-key"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/bucket"

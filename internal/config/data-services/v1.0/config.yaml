@@ -6,7 +6,7 @@ generate:
 output-options:
   custom-doer:
     enabled: true
-    import: contracts "github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
     name: "contracts.ClientInterface"
     generics: "contracts.ClientFlowConfig"
   split-by-tags:

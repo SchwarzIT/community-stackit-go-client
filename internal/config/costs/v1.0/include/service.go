@@ -1,7 +1,7 @@
 package costs
 
 import (
-	"github.com/SchwarzIT/community-stackit-go-client/internal/contracts"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v1.0"
 )
