@@ -8,8 +8,10 @@ import (
 	"encoding/pem"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
@@ -99,6 +101,23 @@ func TestKeyFlow_validateConfig(t *testing.T) {
 		})
 	}
 }
+
+const saKeyStrPattern = `{
+	"active": true,
+	"createdAt": "2023-03-23T18:26:20.335Z",
+	"credentials": {
+	  "aud": "https://stackit-service-account-prod.apps.01.cf.eu01.stackit.cloud",
+	  "iss": "stackit@sa.stackit.cloud",
+	  "kid": "%s",
+	  "sub": "%s"
+	},
+	"id": "%s",
+	"keyAlgorithm": "RSA_2048",
+	"keyOrigin": "USER_PROVIDED",
+	"keyType": "USER_MANAGED",
+	"publicKey": "...",
+	"validUntil": "2024-03-22T18:05:41Z"
+}`
 
 func TestKeyFlow_Init(t *testing.T) {
 	// Create a temporary file with a random name in the default temporary directory
@@ -246,19 +265,38 @@ func TestKeyFlow_Init(t *testing.T) {
 	}
 }
 
-const saKeyStrPattern = `{
-	"active": true,
-	"createdAt": "2023-03-23T18:26:20.335Z",
-	"credentials": {
-	  "aud": "https://stackit-service-account-prod.apps.01.cf.eu01.stackit.cloud",
-	  "iss": "stackit@sa.stackit.cloud",
-	  "kid": "%s",
-	  "sub": "%s"
-	},
-	"id": "%s",
-	"keyAlgorithm": "RSA_2048",
-	"keyOrigin": "USER_PROVIDED",
-	"keyType": "USER_MANAGED",
-	"publicKey": "...",
-	"validUntil": "2024-03-22T18:05:41Z"
-}`
+type errorReader struct{}
+
+func (r *errorReader) Read(p []byte) (n int, err error) {
+	return 0, fmt.Errorf("read error")
+}
+
+func (r *errorReader) Close() error {
+	return nil
+}
+
+const randomTokenResp = `{"access_token":"impEdfCJyeIpDtUOSwMy","expires_in":2726,"refresh_token":"MIaQYdeONTZTwRNgZfxk","scope":"some_scope","token_type":"Bearer"}`
+
+func TestKeyFlow_parseTokenResponse(t *testing.T) {
+	r := &errorReader{}
+	ok := ioutil.NopCloser(strings.NewReader(randomTokenResp))
+
+	tests := []struct {
+		name    string
+		res     *http.Response
+		wantErr bool
+	}{
+		{"nil res", nil, true},
+		{"bad status", &http.Response{StatusCode: http.StatusBadRequest}, true},
+		{"bad body", &http.Response{StatusCode: http.StatusOK, Body: r}, true},
+		{"ok", &http.Response{StatusCode: http.StatusOK, Body: ok}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &KeyFlow{}
+			if err := c.parseTokenResponse(tt.res); (err != nil) != tt.wantErr {
+				t.Errorf("KeyFlow.parseTokenResponse() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
