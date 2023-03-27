@@ -15,6 +15,7 @@ import (
 	"testing"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -119,6 +120,8 @@ const saKeyStrPattern = `{
 	"validUntil": "2024-03-22T18:05:41Z"
 }`
 
+var saKey = fmt.Sprintf(saKeyStrPattern, uuid.New().String(), uuid.New().String(), uuid.New().String())
+
 func TestKeyFlow_Init(t *testing.T) {
 	// Create a temporary file with a random name in the default temporary directory
 	tmpfile1, err := ioutil.TempFile("", "sakey")
@@ -146,11 +149,8 @@ func TestKeyFlow_Init(t *testing.T) {
 		Bytes: x509.MarshalPKCS1PrivateKey(privKey),
 	}
 
-	testUUID := uuid.New().String()
-
 	// Print the private and public keys
 	pkp := pem.EncodeToMemory(privKeyPEM)
-	saKey := fmt.Sprintf(saKeyStrPattern, testUUID, testUUID, testUUID)
 
 	type args struct {
 		cfg []KeyFlowConfig
@@ -296,6 +296,55 @@ func TestKeyFlow_parseTokenResponse(t *testing.T) {
 			c := &KeyFlow{}
 			if err := c.parseTokenResponse(tt.res); (err != nil) != tt.wantErr {
 				t.Errorf("KeyFlow.parseTokenResponse() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestKeyFlow_validateToken(t *testing.T) {
+	// Generate a random private key
+	privateKey := make([]byte, 32)
+	if _, err := rand.Read(privateKey); err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a sample JWT token
+	claims := jwt.StandardClaims{
+		Subject: "test",
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(privateKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	type args struct {
+		token string
+	}
+	tests := []struct {
+		name    string
+		token   string
+		want    bool
+		wantErr bool
+	}{
+		{"no token", "", false, false},
+		{"ok", tokenString, true, false},
+		{"fail", "bad token", false, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &KeyFlow{
+				config: &KeyFlowConfig{
+					PrivateKey: privateKey,
+				},
+			}
+			got, err := c.validateToken(tt.token)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("KeyFlow.validateToken() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("KeyFlow.validateToken() = %v, want %v", got, tt.want)
 			}
 		})
 	}
