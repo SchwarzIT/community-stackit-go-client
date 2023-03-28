@@ -3,7 +3,9 @@ package clients
 import (
 	"context"
 	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -41,11 +43,12 @@ const (
 
 // KeyFlow handles auth with SA key
 type KeyFlow struct {
-	client     *http.Client
-	config     *KeyFlowConfig
-	key        *ServiceAccountKeyPrivateResponse
-	privateKey *rsa.PrivateKey
-	token      *TokenResponseBody
+	client        *http.Client
+	config        *KeyFlowConfig
+	key           *ServiceAccountKeyPrivateResponse
+	privateKey    *rsa.PrivateKey
+	privateKeyPEM []byte
+	token         *TokenResponseBody
 }
 
 // KeyFlowConfig is the flow config
@@ -159,7 +162,9 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 func (c *KeyFlow) GetAccessToken() (string, error) {
 	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
 	if err != nil {
-		return "", err
+		if !strings.Contains(err.Error(), "key is of invalid type") {
+			return "", err
+		}
 	}
 	if accessTokenIsValid {
 		return c.token.AccessToken, nil
@@ -260,6 +265,14 @@ func (c *KeyFlow) loadFiles() error {
 	if err != nil {
 		return err
 	}
+
+	// Encode the private key in PEM format
+	privKeyPEM := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(c.privateKey),
+	}
+	c.privateKeyPEM = pem.EncodeToMemory(privKeyPEM)
+
 	return nil
 }
 
@@ -324,7 +337,7 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 // validateToken parses and validates a JWT token
 func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
-		return c.privateKey, nil
+		return c.privateKeyPEM, nil
 	})
 }
 
