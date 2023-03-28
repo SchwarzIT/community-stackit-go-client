@@ -130,6 +130,21 @@ func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	return nil
 }
 
+// Clone creates a clone of the client
+func (c *KeyFlow) Clone() interface{} {
+	sc := *c
+	nc := &sc
+	cl := *nc.client
+	cf := *nc.config
+	ke := *nc.key
+	to := *nc.token
+	nc.client = &cl
+	nc.config = &cf
+	nc.key = &ke
+	nc.token = &to
+	return c
+}
+
 // Do performs the reuqest
 func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 	accessToken, err := c.GetAccessToken()

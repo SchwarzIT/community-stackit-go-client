@@ -58,6 +58,17 @@ func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 	return c.validate()
 }
 
+// Clone creates a clone of the client
+func (c *TokenFlow) Clone() interface{} {
+	sc := *c
+	nc := &sc
+	cl := *nc.client
+	cf := *nc.config
+	nc.client = &cl
+	nc.config = &cf
+	return c
+}
+
 // processConfig processes the given configuration
 func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
 	c.config = c.getConfigFromEnvironment()

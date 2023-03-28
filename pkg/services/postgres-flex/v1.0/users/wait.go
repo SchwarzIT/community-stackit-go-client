@@ -13,7 +13,7 @@ const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
 // Wait will wait for user deletion
 // returned value for deletion wait will always be nil
-func (*DeleteResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID, userID string) *wait.Handler {
+func (*DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID, userID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		s, err := c.List(ctx, projectID, instanceID)
 		if agg := validate.Response(s, err, "JSON200.Items"); agg != nil {

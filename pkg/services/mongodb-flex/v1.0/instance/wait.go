@@ -15,7 +15,7 @@ const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
 // Wait will wait for instance update to complete
 // returned interface is nil
-func (*CreateResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artificial wait for instance to change status
 	time.Sleep(5 * time.Second)
 
@@ -54,7 +54,7 @@ func (*CreateResponse) Wait(ctx context.Context, c *ClientWithResponses, project
 
 // WaitHandler will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (DeleteResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		s, err := c.List(ctx, projectID, &ListParams{})
 		if err = validate.Response(s, err, "JSON200.Items"); err != nil {

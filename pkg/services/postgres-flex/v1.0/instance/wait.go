@@ -10,17 +10,17 @@ import (
 )
 
 // Wait will wait for instance create to complete
-func (*CreateResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return waitForCreateOrUpdate(ctx, c, projectID, instanceID)
 }
 
 // Wait will wait for instance update to complete
-func (*PutResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return waitForCreateOrUpdate(ctx, c, projectID, instanceID)
 }
 
 // Wait will wait for instance update to complete
-func (*PatchResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*PatchResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return waitForCreateOrUpdate(ctx, c, projectID, instanceID)
 }
 
@@ -51,7 +51,7 @@ func waitForCreateOrUpdate(ctx context.Context, c *ClientWithResponses, projectI
 
 // Wait will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (DeleteResponse) Wait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.Get(ctx, projectID, instanceID)
 		if err != nil {
