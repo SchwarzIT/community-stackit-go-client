@@ -324,7 +324,7 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 // validateToken parses and validates a JWT token
 func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
-		return c.config.PrivateKey, nil
+		return c.privateKey, nil
 	})
 }
 
