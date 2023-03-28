@@ -6,8 +6,8 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
-	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,9 +15,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MicahParks/keyfunc"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -35,6 +37,13 @@ var tokenAPI = env.URLs(
 	"https://api.stackit.cloud/service-account/token",
 	"https://api-qa.stackit.cloud/service-account/token",
 	"https://api-dev.stackit.cloud/service-account/token",
+)
+
+var jsksAPI = env.URLs(
+	"jswks",
+	"https://api.stackit.cloud/service-account/.well-known/jwks.json",
+	"https://api-qa.stackit.cloud/service-account/.well-known/jwks.json",
+	"https://api-dev.stackit.cloud/service-account/.well-known/jwks.json",
 )
 
 const (
@@ -162,16 +171,13 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 func (c *KeyFlow) GetAccessToken() (string, error) {
 	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
 	if err != nil {
-		if !strings.Contains(err.Error(), "key is of invalid type") {
-			return "", err
-		}
+		return "", errors.Wrap(err, "failed initial validation")
 	}
 	if accessTokenIsValid {
 		return c.token.AccessToken, nil
 	}
-
 	if err := c.recreateAccessToken(); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed during token recreation")
 	}
 	return c.token.AccessToken, nil
 }
@@ -334,11 +340,46 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	return tokenString, nil
 }
 
-// validateToken parses and validates a JWT token
+func (c *KeyFlow) GetJwksJSON(token string) (string, error) {
+	requestUrl := jsksAPI.GetURL(c.GetEnvironment())
+	req, err := http.NewRequest(
+		"GET",
+		requestUrl,
+		nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	res, err := do(&http.Client{}, req, c.config.ClientRetry)
+	if err != nil {
+		return "", err
+	}
+	if res.StatusCode == 200 {
+		var body []byte
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			return "", err
+		}
+		jwksJSON := string(body)
+		return jwksJSON, nil
+	} else {
+		return "", fmt.Errorf("error: %s", res.Status)
+	}
+}
+
+// parseToken parses and validates a JWT token
 func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
-	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
-		return c.privateKeyPEM, nil
-	})
+	jwksJSON, err := c.GetJwksJSON(token)
+	if err != nil {
+		return nil, err
+	}
+	var jwksBytes = json.RawMessage(jwksJSON)
+	jwks, err := keyfunc.NewJSON(jwksBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return jwt.Parse(token, jwks.Keyfunc)
 }
 
 // validateToken returns true if tokeb is valid
