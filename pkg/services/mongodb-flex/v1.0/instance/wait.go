@@ -13,9 +13,31 @@ import (
 
 const ClientTimeoutErr = "Client.Timeout exceeded while awaiting headers"
 
+// WaitHandler will wait for instance creation to complete
+// returned interface is of *InstanceSingleInstance
+func (r CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	return createOrUpdateWait(ctx, c, projectID, instanceID)
+}
+
+// WaitHandler will wait for instance update to complete
+// returned interface is nil
+func (r PutResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	// artificial wait for instance to change from status ready to updating
+	time.Sleep(5 * time.Second)
+	return createOrUpdateWait(ctx, c, projectID, instanceID)
+}
+
+// WaitHandler will wait for instance update to complete
+// returned interface is nil
+func (r PatchResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+	// artificial wait for instance to change from status ready to updating
+	time.Sleep(5 * time.Second)
+	return createOrUpdateWait(ctx, c, projectID, instanceID)
+}
+
 // Wait will wait for instance update to complete
 // returned interface is nil
-func (*CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func createOrUpdateWait(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artificial wait for instance to change status
 	time.Sleep(5 * time.Second)
 
