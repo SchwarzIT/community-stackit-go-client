@@ -15,7 +15,7 @@ const (
 	client_timeout_err = "Client.Timeout exceeded while awaiting headers"
 )
 
-func (ProvisionResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, r ProvisionResponse, projectID, instanceID string) *wait.Handler {
+func (ProvisionResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
