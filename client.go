@@ -15,7 +15,7 @@ func NewClientWithKeyAuth(ctx context.Context, cfg ...clients.KeyFlowConfig) (*s
 	if err := client.Init(ctx, cfg...); err != nil {
 		return nil, err
 	}
-	return services.Init[clients.KeyFlowConfig](client), nil
+	return services.Init(client)
 }
 
 // MustNewClientWithKeyAuth panics if client initialization failed
@@ -34,7 +34,7 @@ func NewClientWithTokenAuth(ctx context.Context, cfg ...clients.TokenFlowConfig)
 	if err := client.Init(ctx, cfg...); err != nil {
 		return nil, err
 	}
-	return services.Init[clients.TokenFlowConfig](client), nil
+	return services.Init(client)
 }
 
 // MustNewClientWithTokenAuth panics if client initialization failed

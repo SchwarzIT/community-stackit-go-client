@@ -19,7 +19,7 @@ const (
 
 // Wait will wait for  creation
 // returned interface is nil or *instances.ProjectInstanceUI
-func (*CreateResponse) Wait(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*CreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if agg := validate.Response(s, err, "JSON200"); agg != nil {
@@ -46,7 +46,7 @@ func (*CreateResponse) Wait(ctx context.Context, c *instances.ClientWithResponse
 
 // Wait will wait for  update
 // returned interface is nil or *instances.ProjectInstanceUI
-func (*UpdateResponse) Wait(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*UpdateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	seenUpdating := false
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
@@ -112,7 +112,7 @@ func (*UpdateResponse) Wait(ctx context.Context, c *instances.ClientWithResponse
 
 // Wait will wait for  deletion
 // returned interface is nil
-func (*DeleteResponse) Wait(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (*DeleteResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if agg := validate.Response(s, err, "JSON200"); agg != nil {

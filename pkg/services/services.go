@@ -1,6 +1,9 @@
 package services
 
 import (
+	"errors"
+
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	argus "github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0"
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0"
@@ -36,27 +39,43 @@ type Services struct {
 	Redis         *dataservices.ClientWithResponses
 }
 
-func Init[K contracts.ClientFlowConfig](c contracts.BaseClientInterface) *Services {
+func Init(c contracts.BaseClientInterface) (*Services, error) {
+	nc := newClient(c)
+	if nc == nil {
+		return nil, errors.New("client cloning failed")
+	}
+
 	return &Services{
 		Client: c,
 
 		// Services
-		Argus:              argus.NewService(c),
-		Costs:              costs.NewService(c),
-		Kubernetes:         kubernetes.NewService(c),
-		Membership:         membership.NewService(c),
-		MongoDBFlex:        mongodbflex.NewService(c),
-		ObjectStorage:      objectstorage.NewService(c),
-		PostgresFlex:       postgresflex.NewService(c),
-		ResourceManagement: resourcemanagement.NewService(c),
-		ServiceAccounts:    serviceaccounts.NewService(c),
+		Argus:              argus.NewService(nc),
+		Costs:              costs.NewService(newClient(c)),
+		Kubernetes:         kubernetes.NewService(newClient(c)),
+		Membership:         membership.NewService(newClient(c)),
+		MongoDBFlex:        mongodbflex.NewService(newClient(c)),
+		ObjectStorage:      objectstorage.NewService(newClient(c)),
+		PostgresFlex:       postgresflex.NewService(newClient(c)),
+		ResourceManagement: resourcemanagement.NewService(newClient(c)),
+		ServiceAccounts:    serviceaccounts.NewService(newClient(c)),
 
 		// DSA
-		ElasticSearch: dataservices.NewService(c, dataservices.ElasticSearch),
-		LogMe:         dataservices.NewService(c, dataservices.LogMe),
-		MariaDB:       dataservices.NewService(c, dataservices.MariaDB),
-		PostgresDB:    dataservices.NewService(c, dataservices.PostgresDB),
-		RabbitMQ:      dataservices.NewService(c, dataservices.RabbitMQ),
-		Redis:         dataservices.NewService(c, dataservices.Redis),
+		ElasticSearch: dataservices.NewService(newClient(c), dataservices.ElasticSearch),
+		LogMe:         dataservices.NewService(newClient(c), dataservices.LogMe),
+		MariaDB:       dataservices.NewService(newClient(c), dataservices.MariaDB),
+		PostgresDB:    dataservices.NewService(newClient(c), dataservices.PostgresDB),
+		RabbitMQ:      dataservices.NewService(newClient(c), dataservices.RabbitMQ),
+		Redis:         dataservices.NewService(newClient(c), dataservices.Redis),
+	}, nil
+}
+
+func newClient(c contracts.BaseClientInterface) contracts.BaseClientInterface {
+	nc := c.Clone()
+	if v, ok := nc.(*clients.KeyFlow); ok {
+		return contracts.BaseClientInterface(v)
 	}
+	if v, ok := nc.(*clients.TokenFlow); ok {
+		return contracts.BaseClientInterface(v)
+	}
+	return nil
 }

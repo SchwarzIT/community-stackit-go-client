@@ -25,4 +25,5 @@ type BaseClientInterface interface {
 	Do(req *http.Request) (*http.Response, error)
 	GetEnvironment() env.Environment
 	GetServiceAccountEmail() string
+	Clone() interface{}
 }

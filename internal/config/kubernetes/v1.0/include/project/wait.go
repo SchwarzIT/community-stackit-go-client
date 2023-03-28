@@ -11,7 +11,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (*CreateResponse) Wait(ctx context.Context, c *project.ClientWithResponses, projectID string) *wait.Handler {
+func (*CreateResponse) WaitHandler(ctx context.Context, c *project.ClientWithResponses, projectID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 
 		resp, err := c.Get(ctx, projectID)
@@ -40,7 +40,7 @@ func (*CreateResponse) Wait(ctx context.Context, c *project.ClientWithResponses,
 	})
 }
 
-func (*DeleteResponse) Wait(ctx context.Context, c *project.ClientWithResponses, projectID string) *wait.Handler {
+func (*DeleteResponse) WaitHandler(ctx context.Context, c *project.ClientWithResponses, projectID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		resp, err := c.Get(ctx, projectID)
 		if err != nil {
