@@ -47,6 +47,9 @@ func NewRetryConfig() *RetryConfig {
 
 // do performs the request
 func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Response, err error) {
+	if cfg == nil {
+		cfg = NewRetryConfig()
+	}
 	maxRetries := cfg.MaxRetries
 	err = wait.PollImmediate(cfg.WaitBetweenCalls, cfg.Timeout, wait.ConditionFunc(
 		func() (bool, error) {
