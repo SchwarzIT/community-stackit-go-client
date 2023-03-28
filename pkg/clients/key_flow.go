@@ -3,9 +3,11 @@ package clients
 import (
 	"context"
 	"crypto/rsa"
+	"crypto/x509"
 	"encoding/json"
-	"errors"
+	"encoding/pem"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -13,9 +15,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/MicahParks/keyfunc"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 )
 
 const (
@@ -35,17 +39,25 @@ var tokenAPI = env.URLs(
 	"https://api-dev.stackit.cloud/service-account/token",
 )
 
+var jsksAPI = env.URLs(
+	"jswks",
+	"https://api.stackit.cloud/service-account/.well-known/jwks.json",
+	"https://api-qa.stackit.cloud/service-account/.well-known/jwks.json",
+	"https://api-dev.stackit.cloud/service-account/.well-known/jwks.json",
+)
+
 const (
 	PrivateKeyBlockType = "PRIVATE KEY"
 )
 
 // KeyFlow handles auth with SA key
 type KeyFlow struct {
-	client     *http.Client
-	config     *KeyFlowConfig
-	key        *ServiceAccountKeyPrivateResponse
-	privateKey *rsa.PrivateKey
-	token      *TokenResponseBody
+	client        *http.Client
+	config        *KeyFlowConfig
+	key           *ServiceAccountKeyPrivateResponse
+	privateKey    *rsa.PrivateKey
+	privateKeyPEM []byte
+	token         *TokenResponseBody
 }
 
 // KeyFlowConfig is the flow config
@@ -159,14 +171,13 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 func (c *KeyFlow) GetAccessToken() (string, error) {
 	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
 	if err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed initial validation")
 	}
 	if accessTokenIsValid {
 		return c.token.AccessToken, nil
 	}
-
 	if err := c.recreateAccessToken(); err != nil {
-		return "", err
+		return "", errors.Wrap(err, "failed during token recreation")
 	}
 	return c.token.AccessToken, nil
 }
@@ -260,6 +271,14 @@ func (c *KeyFlow) loadFiles() error {
 	if err != nil {
 		return err
 	}
+
+	// Encode the private key in PEM format
+	privKeyPEM := &pem.Block{
+		Type:  "RSA PRIVATE KEY",
+		Bytes: x509.MarshalPKCS1PrivateKey(c.privateKey),
+	}
+	c.privateKeyPEM = pem.EncodeToMemory(privKeyPEM)
+
 	return nil
 }
 
@@ -321,24 +340,6 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	return tokenString, nil
 }
 
-// validateToken parses and validates a JWT token
-func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
-	return jwt.Parse(token, func(*jwt.Token) (interface{}, error) {
-		return c.config.PrivateKey, nil
-	})
-}
-
-// validateToken returns true if tokeb is valid
-func (c *KeyFlow) validateToken(token string) (bool, error) {
-	if token == "" {
-		return false, nil
-	}
-	if _, err := c.parseToken(token); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
 // requestToken makes a request to the SA token API
 func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) {
 	body := url.Values{}
@@ -367,4 +368,47 @@ func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
 	}
 	c.token = new(TokenResponseBody)
 	return json.Unmarshal(body, c.token)
+}
+
+// validateToken returns true if tokeb is valid
+func (c *KeyFlow) validateToken(token string) (bool, error) {
+	if token == "" {
+		return false, nil
+	}
+	if _, err := c.parseToken(token); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// parseToken parses and validates a JWT token
+func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
+	b, err := c.getJwksJSON(token)
+	if err != nil {
+		return nil, err
+	}
+	var jwksBytes = json.RawMessage(b)
+	jwks, err := keyfunc.NewJSON(jwksBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return jwt.Parse(token, jwks.Keyfunc)
+}
+
+func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
+	req, err := http.NewRequest("GET", jsksAPI.GetURL(c.GetEnvironment()), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	res, err := do(&http.Client{}, req, c.config.ClientRetry)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode == 200 {
+		return io.ReadAll(res.Body)
+	} else {
+		return nil, fmt.Errorf("error: %s", res.Status)
+	}
 }

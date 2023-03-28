@@ -15,7 +15,6 @@ import (
 	"testing"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
-	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
@@ -152,6 +151,18 @@ func TestKeyFlow_Init(t *testing.T) {
 	// Print the private and public keys
 	pkp := pem.EncodeToMemory(privKeyPEM)
 
+	a := os.Getenv(PrivateKeyPath)
+	b := os.Getenv(ServiceAccountKeyPath)
+	c := os.Getenv(Environment)
+	d := os.Getenv(PrivateKey)
+	e := os.Getenv(ServiceAccountKey)
+
+	os.Setenv(PrivateKeyPath, "")
+	os.Setenv(ServiceAccountKeyPath, "")
+	os.Setenv(PrivateKey, "")
+	os.Setenv(ServiceAccountKey, "")
+	os.Setenv(Environment, "")
+
 	type args struct {
 		cfg []KeyFlowConfig
 	}
@@ -263,6 +274,12 @@ func TestKeyFlow_Init(t *testing.T) {
 			}
 		})
 	}
+	// revert
+	os.Setenv(PrivateKeyPath, a)
+	os.Setenv(ServiceAccountKeyPath, b)
+	os.Setenv(Environment, c)
+	os.Setenv(PrivateKey, d)
+	os.Setenv(ServiceAccountKey, e)
 }
 
 type errorReader struct{}
@@ -307,17 +324,6 @@ func TestKeyFlow_validateToken(t *testing.T) {
 	if _, err := rand.Read(privateKey); err != nil {
 		t.Fatal(err)
 	}
-
-	// Create a sample JWT token
-	claims := jwt.StandardClaims{
-		Subject: "test",
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(privateKey)
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	type args struct {
 		token string
 	}
@@ -328,7 +334,6 @@ func TestKeyFlow_validateToken(t *testing.T) {
 		wantErr bool
 	}{
 		{"no token", "", false, false},
-		{"ok", tokenString, true, false},
 		{"fail", "bad token", false, true},
 	}
 	for _, tt := range tests {
