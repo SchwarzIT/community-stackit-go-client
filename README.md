@@ -93,7 +93,7 @@ After the service account has been created, you can authenticate to the client u
 
 2. Create a service account key:
 
-   - Clone this repo and more your keys to `examples/service-accounts`
+   - Clone this repo and move the keys from step (1) to `examples/service-accounts`
 
    - Modify `create_sa_key.go` (fill out the constants)
 
