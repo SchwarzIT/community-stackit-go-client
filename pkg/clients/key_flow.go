@@ -340,59 +340,6 @@ func (c *KeyFlow) generateSelfSignedJWT() (string, error) {
 	return tokenString, nil
 }
 
-func (c *KeyFlow) GetJwksJSON(token string) (string, error) {
-	requestUrl := jsksAPI.GetURL(c.GetEnvironment())
-	req, err := http.NewRequest(
-		"GET",
-		requestUrl,
-		nil)
-	if err != nil {
-		return "", err
-	}
-	req.Header.Add("Authorization", "Bearer "+token)
-	res, err := do(&http.Client{}, req, c.config.ClientRetry)
-	if err != nil {
-		return "", err
-	}
-	if res.StatusCode == 200 {
-		var body []byte
-		body, err = io.ReadAll(res.Body)
-		if err != nil {
-			return "", err
-		}
-		jwksJSON := string(body)
-		return jwksJSON, nil
-	} else {
-		return "", fmt.Errorf("error: %s", res.Status)
-	}
-}
-
-// parseToken parses and validates a JWT token
-func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
-	jwksJSON, err := c.GetJwksJSON(token)
-	if err != nil {
-		return nil, err
-	}
-	var jwksBytes = json.RawMessage(jwksJSON)
-	jwks, err := keyfunc.NewJSON(jwksBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return jwt.Parse(token, jwks.Keyfunc)
-}
-
-// validateToken returns true if tokeb is valid
-func (c *KeyFlow) validateToken(token string) (bool, error) {
-	if token == "" {
-		return false, nil
-	}
-	if _, err := c.parseToken(token); err != nil {
-		return false, err
-	}
-	return true, nil
-}
-
 // requestToken makes a request to the SA token API
 func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) {
 	body := url.Values{}
@@ -421,4 +368,47 @@ func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
 	}
 	c.token = new(TokenResponseBody)
 	return json.Unmarshal(body, c.token)
+}
+
+// validateToken returns true if tokeb is valid
+func (c *KeyFlow) validateToken(token string) (bool, error) {
+	if token == "" {
+		return false, nil
+	}
+	if _, err := c.parseToken(token); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// parseToken parses and validates a JWT token
+func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
+	b, err := c.getJwksJSON(token)
+	if err != nil {
+		return nil, err
+	}
+	var jwksBytes = json.RawMessage(b)
+	jwks, err := keyfunc.NewJSON(jwksBytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return jwt.Parse(token, jwks.Keyfunc)
+}
+
+func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
+	req, err := http.NewRequest("GET", jsksAPI.GetURL(c.GetEnvironment()), nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Authorization", "Bearer "+token)
+	res, err := do(&http.Client{}, req, c.config.ClientRetry)
+	if err != nil {
+		return nil, err
+	}
+	if res.StatusCode == 200 {
+		return io.ReadAll(res.Body)
+	} else {
+		return nil, fmt.Errorf("error: %s", res.Status)
+	}
 }
