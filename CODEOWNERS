@@ -1,8 +1,2 @@
 # These default owners for everything
-*   @do87
-
-# Costs integration owners
-pkg/services/costs/* @troublete
-
-# Object Storage Credentials group
-client/pkg/services/object-storage/credentials-group/* @johannes-riecken @SkyFox277
+*   @do87 @johannes-riecken @SkyFox277
