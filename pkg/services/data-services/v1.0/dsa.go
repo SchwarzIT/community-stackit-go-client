@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/instances"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/offerings"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/credentials"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0/credentials"
 )
 
 // Client which conforms to the OpenAPI3 specification for this service.

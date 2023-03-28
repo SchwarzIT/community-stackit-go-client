@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/backup"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/backup"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/flavors"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/user"
