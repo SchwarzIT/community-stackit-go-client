@@ -20,7 +20,8 @@ func TestNewRetryConfig(t *testing.T) {
 	want := RetryConfig{
 		MaxRetries:       DefaultRetryMaxRetries,
 		WaitBetweenCalls: DefaultRetryWaitBetweenCalls,
-		Timeout:          DefaultRetryTimeout,
+		RetryTimeout:     DefaultRetryTimeout,
+		ClientTimeout:    DefaultClientTimeout,
 	}
 	if !reflect.DeepEqual(*got, want) {
 		t.Errorf("%+v != %+v", *got, want)
@@ -41,17 +42,22 @@ func Test_do(t *testing.T) {
 		errMsg   string
 	}{
 		{"all ok", args{
-			cfg:            &RetryConfig{0, time.Microsecond, time.Second},
+			cfg:            &RetryConfig{0, time.Microsecond, time.Second, DefaultClientTimeout},
+			serverStatus:   http.StatusOK,
+			serverResponse: `{"status":"ok", "testing": "%s"}`,
+		}, &http.Response{StatusCode: http.StatusOK}, false, ""},
+		{"all ok nil client", args{
+			cfg:            &RetryConfig{0, time.Microsecond, time.Second, DefaultClientTimeout},
 			serverStatus:   http.StatusOK,
 			serverResponse: `{"status":"ok", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusOK}, false, ""},
 		{"fail 1", args{
-			cfg:            &RetryConfig{1, time.Microsecond, time.Second},
+			cfg:            &RetryConfig{1, time.Microsecond, time.Second, DefaultClientTimeout},
 			serverStatus:   http.StatusInternalServerError,
 			serverResponse: `{"status":"error 1", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusInternalServerError}, false, ""},
 		{"fail 2 - timeout error", args{
-			cfg:            &RetryConfig{3, time.Microsecond, time.Second},
+			cfg:            &RetryConfig{3, time.Microsecond, time.Second, DefaultClientTimeout},
 			serverStatus:   http.StatusOK,
 			serverResponse: `{"status":"ok", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusOK}, true, "no such host"},
@@ -77,6 +83,9 @@ func Test_do(t *testing.T) {
 			if tt.name == "fail 2 - timeout error" && server != nil {
 				t.Log("closing server")
 				server.Close()
+			}
+			if tt.name == "all ok nil client" {
+				c = nil
 			}
 			gotResp, err := do(c, req, tt.args.cfg)
 			if server != nil {
