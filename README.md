@@ -84,7 +84,7 @@ After the service account has been created, you can authenticate to the client u
 
 ### Key flow
 
-⚠️ Key flow isn't fully supported in the portal yet, which is why setting it up at the moment is a bit more technical.
+⚠️ Currently, setting up `Key flow` requires a slightly more technical approach as it is not yet available in the portal UI.
 
 1. Create an RSA key pair:
 
