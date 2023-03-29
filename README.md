@@ -84,6 +84,8 @@ After the service account has been created, you can authenticate to the client u
 
 ### Key flow
 
+⚠️ Key flow isn't fully supported in the portal yet, which is why setting it up at the moment is a bit more technical.
+
 1. Create an RSA key pair:
 
    ```bash
@@ -91,7 +93,11 @@ After the service account has been created, you can authenticate to the client u
       -keyout private_key.pem -out public_key.pem -subj "/CN=unused"
    ```
 
-2. Create a service account key:
+2. Create a serivce account in one of your STACKIT projects & make sure to assign permissions to it
+
+3. Get your access token from the portal (from the developer tools, network tab)
+
+4. Create a service account key:
 
    - Create a file called `create_sa_key.go` and put it in the same directory as the RSA key pair
 
@@ -105,7 +111,7 @@ After the service account has been created, you can authenticate to the client u
 
    - a file called `sa_key.json` will be created
 
-3. Set environment variables:
+5. Set environment variables:
 
    ```bash
    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
@@ -116,7 +122,7 @@ After the service account has been created, you can authenticate to the client u
    export STACKIT_ENV=prod
    ```
 
-4. Configure the client
+6. Configure the client
 
    ```go
    package main
@@ -135,7 +141,9 @@ After the service account has been created, you can authenticate to the client u
 
 ### Token flow
 
-1. Set the following environment variables:
+1. Create a serivce account in one of your STACKIT projects & make sure to assign permissions to it
+
+2. Set the following environment variables:
 
     ```bash
     export STACKIT_SERVICE_ACCOUNT_EMAIL=email
@@ -146,7 +154,7 @@ After the service account has been created, you can authenticate to the client u
     export STACKIT_ENV=prod
     ```
 
-2. Configure the client
+3. Configure the client
 
    ```go
    package main
