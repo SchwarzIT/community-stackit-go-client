@@ -93,9 +93,9 @@ After the service account has been created, you can authenticate to the client u
 
 2. Create a service account key:
 
-   - Clone this repo and move the keys from step (1) to `examples/service-accounts`
+   - Create a file called `create_sa_key.go` and put it in the same directory as the RSA key pair
 
-   - Modify `create_sa_key.go` (fill out the constants)
+   - Copy the contents of [`examples/service-accounts/create_sa_key.go`](https://raw.githubusercontent.com/SchwarzIT/community-stackit-go-client/main/examples/service-accounts/create_sa_key.go) to `create_sa_key.go` and fill out the constants
 
    - Run with:  
 
