@@ -25,23 +25,25 @@ const (
 )
 
 const (
-	DefaultClientTimeout         = time.Second * 10
+	DefaultClientTimeout         = time.Minute
 	DefaultRetryMaxRetries       = 3
-	DefaultRetryWaitBetweenCalls = 1 * time.Second
+	DefaultRetryWaitBetweenCalls = 30 * time.Second
 	DefaultRetryTimeout          = 2 * time.Minute
 )
 
 type RetryConfig struct {
-	MaxRetries       int
-	WaitBetweenCalls time.Duration
-	Timeout          time.Duration
+	MaxRetries       int           // Max retries
+	WaitBetweenCalls time.Duration // Time to wait between requests
+	RetryTimeout     time.Duration // Max time to re-try
+	ClientTimeout    time.Duration // HTTP Client timeout
 }
 
 func NewRetryConfig() *RetryConfig {
 	return &RetryConfig{
 		MaxRetries:       DefaultRetryMaxRetries,
 		WaitBetweenCalls: DefaultRetryWaitBetweenCalls,
-		Timeout:          DefaultRetryTimeout,
+		RetryTimeout:     DefaultRetryTimeout,
+		ClientTimeout:    DefaultClientTimeout,
 	}
 }
 
@@ -50,8 +52,12 @@ func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Re
 	if cfg == nil {
 		cfg = NewRetryConfig()
 	}
+	if client == nil {
+		client = &http.Client{}
+	}
+	client.Timeout = cfg.ClientTimeout
 	maxRetries := cfg.MaxRetries
-	err = wait.PollImmediate(cfg.WaitBetweenCalls, cfg.Timeout, wait.ConditionFunc(
+	err = wait.PollImmediate(cfg.WaitBetweenCalls, cfg.RetryTimeout, wait.ConditionFunc(
 		func() (bool, error) {
 			resp, err = client.Do(req)
 			if err != nil {
