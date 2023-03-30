@@ -54,6 +54,7 @@ const (
 type KeyFlow struct {
 	client        *http.Client
 	config        *KeyFlowConfig
+	doer          func(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Response, err error)
 	key           *ServiceAccountKeyPrivateResponse
 	privateKey    *rsa.PrivateKey
 	privateKeyPEM []byte
@@ -128,6 +129,7 @@ func (c *KeyFlow) GetServiceAccountEmail() string {
 func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	c.client = &http.Client{}
 	c.token = new(TokenResponseBody)
+	c.doer = do
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
 	if c.config.ClientRetry == nil {
@@ -164,7 +166,7 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	return do(c.client, req, c.config.ClientRetry)
+	return c.doer(c.client, req, c.config.ClientRetry)
 }
 
 // GetAccessToken returns short-lived access token
@@ -351,7 +353,7 @@ func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) 
 		return nil, err
 	}
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	return do(&http.Client{}, req, c.config.ClientRetry)
+	return c.doer(&http.Client{}, req, c.config.ClientRetry)
 }
 
 // parseTokenResponse parses the response from the server
@@ -402,7 +404,7 @@ func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
 		return nil, err
 	}
 	req.Header.Add("Authorization", "Bearer "+token)
-	res, err := do(&http.Client{}, req, c.config.ClientRetry)
+	res, err := c.doer(&http.Client{}, req, c.config.ClientRetry)
 	if err != nil {
 		return nil, err
 	}
