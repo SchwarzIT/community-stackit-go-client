@@ -1,6 +1,7 @@
 package clients
 
 import (
+	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
@@ -16,7 +17,9 @@ import (
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/google/uuid"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestKeyFlow_processConfig(t *testing.T) {
@@ -318,7 +321,23 @@ func TestKeyFlow_parseTokenResponse(t *testing.T) {
 	}
 }
 
+func TestClone(t *testing.T) {
+	c := &KeyFlow{
+		client: &http.Client{},
+		config: &KeyFlowConfig{},
+		key:    &ServiceAccountKeyPrivateResponse{},
+		token:  &TokenResponseBody{},
+	}
+
+	clone := c.Clone().(*KeyFlow)
+
+	if !reflect.DeepEqual(c, clone) {
+		t.Errorf("Clone() = %v, want %v", clone, c)
+	}
+}
+
 func TestKeyFlow_validateToken(t *testing.T) {
+
 	// Generate a random private key
 	privateKey := make([]byte, 32)
 	if _, err := rand.Read(privateKey); err != nil {
@@ -342,6 +361,7 @@ func TestKeyFlow_validateToken(t *testing.T) {
 				config: &KeyFlowConfig{
 					PrivateKey: privateKey,
 				},
+				doer: do,
 			}
 			got, err := c.validateToken(tt.token)
 			if (err != nil) != tt.wantErr {
@@ -351,6 +371,123 @@ func TestKeyFlow_validateToken(t *testing.T) {
 			if got != tt.want {
 				t.Errorf("KeyFlow.validateToken() = %v, want %v", got, tt.want)
 			}
+		})
+	}
+}
+
+type MockDoer struct {
+	mock.Mock
+}
+
+func (m *MockDoer) Do(client *http.Client, req *http.Request, cfg *RetryConfig) (*http.Response, error) {
+	args := m.Called(req)
+	return args.Get(0).(*http.Response), args.Error(1)
+}
+
+func TestGetJwksJSON(t *testing.T) {
+	testCases := []struct {
+		name           string
+		token          string
+		mockResponse   *http.Response
+		mockError      error
+		expectedResult []byte
+		expectedError  error
+	}{
+		{
+			name:  "Success",
+			token: "test_token",
+			mockResponse: &http.Response{
+				StatusCode: 200,
+				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"key": "value"}`))),
+			},
+			mockError:      nil,
+			expectedResult: []byte(`{"key": "value"}`),
+			expectedError:  nil,
+		},
+		{
+			name:           "Error",
+			token:          "test_token",
+			mockResponse:   nil,
+			mockError:      fmt.Errorf("some error"),
+			expectedResult: nil,
+			expectedError:  fmt.Errorf("some error"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDoer := new(MockDoer)
+			mockDoer.On("Do", mock.Anything).Return(tc.mockResponse, tc.mockError)
+
+			c := &KeyFlow{
+				config: &KeyFlowConfig{ClientRetry: NewRetryConfig()},
+				doer:   mockDoer.Do,
+			}
+
+			result, err := c.getJwksJSON(tc.token)
+
+			if tc.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tc.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, tc.expectedResult, result)
+		})
+	}
+}
+
+func TestRequestToken(t *testing.T) {
+	testCases := []struct {
+		name          string
+		grant         string
+		assertion     string
+		mockResponse  *http.Response
+		mockError     error
+		expectedError error
+	}{
+		{
+			name:      "Success",
+			grant:     "test_grant",
+			assertion: "test_assertion",
+			mockResponse: &http.Response{
+				StatusCode: 200,
+				Body:       ioutil.NopCloser(strings.NewReader(`{"access_token": "test_token"}`)),
+			},
+			mockError:     nil,
+			expectedError: nil,
+		},
+		{
+			name:          "Error",
+			grant:         "test_grant",
+			assertion:     "test_assertion",
+			mockResponse:  nil,
+			mockError:     errors.New("request error"),
+			expectedError: errors.New("request error"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockDoer := new(MockDoer)
+			mockDoer.On("Do", mock.Anything).Return(tc.mockResponse, tc.mockError)
+
+			c := &KeyFlow{
+				config: &KeyFlowConfig{ClientRetry: NewRetryConfig()},
+				doer:   mockDoer.Do,
+			}
+
+			res, err := c.requestToken(tc.grant, tc.assertion)
+
+			if tc.expectedError != nil {
+				assert.Error(t, err)
+				assert.Equal(t, tc.expectedError.Error(), err.Error())
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, tc.mockResponse, res)
 		})
 	}
 }
