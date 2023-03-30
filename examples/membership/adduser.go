@@ -12,7 +12,7 @@ import (
 
 func main() {
 	ctx := context.Background()
-	c := stackit.MustNewClientWithTokenAuth(ctx)
+	c := stackit.MustNewClientWithKeyAuth(ctx)
 	member := membership.Member{
 		Subject: "user@host.name",
 		Role:    string(rm.PROJECT_OWNER),
