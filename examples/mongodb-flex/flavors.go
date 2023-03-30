@@ -6,6 +6,7 @@ import (
 	"os"
 
 	stackit "github.com/SchwarzIT/community-stackit-go-client"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0/flavors"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
 
@@ -19,27 +20,19 @@ func main() {
 		panic(err)
 	}
 
-	cpu := 0
-	mem := 0
-	id := ""
+	var smallestFlavor *flavors.InfraFlavor
 	for _, flavor := range *res.JSON200.Flavors {
-		if flavor.ID == nil || flavor.CPU == nil || flavor.Memory == nil {
+		flavor := flavor // bypass re-used var
+		if flavor.ID == nil || flavor.Memory == nil || flavor.CPU == nil {
 			continue
 		}
-		if id == "" {
-			id = *flavor.ID
-			cpu = *flavor.CPU
-			mem = *flavor.Memory
-		}
-		if cpu >= *flavor.CPU && mem >= *flavor.Memory {
-			id = *flavor.ID
-			cpu = *flavor.CPU
-			mem = *flavor.Memory
+		if smallestFlavor == nil ||
+			(*flavor.Memory <= *smallestFlavor.Memory && *flavor.CPU <= *smallestFlavor.CPU) {
+			smallestFlavor = &flavor
 		}
 	}
-	if id == "" {
-		fmt.Println("couldn't find smallest flavor")
-		return
+
+	if smallestFlavor != nil {
+		fmt.Printf("Smallest flavor ID: %s\n", *smallestFlavor.ID)
 	}
-	fmt.Printf("found flavor id %s with %d cpu and %d memory", id, cpu, mem)
 }
