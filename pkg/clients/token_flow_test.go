@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
@@ -161,5 +162,18 @@ func TestTokenFlow_Do(t *testing.T) {
 				t.Errorf("TokenFlow.Do() = %v, want %v", got.StatusCode, tt.want)
 			}
 		})
+	}
+}
+
+func TestTokenClone(t *testing.T) {
+	c := &TokenFlow{
+		client: &http.Client{},
+		config: &TokenFlowConfig{},
+	}
+
+	clone := c.Clone().(*TokenFlow)
+
+	if !reflect.DeepEqual(c, clone) {
+		t.Errorf("Clone() = %v, want %v", clone, c)
 	}
 }
