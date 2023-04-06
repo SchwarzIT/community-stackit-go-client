@@ -6,8 +6,8 @@ import (
 	"os"
 
 	stackit "github.com/SchwarzIT/community-stackit-go-client"
-	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 	serviceaccounts "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-accounts/v2.0"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 )
 
 func marshalDeepObject(in interface{}, path []string) ([]string, error) {

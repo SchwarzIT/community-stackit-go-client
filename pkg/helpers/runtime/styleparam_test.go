@@ -17,7 +17,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )

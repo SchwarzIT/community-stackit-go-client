@@ -23,7 +23,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 )
 
 // BindStyledParameter binds a parameter as described in the Path Parameters
