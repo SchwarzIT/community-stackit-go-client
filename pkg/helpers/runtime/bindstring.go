@@ -21,7 +21,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/types"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 )
 
 // BindStringToObject takes a string, and attempts to assign it to the destination
