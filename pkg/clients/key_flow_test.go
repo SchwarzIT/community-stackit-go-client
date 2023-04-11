@@ -353,7 +353,7 @@ func TestKeyFlow_validateToken(t *testing.T) {
 		wantErr bool
 	}{
 		{"no token", "", false, false},
-		{"fail", "bad token", false, true},
+		{"bad token - ask to recreate", "bad token", false, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
