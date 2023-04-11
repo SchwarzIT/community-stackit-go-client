@@ -378,6 +378,9 @@ func (c *KeyFlow) validateToken(token string) (bool, error) {
 		return false, nil
 	}
 	if _, err := c.parseToken(token); err != nil {
+		if strings.Contains(err.Error(), "401") {
+			return false, nil
+		}
 		return false, err
 	}
 	return true, nil
