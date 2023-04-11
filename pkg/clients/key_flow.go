@@ -173,13 +173,13 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 func (c *KeyFlow) GetAccessToken() (string, error) {
 	accessTokenIsValid, err := c.validateToken(c.token.AccessToken)
 	if err != nil {
-		return "", errors.Wrap(err, "failed initial validation")
+		return "", errors.Wrap(err, "failed to validate existing keyflow token")
 	}
 	if accessTokenIsValid {
 		return c.token.AccessToken, nil
 	}
 	if err := c.recreateAccessToken(); err != nil {
-		return "", errors.Wrap(err, "failed during token recreation")
+		return "", errors.Wrap(err, "failed to recreate keyflow token")
 	}
 	return c.token.AccessToken, nil
 }
