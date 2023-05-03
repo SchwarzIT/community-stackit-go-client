@@ -69,6 +69,7 @@ type KeyFlowConfig struct {
 	PrivateKey            []byte
 	Environment           env.Environment
 	ClientRetry           *RetryConfig
+	TraceparentHeader     string
 }
 
 // TokenResponseBody is the API response
@@ -166,6 +167,9 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	if tp := c.GetTraceparent(); tp != "" {
+		req.Header.Set("Traceparent", tp)
+	}
 	return c.doer(c.client, req, c.config.ClientRetry)
 }
 
@@ -417,4 +421,12 @@ func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
 	} else {
 		return nil, fmt.Errorf("error: %s", res.Status)
 	}
+}
+
+// GetTraceparent returns the defined Traceparent
+func (c *KeyFlow) GetTraceparent() string {
+	if c.config == nil {
+		return ""
+	}
+	return c.config.TraceparentHeader
 }

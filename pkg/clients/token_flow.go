@@ -29,6 +29,7 @@ type TokenFlowConfig struct {
 	ServiceAccountToken string
 	Environment         env.Environment
 	ClientRetry         *RetryConfig
+	TraceparentHeader   string
 }
 
 // GetEnvironment returns the defined API environment
@@ -129,5 +130,16 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}
+	if tp := c.GetTraceparent(); tp != "" {
+		req.Header.Set("Traceparent", tp)
+	}
 	return do(c.client, req, c.config.ClientRetry)
+}
+
+// GetTraceparent returns the defined Traceparent
+func (c *TokenFlow) GetTraceparent() string {
+	if c.config == nil {
+		return ""
+	}
+	return c.config.TraceparentHeader
 }

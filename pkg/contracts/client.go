@@ -26,4 +26,5 @@ type BaseClientInterface interface {
 	GetEnvironment() env.Environment
 	GetServiceAccountEmail() string
 	Clone() interface{}
+	GetTraceparent() string
 }
