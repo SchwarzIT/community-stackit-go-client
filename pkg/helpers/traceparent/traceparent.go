@@ -28,31 +28,31 @@ type Traceparent struct {
 	SpanID  string
 }
 
-func (t Traceparent) String() string {
+func (t *Traceparent) String() string {
 	return fmt.Sprintf("%s-%s-%s-%s", t.Version, t.TraceID, t.SpanID, t.Flag)
 }
 
-func (t Traceparent) SetHeader(req *http.Request) {
+func (t *Traceparent) SetHeader(req *http.Request) {
 	if req == nil {
 		return
 	}
 	req.Header.Set("Traceparent", t.String())
 }
 
-func GenerateCustom(c Config) (Traceparent, error) {
+func GenerateCustom(c Config) (*Traceparent, error) {
 	// Generate a random 16 byte trace ID
 	traceID, err := generateRandomHex(16)
 	if err != nil {
-		return Traceparent{}, errors.Wrap(err, "error generating traceID")
+		return nil, errors.Wrap(err, "error generating traceID")
 	}
 
 	// Generate a random 8 byte span ID
 	spanID, err := generateRandomHex(8)
 	if err != nil {
-		return Traceparent{}, errors.Wrap(err, "error generating spanID")
+		return nil, errors.Wrap(err, "error generating spanID")
 	}
 
-	return Traceparent{
+	return &Traceparent{
 		c,
 		traceID,
 		spanID,
@@ -67,7 +67,7 @@ func generateRandomHex(size int) (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func Generate() (Traceparent, error) {
+func Generate() (*Traceparent, error) {
 	return GenerateCustom(Config{
 		RecordFlag,
 		CurrentVersion,
