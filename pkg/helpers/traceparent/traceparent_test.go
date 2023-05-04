@@ -83,7 +83,7 @@ func TestPretty(t *testing.T) {
 	}
 
 	tp := NewCustom(traceID, spanID, customConfig)
-	expectedOutput := "traceparent:\n- version: 00\n- trace id: 0af7651916cd43dd8448eb211c80319c\n- span id: b7ad6b7169203331\n- flag: 00\n"
+	expectedOutput := "traceparent:\n- version:  00\n- trace id: 0af7651916cd43dd8448eb211c80319c\n- span id:  b7ad6b7169203331\n- flag:     00\n"
 
 	assert.Equal(t, expectedOutput, tp.Pretty())
 }

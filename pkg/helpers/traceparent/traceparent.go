@@ -89,7 +89,7 @@ func (t *Traceparent) String() string {
 }
 
 func (t *Traceparent) Pretty() string {
-	return fmt.Sprintf("traceparent:\n- version: %s\n- trace id: %s\n- span id: %s\n- flag: %s\n", t.Version, t.TraceID, t.SpanID, t.Flag)
+	return fmt.Sprintf("traceparent:\n- version:  %s\n- trace id: %s\n- span id:  %s\n- flag:     %s\n", t.Version, t.TraceID, t.SpanID, t.Flag)
 }
 
 func (t *Traceparent) SetHeader(req *http.Request) {
