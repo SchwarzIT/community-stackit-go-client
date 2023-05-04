@@ -74,6 +74,20 @@ func TestParse(t *testing.T) {
 	assert.True(t, strings.Contains(err.Error(), "spanID can't be empty"))
 }
 
+func TestPretty(t *testing.T) {
+	traceID := "0af7651916cd43dd8448eb211c80319c"
+	spanID := "b7ad6b7169203331"
+	customConfig := Config{
+		Flag:    DoNotRecordFlag,
+		Version: CurrentVersion,
+	}
+
+	tp := NewCustom(traceID, spanID, customConfig)
+	expectedOutput := "traceparent:\n- version: 00\n- trace id: 0af7651916cd43dd8448eb211c80319c\n- span id: b7ad6b7169203331\n- flag: 00\n"
+
+	assert.Equal(t, expectedOutput, tp.Pretty())
+}
+
 func TestGenerate(t *testing.T) {
 	tp, err := Generate()
 	assert.NoError(t, err)
