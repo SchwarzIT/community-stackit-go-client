@@ -2,6 +2,7 @@ package traceparent
 
 import (
 	"net/http"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -36,6 +37,41 @@ func TestNewCustom(t *testing.T) {
 	assert.Equal(t, spanID, tp.SpanID)
 	assert.Equal(t, customConfig.Flag, tp.Config.Flag)
 	assert.Equal(t, customConfig.Version, tp.Config.Version)
+}
+
+func TestParse(t *testing.T) {
+	validTraceparent := "01-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-00"
+	tp, err := Parse(validTraceparent)
+	assert.NoError(t, err)
+	assert.Equal(t, "0af7651916cd43dd8448eb211c80319c", tp.TraceID)
+	assert.Equal(t, "b7ad6b7169203331", tp.SpanID)
+	assert.Equal(t, RecordFlag, tp.Config.Flag)
+	assert.Equal(t, CurrentVersion, tp.Config.Version)
+
+	invalidTraceparent := "01-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331"
+	_, err = Parse(invalidTraceparent)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "unexpected traceparent structure"))
+
+	unknownFlagTraceparent := "02-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-00"
+	_, err = Parse(unknownFlagTraceparent)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "unknown flag"))
+
+	unknownVersionTraceparent := "01-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-02"
+	_, err = Parse(unknownVersionTraceparent)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "unknown version"))
+
+	emptyTraceID := "01--b7ad6b7169203331-00"
+	_, err = Parse(emptyTraceID)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "traceID can't be empty"))
+
+	emptySpanID := "01-0af7651916cd43dd8448eb211c80319c--00"
+	_, err = Parse(emptySpanID)
+	assert.Error(t, err)
+	assert.True(t, strings.Contains(err.Error(), "spanID can't be empty"))
 }
 
 func TestGenerate(t *testing.T) {

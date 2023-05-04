@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -47,6 +48,40 @@ func NewCustom(traceID, spanID string, c Config) *Traceparent {
 		traceID,
 		spanID,
 	}
+}
+
+func Parse(s string) (*Traceparent, error) {
+	sl := strings.Split(s, "-")
+	if len(sl) != 4 {
+		return nil, errors.New("unexpected traceparent structure")
+	}
+
+	var f Flag
+	switch sl[0] {
+	case string(RecordFlag):
+		f = RecordFlag
+	case string(DoNotRecordFlag):
+		f = DoNotRecordFlag
+	default:
+		return nil, fmt.Errorf("unknown flag '%s'", sl[0])
+	}
+
+	var v Version
+	switch sl[3] {
+	case string(CurrentVersion):
+		v = CurrentVersion
+	default:
+		return nil, fmt.Errorf("unknown version '%s'", sl[3])
+	}
+
+	if sl[1] == "" {
+		return nil, errors.New("traceID can't be empty")
+	}
+
+	if sl[2] == "" {
+		return nil, errors.New("spanID can't be empty")
+	}
+	return NewCustom(sl[1], sl[2], Config{f, v}), nil
 }
 
 func (t *Traceparent) String() string {
