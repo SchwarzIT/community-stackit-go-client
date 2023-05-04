@@ -17,6 +17,7 @@ import (
 
 	"github.com/MicahParks/keyfunc"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -69,6 +70,7 @@ type KeyFlowConfig struct {
 	PrivateKey            []byte
 	Environment           env.Environment
 	ClientRetry           *RetryConfig
+	Traceparent           *traceparent.Traceparent
 }
 
 // TokenResponseBody is the API response
@@ -166,6 +168,9 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
+	if t := c.GetTraceparent(); t != nil {
+		t.SetHeader(req)
+	}
 	return c.doer(c.client, req, c.config.ClientRetry)
 }
 
@@ -208,7 +213,6 @@ func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
 // mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and currentCfg.
 func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	merged := *currentCfg
-
 	if cfg.ServiceAccountKeyPath != "" {
 		merged.ServiceAccountKeyPath = cfg.ServiceAccountKeyPath
 	}
@@ -224,7 +228,9 @@ func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	if cfg.Environment != "" {
 		merged.Environment = cfg.Environment
 	}
-
+	if cfg.Traceparent != nil {
+		merged.Traceparent = cfg.Traceparent
+	}
 	return &merged
 }
 
@@ -417,4 +423,12 @@ func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
 	} else {
 		return nil, fmt.Errorf("error: %s", res.Status)
 	}
+}
+
+// GetTraceparent returns the defined Traceparent
+func (c *KeyFlow) GetTraceparent() *traceparent.Traceparent {
+	if c.config == nil {
+		return nil
+	}
+	return c.config.Traceparent
 }

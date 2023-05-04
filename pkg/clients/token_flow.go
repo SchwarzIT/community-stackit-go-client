@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"golang.org/x/oauth2"
 )
 
@@ -29,6 +30,7 @@ type TokenFlowConfig struct {
 	ServiceAccountToken string
 	Environment         env.Environment
 	ClientRetry         *RetryConfig
+	Traceparent         *traceparent.Traceparent
 }
 
 // GetEnvironment returns the defined API environment
@@ -89,7 +91,6 @@ func (c *TokenFlow) getConfigFromEnvironment() *TokenFlowConfig {
 // mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and currentCfg.
 func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowConfig {
 	merged := *currentCfg
-
 	if cfg.ServiceAccountEmail != "" {
 		merged.ServiceAccountEmail = cfg.ServiceAccountEmail
 	}
@@ -99,7 +100,9 @@ func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowCon
 	if cfg.Environment != "" {
 		merged.Environment = cfg.Environment
 	}
-
+	if cfg.Traceparent != nil {
+		merged.Traceparent = cfg.Traceparent
+	}
 	return &merged
 }
 
@@ -129,5 +132,16 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}
+	if t := c.GetTraceparent(); t != nil {
+		t.SetHeader(req)
+	}
 	return do(c.client, req, c.config.ClientRetry)
+}
+
+// GetTraceparent returns the defined Traceparent
+func (c *TokenFlow) GetTraceparent() *traceparent.Traceparent {
+	if c.config == nil {
+		return nil
+	}
+	return c.config.Traceparent
 }

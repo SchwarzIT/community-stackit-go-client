@@ -160,11 +160,12 @@ func DefaultResponseErrorHandler(resp *http.Response) error {
 		b, _ = io.ReadAll(resp.Body)
 	}
 	return fmt.Errorf(
-		"call error:\nHTTP status code: %d\nHTTP status message: %s\nServer response: %s\n%s",
+		"call error:\nHTTP status code: %d\nHTTP status message: %s\nServer response: %s\nURL: %s\nTrace: %s\n",
 		resp.StatusCode,
 		http.StatusText(resp.StatusCode),
 		string(b),
 		resp.Request.URL.String(),
+		resp.Request.Header.Get("Traceparent"),
 	)
 }
 
