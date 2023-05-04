@@ -85,7 +85,7 @@ func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Re
 		}),
 	)
 	if err != nil {
-		return resp, errors.Wrap(err, fmt.Sprintf("url: %s\nmethod: %s\ntraceparent: %s\n", req.URL.String(), req.Method, req.Header.Get("Traceparent")))
+		return resp, errors.Wrap(err, fmt.Sprintf("url: %s\nmethod: %s\ntrace: %s\n", req.URL.String(), req.Method, req.Header.Get("Traceparent")))
 	}
 
 	return resp, err
