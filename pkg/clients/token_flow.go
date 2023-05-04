@@ -91,7 +91,6 @@ func (c *TokenFlow) getConfigFromEnvironment() *TokenFlowConfig {
 // mergeConfigs returns a new TokenFlowConfig that combines the values of cfg and currentCfg.
 func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowConfig {
 	merged := *currentCfg
-
 	if cfg.ServiceAccountEmail != "" {
 		merged.ServiceAccountEmail = cfg.ServiceAccountEmail
 	}
@@ -101,7 +100,9 @@ func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowCon
 	if cfg.Environment != "" {
 		merged.Environment = cfg.Environment
 	}
-
+	if cfg.Traceparent != nil {
+		merged.Traceparent = cfg.Traceparent
+	}
 	return &merged
 }
 

@@ -213,7 +213,6 @@ func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
 // mergeConfigs returns a new KeyFlowConfig that combines the values of cfg and currentCfg.
 func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	merged := *currentCfg
-
 	if cfg.ServiceAccountKeyPath != "" {
 		merged.ServiceAccountKeyPath = cfg.ServiceAccountKeyPath
 	}
@@ -229,7 +228,9 @@ func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	if cfg.Environment != "" {
 		merged.Environment = cfg.Environment
 	}
-
+	if cfg.Traceparent != nil {
+		merged.Traceparent = cfg.Traceparent
+	}
 	return &merged
 }
 
