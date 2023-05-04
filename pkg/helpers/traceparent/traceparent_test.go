@@ -7,6 +7,37 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestNew(t *testing.T) {
+	traceID := "0af7651916cd43dd8448eb211c80319c"
+	spanID := "b7ad6b7169203331"
+
+	tp := New(traceID, spanID)
+
+	// Check if the Traceparent has the correct trace ID, span ID, and config
+	assert.Equal(t, traceID, tp.TraceID)
+	assert.Equal(t, spanID, tp.SpanID)
+	assert.Equal(t, DefaultConfig.Flag, tp.Config.Flag)
+	assert.Equal(t, DefaultConfig.Version, tp.Config.Version)
+}
+
+func TestNewCustom(t *testing.T) {
+	traceID := "0af7651916cd43dd8448eb211c80319c"
+	spanID := "b7ad6b7169203331"
+
+	customConfig := Config{
+		Flag:    DoNotRecordFlag,
+		Version: "01",
+	}
+
+	tp := NewCustom(traceID, spanID, customConfig)
+
+	// Check if the Traceparent has the correct trace ID, span ID, and custom config
+	assert.Equal(t, traceID, tp.TraceID)
+	assert.Equal(t, spanID, tp.SpanID)
+	assert.Equal(t, customConfig.Flag, tp.Config.Flag)
+	assert.Equal(t, customConfig.Version, tp.Config.Version)
+}
+
 func TestGenerate(t *testing.T) {
 	tp, err := Generate()
 	assert.NoError(t, err)

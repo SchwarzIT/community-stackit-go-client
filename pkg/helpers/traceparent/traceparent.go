@@ -28,6 +28,27 @@ type Traceparent struct {
 	SpanID  string
 }
 
+var DefaultConfig = Config{
+	RecordFlag,
+	CurrentVersion,
+}
+
+func New(traceID, spanID string) *Traceparent {
+	return &Traceparent{
+		DefaultConfig,
+		traceID,
+		spanID,
+	}
+}
+
+func NewCustom(traceID, spanID string, c Config) *Traceparent {
+	return &Traceparent{
+		c,
+		traceID,
+		spanID,
+	}
+}
+
 func (t *Traceparent) String() string {
 	return fmt.Sprintf("%s-%s-%s-%s", t.Version, t.TraceID, t.SpanID, t.Flag)
 }
@@ -68,8 +89,5 @@ func generateRandomHex(size int) (string, error) {
 }
 
 func Generate() (*Traceparent, error) {
-	return GenerateCustom(Config{
-		RecordFlag,
-		CurrentVersion,
-	})
+	return GenerateCustom(DefaultConfig)
 }
