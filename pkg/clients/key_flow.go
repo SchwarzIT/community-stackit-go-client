@@ -17,6 +17,7 @@ import (
 
 	"github.com/MicahParks/keyfunc"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -69,7 +70,7 @@ type KeyFlowConfig struct {
 	PrivateKey            []byte
 	Environment           env.Environment
 	ClientRetry           *RetryConfig
-	TraceparentHeader     string
+	Traceparent           *traceparent.Traceparent
 }
 
 // TokenResponseBody is the API response
@@ -167,8 +168,8 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	if tp := c.GetTraceparent(); tp != "" {
-		req.Header.Set("Traceparent", tp)
+	if t := c.GetTraceparent(); t != nil {
+		t.SetHeader(req)
 	}
 	return c.doer(c.client, req, c.config.ClientRetry)
 }
@@ -424,9 +425,9 @@ func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
 }
 
 // GetTraceparent returns the defined Traceparent
-func (c *KeyFlow) GetTraceparent() string {
+func (c *KeyFlow) GetTraceparent() *traceparent.Traceparent {
 	if c.config == nil {
-		return ""
+		return nil
 	}
-	return c.config.TraceparentHeader
+	return c.config.Traceparent
 }

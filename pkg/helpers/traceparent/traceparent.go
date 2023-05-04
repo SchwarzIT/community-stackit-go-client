@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"net/http"
 
 	"github.com/pkg/errors"
 )
@@ -21,22 +22,41 @@ type Config struct {
 	Flag    Flag
 	Version Version
 }
+type Traceparent struct {
+	Config
+	TraceID string
+	SpanID  string
+}
 
-func GenerateCustom(c Config) (string, error) {
+func (t Traceparent) String() string {
+	return fmt.Sprintf("%s-%s-%s-%s", t.Version, t.TraceID, t.SpanID, t.Flag)
+}
+
+func (t Traceparent) SetHeader(req *http.Request) {
+	if req == nil {
+		return
+	}
+	req.Header.Set("Traceparent", t.String())
+}
+
+func GenerateCustom(c Config) (Traceparent, error) {
 	// Generate a random 16 byte trace ID
 	traceID, err := generateRandomHex(16)
 	if err != nil {
-		return "", errors.Wrap(err, "error generating traceID")
+		return Traceparent{}, errors.Wrap(err, "error generating traceID")
 	}
 
 	// Generate a random 8 byte span ID
 	spanID, err := generateRandomHex(8)
 	if err != nil {
-		return "", errors.Wrap(err, "error generating spanID")
+		return Traceparent{}, errors.Wrap(err, "error generating spanID")
 	}
 
-	// Construct the traceparent header
-	return fmt.Sprintf("%s-%s-%s-%s", c.Version, traceID, spanID, c.Flag), nil
+	return Traceparent{
+		c,
+		traceID,
+		spanID,
+	}, nil
 }
 
 func generateRandomHex(size int) (string, error) {
@@ -47,7 +67,7 @@ func generateRandomHex(size int) (string, error) {
 	return hex.EncodeToString(bytes), nil
 }
 
-func Generate() (string, error) {
+func Generate() (Traceparent, error) {
 	return GenerateCustom(Config{
 		RecordFlag,
 		CurrentVersion,

@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"golang.org/x/oauth2"
 )
 
@@ -29,7 +30,7 @@ type TokenFlowConfig struct {
 	ServiceAccountToken string
 	Environment         env.Environment
 	ClientRetry         *RetryConfig
-	TraceparentHeader   string
+	Traceparent         *traceparent.Traceparent
 }
 
 // GetEnvironment returns the defined API environment
@@ -130,16 +131,16 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}
-	if tp := c.GetTraceparent(); tp != "" {
-		req.Header.Set("Traceparent", tp)
+	if t := c.GetTraceparent(); t != nil {
+		t.SetHeader(req)
 	}
 	return do(c.client, req, c.config.ClientRetry)
 }
 
 // GetTraceparent returns the defined Traceparent
-func (c *TokenFlow) GetTraceparent() string {
+func (c *TokenFlow) GetTraceparent() *traceparent.Traceparent {
 	if c.config == nil {
-		return ""
+		return nil
 	}
-	return c.config.TraceparentHeader
+	return c.config.Traceparent
 }
