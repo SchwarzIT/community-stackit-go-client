@@ -300,7 +300,9 @@ func (c *KeyFlow) recreateAccessToken() error {
 		return err
 	}
 	if refreshTokenIsValid {
-		return c.createAccessTokenWithRefreshToken()
+		if err := c.createAccessTokenWithRefreshToken(); err == nil {
+			return nil
+		}
 	}
 	return c.createAccessToken()
 }
