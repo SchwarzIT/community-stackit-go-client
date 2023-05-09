@@ -17,6 +17,7 @@ const (
 	userToken           = ""
 	serviceAccountEmail = ""
 	projectID           = ""
+	publicKeyPath       = "public_key.pem"
 )
 
 func main() {
@@ -27,7 +28,7 @@ func main() {
 	})
 
 	// make sure to create an RSA key-pair
-	b, err := os.ReadFile("public_key.pem")
+	b, err := os.ReadFile(publicKeyPath)
 	if err != nil {
 		panic(err)
 	}
