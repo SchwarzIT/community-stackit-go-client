@@ -134,7 +134,7 @@ After the service account has been created, you can authenticate to the client u
 
    func main() {
        ctx := context.Background()
-       c := stackit.MustNewClientWithTokenAuth(ctx)
+       c := stackit.MustNewClientWithKeyAuth(ctx)
        // ...
    }
    ```
