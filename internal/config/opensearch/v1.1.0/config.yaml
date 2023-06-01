@@ -1,0 +1,40 @@
+package: opensearch
+output: ../../../../pkg/services/opensearch/v1.1.0/dsa.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
+    name: "contracts.BaseClientInterface"
+  split-by-tags:
+    verbose: false
+    enabled: true
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "opensearch."
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: Id
+    with: ID
+    all: true
+  params:
+  - replace: Id
+    with: ID
+    all: true
+  schemas:
+  - replace: Id
+    with: ID
+    all: true
