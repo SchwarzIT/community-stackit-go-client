@@ -42,14 +42,14 @@ type Error struct {
 
 // Instance defines model for Instance.
 type Instance struct {
-	CfGuid           string        `json:"cfGuid"`
-	CfSpaceGuid      string        `json:"cfSpaceGuid"`
+	CFGUID           string        `json:"cfGuid"`
+	CFSpaceGUID      string        `json:"cfSpaceGuid"`
 	DashboardUrl     string        `json:"dashboardUrl"`
 	ImageUrl         string        `json:"imageUrl"`
 	InstanceID       *string       `json:"instanceId,omitempty"`
 	LastOperation    LastOperation `json:"lastOperation"`
 	Name             string        `json:"name"`
-	OrganizationGuid *string       `json:"organizationGuid,omitempty"`
+	OrganizationGUID *string       `json:"organizationGuid,omitempty"`
 	Parameters       Object        `json:"parameters"`
 	PlanID           string        `json:"planId"`
 }

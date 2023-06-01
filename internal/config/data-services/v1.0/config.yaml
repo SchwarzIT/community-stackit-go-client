@@ -64,3 +64,9 @@ tidy:
   - replace: Id
     with: ID
     all: true
+  - replace: Cf
+    with: CF
+    prefix: true
+  - replace: Guid
+    with: GUID
+    all: true
