@@ -6,10 +6,10 @@ import (
 )
 
 var BaseURLs = env.URLs(
-	"elasticsearch",
-	"https://elasticsearch.api.eu01.stackit.cloud",
-	"https://elasticsearch.api.eu01.qa.stackit.cloud",
-	"https://elasticsearch.api.eu01.dev.stackit.cloud",
+	"opensearch",
+	"https://opensearch.api.eu01.stackit.cloud",
+	"https://opensearch.api.eu01.qa.stackit.cloud",
+	"https://opensearch.api.eu01.dev.stackit.cloud",
 )
 
 func NewService(c contracts.BaseClientInterface) *ClientWithResponses {
