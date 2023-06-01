@@ -84,12 +84,12 @@ func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Clie
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// OfferingsGet request
-	OfferingsGetRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) OfferingsGetRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewOfferingsGetRequest(ctx, c.Server, projectID)
+func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +100,8 @@ func (c *Client) OfferingsGetRaw(ctx context.Context, projectID string, reqEdito
 	return c.Client.Do(req)
 }
 
-// NewOfferingsGetRequest generates requests for OfferingsGet
-func NewOfferingsGetRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -156,11 +156,11 @@ func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientW
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// OfferingsGet request
-	OfferingsGet(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*OfferingsGetResponse, error)
+	// List request
+	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 }
 
-type OfferingsGetResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Offerings
@@ -168,7 +168,7 @@ type OfferingsGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r OfferingsGetResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -176,31 +176,31 @@ func (r OfferingsGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r OfferingsGetResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// OfferingsGet request returning *OfferingsGetResponse
-func (c *ClientWithResponses) OfferingsGet(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*OfferingsGetResponse, error) {
-	rsp, err := c.OfferingsGetRaw(ctx, projectID, reqEditors...)
+// List request returning *ListResponse
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseOfferingsGetResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// ParseOfferingsGetResponse parses an HTTP response from a OfferingsGet call
-func (c *ClientWithResponses) ParseOfferingsGetResponse(rsp *http.Response) (*OfferingsGetResponse, error) {
+// ParseListResponse parses an HTTP response from a List call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &OfferingsGetResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

@@ -15,7 +15,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/SchwarzIT/community-stackit-go-client/internal/helpers/runtime"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/runtime"
 	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 )
@@ -143,11 +143,11 @@ type BadRequest = Error
 // NotFound defines model for NotFound.
 type NotFound = Error
 
-// InstanceProvisionJSONRequestBody defines body for InstanceProvision for application/json ContentType.
-type InstanceProvisionJSONRequestBody = InstanceProvisionRequest
+// ProvisionJSONRequestBody defines body for Provision for application/json ContentType.
+type ProvisionJSONRequestBody = InstanceProvisionRequest
 
-// InstanceUpdateJSONRequestBody defines body for InstanceUpdate for application/json ContentType.
-type InstanceUpdateJSONRequestBody = InstanceUpdateRequest
+// UpdateJSONRequestBody defines body for Update for application/json ContentType.
+type UpdateJSONRequestBody = InstanceUpdateRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -177,37 +177,37 @@ func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Clie
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// InstanceGetByGateway request
-	InstanceGetByGatewayRaw(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetByGateway request
+	GetByGatewayRaw(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceList request
-	InstanceListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceProvision request with any body
-	InstanceProvisionRawWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Provision request with any body
+	ProvisionRawWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	InstanceProvisionRaw(ctx context.Context, projectID string, body InstanceProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	ProvisionRaw(ctx context.Context, projectID string, body ProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceDeprovision request
-	InstanceDeprovisionRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Deprovision request
+	DeprovisionRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceGet request
-	InstanceGetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Get request
+	GetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceUpdate request with any body
-	InstanceUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// Update request with any body
+	UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	InstanceUpdateRaw(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+	UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceBackupsGet request
-	InstanceBackupsGetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetBackups request
+	GetBackupsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// InstanceMetricsGet request
-	InstanceMetricsGetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// GetMetrics request
+	GetMetricsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) InstanceGetByGatewayRaw(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceGetByGatewayRequest(ctx, c.Server, gatewayName)
+func (c *Client) GetByGatewayRaw(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetByGatewayRequest(ctx, c.Server, gatewayName)
 	if err != nil {
 		return nil, err
 	}
@@ -218,8 +218,8 @@ func (c *Client) InstanceGetByGatewayRaw(ctx context.Context, gatewayName string
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceListRequest(ctx, c.Server, projectID)
+func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -230,8 +230,8 @@ func (c *Client) InstanceListRaw(ctx context.Context, projectID string, reqEdito
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceProvisionRawWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceProvisionRequestWithBody(ctx, c.Server, projectID, contentType, body)
+func (c *Client) ProvisionRawWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProvisionRequestWithBody(ctx, c.Server, projectID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -242,8 +242,8 @@ func (c *Client) InstanceProvisionRawWithBody(ctx context.Context, projectID str
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceProvisionRaw(ctx context.Context, projectID string, body InstanceProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceProvisionRequest(ctx, c.Server, projectID, body)
+func (c *Client) ProvisionRaw(ctx context.Context, projectID string, body ProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewProvisionRequest(ctx, c.Server, projectID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -254,8 +254,8 @@ func (c *Client) InstanceProvisionRaw(ctx context.Context, projectID string, bod
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceDeprovisionRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceDeprovisionRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) DeprovisionRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeprovisionRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -266,8 +266,8 @@ func (c *Client) InstanceDeprovisionRaw(ctx context.Context, projectID string, i
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceGetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceGetRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) GetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -278,8 +278,8 @@ func (c *Client) InstanceGetRaw(ctx context.Context, projectID string, instanceI
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceUpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
+func (c *Client) UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequestWithBody(ctx, c.Server, projectID, instanceID, contentType, body)
 	if err != nil {
 		return nil, err
 	}
@@ -290,8 +290,8 @@ func (c *Client) InstanceUpdateRawWithBody(ctx context.Context, projectID string
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceUpdateRaw(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceUpdateRequest(ctx, c.Server, projectID, instanceID, body)
+func (c *Client) UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewUpdateRequest(ctx, c.Server, projectID, instanceID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -302,8 +302,8 @@ func (c *Client) InstanceUpdateRaw(ctx context.Context, projectID string, instan
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceBackupsGetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceBackupsGetRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) GetBackupsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBackupsRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -314,8 +314,8 @@ func (c *Client) InstanceBackupsGetRaw(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-func (c *Client) InstanceMetricsGetRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewInstanceMetricsGetRequest(ctx, c.Server, projectID, instanceID)
+func (c *Client) GetMetricsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetMetricsRequest(ctx, c.Server, projectID, instanceID)
 	if err != nil {
 		return nil, err
 	}
@@ -326,8 +326,8 @@ func (c *Client) InstanceMetricsGetRaw(ctx context.Context, projectID string, in
 	return c.Client.Do(req)
 }
 
-// NewInstanceGetByGatewayRequest generates requests for InstanceGetByGateway
-func NewInstanceGetByGatewayRequest(ctx context.Context, server string, gatewayName string) (*http.Request, error) {
+// NewGetByGatewayRequest generates requests for GetByGateway
+func NewGetByGatewayRequest(ctx context.Context, server string, gatewayName string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -360,8 +360,8 @@ func NewInstanceGetByGatewayRequest(ctx context.Context, server string, gatewayN
 	return req, nil
 }
 
-// NewInstanceListRequest generates requests for InstanceList
-func NewInstanceListRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -394,19 +394,19 @@ func NewInstanceListRequest(ctx context.Context, server string, projectID string
 	return req, nil
 }
 
-// NewInstanceProvisionRequest calls the generic InstanceProvision builder with application/json body
-func NewInstanceProvisionRequest(ctx context.Context, server string, projectID string, body InstanceProvisionJSONRequestBody) (*http.Request, error) {
+// NewProvisionRequest calls the generic Provision builder with application/json body
+func NewProvisionRequest(ctx context.Context, server string, projectID string, body ProvisionJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewInstanceProvisionRequestWithBody(ctx, server, projectID, "application/json", bodyReader)
+	return NewProvisionRequestWithBody(ctx, server, projectID, "application/json", bodyReader)
 }
 
-// NewInstanceProvisionRequestWithBody generates requests for InstanceProvision with any type of body
-func NewInstanceProvisionRequestWithBody(ctx context.Context, server string, projectID string, contentType string, body io.Reader) (*http.Request, error) {
+// NewProvisionRequestWithBody generates requests for Provision with any type of body
+func NewProvisionRequestWithBody(ctx context.Context, server string, projectID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -441,8 +441,8 @@ func NewInstanceProvisionRequestWithBody(ctx context.Context, server string, pro
 	return req, nil
 }
 
-// NewInstanceDeprovisionRequest generates requests for InstanceDeprovision
-func NewInstanceDeprovisionRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+// NewDeprovisionRequest generates requests for Deprovision
+func NewDeprovisionRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -482,8 +482,8 @@ func NewInstanceDeprovisionRequest(ctx context.Context, server string, projectID
 	return req, nil
 }
 
-// NewInstanceGetRequest generates requests for InstanceGet
-func NewInstanceGetRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+// NewGetRequest generates requests for Get
+func NewGetRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -523,19 +523,19 @@ func NewInstanceGetRequest(ctx context.Context, server string, projectID string,
 	return req, nil
 }
 
-// NewInstanceUpdateRequest calls the generic InstanceUpdate builder with application/json body
-func NewInstanceUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, body InstanceUpdateJSONRequestBody) (*http.Request, error) {
+// NewUpdateRequest calls the generic Update builder with application/json body
+func NewUpdateRequest(ctx context.Context, server string, projectID string, instanceID string, body UpdateJSONRequestBody) (*http.Request, error) {
 	var bodyReader io.Reader
 	buf, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
 	bodyReader = bytes.NewReader(buf)
-	return NewInstanceUpdateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
+	return NewUpdateRequestWithBody(ctx, server, projectID, instanceID, "application/json", bodyReader)
 }
 
-// NewInstanceUpdateRequestWithBody generates requests for InstanceUpdate with any type of body
-func NewInstanceUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
+// NewUpdateRequestWithBody generates requests for Update with any type of body
+func NewUpdateRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, contentType string, body io.Reader) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -577,8 +577,8 @@ func NewInstanceUpdateRequestWithBody(ctx context.Context, server string, projec
 	return req, nil
 }
 
-// NewInstanceBackupsGetRequest generates requests for InstanceBackupsGet
-func NewInstanceBackupsGetRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+// NewGetBackupsRequest generates requests for GetBackups
+func NewGetBackupsRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -618,8 +618,8 @@ func NewInstanceBackupsGetRequest(ctx context.Context, server string, projectID 
 	return req, nil
 }
 
-// NewInstanceMetricsGetRequest generates requests for InstanceMetricsGet
-func NewInstanceMetricsGetRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+// NewGetMetricsRequest generates requests for GetMetrics
+func NewGetMetricsRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -681,36 +681,36 @@ func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientW
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// InstanceGetByGateway request
-	InstanceGetByGateway(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*InstanceGetByGatewayResponse, error)
+	// GetByGateway request
+	GetByGateway(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*GetByGatewayResponse, error)
 
-	// InstanceList request
-	InstanceList(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*InstanceListResponse, error)
+	// List request
+	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
-	// InstanceProvision request with any body
-	InstanceProvisionWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceProvisionResponse, error)
+	// Provision request with any body
+	ProvisionWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ProvisionResponse, error)
 
-	InstanceProvision(ctx context.Context, projectID string, body InstanceProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceProvisionResponse, error)
+	Provision(ctx context.Context, projectID string, body ProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*ProvisionResponse, error)
 
-	// InstanceDeprovision request
-	InstanceDeprovision(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceDeprovisionResponse, error)
+	// Deprovision request
+	Deprovision(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeprovisionResponse, error)
 
-	// InstanceGet request
-	InstanceGet(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceGetResponse, error)
+	// Get request
+	Get(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
 
-	// InstanceUpdate request with any body
-	InstanceUpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error)
+	// Update request with any body
+	UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
-	InstanceUpdate(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error)
+	Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
-	// InstanceBackupsGet request
-	InstanceBackupsGet(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceBackupsGetResponse, error)
+	// GetBackups request
+	GetBackups(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetBackupsResponse, error)
 
-	// InstanceMetricsGet request
-	InstanceMetricsGet(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceMetricsGetResponse, error)
+	// GetMetrics request
+	GetMetrics(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetMetricsResponse, error)
 }
 
-type InstanceGetByGatewayResponse struct {
+type GetByGatewayResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Instance
@@ -720,7 +720,7 @@ type InstanceGetByGatewayResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceGetByGatewayResponse) Status() string {
+func (r GetByGatewayResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -728,14 +728,14 @@ func (r InstanceGetByGatewayResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceGetByGatewayResponse) StatusCode() int {
+func (r GetByGatewayResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceListResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceList
@@ -744,7 +744,7 @@ type InstanceListResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceListResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -752,14 +752,14 @@ func (r InstanceListResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceListResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceProvisionResponse struct {
+type ProvisionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON202      *InstanceID
@@ -769,7 +769,7 @@ type InstanceProvisionResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceProvisionResponse) Status() string {
+func (r ProvisionResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -777,14 +777,14 @@ func (r InstanceProvisionResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceProvisionResponse) StatusCode() int {
+func (r ProvisionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceDeprovisionResponse struct {
+type DeprovisionResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *Error
@@ -793,7 +793,7 @@ type InstanceDeprovisionResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceDeprovisionResponse) Status() string {
+func (r DeprovisionResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -801,14 +801,14 @@ func (r InstanceDeprovisionResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceDeprovisionResponse) StatusCode() int {
+func (r DeprovisionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceGetResponse struct {
+type GetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Instance
@@ -818,7 +818,7 @@ type InstanceGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceGetResponse) Status() string {
+func (r GetResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -826,14 +826,14 @@ func (r InstanceGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceGetResponse) StatusCode() int {
+func (r GetResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceUpdateResponse struct {
+type UpdateResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *Error
@@ -842,7 +842,7 @@ type InstanceUpdateResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceUpdateResponse) Status() string {
+func (r UpdateResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -850,14 +850,14 @@ func (r InstanceUpdateResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceUpdateResponse) StatusCode() int {
+func (r UpdateResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceBackupsGetResponse struct {
+type GetBackupsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceBackupsList
@@ -866,7 +866,7 @@ type InstanceBackupsGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceBackupsGetResponse) Status() string {
+func (r GetBackupsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -874,14 +874,14 @@ func (r InstanceBackupsGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceBackupsGetResponse) StatusCode() int {
+func (r GetBackupsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-type InstanceMetricsGetResponse struct {
+type GetMetricsResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *InstanceMetrics
@@ -890,7 +890,7 @@ type InstanceMetricsGetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r InstanceMetricsGetResponse) Status() string {
+func (r GetMetricsResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -898,110 +898,110 @@ func (r InstanceMetricsGetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r InstanceMetricsGetResponse) StatusCode() int {
+func (r GetMetricsResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// InstanceGetByGateway request returning *InstanceGetByGatewayResponse
-func (c *ClientWithResponses) InstanceGetByGateway(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*InstanceGetByGatewayResponse, error) {
-	rsp, err := c.InstanceGetByGatewayRaw(ctx, gatewayName, reqEditors...)
+// GetByGateway request returning *GetByGatewayResponse
+func (c *ClientWithResponses) GetByGateway(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*GetByGatewayResponse, error) {
+	rsp, err := c.GetByGatewayRaw(ctx, gatewayName, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceGetByGatewayResponse(rsp)
+	return c.ParseGetByGatewayResponse(rsp)
 }
 
-// InstanceList request returning *InstanceListResponse
-func (c *ClientWithResponses) InstanceList(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*InstanceListResponse, error) {
-	rsp, err := c.InstanceListRaw(ctx, projectID, reqEditors...)
+// List request returning *ListResponse
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceListResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// InstanceProvisionWithBody request with arbitrary body returning *InstanceProvisionResponse
-func (c *ClientWithResponses) InstanceProvisionWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceProvisionResponse, error) {
-	rsp, err := c.InstanceProvisionRawWithBody(ctx, projectID, contentType, body, reqEditors...)
+// ProvisionWithBody request with arbitrary body returning *ProvisionResponse
+func (c *ClientWithResponses) ProvisionWithBody(ctx context.Context, projectID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ProvisionResponse, error) {
+	rsp, err := c.ProvisionRawWithBody(ctx, projectID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceProvisionResponse(rsp)
+	return c.ParseProvisionResponse(rsp)
 }
 
-func (c *ClientWithResponses) InstanceProvision(ctx context.Context, projectID string, body InstanceProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceProvisionResponse, error) {
-	rsp, err := c.InstanceProvisionRaw(ctx, projectID, body, reqEditors...)
+func (c *ClientWithResponses) Provision(ctx context.Context, projectID string, body ProvisionJSONRequestBody, reqEditors ...RequestEditorFn) (*ProvisionResponse, error) {
+	rsp, err := c.ProvisionRaw(ctx, projectID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceProvisionResponse(rsp)
+	return c.ParseProvisionResponse(rsp)
 }
 
-// InstanceDeprovision request returning *InstanceDeprovisionResponse
-func (c *ClientWithResponses) InstanceDeprovision(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceDeprovisionResponse, error) {
-	rsp, err := c.InstanceDeprovisionRaw(ctx, projectID, instanceID, reqEditors...)
+// Deprovision request returning *DeprovisionResponse
+func (c *ClientWithResponses) Deprovision(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeprovisionResponse, error) {
+	rsp, err := c.DeprovisionRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceDeprovisionResponse(rsp)
+	return c.ParseDeprovisionResponse(rsp)
 }
 
-// InstanceGet request returning *InstanceGetResponse
-func (c *ClientWithResponses) InstanceGet(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceGetResponse, error) {
-	rsp, err := c.InstanceGetRaw(ctx, projectID, instanceID, reqEditors...)
+// Get request returning *GetResponse
+func (c *ClientWithResponses) Get(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
+	rsp, err := c.GetRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceGetResponse(rsp)
+	return c.ParseGetResponse(rsp)
 }
 
-// InstanceUpdateWithBody request with arbitrary body returning *InstanceUpdateResponse
-func (c *ClientWithResponses) InstanceUpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error) {
-	rsp, err := c.InstanceUpdateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
+// UpdateWithBody request with arbitrary body returning *UpdateResponse
+func (c *ClientWithResponses) UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.UpdateRawWithBody(ctx, projectID, instanceID, contentType, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceUpdateResponse(rsp)
+	return c.ParseUpdateResponse(rsp)
 }
 
-func (c *ClientWithResponses) InstanceUpdate(ctx context.Context, projectID string, instanceID string, body InstanceUpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*InstanceUpdateResponse, error) {
-	rsp, err := c.InstanceUpdateRaw(ctx, projectID, instanceID, body, reqEditors...)
+func (c *ClientWithResponses) Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error) {
+	rsp, err := c.UpdateRaw(ctx, projectID, instanceID, body, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceUpdateResponse(rsp)
+	return c.ParseUpdateResponse(rsp)
 }
 
-// InstanceBackupsGet request returning *InstanceBackupsGetResponse
-func (c *ClientWithResponses) InstanceBackupsGet(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceBackupsGetResponse, error) {
-	rsp, err := c.InstanceBackupsGetRaw(ctx, projectID, instanceID, reqEditors...)
+// GetBackups request returning *GetBackupsResponse
+func (c *ClientWithResponses) GetBackups(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetBackupsResponse, error) {
+	rsp, err := c.GetBackupsRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceBackupsGetResponse(rsp)
+	return c.ParseGetBackupsResponse(rsp)
 }
 
-// InstanceMetricsGet request returning *InstanceMetricsGetResponse
-func (c *ClientWithResponses) InstanceMetricsGet(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*InstanceMetricsGetResponse, error) {
-	rsp, err := c.InstanceMetricsGetRaw(ctx, projectID, instanceID, reqEditors...)
+// GetMetrics request returning *GetMetricsResponse
+func (c *ClientWithResponses) GetMetrics(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetMetricsResponse, error) {
+	rsp, err := c.GetMetricsRaw(ctx, projectID, instanceID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseInstanceMetricsGetResponse(rsp)
+	return c.ParseGetMetricsResponse(rsp)
 }
 
-// ParseInstanceGetByGatewayResponse parses an HTTP response from a InstanceGetByGateway call
-func (c *ClientWithResponses) ParseInstanceGetByGatewayResponse(rsp *http.Response) (*InstanceGetByGatewayResponse, error) {
+// ParseGetByGatewayResponse parses an HTTP response from a GetByGateway call
+func (c *ClientWithResponses) ParseGetByGatewayResponse(rsp *http.Response) (*GetByGatewayResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceGetByGatewayResponse{
+	response := &GetByGatewayResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1034,15 +1034,15 @@ func (c *ClientWithResponses) ParseInstanceGetByGatewayResponse(rsp *http.Respon
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceListResponse parses an HTTP response from a InstanceList call
-func (c *ClientWithResponses) ParseInstanceListResponse(rsp *http.Response) (*InstanceListResponse, error) {
+// ParseListResponse parses an HTTP response from a List call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceListResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1068,15 +1068,15 @@ func (c *ClientWithResponses) ParseInstanceListResponse(rsp *http.Response) (*In
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceProvisionResponse parses an HTTP response from a InstanceProvision call
-func (c *ClientWithResponses) ParseInstanceProvisionResponse(rsp *http.Response) (*InstanceProvisionResponse, error) {
+// ParseProvisionResponse parses an HTTP response from a Provision call
+func (c *ClientWithResponses) ParseProvisionResponse(rsp *http.Response) (*ProvisionResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceProvisionResponse{
+	response := &ProvisionResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1109,15 +1109,15 @@ func (c *ClientWithResponses) ParseInstanceProvisionResponse(rsp *http.Response)
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceDeprovisionResponse parses an HTTP response from a InstanceDeprovision call
-func (c *ClientWithResponses) ParseInstanceDeprovisionResponse(rsp *http.Response) (*InstanceDeprovisionResponse, error) {
+// ParseDeprovisionResponse parses an HTTP response from a Deprovision call
+func (c *ClientWithResponses) ParseDeprovisionResponse(rsp *http.Response) (*DeprovisionResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceDeprovisionResponse{
+	response := &DeprovisionResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1143,15 +1143,15 @@ func (c *ClientWithResponses) ParseInstanceDeprovisionResponse(rsp *http.Respons
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceGetResponse parses an HTTP response from a InstanceGet call
-func (c *ClientWithResponses) ParseInstanceGetResponse(rsp *http.Response) (*InstanceGetResponse, error) {
+// ParseGetResponse parses an HTTP response from a Get call
+func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceGetResponse{
+	response := &GetResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1184,15 +1184,15 @@ func (c *ClientWithResponses) ParseInstanceGetResponse(rsp *http.Response) (*Ins
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceUpdateResponse parses an HTTP response from a InstanceUpdate call
-func (c *ClientWithResponses) ParseInstanceUpdateResponse(rsp *http.Response) (*InstanceUpdateResponse, error) {
+// ParseUpdateResponse parses an HTTP response from a Update call
+func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceUpdateResponse{
+	response := &UpdateResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1218,15 +1218,15 @@ func (c *ClientWithResponses) ParseInstanceUpdateResponse(rsp *http.Response) (*
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceBackupsGetResponse parses an HTTP response from a InstanceBackupsGet call
-func (c *ClientWithResponses) ParseInstanceBackupsGetResponse(rsp *http.Response) (*InstanceBackupsGetResponse, error) {
+// ParseGetBackupsResponse parses an HTTP response from a GetBackups call
+func (c *ClientWithResponses) ParseGetBackupsResponse(rsp *http.Response) (*GetBackupsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceBackupsGetResponse{
+	response := &GetBackupsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}
@@ -1252,15 +1252,15 @@ func (c *ClientWithResponses) ParseInstanceBackupsGetResponse(rsp *http.Response
 	return response, validate.ResponseObject(response)
 }
 
-// ParseInstanceMetricsGetResponse parses an HTTP response from a InstanceMetricsGet call
-func (c *ClientWithResponses) ParseInstanceMetricsGetResponse(rsp *http.Response) (*InstanceMetricsGetResponse, error) {
+// ParseGetMetricsResponse parses an HTTP response from a GetMetrics call
+func (c *ClientWithResponses) ParseGetMetricsResponse(rsp *http.Response) (*GetMetricsResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &InstanceMetricsGetResponse{
+	response := &GetMetricsResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

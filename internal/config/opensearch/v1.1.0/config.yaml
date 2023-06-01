@@ -30,9 +30,30 @@ tidy:
   - replace: Id
     with: ID
     all: true
+  - replace: Instance
+    with:
+    prefix: true
+  - replace: Credentials
+    with:
+    prefix: true
+  - replace: CredentialGet
+    with: GetCredentialByID
+    prefix: true
+  - replace: BackupsGet
+    with: GetBackups
+    prefix: true
+  - replace: MetricsGet
+    with: GetMetrics
+    prefix: true
+  - replace: OfferingsGet
+    with: List
+    prefix: true
   params:
   - replace: Id
     with: ID
+    all: true
+  - replace: credentialsID
+    with: credentialID
     all: true
   schemas:
   - replace: Id
