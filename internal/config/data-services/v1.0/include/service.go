@@ -11,6 +11,7 @@ const (
 	LogMe
 	MariaDB
 	MongoDB
+	Opensearch
 	PostgresDB
 	RabbitMQ
 	Redis
@@ -30,6 +31,8 @@ func GetBaseURLs(serviceID int) env.EnvironmentURLs {
 		return setLogMeURLs()
 	case MariaDB:
 		return setMariaDBURLs()
+	case Opensearch:
+		return setOpensearchURLs()
 	case PostgresDB:
 		return setPostgresDBURLs()
 	case RabbitMQ:
@@ -64,6 +67,15 @@ func setMariaDBURLs() env.EnvironmentURLs {
 		"https://mariadb.api.eu01.stackit.cloud",
 		"https://mariadb.api.eu01.qa.stackit.cloud",
 		"https://mariadb.api.eu01.dev.stackit.cloud",
+	)
+}
+
+func setOpensearchURLs() env.EnvironmentURLs {
+	return env.URLs(
+		"redis",
+		"https://opensearch.api.eu01.stackit.cloud",
+		"https://opensearch.api.eu01.qa.stackit.cloud",
+		"https://opensearch.api.eu01.dev.stackit.cloud",
 	)
 }
 

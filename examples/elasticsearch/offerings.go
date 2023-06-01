@@ -12,7 +12,7 @@ func main() {
 	ctx := context.Background()
 	c := stackit.MustNewClientWithKeyAuth(ctx)
 
-	res, err := c.ElasticSearch.Offerings.Get(ctx, "my-project-id")
+	res, err := c.ElasticSearch.Offerings.List(ctx, "my-project-id")
 	if err = validate.Response(res, err, "JSON200"); err != nil {
 		panic(err)
 	}

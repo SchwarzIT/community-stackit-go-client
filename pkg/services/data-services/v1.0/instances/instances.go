@@ -54,6 +54,21 @@ type Instance struct {
 	PlanID           string        `json:"planId"`
 }
 
+// InstanceBackup defines model for InstanceBackup.
+type InstanceBackup struct {
+	Downloadable *bool   `json:"downloadable,omitempty"`
+	FinishedAt   string  `json:"finished_at"`
+	ID           int     `json:"id"`
+	Size         *int    `json:"size,omitempty"`
+	Status       string  `json:"status"`
+	TriggeredAt  *string `json:"triggered_at,omitempty"`
+}
+
+// InstanceBackupsList defines model for InstanceBackupsList.
+type InstanceBackupsList struct {
+	InstanceBackups []InstanceBackup `json:"instanceBackups"`
+}
+
 // InstanceID defines model for InstanceID.
 type InstanceID struct {
 	InstanceID string `json:"instanceId"`
@@ -64,17 +79,46 @@ type InstanceList struct {
 	Instances []Instance `json:"instances"`
 }
 
+// InstanceMetrics defines model for InstanceMetrics.
+type InstanceMetrics struct {
+	CpuIDleTime                          *int `json:"cpuIdleTime,omitempty"`
+	CpuLoadPercent                       int  `json:"cpuLoadPercent"`
+	CpuSystemTime                        *int `json:"cpuSystemTime,omitempty"`
+	CpuUserTime                          *int `json:"cpuUserTime,omitempty"`
+	DiskPersistentTotal                  int  `json:"diskPersistentTotal"`
+	DiskPersistentUsed                   int  `json:"diskPersistentUsed"`
+	MemoryTotal                          int  `json:"memoryTotal"`
+	MemoryUsed                           int  `json:"memoryUsed"`
+	ParachuteDiskPersistentActivated     int  `json:"parachuteDiskPersistentActivated"`
+	ParachuteDiskPersistentTotal         int  `json:"parachuteDiskPersistentTotal"`
+	ParachuteDiskPersistentUsed          int  `json:"parachuteDiskPersistentUsed"`
+	ParachuteDiskPersistentUsedPercent   int  `json:"parachuteDiskPersistentUsedPercent"`
+	ParachuteDiskPersistentUsedThreshold int  `json:"parachuteDiskPersistentUsedThreshold"`
+}
+
+// InstanceParameters defines model for InstanceParameters.
+type InstanceParameters struct {
+	EnableMonitoring     *bool     `json:"enable_monitoring,omitempty"`
+	Graphite             *string   `json:"graphite,omitempty"`
+	MetricsFrequency     *int      `json:"metrics_frequency,omitempty"`
+	MetricsPrefix        *string   `json:"metrics_prefix,omitempty"`
+	MonitoringInstanceID *string   `json:"monitoring_instance_id,omitempty"`
+	Plugins              *[]string `json:"plugins,omitempty"`
+	SgwAcl               *string   `json:"sgw_acl,omitempty"`
+	Syslog               *[]string `json:"syslog,omitempty"`
+}
+
 // InstanceProvisionRequest defines model for InstanceProvisionRequest.
 type InstanceProvisionRequest struct {
-	InstanceName string  `json:"instanceName"`
-	Parameters   *Object `json:"parameters,omitempty"`
-	PlanID       string  `json:"planId"`
+	InstanceName string              `json:"instanceName"`
+	Parameters   *InstanceParameters `json:"parameters,omitempty"`
+	PlanID       string              `json:"planId"`
 }
 
 // InstanceUpdateRequest defines model for InstanceUpdateRequest.
 type InstanceUpdateRequest struct {
-	Parameters *Object `json:"parameters,omitempty"`
-	PlanID     string  `json:"planId"`
+	Parameters *InstanceParameters `json:"parameters,omitempty"`
+	PlanID     string              `json:"planId"`
 }
 
 // Object defines model for Object.
@@ -133,6 +177,9 @@ func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Clie
 
 // The interface specification for the client above.
 type rawClientInterface interface {
+	// GetByGateway request
+	GetByGatewayRaw(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// List request
 	ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -151,6 +198,24 @@ type rawClientInterface interface {
 	UpdateRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateRaw(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetBackups request
+	GetBackupsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetMetrics request
+	GetMetricsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) GetByGatewayRaw(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetByGatewayRequest(ctx, c.Server, gatewayName)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -235,6 +300,64 @@ func (c *Client) UpdateRaw(ctx context.Context, projectID string, instanceID str
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+func (c *Client) GetBackupsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetBackupsRequest(ctx, c.Server, projectID, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetMetricsRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetMetricsRequest(ctx, c.Server, projectID, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewGetByGatewayRequest generates requests for GetByGateway
+func NewGetByGatewayRequest(ctx context.Context, server string, gatewayName string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "gatewayName", runtime.ParamLocationPath, gatewayName)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/instances/gatewayName/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewListRequest generates requests for List
@@ -454,6 +577,88 @@ func NewUpdateRequestWithBody(ctx context.Context, server string, projectID stri
 	return req, nil
 }
 
+// NewGetBackupsRequest generates requests for GetBackups
+func NewGetBackupsRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/backups", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
+// NewGetMetricsRequest generates requests for GetMetrics
+func NewGetMetricsRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/metrics", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
@@ -476,6 +681,9 @@ func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientW
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// GetByGateway request
+	GetByGateway(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*GetByGatewayResponse, error)
+
 	// List request
 	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
@@ -494,6 +702,37 @@ type ClientWithResponsesInterface interface {
 	UpdateWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
 
 	Update(ctx context.Context, projectID string, instanceID string, body UpdateJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateResponse, error)
+
+	// GetBackups request
+	GetBackups(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetBackupsResponse, error)
+
+	// GetMetrics request
+	GetMetrics(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetMetricsResponse, error)
+}
+
+type GetByGatewayResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Instance
+	JSON404      *Error
+	JSON410      *Error
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetByGatewayResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetByGatewayResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type ListResponse struct {
@@ -618,6 +857,63 @@ func (r UpdateResponse) StatusCode() int {
 	return 0
 }
 
+type GetBackupsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *InstanceBackupsList
+	JSON404      *Error
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetBackupsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetBackupsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type GetMetricsResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *InstanceMetrics
+	JSON404      *Error
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetMetricsResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetMetricsResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// GetByGateway request returning *GetByGatewayResponse
+func (c *ClientWithResponses) GetByGateway(ctx context.Context, gatewayName string, reqEditors ...RequestEditorFn) (*GetByGatewayResponse, error) {
+	rsp, err := c.GetByGatewayRaw(ctx, gatewayName, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseGetByGatewayResponse(rsp)
+}
+
 // List request returning *ListResponse
 func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
@@ -677,6 +973,65 @@ func (c *ClientWithResponses) Update(ctx context.Context, projectID string, inst
 		return nil, err
 	}
 	return c.ParseUpdateResponse(rsp)
+}
+
+// GetBackups request returning *GetBackupsResponse
+func (c *ClientWithResponses) GetBackups(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetBackupsResponse, error) {
+	rsp, err := c.GetBackupsRaw(ctx, projectID, instanceID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseGetBackupsResponse(rsp)
+}
+
+// GetMetrics request returning *GetMetricsResponse
+func (c *ClientWithResponses) GetMetrics(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*GetMetricsResponse, error) {
+	rsp, err := c.GetMetricsRaw(ctx, projectID, instanceID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseGetMetricsResponse(rsp)
+}
+
+// ParseGetByGatewayResponse parses an HTTP response from a GetByGateway call
+func (c *ClientWithResponses) ParseGetByGatewayResponse(rsp *http.Response) (*GetByGatewayResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetByGatewayResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Instance
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 410:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON410 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
 }
 
 // ParseListResponse parses an HTTP response from a List call
@@ -850,6 +1205,74 @@ func (c *ClientWithResponses) ParseUpdateResponse(rsp *http.Response) (*UpdateRe
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
+// ParseGetBackupsResponse parses an HTTP response from a GetBackups call
+func (c *ClientWithResponses) ParseGetBackupsResponse(rsp *http.Response) (*GetBackupsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetBackupsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InstanceBackupsList
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Error
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
+// ParseGetMetricsResponse parses an HTTP response from a GetMetrics call
+func (c *ClientWithResponses) ParseGetMetricsResponse(rsp *http.Response) (*GetMetricsResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetMetricsResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest InstanceMetrics
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
 		var dest Error

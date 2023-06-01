@@ -34,6 +34,7 @@ type Services struct {
 	LogMe         *dataservices.ClientWithResponses
 	MariaDB       *dataservices.ClientWithResponses
 	MongoDB       *dataservices.ClientWithResponses
+	Opensearch    *dataservices.ClientWithResponses
 	PostgresDB    *dataservices.ClientWithResponses
 	RabbitMQ      *dataservices.ClientWithResponses
 	Redis         *dataservices.ClientWithResponses
@@ -63,6 +64,7 @@ func Init(c contracts.BaseClientInterface) (*Services, error) {
 		ElasticSearch: dataservices.NewService(newClient(c), dataservices.ElasticSearch),
 		LogMe:         dataservices.NewService(newClient(c), dataservices.LogMe),
 		MariaDB:       dataservices.NewService(newClient(c), dataservices.MariaDB),
+		Opensearch:    dataservices.NewService(newClient(c), dataservices.Opensearch),
 		PostgresDB:    dataservices.NewService(newClient(c), dataservices.PostgresDB),
 		RabbitMQ:      dataservices.NewService(newClient(c), dataservices.RabbitMQ),
 		Redis:         dataservices.NewService(newClient(c), dataservices.Redis),
