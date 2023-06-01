@@ -84,12 +84,12 @@ func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Clie
 
 // The interface specification for the client above.
 type rawClientInterface interface {
-	// Get request
-	GetRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+	// List request
+	ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
-func (c *Client) GetRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetRequest(ctx, c.Server, projectID)
+func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewListRequest(ctx, c.Server, projectID)
 	if err != nil {
 		return nil, err
 	}
@@ -100,8 +100,8 @@ func (c *Client) GetRaw(ctx context.Context, projectID string, reqEditors ...Req
 	return c.Client.Do(req)
 }
 
-// NewGetRequest generates requests for Get
-func NewGetRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+// NewListRequest generates requests for List
+func NewListRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
 	var err error
 
 	var pathParam0 string
@@ -156,11 +156,11 @@ func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientW
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
-	// Get request
-	Get(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
+	// List request
+	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 }
 
-type GetResponse struct {
+type ListResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *Offerings
@@ -168,7 +168,7 @@ type GetResponse struct {
 }
 
 // Status returns HTTPResponse.Status
-func (r GetResponse) Status() string {
+func (r ListResponse) Status() string {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.Status
 	}
@@ -176,31 +176,31 @@ func (r GetResponse) Status() string {
 }
 
 // StatusCode returns HTTPResponse.StatusCode
-func (r GetResponse) StatusCode() int {
+func (r ListResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
 	return 0
 }
 
-// Get request returning *GetResponse
-func (c *ClientWithResponses) Get(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*GetResponse, error) {
-	rsp, err := c.GetRaw(ctx, projectID, reqEditors...)
+// List request returning *ListResponse
+func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
+	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
 	if err != nil {
 		return nil, err
 	}
-	return c.ParseGetResponse(rsp)
+	return c.ParseListResponse(rsp)
 }
 
-// ParseGetResponse parses an HTTP response from a Get call
-func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse, error) {
+// ParseListResponse parses an HTTP response from a List call
+func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
 	defer func() { _ = rsp.Body.Close() }()
 	if err != nil {
 		return nil, err
 	}
 
-	response := &GetResponse{
+	response := &ListResponse{
 		Body:         bodyBytes,
 		HTTPResponse: rsp,
 	}

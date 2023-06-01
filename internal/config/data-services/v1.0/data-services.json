@@ -9,6 +9,15 @@
         "schema": {
           "type": "string"
         }
+      },
+      "projectId": {
+        "description": "Project id on which user has permissions",
+        "in": "path",
+        "name": "projectId",
+        "required": true,
+        "schema": {
+          "type": "string"
+        }
       }
     },
     "responses": {
@@ -58,9 +67,6 @@
           "name": {
             "type": "string"
           },
-          "username": {
-            "type": "string"
-          },
           "password": {
             "type": "string"
           },
@@ -69,15 +75,18 @@
           },
           "protocols": {
             "$ref": "#/components/schemas/Object"
+          },
+          "uri": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
           }
         },
         "required": [
           "host",
-          "hosts",
-          "port",
-          "name",
-          "password",
-          "username"
+          "username",
+          "password"
         ],
         "type": "object"
       },
@@ -187,6 +196,48 @@
         ],
         "type": "object"
       },
+      "InstanceBackup": {
+        "properties": {
+          "downloadable": {
+            "type": "boolean"
+          },
+          "finished_at": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "triggered_at": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "finished_at"
+        ],
+        "type": "object"
+      },
+      "InstanceBackupsList": {
+        "properties": {
+          "instanceBackups": {
+            "items": {
+              "$ref": "#/components/schemas/InstanceBackup"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "instanceBackups"
+        ],
+        "type": "object"
+      },
       "InstanceId": {
         "properties": {
           "instanceId": {
@@ -212,13 +263,105 @@
         ],
         "type": "object"
       },
+      "InstanceMetrics": {
+        "properties": {
+          "cpuIdleTime": {
+            "type": "integer"
+          },
+          "cpuLoadPercent": {
+            "type": "integer"
+          },
+          "cpuSystemTime": {
+            "type": "integer"
+          },
+          "cpuUserTime": {
+            "type": "integer"
+          },
+          "diskPersistentTotal": {
+            "type": "integer"
+          },
+          "diskPersistentUsed": {
+            "type": "integer"
+          },
+          "memoryTotal": {
+            "type": "integer"
+          },
+          "memoryUsed": {
+            "type": "integer"
+          },
+          "parachuteDiskPersistentActivated": {
+            "type": "integer"
+          },
+          "parachuteDiskPersistentTotal": {
+            "type": "integer"
+          },
+          "parachuteDiskPersistentUsed": {
+            "type": "integer"
+          },
+          "parachuteDiskPersistentUsedPercent": {
+            "type": "integer"
+          },
+          "parachuteDiskPersistentUsedThreshold": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "memoryTotal",
+          "memoryUsed",
+          "diskPersistentTotal",
+          "diskPersistentUsed",
+          "parachuteDiskPersistentTotal",
+          "parachuteDiskPersistentUsed",
+          "parachuteDiskPersistentUsedPercent",
+          "parachuteDiskPersistentUsedThreshold",
+          "parachuteDiskPersistentActivated",
+          "cpuLoadPercent"
+        ],
+        "type": "object"
+      },
+      "InstanceParameters": {
+        "properties": {
+          "enable_monitoring": {
+            "default": false,
+            "type": "boolean"
+          },
+          "graphite": {
+            "type": "string"
+          },
+          "metrics_frequency": {
+            "type": "integer"
+          },
+          "metrics_prefix": {
+            "type": "string"
+          },
+          "monitoring_instance_id": {
+            "type": "string"
+          },
+          "plugins": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sgw_acl": {
+            "type": "string"
+          },
+          "syslog": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "InstanceProvisionRequest": {
         "properties": {
           "instanceName": {
             "type": "string"
           },
           "parameters": {
-            "$ref": "#/components/schemas/Object"
+            "$ref": "#/components/schemas/InstanceParameters"
           },
           "planId": {
             "type": "string"
@@ -248,7 +391,7 @@
       "InstanceUpdateRequest": {
         "properties": {
           "parameters": {
-            "$ref": "#/components/schemas/Object"
+            "$ref": "#/components/schemas/InstanceParameters"
           },
           "planId": {
             "type": "string"
@@ -423,16 +566,54 @@
   },
   "info": {
     "contact": {
-      "email": "stackit-dsa@groups.office.schwarz",
-      "name": "STACKIT DSA",
-      "url": "https://developers.stackit.schwarz"
+      "url": "https://docs.stackit.cloud/stackit/en/support-area-72063304.html"
     },
-    "description": "Data Services Access API endpoints for the Wrapper Service Broker",
-    "title": "STACKIT Data Services Access Elasticsearch API",
-    "version": "1.0.0"
+    "description": "The STACKIT Opensearch API provides endpoints to list service offerings, manage service instances and service credentials within STACKIT portal projects.",
+    "termsOfService": "https://www.stackit.de/en/general-terms-and-conditions/terms-of-use/",
+    "title": "STACKIT Opensearch API",
+    "version": "1.1.0"
   },
   "openapi": "3.0.3",
   "paths": {
+    "/v1/instances/gatewayName/{gatewayName}": {
+      "get": {
+        "description": "find a service instance for provided gateway name",
+        "operationId": "Instance.getByGateway",
+        "parameters": [
+          {
+            "description": "gateway name generated for instance",
+            "in": "path",
+            "name": "gatewayName",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Instance"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "410": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "summary": "get service instance by gateway name",
+        "tags": [
+          "Instances"
+        ]
+      }
+    },
     "/v1/projects/{projectId}/instances": {
       "get": {
         "description": "Get a list of available instances",
@@ -556,7 +737,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "summary": "service instance deprovision",
+        "summary": "delete service instance",
         "tags": [
           "Instances"
         ]
@@ -574,6 +755,7 @@
             }
           },
           {
+            "description": "Id of instance being deleted",
             "in": "path",
             "name": "instanceId",
             "required": true,
@@ -600,6 +782,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
+        "summary": "get a service instance",
         "tags": [
           "Instances"
         ]
@@ -654,9 +837,52 @@
         ]
       }
     },
+    "/v1/projects/{projectId}/instances/{instanceId}/backups": {
+      "get": {
+        "operationId": "InstanceBackups.get",
+        "parameters": [
+          {
+            "description": "Id of instance being deleted",
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceBackupsList"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "summary": "get latest backup information for provided instanceId",
+        "tags": [
+          "Instances"
+        ]
+      }
+    },
     "/v1/projects/{projectId}/instances/{instanceId}/credentials": {
       "get": {
-        "description": "Get all credentials for instance",
+        "description": "get list all credentials ids for instance",
         "operationId": "Credentials.get",
         "parameters": [
           {
@@ -668,6 +894,7 @@
             }
           },
           {
+            "description": "Id of instance being deleted",
             "in": "path",
             "name": "instanceId",
             "required": true,
@@ -691,6 +918,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
+        "summary": "get list of credentials ids",
         "tags": [
           "Credentials"
         ]
@@ -708,6 +936,7 @@
             }
           },
           {
+            "description": "Id of instance being deleted",
             "in": "path",
             "name": "instanceId",
             "required": true,
@@ -731,6 +960,7 @@
             "$ref": "#/components/responses/BadRequest"
           }
         },
+        "summary": "create new credentials",
         "tags": [
           "Credentials"
         ]
@@ -750,6 +980,7 @@
             }
           },
           {
+            "description": "Id of the instance being deleted",
             "in": "path",
             "name": "instanceId",
             "required": true,
@@ -775,7 +1006,7 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
-        "summary": "delete a service credentials",
+        "summary": "delete credentials by id",
         "tags": [
           "Credentials"
         ]
@@ -793,6 +1024,7 @@
             }
           },
           {
+            "description": "Id of the instance being deleted",
             "in": "path",
             "name": "instanceId",
             "required": true,
@@ -825,8 +1057,52 @@
             "$ref": "#/components/responses/NotFound"
           }
         },
+        "summary": "get credentials by id",
         "tags": [
           "Credentials"
+        ]
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/metrics": {
+      "get": {
+        "operationId": "InstanceMetrics.get",
+        "parameters": [
+          {
+            "description": "Id of instance being deleted",
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceMetrics"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "summary": "get latest metrics for cpu load, memory and disk usage",
+        "tags": [
+          "Instances"
         ]
       }
     },
@@ -865,8 +1141,8 @@
   },
   "servers": [
     {
-      "description": "Data Services Access API endpoints for the Wrapper Service Broker",
-      "url": "https://dsa-elasticsearch.api.eu01.stackit.cloud"
+      "description": "The STACKIT Opensearch API provides endpoints to list service offerings, manage ",
+      "url": "https://opensearch.api.eu01.stackit.cloud"
     }
   ],
   "tags": [
