@@ -8,9 +8,9 @@ import (
 
 var BaseURLs = env.URLs(
 	"argus",
-	"https://argus.api.stackit.cloud",
-	"https://argus.api.stg.stackit.cloud",
-	"https://argus.api.dev.stackit.cloud",
+	"https://argus.api.eu01.stackit.cloud",
+	"https://argus.api.eu01.qa.stackit.cloud",
+	"https://argus.api.eu01.dev.stackit.cloud",
 )
 
 func NewService(c contracts.BaseClientInterface) *argus.ClientWithResponses {
