@@ -1,3 +1,3 @@
 package gen
 
-//go:generate go run dev.azure.com/schwarzit/schwarzit.odj.core/_git/stackit-client-generator.git/cmd/oapi-codegen@latest -config config.yaml mongodb.json
+//go:generate go run github.com/do87/stackit-client-generator/cmd/oapi-codegen@v0.0.3 -config config.yaml mongodb.json
