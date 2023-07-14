@@ -8,9 +8,9 @@ import (
 
 var BaseURLs = env.URLs(
 	"resource_management",
-	"https://api.stackit.cloud/resource-management/v2/",
-	"https://api-qa.stackit.cloud/resource-management/v2/",
-	"https://api-dev.stackit.cloud/resource-management/v2/",
+	"https://resource-manager.api.eu01.stackit.cloud/v2/",
+	"https://resource-manager.api.eu01.qa.stackit.cloud/v2/",
+	"https://resource-manager.api.eu01.dev.stackit.cloud/v2/",
 )
 
 func NewService(c contracts.BaseClientInterface) *resourcemanagement.ClientWithResponses {
