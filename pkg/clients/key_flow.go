@@ -17,7 +17,6 @@ import (
 
 	"github.com/MicahParks/keyfunc"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -65,7 +64,7 @@ type KeyFlowConfig struct {
 	ServiceAccountKey     []byte
 	PrivateKey            []byte
 	ClientRetry           *RetryConfig
-	Traceparent           *traceparent.Traceparent
+	Traceparent           bool
 }
 
 // TokenResponseBody is the API response
@@ -121,9 +120,6 @@ func (c *KeyFlow) Init(ctx context.Context, cfg ...KeyFlowConfig) error {
 	c.doer = do
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
-	if c.config.ClientRetry == nil {
-		c.config.ClientRetry = NewRetryConfig()
-	}
 	if err := c.validateConfig(); err != nil {
 		return err
 	}
@@ -155,9 +151,6 @@ func (c *KeyFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", accessToken))
-	if t := c.GetTraceparent(); t != nil {
-		t.SetHeader(req)
-	}
 	return c.doer(c.client, req, c.config.ClientRetry)
 }
 
@@ -180,10 +173,14 @@ func (c *KeyFlow) GetAccessToken() (string, error) {
 
 // processConfig processes the given configuration
 func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
+	if c.config.ClientRetry == nil {
+		c.config.ClientRetry = NewRetryConfig()
+	}
 	c.config = c.getConfigFromEnvironment()
 	for _, m := range cfg {
 		c.config = c.mergeConfigs(&m, c.config)
 	}
+	c.config.ClientRetry.Traceparent = c.config.Traceparent
 }
 
 // getConfigFromEnvironment returns a KeyFlowConfig populated with environment variables.
@@ -211,9 +208,7 @@ func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	if len(cfg.PrivateKey) != 0 {
 		merged.PrivateKey = cfg.PrivateKey
 	}
-	if cfg.Traceparent != nil {
-		merged.Traceparent = cfg.Traceparent
-	}
+	merged.Traceparent = merged.Traceparent || cfg.Traceparent
 	return &merged
 }
 
@@ -408,12 +403,4 @@ func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
 	} else {
 		return nil, fmt.Errorf("error: %s", res.Status)
 	}
-}
-
-// GetTraceparent returns the defined Traceparent
-func (c *KeyFlow) GetTraceparent() *traceparent.Traceparent {
-	if c.config == nil {
-		return nil
-	}
-	return c.config.Traceparent
 }

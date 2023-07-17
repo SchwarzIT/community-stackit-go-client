@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
 	"github.com/pkg/errors"
 	"k8s.io/apimachinery/pkg/util/wait"
@@ -24,6 +25,7 @@ const (
 	DefaultRetryMaxRetries       = 3
 	DefaultRetryWaitBetweenCalls = 30 * time.Second
 	DefaultRetryTimeout          = 2 * time.Minute
+	DefaultTraceparent           = false
 )
 
 type RetryConfig struct {
@@ -31,6 +33,7 @@ type RetryConfig struct {
 	WaitBetweenCalls time.Duration // Time to wait between requests
 	RetryTimeout     time.Duration // Max time to re-try
 	ClientTimeout    time.Duration // HTTP Client timeout
+	Traceparent      bool          // Add traceparent header?
 }
 
 func NewRetryConfig() *RetryConfig {
@@ -39,6 +42,7 @@ func NewRetryConfig() *RetryConfig {
 		WaitBetweenCalls: DefaultRetryWaitBetweenCalls,
 		RetryTimeout:     DefaultRetryTimeout,
 		ClientTimeout:    DefaultClientTimeout,
+		Traceparent:      DefaultTraceparent,
 	}
 }
 
@@ -54,6 +58,10 @@ func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Re
 	maxRetries := cfg.MaxRetries
 	err = wait.PollImmediate(cfg.WaitBetweenCalls, cfg.RetryTimeout, wait.ConditionFunc(
 		func() (bool, error) {
+			if cfg.Traceparent {
+				t, _ := traceparent.Generate()
+				t.SetHeader(req)
+			}
 			resp, err = client.Do(req)
 			if err != nil {
 				if maxRetries > 0 {

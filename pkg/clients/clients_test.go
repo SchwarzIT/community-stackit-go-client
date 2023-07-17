@@ -42,22 +42,22 @@ func Test_do(t *testing.T) {
 		errMsg   string
 	}{
 		{"all ok", args{
-			cfg:            &RetryConfig{0, time.Microsecond, time.Second, DefaultClientTimeout},
+			cfg:            &RetryConfig{0, time.Microsecond, time.Second, DefaultClientTimeout, false},
 			serverStatus:   http.StatusOK,
 			serverResponse: `{"status":"ok", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusOK}, false, ""},
 		{"all ok nil client", args{
-			cfg:            &RetryConfig{0, time.Microsecond, time.Second, DefaultClientTimeout},
+			cfg:            &RetryConfig{0, time.Microsecond, time.Second, DefaultClientTimeout, false},
 			serverStatus:   http.StatusOK,
 			serverResponse: `{"status":"ok", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusOK}, false, ""},
 		{"fail 1", args{
-			cfg:            &RetryConfig{1, time.Microsecond, time.Second, DefaultClientTimeout},
+			cfg:            &RetryConfig{1, time.Microsecond, time.Second, DefaultClientTimeout, false},
 			serverStatus:   http.StatusInternalServerError,
 			serverResponse: `{"status":"error 1", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusInternalServerError}, false, ""},
 		{"fail 2 - timeout error", args{
-			cfg:            &RetryConfig{3, time.Microsecond, time.Second, DefaultClientTimeout},
+			cfg:            &RetryConfig{3, time.Microsecond, time.Second, DefaultClientTimeout, false},
 			serverStatus:   http.StatusOK,
 			serverResponse: `{"status":"ok", "testing": "%s"}`,
 		}, &http.Response{StatusCode: http.StatusOK}, true, "no such host"},

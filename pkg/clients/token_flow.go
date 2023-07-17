@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"golang.org/x/oauth2"
 )
 
@@ -28,7 +27,7 @@ type TokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
 	ClientRetry         *RetryConfig
-	Traceparent         *traceparent.Traceparent
+	Traceparent         bool
 }
 
 // GetServiceAccountEmail returns the service account email
@@ -47,9 +46,6 @@ func (c *TokenFlow) GetConfig() TokenFlowConfig {
 func (c *TokenFlow) Init(ctx context.Context, cfg ...TokenFlowConfig) error {
 	c.processConfig(cfg...)
 	c.configureHTTPClient(ctx)
-	if c.config.ClientRetry == nil {
-		c.config.ClientRetry = NewRetryConfig()
-	}
 	return c.validate()
 }
 
@@ -66,10 +62,14 @@ func (c *TokenFlow) Clone() interface{} {
 
 // processConfig processes the given configuration
 func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
+	if c.config.ClientRetry == nil {
+		c.config.ClientRetry = NewRetryConfig()
+	}
 	c.config = c.getConfigFromEnvironment()
 	for _, m := range cfg {
 		c.config = c.mergeConfigs(&m, c.config)
 	}
+	c.config.ClientRetry.Traceparent = c.config.Traceparent
 }
 
 // getConfigFromEnvironment returns a TokenFlowConfig populated with environment variables.
@@ -89,9 +89,7 @@ func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowCon
 	if cfg.ServiceAccountToken != "" {
 		merged.ServiceAccountToken = cfg.ServiceAccountToken
 	}
-	if cfg.Traceparent != nil {
-		merged.Traceparent = cfg.Traceparent
-	}
+	merged.Traceparent = merged.Traceparent || cfg.Traceparent
 	return &merged
 }
 
@@ -121,16 +119,5 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 	if c.client == nil {
 		return nil, errors.New("please run Init()")
 	}
-	if t := c.GetTraceparent(); t != nil {
-		t.SetHeader(req)
-	}
 	return do(c.client, req, c.config.ClientRetry)
-}
-
-// GetTraceparent returns the defined Traceparent
-func (c *TokenFlow) GetTraceparent() *traceparent.Traceparent {
-	if c.config == nil {
-		return nil
-	}
-	return c.config.Traceparent
 }
