@@ -62,10 +62,10 @@ func (c *TokenFlow) Clone() interface{} {
 
 // processConfig processes the given configuration
 func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
+	c.config = c.getConfigFromEnvironment()
 	if c.config.ClientRetry == nil {
 		c.config.ClientRetry = NewRetryConfig()
 	}
-	c.config = c.getConfigFromEnvironment()
 	for _, m := range cfg {
 		c.config = c.mergeConfigs(&m, c.config)
 	}

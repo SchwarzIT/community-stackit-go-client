@@ -173,10 +173,10 @@ func (c *KeyFlow) GetAccessToken() (string, error) {
 
 // processConfig processes the given configuration
 func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
+	c.config = c.getConfigFromEnvironment()
 	if c.config.ClientRetry == nil {
 		c.config.ClientRetry = NewRetryConfig()
 	}
-	c.config = c.getConfigFromEnvironment()
 	for _, m := range cfg {
 		c.config = c.mergeConfigs(&m, c.config)
 	}
