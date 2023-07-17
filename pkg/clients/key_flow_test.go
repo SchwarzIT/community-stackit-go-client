@@ -34,7 +34,12 @@ func TestKeyFlow_processConfig(t *testing.T) {
 	os.Setenv(PrivateKey, "test 3")
 	os.Setenv(ServiceAccountKey, "test 4")
 
-	kf := &KeyFlow{}
+	rc := NewRetryConfig()
+	kf := &KeyFlow{
+		config: &KeyFlowConfig{
+			ClientRetry: rc,
+		},
+	}
 	kf.processConfig()
 
 	want := KeyFlowConfig{
@@ -42,6 +47,7 @@ func TestKeyFlow_processConfig(t *testing.T) {
 		ServiceAccountKeyPath: "test 2",
 		PrivateKey:            []byte("test 3"),
 		ServiceAccountKey:     []byte("test 4"),
+		ClientRetry:           rc,
 	}
 	assert.EqualValues(t, want, *kf.config)
 
@@ -59,15 +65,19 @@ func TestKeyFlow_processConfig(t *testing.T) {
 		args args
 	}{
 		{"test manual 1", args{[]KeyFlowConfig{
-			{PrivateKeyPath: "test 1"},
-			{ServiceAccountKeyPath: "test 2"},
-			{PrivateKey: []byte("test 3")},
-			{ServiceAccountKey: []byte("test 4")},
+			{PrivateKeyPath: "test 1", ClientRetry: rc},
+			{ServiceAccountKeyPath: "test 2", ClientRetry: rc},
+			{PrivateKey: []byte("test 3"), ClientRetry: rc},
+			{ServiceAccountKey: []byte("test 4"), ClientRetry: rc},
 		}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			c := &KeyFlow{}
+			c := &KeyFlow{
+				config: &KeyFlowConfig{
+					ClientRetry: rc,
+				},
+			}
 			c.processConfig(tt.args.cfg...)
 			assert.Equal(t, want, c.GetConfig())
 		})
