@@ -33,7 +33,7 @@ type RetryConfig struct {
 	WaitBetweenCalls time.Duration // Time to wait between requests
 	RetryTimeout     time.Duration // Max time to re-try
 	ClientTimeout    time.Duration // HTTP Client timeout
-	Traceparent      bool          // Add traceparent header?
+	Traceparent      *bool         // Add traceparent header?
 }
 
 func NewRetryConfig() *RetryConfig {
@@ -42,7 +42,7 @@ func NewRetryConfig() *RetryConfig {
 		WaitBetweenCalls: DefaultRetryWaitBetweenCalls,
 		RetryTimeout:     DefaultRetryTimeout,
 		ClientTimeout:    DefaultClientTimeout,
-		Traceparent:      DefaultTraceparent,
+		Traceparent:      nil,
 	}
 }
 
@@ -58,7 +58,7 @@ func do(client *http.Client, req *http.Request, cfg *RetryConfig) (resp *http.Re
 	maxRetries := cfg.MaxRetries
 	err = wait.PollImmediate(cfg.WaitBetweenCalls, cfg.RetryTimeout, wait.ConditionFunc(
 		func() (bool, error) {
-			if cfg.Traceparent {
+			if cfg.Traceparent != nil && *cfg.Traceparent {
 				t, _ := traceparent.Generate()
 				t.SetHeader(req)
 			}
