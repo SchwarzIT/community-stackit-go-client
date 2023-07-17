@@ -64,7 +64,6 @@ type KeyFlowConfig struct {
 	ServiceAccountKey     []byte
 	PrivateKey            []byte
 	ClientRetry           *RetryConfig
-	Traceparent           bool
 }
 
 // TokenResponseBody is the API response
@@ -183,7 +182,6 @@ func (c *KeyFlow) processConfig(cfg ...KeyFlowConfig) {
 	for _, m := range cfg {
 		c.config = c.mergeConfigs(&m, c.config)
 	}
-	c.config.ClientRetry.Traceparent = c.config.Traceparent
 }
 
 // getConfigFromEnvironment returns a KeyFlowConfig populated with environment variables.
@@ -211,7 +209,6 @@ func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	if len(cfg.PrivateKey) != 0 {
 		merged.PrivateKey = cfg.PrivateKey
 	}
-	merged.Traceparent = merged.Traceparent || cfg.Traceparent
 	return &merged
 }
 
@@ -406,4 +403,8 @@ func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
 	} else {
 		return nil, fmt.Errorf("error: %s", res.Status)
 	}
+}
+
+func (c *KeyFlow) EnableTraceparent() {
+	c.config.ClientRetry.Traceparent = true
 }

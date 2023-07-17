@@ -46,8 +46,8 @@ func TestTokenFlow_processConfig(t *testing.T) {
 		args args
 	}{
 		{"test manual 1", args{[]TokenFlowConfig{
-			{ServiceAccountEmail: "test 1", ClientRetry: rc, Traceparent: false},
-			{ServiceAccountToken: "test 2", ClientRetry: rc, Traceparent: false},
+			{ServiceAccountEmail: "test 1", ClientRetry: rc},
+			{ServiceAccountToken: "test 2", ClientRetry: rc},
 		}}},
 	}
 	for _, tt := range tests {

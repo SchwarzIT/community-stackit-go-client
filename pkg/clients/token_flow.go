@@ -27,7 +27,6 @@ type TokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
 	ClientRetry         *RetryConfig
-	Traceparent         bool
 }
 
 // GetServiceAccountEmail returns the service account email
@@ -69,7 +68,6 @@ func (c *TokenFlow) processConfig(cfg ...TokenFlowConfig) {
 	for _, m := range cfg {
 		c.config = c.mergeConfigs(&m, c.config)
 	}
-	c.config.ClientRetry.Traceparent = c.config.Traceparent
 }
 
 // getConfigFromEnvironment returns a TokenFlowConfig populated with environment variables.
@@ -89,7 +87,6 @@ func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowCon
 	if cfg.ServiceAccountToken != "" {
 		merged.ServiceAccountToken = cfg.ServiceAccountToken
 	}
-	merged.Traceparent = merged.Traceparent || cfg.Traceparent
 	return &merged
 }
 
@@ -120,4 +117,8 @@ func (c *TokenFlow) Do(req *http.Request) (*http.Response, error) {
 		return nil, errors.New("please run Init()")
 	}
 	return do(c.client, req, c.config.ClientRetry)
+}
+
+func (c *TokenFlow) EnableTraceparent() {
+	c.config.ClientRetry.Traceparent = true
 }

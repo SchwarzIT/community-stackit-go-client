@@ -65,10 +65,10 @@ func TestKeyFlow_processConfig(t *testing.T) {
 		args args
 	}{
 		{"test manual 1", args{[]KeyFlowConfig{
-			{PrivateKeyPath: "test 1", ClientRetry: rc, Traceparent: false},
-			{ServiceAccountKeyPath: "test 2", ClientRetry: rc, Traceparent: false},
-			{PrivateKey: []byte("test 3"), ClientRetry: rc, Traceparent: false},
-			{ServiceAccountKey: []byte("test 4"), ClientRetry: rc, Traceparent: false},
+			{PrivateKeyPath: "test 1", ClientRetry: rc},
+			{ServiceAccountKeyPath: "test 2", ClientRetry: rc},
+			{PrivateKey: []byte("test 3"), ClientRetry: rc},
+			{ServiceAccountKey: []byte("test 4"), ClientRetry: rc},
 		}}},
 	}
 	for _, tt := range tests {
