@@ -1,8 +1,8 @@
 package dataservices
 
 import (
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
 )
 
@@ -18,12 +18,12 @@ const (
 )
 
 func NewService(c contracts.BaseClientInterface, serviceID int) *dataservices.ClientWithResponses {
-	url := GetBaseURLs(serviceID).GetURL(c.GetEnvironment())
+	url := GetBaseURLs(serviceID).Get()
 	nc, _ := dataservices.NewClient(url, dataservices.WithHTTPClient(c))
 	return nc
 }
 
-func GetBaseURLs(serviceID int) env.EnvironmentURLs {
+func GetBaseURLs(serviceID int) baseurl.BaseURL {
 	switch serviceID {
 	case ElasticSearch:
 		return setElasticSearchURLs()
@@ -40,68 +40,54 @@ func GetBaseURLs(serviceID int) env.EnvironmentURLs {
 	case Redis:
 		return setRedisURL()
 	}
-	return env.EnvironmentURLs{}
+	return baseurl.BaseURL{}
 }
 
-func setElasticSearchURLs() env.EnvironmentURLs {
-	return env.URLs(
+func setElasticSearchURLs() baseurl.BaseURL {
+	return baseurl.New(
 		"elasticsearch",
 		"https://elasticsearch.api.eu01.stackit.cloud",
-		"https://elasticsearch.api.eu01.qa.stackit.cloud",
-		"https://elasticsearch.api.eu01.dev.stackit.cloud",
 	)
 }
 
-func setLogMeURLs() env.EnvironmentURLs {
-	return env.URLs(
+func setLogMeURLs() baseurl.BaseURL {
+	return baseurl.New(
 		"logme",
 		"https://logme.api.eu01.stackit.cloud",
-		"https://logme.api.eu01.qa.stackit.cloud",
-		"https://logme.api.eu01.dev.stackit.cloud",
 	)
 }
 
-func setMariaDBURLs() env.EnvironmentURLs {
-	return env.URLs(
+func setMariaDBURLs() baseurl.BaseURL {
+	return baseurl.New(
 		"mariadb",
 		"https://mariadb.api.eu01.stackit.cloud",
-		"https://mariadb.api.eu01.qa.stackit.cloud",
-		"https://mariadb.api.eu01.dev.stackit.cloud",
 	)
 }
 
-func setOpensearchURLs() env.EnvironmentURLs {
-	return env.URLs(
+func setOpensearchURLs() baseurl.BaseURL {
+	return baseurl.New(
 		"redis",
 		"https://opensearch.api.eu01.stackit.cloud",
-		"https://opensearch.api.eu01.qa.stackit.cloud",
-		"https://opensearch.api.eu01.dev.stackit.cloud",
 	)
 }
 
-func setPostgresDBURLs() env.EnvironmentURLs {
-	return env.URLs(
+func setPostgresDBURLs() baseurl.BaseURL {
+	return baseurl.New(
 		"postgresql",
 		"https://postgresql.api.eu01.stackit.cloud",
-		"https://postgresql.api.eu01.qa.stackit.cloud",
-		"https://postgresql.api.eu01.dev.stackit.cloud",
 	)
 }
 
-func setRabbitMQURLs() env.EnvironmentURLs {
-	return env.URLs(
+func setRabbitMQURLs() baseurl.BaseURL {
+	return baseurl.New(
 		"rabbitmq",
 		"https://rabbitmq.api.eu01.stackit.cloud",
-		"https://rabbitmq.api.eu01.qa.stackit.cloud",
-		"https://rabbitmq.api.eu01.dev.stackit.cloud",
 	)
 }
 
-func setRedisURL() env.EnvironmentURLs {
-	return env.URLs(
+func setRedisURL() baseurl.BaseURL {
+	return baseurl.New(
 		"redis",
 		"https://redis.api.eu01.stackit.cloud",
-		"https://redis.api.eu01.qa.stackit.cloud",
-		"https://redis.api.eu01.dev.stackit.cloud",
 	)
 }

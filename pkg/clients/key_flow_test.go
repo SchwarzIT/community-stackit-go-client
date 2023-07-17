@@ -15,7 +15,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +44,6 @@ func TestKeyFlow_processConfig(t *testing.T) {
 		ServiceAccountKeyPath: "test 2",
 		PrivateKey:            []byte("test 3"),
 		ServiceAccountKey:     []byte("test 4"),
-		Environment:           env.Parse("qa"),
 	}
 	assert.EqualValues(t, want, *kf.config)
 
@@ -68,7 +66,6 @@ func TestKeyFlow_processConfig(t *testing.T) {
 			{ServiceAccountKeyPath: "test 2"},
 			{PrivateKey: []byte("test 3")},
 			{ServiceAccountKey: []byte("test 4")},
-			{Environment: "qa"},
 		}}},
 	}
 	for _, tt := range tests {
@@ -257,18 +254,12 @@ func TestKeyFlow_Init(t *testing.T) {
 				if !reflect.DeepEqual(c.GetConfig(), KeyFlowConfig{}) {
 					t.Error("config doesn't match")
 				}
-				if c.GetEnvironment() != "" {
-					t.Error("env should be empty before Init")
-				}
 				if c.GetServiceAccountEmail() != "" {
 					t.Error("sa email should be empty before Init")
 				}
 			}
 			if err := c.Init(context.Background(), tt.config...); (err != nil) != tt.wantErr {
 				t.Errorf("KeyFlow.Init() error = %v, wantErr %v", err, tt.wantErr)
-			}
-			if c.GetEnvironment() != "prod" {
-				t.Errorf("c.GetEnvironment() = %s != prod", c.GetEnvironment())
 			}
 			if tt.name == "ok 2" {
 				if c.GetServiceAccountEmail() != "stackit@sa.stackit.cloud" {

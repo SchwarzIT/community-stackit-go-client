@@ -23,7 +23,14 @@ output-options:
     type: error
     description: "Aggregated error"
     apply-to: ["*"]
-    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    imports: 
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/flavors"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/versions"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/backups"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/storage"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/users"
     set: "validate.DefaultResponseErrorHandler(rsp)"
   copy:
   - from: include/service.go
