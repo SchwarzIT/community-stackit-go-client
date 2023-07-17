@@ -7,10 +7,8 @@ import (
 )
 
 type EnvironmentURLs struct {
-	// Base URL for each environment
-	Prod string
-	QA   string
-	Dev  string
+	// Base URL
+	BaseURL string
 
 	// OverrideWith specifies an environment
 	// variable name. When set, the value
@@ -18,29 +16,28 @@ type EnvironmentURLs struct {
 	OverrideWith string
 }
 
-// URLs expects the package name and base URLs for prod, qa, dev
-// the package name is used fot setting OverrideWith
+// URLs expects the package name and base URL
 // for example, for pkg=costs, OverrideWith will be
 // STACKIT_COSTS_BASEURL
-func URLs(pkg, prod, qa, dev string) EnvironmentURLs {
+func URLs(pkg, baseURL string) EnvironmentURLs {
 	return EnvironmentURLs{
-		Prod:         prod,
-		QA:           qa,
-		Dev:          dev,
+		BaseURL:      baseURL,
 		OverrideWith: fmt.Sprintf("STACKIT_%s_BASEURL", strings.ToUpper(pkg)),
 	}
 }
 
-func (eu EnvironmentURLs) GetURL(e Environment) string {
+// GetURL returns the base URL
+// if the override environment variable is set, it is returned instead
+func (eu EnvironmentURLs) GetURL() string {
 	url := os.Getenv(eu.OverrideWith)
 	if url != "" {
 		return url
 	}
-	if e.IsDev() {
-		return eu.Dev
-	}
-	if e.IsQA() {
-		return eu.QA
-	}
-	return eu.Prod
+	return eu.BaseURL
+}
+
+// GetOverrideName returns the name of the environment variable
+// that can be used to override the base URL
+func (eu EnvironmentURLs) GetOverrideName() string {
+	return eu.OverrideWith
 }
