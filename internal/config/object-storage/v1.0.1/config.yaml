@@ -18,7 +18,12 @@ output-options:
     type: error
     description: "Aggregated error"
     apply-to: ["*"]
-    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    imports: 
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/project"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/access-key"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/bucket"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1/credentials-group"
     set: "validate.DefaultResponseErrorHandler(rsp)"
   copy:
   - from: include/service.go

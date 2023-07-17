@@ -8,9 +8,9 @@ import (
 
 var BaseURLs = env.URLs(
 	"object_storage",
-	"https://api.stackit.cloud/object-storage-api/",
-	"https://api-qa.stackit.cloud/object-storage-api/",
-	"https://api-dev.stackit.cloud/object-storage-api/",
+	"https://object-storage-api.api.eu01.stackit.cloud",
+	"https://object-storage-api.api.eu01.qa.stackit.cloud",
+	"https://object-storage-api.api.eu01.dev.stackit.cloud",
 )
 
 func NewService(c contracts.BaseClientInterface) *objectstorage.ClientWithResponses {

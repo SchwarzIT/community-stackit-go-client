@@ -8,9 +8,9 @@ import (
 
 var BaseURLs = env.URLs(
 	"mongodb_flex",
-	"https://api.stackit.cloud/mongodb/v1/",
-	"https://api-qa.stackit.cloud/mongodb/v1/",
-	"https://api-dev.stackit.cloud/mongodb/v1/",
+	"https://mongodb-flex-service.api.eu01.stackit.cloud/v1/",
+	"https://mongodb-flex-service.api.eu01.qa.stackit.cloud/v1/",
+	"https://mongodb-flex-service.api.eu01.dev.stackit.cloud/v1/",
 )
 
 func NewService(c contracts.BaseClientInterface) *mongodb.ClientWithResponses {
