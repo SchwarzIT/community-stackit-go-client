@@ -175,7 +175,7 @@ the pattern is `STACKIT_${package}_BASEURL`
 
 example: `STACKIT_KUBERNETES_BASEURL` or `STACKIT_LOGME_BASEURL`
 
-### Keyflow authentication for non-prod
+### Key authentication for non-prod
 
 for token API set `STACKIT_TOKEN_BASEURL`
 
