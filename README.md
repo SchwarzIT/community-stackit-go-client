@@ -181,7 +181,7 @@ for token API set `STACKIT_TOKEN_BASEURL`
 
 and for jwks.json url set `STACKIT_JWKS_BASEURL`
 
-<br />
+&nbsp;
 
 ## Contributing
 
