@@ -21,12 +21,15 @@ func TestTokenFlow_processConfig(t *testing.T) {
 	os.Setenv(ServiceAccountEmail, "test 1")
 	os.Setenv(ServiceAccountToken, "test 2")
 
+	rc := NewRetryConfig()
 	tf := &TokenFlow{}
 	tf.processConfig()
+	tf.config.ClientRetry = rc
 
 	want := TokenFlowConfig{
 		ServiceAccountEmail: "test 1",
 		ServiceAccountToken: "test 2",
+		ClientRetry:         rc,
 	}
 	assert.EqualValues(t, want, *tf.config)
 
@@ -43,13 +46,16 @@ func TestTokenFlow_processConfig(t *testing.T) {
 		args args
 	}{
 		{"test manual 1", args{[]TokenFlowConfig{
-			{ServiceAccountEmail: "test 1"},
-			{ServiceAccountToken: "test 2"},
+			{ServiceAccountEmail: "test 1", ClientRetry: rc, Traceparent: false},
+			{ServiceAccountToken: "test 2", ClientRetry: rc, Traceparent: false},
 		}}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &TokenFlow{}
+			c.config = &TokenFlowConfig{
+				ClientRetry: rc,
+			}
 			c.processConfig(tt.args.cfg...)
 			assert.Equal(t, want, c.GetConfig())
 		})
