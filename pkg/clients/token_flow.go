@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"golang.org/x/oauth2"
 )
@@ -28,14 +27,8 @@ type TokenFlow struct {
 type TokenFlowConfig struct {
 	ServiceAccountEmail string
 	ServiceAccountToken string
-	Environment         env.Environment
 	ClientRetry         *RetryConfig
 	Traceparent         *traceparent.Traceparent
-}
-
-// GetEnvironment returns the defined API environment
-func (c *TokenFlow) GetEnvironment() env.Environment {
-	return c.GetConfig().Environment
 }
 
 // GetServiceAccountEmail returns the service account email
@@ -84,7 +77,6 @@ func (c *TokenFlow) getConfigFromEnvironment() *TokenFlowConfig {
 	return &TokenFlowConfig{
 		ServiceAccountEmail: os.Getenv(ServiceAccountEmail),
 		ServiceAccountToken: os.Getenv(ServiceAccountToken),
-		Environment:         env.Parse(os.Getenv(Environment)),
 	}
 }
 
@@ -96,9 +88,6 @@ func (c *TokenFlow) mergeConfigs(cfg, currentCfg *TokenFlowConfig) *TokenFlowCon
 	}
 	if cfg.ServiceAccountToken != "" {
 		merged.ServiceAccountToken = cfg.ServiceAccountToken
-	}
-	if cfg.Environment != "" {
-		merged.Environment = cfg.Environment
 	}
 	if cfg.Traceparent != nil {
 		merged.Traceparent = cfg.Traceparent

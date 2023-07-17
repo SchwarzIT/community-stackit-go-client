@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 )
 
@@ -18,13 +17,11 @@ type ClientFlowConfig interface {
 type ClientInterface[f ClientFlowConfig] interface {
 	Do(req *http.Request) (*http.Response, error)
 	GetConfig() f
-	GetEnvironment() env.Environment
 	GetServiceAccountEmail() string
 }
 
 type BaseClientInterface interface {
 	Do(req *http.Request) (*http.Response, error)
-	GetEnvironment() env.Environment
 	GetServiceAccountEmail() string
 	Clone() interface{}
 	GetTraceparent() *traceparent.Traceparent

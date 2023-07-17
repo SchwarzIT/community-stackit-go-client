@@ -10,7 +10,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,7 +29,6 @@ func TestTokenFlow_processConfig(t *testing.T) {
 	want := TokenFlowConfig{
 		ServiceAccountEmail: "test 1",
 		ServiceAccountToken: "test 2",
-		Environment:         env.Parse("dev"),
 	}
 	assert.EqualValues(t, want, *tf.config)
 
@@ -50,7 +48,6 @@ func TestTokenFlow_processConfig(t *testing.T) {
 		{"test manual 1", args{[]TokenFlowConfig{
 			{ServiceAccountEmail: "test 1"},
 			{ServiceAccountToken: "test 2"},
-			{Environment: "dev"},
 		}}},
 	}
 	for _, tt := range tests {
@@ -96,7 +93,6 @@ func TestTokenFlow_Init(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &TokenFlow{}
-			assert.EqualValues(t, "", c.GetEnvironment())
 
 			os.Setenv(ServiceAccountEmail, "")
 			os.Setenv(ServiceAccountToken, "")
@@ -108,7 +104,6 @@ func TestTokenFlow_Init(t *testing.T) {
 			if c.config == nil {
 				t.Error("config is nil")
 			}
-			assert.EqualValues(t, "prod", c.GetEnvironment())
 			assert.EqualValues(t, c.config.ServiceAccountEmail, c.GetServiceAccountEmail())
 		})
 	}

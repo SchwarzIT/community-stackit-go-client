@@ -1,4 +1,4 @@
-package env
+package baseurl
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-type EnvironmentURLs struct {
+type BaseURL struct {
 	// Base URL
 	BaseURL string
 
@@ -16,19 +16,19 @@ type EnvironmentURLs struct {
 	OverrideWith string
 }
 
-// URLs expects the package name and base URL
+// New expects the package name and base URL
 // for example, for pkg=costs, OverrideWith will be
 // STACKIT_COSTS_BASEURL
-func URLs(pkg, baseURL string) EnvironmentURLs {
-	return EnvironmentURLs{
+func New(pkg, baseURL string) BaseURL {
+	return BaseURL{
 		BaseURL:      baseURL,
 		OverrideWith: fmt.Sprintf("STACKIT_%s_BASEURL", strings.ToUpper(pkg)),
 	}
 }
 
-// GetURL returns the base URL
+// Get returns the base URL
 // if the override environment variable is set, it is returned instead
-func (eu EnvironmentURLs) GetURL() string {
+func (eu BaseURL) Get() string {
 	url := os.Getenv(eu.OverrideWith)
 	if url != "" {
 		return url
@@ -38,6 +38,6 @@ func (eu EnvironmentURLs) GetURL() string {
 
 // GetOverrideName returns the name of the environment variable
 // that can be used to override the base URL
-func (eu EnvironmentURLs) GetOverrideName() string {
+func (eu BaseURL) GetOverrideName() string {
 	return eu.OverrideWith
 }

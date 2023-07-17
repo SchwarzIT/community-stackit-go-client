@@ -16,7 +16,7 @@ import (
 	"time"
 
 	"github.com/MicahParks/keyfunc"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/env"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/traceparent"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -33,18 +33,14 @@ const (
 	PrivateKeyPath        = "STACKIT_PRIVATE_KEY_PATH"
 )
 
-var tokenAPI = env.URLs(
+var tokenAPI = baseurl.New(
 	"token",
 	"https://api.stackit.cloud/service-account/token",
-	"https://api-qa.stackit.cloud/service-account/token",
-	"https://api-dev.stackit.cloud/service-account/token",
 )
 
-var jsksAPI = env.URLs(
+var jsksAPI = baseurl.New(
 	"jswks",
 	"https://api.stackit.cloud/service-account/.well-known/jwks.json",
-	"https://api-qa.stackit.cloud/service-account/.well-known/jwks.json",
-	"https://api-dev.stackit.cloud/service-account/.well-known/jwks.json",
 )
 
 const (
@@ -68,7 +64,6 @@ type KeyFlowConfig struct {
 	PrivateKeyPath        string
 	ServiceAccountKey     []byte
 	PrivateKey            []byte
-	Environment           env.Environment
 	ClientRetry           *RetryConfig
 	Traceparent           *traceparent.Traceparent
 }
@@ -101,14 +96,6 @@ type ServiceAccountKeyPrivateResponse struct {
 	KeyType      string     `json:"keyType"`
 	PublicKey    string     `json:"publicKey"`
 	ValidUntil   *time.Time `json:"validUntil,omitempty"`
-}
-
-// GetEnvironment returns the defined API environment
-func (c *KeyFlow) GetEnvironment() env.Environment {
-	if c.config == nil {
-		return ""
-	}
-	return c.config.Environment
 }
 
 // GetConfig returns the flow configuration
@@ -206,7 +193,6 @@ func (c *KeyFlow) getConfigFromEnvironment() *KeyFlowConfig {
 		PrivateKeyPath:        os.Getenv(PrivateKeyPath),
 		ServiceAccountKey:     []byte(os.Getenv(ServiceAccountKey)),
 		PrivateKey:            []byte(os.Getenv(PrivateKey)),
-		Environment:           env.Parse(os.Getenv(Environment)),
 	}
 }
 
@@ -224,9 +210,6 @@ func (c *KeyFlow) mergeConfigs(cfg, currentCfg *KeyFlowConfig) *KeyFlowConfig {
 	}
 	if len(cfg.PrivateKey) != 0 {
 		merged.PrivateKey = cfg.PrivateKey
-	}
-	if cfg.Environment != "" {
-		merged.Environment = cfg.Environment
 	}
 	if cfg.Traceparent != nil {
 		merged.Traceparent = cfg.Traceparent
@@ -356,7 +339,7 @@ func (c *KeyFlow) requestToken(grant, assertion string) (*http.Response, error) 
 	body.Set("grant_type", grant)
 	body.Set("assertion", assertion)
 	payload := strings.NewReader(body.Encode())
-	req, err := http.NewRequest(http.MethodPost, tokenAPI.GetURL(c.GetEnvironment()), payload)
+	req, err := http.NewRequest(http.MethodPost, tokenAPI.Get(), payload)
 	if err != nil {
 		return nil, err
 	}
@@ -411,7 +394,7 @@ func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 }
 
 func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
-	req, err := http.NewRequest("GET", jsksAPI.GetURL(c.GetEnvironment()), nil)
+	req, err := http.NewRequest("GET", jsksAPI.Get(), nil)
 	if err != nil {
 		return nil, err
 	}
