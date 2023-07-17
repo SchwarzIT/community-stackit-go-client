@@ -12,11 +12,6 @@ import (
 )
 
 const (
-	// API configuration options:
-	Environment = "STACKIT_ENV"
-)
-
-const (
 	// Known error messages
 	ClientTimeoutErr           = "Client.Timeout exceeded while awaiting headers"
 	ClientContextDeadlineErr   = "context deadline exceeded"

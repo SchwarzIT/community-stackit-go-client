@@ -116,10 +116,6 @@ After the service account has been created, you can authenticate to the client u
    ```bash
    export STACKIT_SERVICE_ACCOUNT_KEY_PATH="sa_key.json"
    export STACKIT_PRIVATE_KEY_PATH="private_key.pem"
-
-   # optionally modify the API environment to one of:
-   # `dev`, `qa` or `prod` (default)
-   export STACKIT_ENV=prod
    ```
 
 6. Configure the client
@@ -148,10 +144,6 @@ After the service account has been created, you can authenticate to the client u
     ```bash
     export STACKIT_SERVICE_ACCOUNT_EMAIL=email
     export STACKIT_SERVICE_ACCOUNT_TOKEN=token
-
-    # optionally modify the API environment to one of:
-    # `dev`, `qa` or `prod` (default)
-    export STACKIT_ENV=prod
     ```
 
 3. Configure the client
@@ -172,6 +164,22 @@ After the service account has been created, you can authenticate to the client u
    ```
 
 &nbsp;
+
+## Working with non-prod environments
+
+For each service package there's an overriding environment variable for the base URL
+
+they are defined for every service in `service.go` according to the specified package name
+
+the pattern is `STACKIT_${package}_BASEURL`
+
+example: `STACKIT_KUBERNETES_BASEURL` or `STACKIT_LOGME_BASEURL`
+
+### Keyflow authentication for non-prod
+
+for token API set `STACKIT_TOKEN_BASEURL`
+
+and for jwks.json url set `STACKIT_JWKS_BASEURL`
 
 ## Contributing
 

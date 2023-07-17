@@ -39,7 +39,7 @@ var tokenAPI = baseurl.New(
 )
 
 var jsksAPI = baseurl.New(
-	"jswks",
+	"jwks",
 	"https://api.stackit.cloud/service-account/.well-known/jwks.json",
 )
 

@@ -26,7 +26,6 @@ func TestKeyFlow_processConfig(t *testing.T) {
 	// test env variable loading
 	a := os.Getenv(PrivateKeyPath)
 	b := os.Getenv(ServiceAccountKeyPath)
-	c := os.Getenv(Environment)
 	d := os.Getenv(PrivateKey)
 	e := os.Getenv(ServiceAccountKey)
 
@@ -34,7 +33,6 @@ func TestKeyFlow_processConfig(t *testing.T) {
 	os.Setenv(ServiceAccountKeyPath, "test 2")
 	os.Setenv(PrivateKey, "test 3")
 	os.Setenv(ServiceAccountKey, "test 4")
-	os.Setenv(Environment, "qa")
 
 	kf := &KeyFlow{}
 	kf.processConfig()
@@ -50,7 +48,6 @@ func TestKeyFlow_processConfig(t *testing.T) {
 	// revert
 	os.Setenv(PrivateKeyPath, a)
 	os.Setenv(ServiceAccountKeyPath, b)
-	os.Setenv(Environment, c)
 	os.Setenv(PrivateKey, d)
 	os.Setenv(ServiceAccountKey, e)
 
@@ -153,7 +150,6 @@ func TestKeyFlow_Init(t *testing.T) {
 
 	a := os.Getenv(PrivateKeyPath)
 	b := os.Getenv(ServiceAccountKeyPath)
-	c := os.Getenv(Environment)
 	d := os.Getenv(PrivateKey)
 	e := os.Getenv(ServiceAccountKey)
 
@@ -161,7 +157,6 @@ func TestKeyFlow_Init(t *testing.T) {
 	os.Setenv(ServiceAccountKeyPath, "")
 	os.Setenv(PrivateKey, "")
 	os.Setenv(ServiceAccountKey, "")
-	os.Setenv(Environment, "")
 
 	type args struct {
 		cfg []KeyFlowConfig
@@ -271,7 +266,6 @@ func TestKeyFlow_Init(t *testing.T) {
 	// revert
 	os.Setenv(PrivateKeyPath, a)
 	os.Setenv(ServiceAccountKeyPath, b)
-	os.Setenv(Environment, c)
 	os.Setenv(PrivateKey, d)
 	os.Setenv(ServiceAccountKey, e)
 }

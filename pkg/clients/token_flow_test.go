@@ -17,11 +17,9 @@ func TestTokenFlow_processConfig(t *testing.T) {
 	// test env variable loading
 	a := os.Getenv(ServiceAccountEmail)
 	b := os.Getenv(ServiceAccountToken)
-	c := os.Getenv(Environment)
 
 	os.Setenv(ServiceAccountEmail, "test 1")
 	os.Setenv(ServiceAccountToken, "test 2")
-	os.Setenv(Environment, "dev")
 
 	tf := &TokenFlow{}
 	tf.processConfig()
@@ -35,7 +33,6 @@ func TestTokenFlow_processConfig(t *testing.T) {
 	// revert
 	os.Setenv(ServiceAccountEmail, a)
 	os.Setenv(ServiceAccountToken, b)
-	os.Setenv(Environment, c)
 
 	// Test manual configuration
 	type args struct {
