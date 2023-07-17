@@ -22,6 +22,5 @@ type ClientInterface[f ClientFlowConfig] interface {
 type BaseClientInterface interface {
 	Do(req *http.Request) (*http.Response, error)
 	GetServiceAccountEmail() string
-	EnableTraceparent()
 	Clone() interface{}
 }
