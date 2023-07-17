@@ -57,6 +57,7 @@ func TestTokenFlow_processConfig(t *testing.T) {
 			c := &TokenFlow{}
 			c.config = &TokenFlowConfig{}
 			c.processConfig(tt.args.cfg...)
+			assert.Equal(t, &c.config.EnableTraceparent, c.config.ClientRetry.Traceparent)
 			want.ClientRetry = nil
 			c.config.ClientRetry = nil
 			assert.Equal(t, want, c.GetConfig())

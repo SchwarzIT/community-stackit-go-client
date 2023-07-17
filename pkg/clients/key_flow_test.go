@@ -72,6 +72,7 @@ func TestKeyFlow_processConfig(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &KeyFlow{}
 			c.processConfig(tt.args.cfg...)
+			assert.Equal(t, &c.config.EnableTraceparent, c.config.ClientRetry.Traceparent)
 			want.ClientRetry = nil
 			c.config.ClientRetry = nil
 			assert.Equal(t, want, c.GetConfig())
