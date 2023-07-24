@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/users"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/acls"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/users"
 )
 
 // Client which conforms to the OpenAPI3 specification for this service.
