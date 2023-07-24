@@ -14,6 +14,7 @@ import (
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1"
 	postgresflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0"
 	resourcemanagement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/resource-management/v2.0"
+	secretsmanager "github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0"
 	serviceaccounts "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-accounts/v2.0"
 )
 
@@ -27,6 +28,7 @@ type Services struct {
 	ObjectStorage      *objectstorage.ClientWithResponses
 	PostgresFlex       *postgresflex.ClientWithResponses
 	ResourceManagement *resourcemanagement.ClientWithResponses
+	SecretsManager     *secretsmanager.ClientWithResponses
 	ServiceAccounts    *serviceaccounts.ClientWithResponses
 
 	// DSA
@@ -59,6 +61,7 @@ func Init(c contracts.BaseClientInterface) (*Services, error) {
 		PostgresFlex:       postgresflex.NewService(newClient(c)),
 		ResourceManagement: resourcemanagement.NewService(newClient(c)),
 		ServiceAccounts:    serviceaccounts.NewService(newClient(c)),
+		SecretsManager:     secretsmanager.NewService(newClient(c)),
 
 		// DSA
 		ElasticSearch: dataservices.NewService(newClient(c), dataservices.ElasticSearch),
