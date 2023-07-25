@@ -1,0 +1,97 @@
+package: secretsmanager
+output: ../../../../pkg/services/secrets-manager/v1.1.0/secretsmanager.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
+    name: "contracts.BaseClientInterface"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+      - instances
+      - acls
+      - users
+  extend-response:
+    - field: Error
+      type: error
+      description: "Aggregated error"
+      apply-to: ["*"]
+      imports:
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/acls"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/users"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/secrets-manager/v1.1.0/instances"
+      set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+    - from: include/service.go
+      to: service.go
+      tidy:
+        - replace: "secretsmanager."
+          all: true
+tidy:
+  verbose: false
+  functions:
+    - replace: Id
+      with: ID
+      all: true
+    - replace: GetV1ProjectsProjectIDInstancesInstanceIDAcls
+      with: List
+      all: true
+    - replace: PostV1ProjectsProjectIDInstancesInstanceIDAcls
+      with: Create
+      all: true
+    - replace: PutV1ProjectsProjectIDInstancesInstanceIDAclsAclID
+      with: Update
+      all: true
+    - replace: V1ProjectsProjectIDInstancesInstanceIDAclsAclID
+      all: true
+    - replace: V1ProjectsProjectIDInstancesInstanceIDAclsAclID
+      all: true
+    - replace: ListAclID
+      with: Get
+      all: true
+    - replace: GetV1ProjectsProjectIDInstances
+      with: List
+      all: true
+    - replace: PostV1ProjectsProjectIDInstances
+      with: Create
+      all: true
+    - replace: DeleteV1ProjectsProjectIDInstancesInstanceID
+      with: Delete
+      all: true
+    - replace: GetV1ProjectsProjectIDInstancesInstanceID
+      with: Get
+      all: true
+    - replace: ListInstanceID
+      with: Get
+      all: true
+    - replace: GetUsers
+      with: List
+      all: true
+    - replace: CreateInstanceIDUsers
+      with: Create
+      all: true
+    - replace: DeleteUsersUserID
+      with: Delete
+      all: true
+    - replace: GetUsersUserID
+      with: Get
+      all: true
+    - replace: PutV1ProjectsProjectIDInstancesInstanceIDUsersUserID
+      with: Update
+      all: true
+    - replace: ListUserID
+      with: Get
+      all: true
+  params:
+    - replace: Id
+      with: ID
+      all: true
+  schemas:
+    - replace: Id
+      with: ID
+      all: true
