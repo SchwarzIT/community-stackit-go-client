@@ -7,7 +7,7 @@ import (
 
 var BaseURLs = baseurl.New(
 	"object_storage",
-	"https://object-storage-api.api.eu01.stackit.cloud",
+	"https://object-storage.api.eu01.stackit.cloud",
 )
 
 func NewService(c contracts.BaseClientInterface) *ClientWithResponses {
