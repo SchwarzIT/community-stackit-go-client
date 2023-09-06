@@ -25,6 +25,9 @@ func (*EnableProjectResponse) WaitHandler(ctx context.Context, c *project.Client
 				*resp.JSON200.Status,
 				projectID,
 			)
+		case project.STATUS_UNSPECIFIED:
+			// in some cases beta APIs do not return a status
+			fallthrough
 		case project.STATUS_READY:
 			return nil, true, nil
 		}
@@ -41,7 +44,8 @@ func (*DisableProjectResponse) WaitHandler(ctx context.Context, c *project.Clien
 			}
 			return nil, false, err
 		}
-		if *resp.JSON200.Status == project.STATUS_DISABLED {
+		if *resp.JSON200.Status == project.STATUS_DISABLED ||
+			*resp.JSON200.Status == project.STATUS_UNSPECIFIED {
 			return nil, true, nil
 		}
 		return nil, false, nil
