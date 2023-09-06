@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/argus/v1.0/instances"
-	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/project"
 )
 
 // Client which conforms to the OpenAPI3 specification for this service.

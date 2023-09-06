@@ -21,6 +21,8 @@ output-options:
       apply-to: ["*"]
       imports:
         - "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/project"
       set: "validate.DefaultResponseErrorHandler(rsp)"
   copy:
     - from: include/service.go
