@@ -33,6 +33,11 @@ output-options:
       tidy: 
       - replace: "instances."
         all: true
+    - from: include/project/wait.go
+      to: project/wait.go
+      tidy: 
+      - replace: "project."
+        all: true
 tidy:
   verbose: false
   functions:
