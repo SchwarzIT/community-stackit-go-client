@@ -11,13 +11,13 @@ import (
 )
 
 // Wait will wait for instance create to complete
-func (*CreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
-	return waitForCreate(ctx, c, projectID, instanceID)
+func (*CreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, name string) *wait.Handler {
+	return waitForCreate(ctx, c, projectID, name)
 }
 
-func waitForCreate(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func waitForCreate(ctx context.Context, c *instances.ClientWithResponses, projectID, name string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		s, err := c.Get(ctx, projectID, instanceID)
+		s, err := c.Get(ctx, projectID, name)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
 			return nil, false, err
 		}
@@ -33,9 +33,9 @@ func waitForCreate(ctx context.Context, c *instances.ClientWithResponses, projec
 
 // Wait will wait for instance deletion
 // returned value for deletion wait will always be nil
-func (DeleteResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, instanceID string) *wait.Handler {
+func (DeleteResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, name string) *wait.Handler {
 	return wait.New(func() (interface{}, bool, error) {
-		res, err := c.Get(ctx, projectID, instanceID)
+		res, err := c.Get(ctx, projectID, name)
 		if err = validate.Response(res, err); err != nil {
 			if res != nil && res.StatusCode() == http.StatusNotFound {
 				return nil, true, nil
