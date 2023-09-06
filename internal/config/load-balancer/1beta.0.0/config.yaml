@@ -28,6 +28,11 @@ output-options:
       tidy:
         - replace: "loadbalancer."
           all: true
+    - from: include/instances/wait.go
+      to: instances/wait.go
+      tidy: 
+      - replace: "instances."
+        all: true
 tidy:
   verbose: false
   functions:
