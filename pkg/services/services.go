@@ -57,6 +57,7 @@ func Init(c contracts.BaseClientInterface) (*Services, error) {
 		Argus:              argus.NewService(nc),
 		Costs:              costs.NewService(newClient(c)),
 		Kubernetes:         kubernetes.NewService(newClient(c)),
+		LoadBalancer:       loadbalancer.NewService(newClient(c)),
 		Membership:         membership.NewService(newClient(c)),
 		MongoDBFlex:        mongodbflex.NewService(newClient(c)),
 		ObjectStorage:      objectstorage.NewService(newClient(c)),
