@@ -12,10 +12,7 @@ import (
 
 // Wait will wait for instance create to complete
 func (*CreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, name string) *wait.Handler {
-	return waitForCreate(ctx, c, projectID, name)
-}
-
-func waitForCreate(ctx context.Context, c *instances.ClientWithResponses, projectID, name string) *wait.Handler {
+	maxFailCount := 5
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, name)
 		if err = validate.Response(s, err, "JSON200"); err != nil {
@@ -25,7 +22,10 @@ func waitForCreate(ctx context.Context, c *instances.ClientWithResponses, projec
 			return s.JSON200, true, nil
 		}
 		if *s.JSON200.Status == instances.STATUS_ERROR {
-			return s.JSON200, false, errors.New("received status FAILED from server")
+			if maxFailCount == 0 {
+				return s.JSON200, false, errors.New("received status FAILED from server")
+			}
+			maxFailCount--
 		}
 		return s.JSON200, false, nil
 	})
