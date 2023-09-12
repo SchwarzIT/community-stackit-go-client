@@ -14,17 +14,21 @@ func (*CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, 
 	maxFailCount := 5
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, name)
-		if err = validate.Response(s, err, "JSON200"); err != nil {
+		if err = validate.Response(s, err, "JSON200.Status"); err != nil {
 			return nil, false, err
 		}
-		if *s.JSON200.Status == STATUS_READY {
+		status := *s.JSON200.Status
+		if status == STATUS_READY {
 			return s.JSON200, true, nil
 		}
-		if *s.JSON200.Status == STATUS_ERROR {
+		if status == STATUS_ERROR {
 			if maxFailCount == 0 {
 				return s.JSON200, false, errors.New("received status FAILED from server")
 			}
 			maxFailCount--
+		}
+		if status == STATUS_TERMINATING {
+			return s.JSON200, false, errors.New("received status TERMINATING from server")
 		}
 		return s.JSON200, false, nil
 	})
