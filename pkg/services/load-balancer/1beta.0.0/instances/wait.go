@@ -19,18 +19,18 @@ func (*CreateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, 
 		}
 		status := *s.JSON200.Status
 		if status == STATUS_READY {
-			return s.JSON200, true, nil
+			return s, true, nil
 		}
 		if status == STATUS_ERROR {
 			if maxFailCount == 0 {
-				return s.JSON200, false, errors.New("received status FAILED from server")
+				return s, false, errors.New("received status FAILED from server")
 			}
 			maxFailCount--
 		}
 		if status == STATUS_TERMINATING {
-			return s.JSON200, false, errors.New("received status TERMINATING from server")
+			return s, false, errors.New("received status TERMINATING from server")
 		}
-		return s.JSON200, false, nil
+		return s, false, nil
 	})
 }
 
