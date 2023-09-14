@@ -3,6 +3,7 @@ package instances
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0/instances"
@@ -12,7 +13,7 @@ import (
 
 // Wait will wait for instance create to complete
 func (*CreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithResponses, projectID, name string) *wait.Handler {
-	maxFailCount := 5
+	maxFailCount := 10
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, name)
 		if err = validate.Response(s, err, "JSON200.Status"); err != nil {
@@ -24,9 +25,23 @@ func (*CreateResponse) WaitHandler(ctx context.Context, c *instances.ClientWithR
 		}
 		if status == instances.STATUS_ERROR {
 			if maxFailCount == 0 {
-				return s, false, errors.New("received status FAILED from server")
+				errorCollection := ""
+				if s != nil && s.JSON200 != nil && s.JSON200.Errors != nil {
+					for _, e := range *s.JSON200.Errors {
+						etype, edesc := "", ""
+						if e.Type != nil {
+							etype = string(*e.Type)
+						}
+						if e.Description != nil {
+							edesc = *e.Description
+						}
+						errorCollection += fmt.Sprintf("%s: %s\n", etype, edesc)
+					}
+				}
+				return s, false, fmt.Errorf("received status %s from server\n%s", status, errorCollection)
 			}
 			maxFailCount--
+			return s, false, nil
 		}
 		if status == instances.STATUS_TERMINATING {
 			return s, false, errors.New("received status TERMINATING from server")
