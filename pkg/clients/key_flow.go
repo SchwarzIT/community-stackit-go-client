@@ -362,24 +362,26 @@ func (c *KeyFlow) parseTokenResponse(res *http.Response) error {
 	return json.Unmarshal(body, c.token)
 }
 
-// validateToken returns true if tokeb is valid
+// validateToken returns true if token is valid
 func (c *KeyFlow) validateToken(token string) (bool, error) {
 	if token == "" {
 		return false, nil
 	}
-	if _, err := c.parseToken(token); err != nil {
-		if strings.Contains(err.Error(), "401") {
+	parsedToken, err := c.parseToken(token)
+	if err != nil {
+		var validationError *jwt.ValidationError
+		if errors.As(err, &validationError) {
 			c.token = new(TokenResponseBody)
 			return false, nil
 		}
 		return false, err
 	}
-	return true, nil
+	return parsedToken.Valid, nil
 }
 
 // parseToken parses and validates a JWT token
 func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
-	b, err := c.getJwksJSON(token)
+	b, err := c.getJwksJSON()
 	if err != nil {
 		return nil, err
 	}
@@ -392,12 +394,11 @@ func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
 	return jwt.Parse(token, jwks.Keyfunc)
 }
 
-func (c *KeyFlow) getJwksJSON(token string) ([]byte, error) {
+func (c *KeyFlow) getJwksJSON() ([]byte, error) {
 	req, err := http.NewRequest("GET", jsksAPI.Get(), nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Add("Authorization", "Bearer "+token)
 	res, err := c.doer(&http.Client{}, req, c.config.ClientRetry)
 	if err != nil {
 		return nil, err
