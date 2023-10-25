@@ -415,7 +415,7 @@ func TestGetJwksJSON(t *testing.T) {
 				doer:   mockDoer.Do,
 			}
 
-			result, err := c.getJwksJSON(tc.token)
+			result, err := c.getJwksJSON()
 
 			if tc.expectedError != nil {
 				assert.Error(t, err)
