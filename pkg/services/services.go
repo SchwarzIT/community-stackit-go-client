@@ -9,7 +9,7 @@ import (
 	costs "github.com/SchwarzIT/community-stackit-go-client/pkg/services/costs/v2.0"
 	dataservices "github.com/SchwarzIT/community-stackit-go-client/pkg/services/data-services/v1.0"
 	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0"
-	loadbalancer "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1beta.0.0"
+	loadbalancer "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0"
 	membership "github.com/SchwarzIT/community-stackit-go-client/pkg/services/membership/v2.0"
 	mongodbflex "github.com/SchwarzIT/community-stackit-go-client/pkg/services/mongodb-flex/v1.0"
 	objectstorage "github.com/SchwarzIT/community-stackit-go-client/pkg/services/object-storage/v1.0.1"
