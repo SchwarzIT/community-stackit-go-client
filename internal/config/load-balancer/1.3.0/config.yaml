@@ -1,0 +1,74 @@
+package: loadbalancer
+output: ../../../../pkg/services/load-balancer/1.3.0/loadbalancer.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
+    name: "contracts.BaseClientInterface"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+      - Project
+      - Instances
+  extend-response:
+    - field: Error
+      type: error
+      description: "Aggregated error"
+      apply-to: ["*"]
+      imports:
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0/instances"
+        - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/load-balancer/1.3.0/project"
+      set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+    - from: include/service.go
+      to: service.go
+      tidy:
+        - replace: "loadbalancer."
+          all: true
+    - from: include/instances/wait.go
+      to: instances/wait.go
+      tidy: 
+      - replace: "instances."
+        all: true
+    - from: include/project/wait.go
+      to: project/wait.go
+      tidy: 
+      - replace: "project."
+        all: true
+tidy:
+  verbose: false
+  functions:
+    - replace: Id
+      with: ID
+      all: true
+    - replace: APIServiceDisable
+      with: DisableProject
+      all: true
+    - replace: APIServiceEnable
+      with: EnableProject
+      all: true
+    - replace: APIServiceStatus
+      with: GetStatus
+      all: true
+    - replace: APIService
+      prefix: true
+    - replace: LoadBalancers
+      all: true
+    - replace: LoadBalancer
+      all: true
+    - replace: CreateInstances
+      with: Create
+      all: true
+  params:
+    - replace: Id
+      with: ID
+      all: true
+  schemas:
+    - replace: Id
+      with: ID
+      all: true
