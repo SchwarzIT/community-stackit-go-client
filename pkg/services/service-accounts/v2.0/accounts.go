@@ -1089,7 +1089,7 @@ func NewGetKeysRequest(ctx context.Context, server string, projectId string, ser
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1141,7 +1141,7 @@ func NewCreateKeysRequestWithBody(ctx context.Context, server string, projectId 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1191,7 +1191,7 @@ func NewDeleteKeysRequest(ctx context.Context, server string, projectId string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1239,7 +1239,7 @@ func NewGeKeyRequest(ctx context.Context, server string, projectId string, servi
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1318,7 +1318,7 @@ func NewUpdateKeysRequestWithBody(ctx context.Context, server string, projectId 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
