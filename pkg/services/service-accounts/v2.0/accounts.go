@@ -488,9 +488,6 @@ type rawClientInterface interface {
 	// DeleteAccessTokens request
 	DeleteAccessTokensRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, accessTokenId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*http.Response, error)
 
-	// GetServiceAccountJwks request
-	GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
-
 	// GetKeys request
 	GetKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -509,6 +506,9 @@ type rawClientInterface interface {
 	UpdateKeysRawWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetServiceAccountJwks request
+	GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) CreateTokenRawWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -631,18 +631,6 @@ func (c *Client) DeleteAccessTokensRaw(ctx context.Context, projectId string, se
 	return c.Client.Do(req)
 }
 
-func (c *Client) GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
-	req, err := NewGetServiceAccountJwksRequest(ctx, c.Server, serviceAccountEmail)
-	if err != nil {
-		return nil, err
-	}
-	req = req.WithContext(ctx)
-	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
-		return nil, err
-	}
-	return c.Client.Do(req)
-}
-
 func (c *Client) GetKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetKeysRequest(ctx, c.Server, projectId, serviceAccountEmail)
 	if err != nil {
@@ -717,6 +705,18 @@ func (c *Client) UpdateKeysRawWithBody(ctx context.Context, projectId string, se
 
 func (c *Client) UpdateKeysRaw(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateKeysRequest(ctx, c.Server, projectId, serviceAccountEmail, keyId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetServiceAccountJwksRaw(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetServiceAccountJwksRequest(ctx, c.Server, serviceAccountEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -1032,40 +1032,6 @@ func NewDeleteAccessTokensRequest(ctx context.Context, server string, projectId 
 	return req, nil
 }
 
-// NewGetServiceAccountJwksRequest generates requests for GetServiceAccountJwks
-func NewGetServiceAccountJwksRequest(ctx context.Context, server string, serviceAccountEmail openapiTypes.Email) (*http.Request, error) {
-	var err error
-
-	var pathParam0 string
-
-	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountEmail", runtime.ParamLocationPath, serviceAccountEmail)
-	if err != nil {
-		return nil, err
-	}
-
-	serverURL, err := url.Parse(server)
-	if err != nil {
-		return nil, err
-	}
-
-	operationPath := fmt.Sprintf("/v2/service-accounts/public/jwk/%s", pathParam0)
-	if operationPath[0] == '/' {
-		operationPath = "." + operationPath
-	}
-
-	queryURL, err := serverURL.Parse(operationPath)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequestWithContext(ctx, "GET", queryURL.String(), nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return req, nil
-}
-
 // NewGetKeysRequest generates requests for GetKeys
 func NewGetKeysRequest(ctx context.Context, server string, projectId string, serviceAccountEmail openapiTypes.Email) (*http.Request, error) {
 	var err error
@@ -1089,7 +1055,7 @@ func NewGetKeysRequest(ctx context.Context, server string, projectId string, ser
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1141,7 +1107,7 @@ func NewCreateKeysRequestWithBody(ctx context.Context, server string, projectId 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys", pathParam0, pathParam1)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1191,7 +1157,7 @@ func NewDeleteKeysRequest(ctx context.Context, server string, projectId string, 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1239,7 +1205,7 @@ func NewGeKeyRequest(ctx context.Context, server string, projectId string, servi
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1318,7 +1284,7 @@ func NewUpdateKeysRequestWithBody(ctx context.Context, server string, projectId 
 		return nil, err
 	}
 
-	operationPath := fmt.Sprintf("/v2alpha1/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
+	operationPath := fmt.Sprintf("/v2/projects/%s/service-accounts/%s/keys/%s", pathParam0, pathParam1, pathParam2)
 	if operationPath[0] == '/' {
 		operationPath = "." + operationPath
 	}
@@ -1334,6 +1300,40 @@ func NewUpdateKeysRequestWithBody(ctx context.Context, server string, projectId 
 	}
 
 	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewGetServiceAccountJwksRequest generates requests for GetServiceAccountJwks
+func NewGetServiceAccountJwksRequest(ctx context.Context, server string, serviceAccountEmail openapiTypes.Email) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "serviceAccountEmail", runtime.ParamLocationPath, serviceAccountEmail)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v2/service-accounts/public/jwk/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
 
 	return req, nil
 }
@@ -1387,9 +1387,6 @@ type ClientWithResponsesInterface interface {
 	// DeleteAccessTokens request
 	DeleteAccessTokens(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, accessTokenId openapiTypes.UUID, reqEditors ...RequestEditorFn) (*DeleteAccessTokensResponse, error)
 
-	// GetServiceAccountJwks request
-	GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error)
-
 	// GetKeys request
 	GetKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetKeysResponse, error)
 
@@ -1408,6 +1405,9 @@ type ClientWithResponsesInterface interface {
 	UpdateKeysWithBody(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error)
 
 	UpdateKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, keyId openapiTypes.UUID, body UpdateKeysJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateKeysResponse, error)
+
+	// GetServiceAccountJwks request
+	GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error)
 }
 
 type CreateTokenResponse struct {
@@ -1593,29 +1593,6 @@ func (r DeleteAccessTokensResponse) StatusCode() int {
 	return 0
 }
 
-type GetServiceAccountJwksResponse struct {
-	Body         []byte
-	HTTPResponse *http.Response
-	JSON200      *GetJWKResponseBody
-	Error        error // Aggregated error
-}
-
-// Status returns HTTPResponse.Status
-func (r GetServiceAccountJwksResponse) Status() string {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.Status
-	}
-	return http.StatusText(0)
-}
-
-// StatusCode returns HTTPResponse.StatusCode
-func (r GetServiceAccountJwksResponse) StatusCode() int {
-	if r.HTTPResponse != nil {
-		return r.HTTPResponse.StatusCode
-	}
-	return 0
-}
-
 type GetKeysResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -1747,6 +1724,29 @@ func (r UpdateKeysResponse) StatusCode() int {
 	return 0
 }
 
+type GetServiceAccountJwksResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *GetJWKResponseBody
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r GetServiceAccountJwksResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetServiceAccountJwksResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // CreateTokenWithBody request with arbitrary body returning *CreateTokenResponse
 func (c *ClientWithResponses) CreateTokenWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateTokenResponse, error) {
 	rsp, err := c.CreateTokenRawWithBody(ctx, contentType, body, reqEditors...)
@@ -1834,15 +1834,6 @@ func (c *ClientWithResponses) DeleteAccessTokens(ctx context.Context, projectId 
 	return c.ParseDeleteAccessTokensResponse(rsp)
 }
 
-// GetServiceAccountJwks request returning *GetServiceAccountJwksResponse
-func (c *ClientWithResponses) GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error) {
-	rsp, err := c.GetServiceAccountJwksRaw(ctx, serviceAccountEmail, reqEditors...)
-	if err != nil {
-		return nil, err
-	}
-	return c.ParseGetServiceAccountJwksResponse(rsp)
-}
-
 // GetKeys request returning *GetKeysResponse
 func (c *ClientWithResponses) GetKeys(ctx context.Context, projectId string, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetKeysResponse, error) {
 	rsp, err := c.GetKeysRaw(ctx, projectId, serviceAccountEmail, reqEditors...)
@@ -1902,6 +1893,15 @@ func (c *ClientWithResponses) UpdateKeys(ctx context.Context, projectId string, 
 		return nil, err
 	}
 	return c.ParseUpdateKeysResponse(rsp)
+}
+
+// GetServiceAccountJwks request returning *GetServiceAccountJwksResponse
+func (c *ClientWithResponses) GetServiceAccountJwks(ctx context.Context, serviceAccountEmail openapiTypes.Email, reqEditors ...RequestEditorFn) (*GetServiceAccountJwksResponse, error) {
+	rsp, err := c.GetServiceAccountJwksRaw(ctx, serviceAccountEmail, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseGetServiceAccountJwksResponse(rsp)
 }
 
 // ParseCreateTokenResponse parses an HTTP response from a CreateToken call
@@ -2247,33 +2247,6 @@ func (c *ClientWithResponses) ParseDeleteAccessTokensResponse(rsp *http.Response
 	return response, validate.ResponseObject(response)
 }
 
-// ParseGetServiceAccountJwksResponse parses an HTTP response from a GetServiceAccountJwks call
-func (c *ClientWithResponses) ParseGetServiceAccountJwksResponse(rsp *http.Response) (*GetServiceAccountJwksResponse, error) {
-	bodyBytes, err := io.ReadAll(rsp.Body)
-	defer func() { _ = rsp.Body.Close() }()
-	if err != nil {
-		return nil, err
-	}
-
-	response := &GetServiceAccountJwksResponse{
-		Body:         bodyBytes,
-		HTTPResponse: rsp,
-	}
-	response.Error = validate.DefaultResponseErrorHandler(rsp)
-
-	switch {
-	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest GetJWKResponseBody
-		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
-			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
-		}
-		response.JSON200 = &dest
-
-	}
-
-	return response, validate.ResponseObject(response)
-}
-
 // ParseGetKeysResponse parses an HTTP response from a GetKeys call
 func (c *ClientWithResponses) ParseGetKeysResponse(rsp *http.Response) (*GetKeysResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -2515,6 +2488,33 @@ func (c *ClientWithResponses) ParseUpdateKeysResponse(rsp *http.Response) (*Upda
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON409 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
+// ParseGetServiceAccountJwksResponse parses an HTTP response from a GetServiceAccountJwks call
+func (c *ClientWithResponses) ParseGetServiceAccountJwksResponse(rsp *http.Response) (*GetServiceAccountJwksResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetServiceAccountJwksResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest GetJWKResponseBody
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON200 = &dest
 
 	}
 
