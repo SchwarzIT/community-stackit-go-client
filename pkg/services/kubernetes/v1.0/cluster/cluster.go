@@ -172,6 +172,11 @@ type MaintenanceAutoUpdate struct {
 	MachineImageVersion *bool `json:"machineImageVersion,omitempty"`
 }
 
+// Network defines model for Network.
+type Network struct {
+	ID *string `json:"id,omitempty"`
+}
+
 // Nodepool defines model for Nodepool.
 type Nodepool struct {
 	AvailabilityZones []string           `json:"availabilityZones"`
@@ -245,6 +250,7 @@ type SkeServiceCreateOrUpdateClusterRequest struct {
 	// Kubernetes For valid versions please take a look at /provider-options kubernetesVersions
 	Kubernetes  Kubernetes     `json:"kubernetes"`
 	Maintenance *Maintenance   `json:"maintenance,omitempty"`
+	Network     *Network       `json:"network,omitempty"`
 	Nodepools   []Nodepool     `json:"nodepools"`
 	Status      *ClusterStatus `json:"status,omitempty"`
 }

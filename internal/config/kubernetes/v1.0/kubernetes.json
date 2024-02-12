@@ -28,6 +28,9 @@
           "maintenance": {
             "$ref": "#/components/schemas/v1Maintenance"
           },
+          "network":{
+            "$ref": "#/components/schemas/v1Network"
+          },
           "nodepools": {
             "items": {
               "$ref": "#/components/schemas/v1Nodepool"
@@ -396,6 +399,14 @@
           "timeWindow"
         ],
         "type": "object"
+      },
+      "v1Network": {
+        "properties": {
+          "id": {
+            "title": "ID of the SNA network into which the cluster will be deployed",
+            "type": "string"
+          }
+        }
       },
       "v1Nodepool": {
         "properties": {
