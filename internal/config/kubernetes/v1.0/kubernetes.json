@@ -121,6 +121,9 @@
           "maintenance": {
             "$ref": "#/components/schemas/v1Maintenance"
           },
+          "network":{
+            "$ref": "#/components/schemas/v1Network"
+          },
           "name": {
             "readOnly": true,
             "type": "string"
