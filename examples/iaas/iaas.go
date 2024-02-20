@@ -23,7 +23,7 @@ func main() {
 
 	req := iaas.V1CreateNetworkJSONBody{
 		// Name The name for a General Object. Matches Names and also UUIDs.
-		Name: "SNA Network",
+		Name: "Network",
 
 		// Nameservers List of DNS Servers/Nameservers.
 		Nameservers:    &servers, //
