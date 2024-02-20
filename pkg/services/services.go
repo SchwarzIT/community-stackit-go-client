@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	iaas "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
@@ -23,6 +24,7 @@ type Services struct {
 	Client             contracts.BaseClientInterface
 	Argus              *argus.ClientWithResponses
 	Costs              *costs.ClientWithResponses
+	IAAS               *iaas.ClientWithResponses
 	Kubernetes         *kubernetes.ClientWithResponses
 	LoadBalancer       *loadbalancer.ClientWithResponses
 	Membership         *membership.ClientWithResponses
@@ -56,6 +58,7 @@ func Init(c contracts.BaseClientInterface) (*Services, error) {
 		// Services
 		Argus:              argus.NewService(nc),
 		Costs:              costs.NewService(newClient(c)),
+		IAAS:               iaas.NewService(newClient(c)),
 		Kubernetes:         kubernetes.NewService(newClient(c)),
 		LoadBalancer:       loadbalancer.NewService(newClient(c)),
 		Membership:         membership.NewService(newClient(c)),

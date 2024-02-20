@@ -14,14 +14,14 @@ output-options:
 tidy:
   verbose: false
   functions:
-    - replace: Id
-      with: ID
-      all: true
+  - replace: Id
+    with: ID
+    all: true
   params:
-    - replace: Id
-      with: ID
-      all: true
+  - replace: Id
+    with: ID
+    all: true
   schemas:
-    - replace: Id
-      with: ID
-      all: true
+  - replace: Id
+    with: ID
+    all: true
