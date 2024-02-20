@@ -6,7 +6,7 @@ import (
 
 var BaseURLs = baseurl.New(
 	"iaas",
-	"https://iaas.api.eu01.stackit.cloud",
+	"https://iaas.api.eu01.stackit.cloud/",
 )
 
 //func NewService(c contracts.BaseClientInterface) *mongodb.ClientWithResponses {
