@@ -413,3 +413,26 @@ func TestPublicIP(t *testing.T) {
 		})
 	}
 }
+
+func TestNetworkID(t *testing.T) {
+	type args struct {
+		id string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"not ok", args{"14b0cd73-3342-44a3-a10e-q1bc20af4497"}, true},
+		{"not ok", args{"14b0cd73-3342-44a3-a10e-q1bc20af44979"}, true},
+		{"ok [1]", args{"14b0cd73-3342-44a3-a10e-f1bc20af4497"}, false},
+		{"ok [2]", args{"14b0cd52-6677-44a3-a10e-f1bc21af4445"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.NetworkID(tt.args.id); (err != nil) != tt.wantErr {
+				t.Errorf("NetworkID() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

@@ -261,3 +261,16 @@ func PublicIP(ip string) error {
 	}
 	return nil
 }
+
+func NetworkID(id string) error {
+	exp := "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+	r := regexp.MustCompile(exp)
+	if !r.MatchString(id) {
+		return fmt.Errorf("invalid networkID: %s. valid ID must match the expression: %s", id, exp)
+	}
+	if len(id) != 36 {
+		return fmt.Errorf("invalid networkID: %s. Valid ID must be exactly 36 characters", id)
+	}
+
+	return nil
+}
