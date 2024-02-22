@@ -301,3 +301,115 @@ func TestErrorIsOneOf(t *testing.T) {
 		})
 	}
 }
+
+func TestNetworkName(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"no ok", args{"Invalid Name!"}, true},
+		{"ok [1]", args{"My-Example_String.123"}, false},
+		{"ok [2]", args{"Hello_World"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.NetworkName(tt.args.name); (err != nil) != tt.wantErr {
+				t.Errorf("NetworkName() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestNameServer(t *testing.T) {
+	type args struct {
+		name string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"not ok [1]", args{"256.100.50.25"}, true},
+		{"not ok [2]", args{"GHT:::1200:::0000"}, true},
+		{"ok [1]", args{"192.168.1.1"}, false},
+		{"ok [2]", args{"2001:0db8:85a3:0000:0000:8a2e:0370:7334"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.NameServer(tt.args.name); (err != nil) != tt.wantErr {
+				t.Errorf("NameServer() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPrefixLength(t *testing.T) {
+	type args struct {
+		prefix int64
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"not ok [1]", args{21}, true},
+		{"not ok [2]", args{30}, true},
+		{"ok [1]", args{22}, false},
+		{"ok [2]", args{29}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.PrefixLengthV4(tt.args.prefix); (err != nil) != tt.wantErr {
+				t.Errorf("NameServer() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPrefix(t *testing.T) {
+	type args struct {
+		prefix string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"not ok", args{"999.999.999.999/32"}, true},
+		{"ok [1]", args{"192.168.1.1/24"}, false},
+		{"ok [2]", args{"fe80::1ff:fe23:4567:890a/64"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.Prefix(tt.args.prefix); (err != nil) != tt.wantErr {
+				t.Errorf("Prefix() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestPublicIP(t *testing.T) {
+	type args struct {
+		ip string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"not ok", args{"999.999.999.999"}, true},
+		{"ok [1]", args{"192.168.1.1"}, false},
+		{"ok [2]", args{"2001:0db8:85a3:0000:0000:8a2e:0370:7334"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.PublicIP(tt.args.ip); (err != nil) != tt.wantErr {
+				t.Errorf("PublicIP() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
