@@ -10,9 +10,9 @@ import (
 	openapiTypes "github.com/SchwarzIT/community-stackit-go-client/pkg/helpers/types"
 )
 
-func (*V1CreateNetworkResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, networkID openapiTypes.UUID) *wait.Handler {
+func (*V1CreateNetworkResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID openapiTypes.UUID) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
-		resp, err := c.V1GetNetwork(ctx, projectID, networkID)
+		resp, err := c.V1ListNetworksInProject(ctx, projectID)
 		if err != nil {
 			if strings.Contains(err.Error(), http.StatusText(http.StatusForbidden)) {
 				return nil, false, nil
