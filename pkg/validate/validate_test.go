@@ -337,6 +337,7 @@ func TestNameServer(t *testing.T) {
 		{"not ok [2]", args{"GHT:::1200:::0000"}, true},
 		{"ok [1]", args{"192.168.1.1"}, false},
 		{"ok [2]", args{"2001:0db8:85a3:0000:0000:8a2e:0370:7334"}, false},
+		{"ok [2]", args{"\"1.1.1.1\""}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -382,6 +383,7 @@ func TestPrefix(t *testing.T) {
 		{"not ok", args{"999.999.999.999/32"}, true},
 		{"ok [1]", args{"192.168.1.1/24"}, false},
 		{"ok [2]", args{"fe80::1ff:fe23:4567:890a/64"}, false},
+		{"ok [1]", args{"\"192.168.1.1/24\""}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
