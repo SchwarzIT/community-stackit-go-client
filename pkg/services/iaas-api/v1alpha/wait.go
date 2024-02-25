@@ -11,16 +11,23 @@ import (
 )
 
 // WaitHandler wait for the network to be created and return it.
-func (*V1CreateNetworkResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID openapiTypes.UUID) *wait.Handler {
+func (*V1CreateNetworkResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID openapiTypes.UUID, name string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 		resp, err := c.V1ListNetworksInProject(ctx, projectID)
 		if err != nil {
 			return nil, false, err
 		}
 
-		if resp.JSON200 != nil {
-			// the network is created successfully
-			return nil, true, nil
+		if resp.JSON200 != nil && len(resp.JSON200.Items) > 0 {
+			for _, n := range resp.JSON200.Items {
+				if n.Name == name {
+					// the network is created successfully
+					return n, true, nil
+				}
+			}
+
+			// the network that is created was not found
+			return nil, false, nil
 		}
 
 		if resp.JSON400 != nil {
@@ -37,6 +44,7 @@ func (*V1CreateNetworkResponse) WaitHandler(ctx context.Context, c *ClientWithRe
 			// if the server returns 403 then we can't retry the same request because the result will be the same
 			return nil, false, errors.New(resp.JSON403.Msg)
 		}
+
 		// in all other cases we will retry the request until the network is not created or an error occurred.
 		return nil, false, nil
 	})
