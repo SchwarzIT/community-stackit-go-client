@@ -6,8 +6,8 @@ import (
 )
 
 var BaseURLs = baseurl.New(
-	"kubernetes",
-	"https://ske.api.eu01.stackit.cloud/",
+	"iaas",
+	"https://iaas.api.eu01.stackit.cloud/",
 )
 
 func NewService(c contracts.BaseClientInterface) *ClientWithResponses {
