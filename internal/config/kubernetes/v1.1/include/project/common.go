@@ -3,7 +3,7 @@
 
 package project
 
-import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1/project"
+import "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0/project"
 
 type CreateResponse struct {
 	project.ClientWithResponsesInterface
