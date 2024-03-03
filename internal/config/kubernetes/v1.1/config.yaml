@@ -1,0 +1,85 @@
+package: kubernetes
+output: ../../../../pkg/services/kubernetes/v1.1/kubernetes.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
+    name: "contracts.BaseClientInterface"
+  split-by-tags:
+    verbose: false
+    enabled: true
+  extend-response:
+  - field: Error
+    type: error
+    description: "Aggregated error"
+    apply-to: ["*"]
+    imports: ["github.com/SchwarzIT/community-stackit-go-client/pkg/validate"]
+    set: "validate.DefaultResponseErrorHandler(rsp)"
+  copy:
+  - from: include/cluster/wait.go
+    to: cluster/wait.go
+    tidy: 
+    - replace: "cluster."
+      all: true
+  - from: include/cluster/validate.go
+    to: cluster/validate.go
+    tidy: 
+    - replace: "cluster."
+      all: true
+  - from: include/service.go
+    to: service.go
+    tidy: 
+    - replace: "kubernetes."
+      all: true
+  - from: include/project/wait.go
+    to: project/wait.go
+    tidy: 
+    - replace: "project."
+      all: true
+tidy:
+  verbose: false
+  functions:
+  - replace: SkeService
+    with: 
+    prefix: true
+  - replace: Clusters
+    with: 
+    suffix: true
+  - replace: Cluster
+    with: 
+    suffix: true
+  - replace: TriggerCluster
+    with: Trigger
+    prefix: true
+  - replace: GetClusterCredentials
+    with: List
+    prefix: true
+  - replace: TriggerCredentialRotation
+    with: TriggerRotation
+    prefix: true
+  - replace: Project
+    with: 
+    suffix: true
+  - replace: GetProviderOptions
+    with: List
+    prefix: true
+  params:
+  - replace: Id
+    with: ID
+    suffix: true
+  schemas:
+  - replace: v1
+    with:
+    prefix: true
+  - replace: Id
+    with: ID
+    suffix: true
+  - replace: Cri
+    with: CRI
+    match: true
+  - replace: Cpu
+    with: CPU
+    match: true
