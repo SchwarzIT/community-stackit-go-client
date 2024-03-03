@@ -3,7 +3,7 @@ package kubernetes
 import (
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
-	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.1"
+	kubernetes "github.com/SchwarzIT/community-stackit-go-client/pkg/services/kubernetes/v1.0"
 )
 
 var BaseURLs = baseurl.New(
