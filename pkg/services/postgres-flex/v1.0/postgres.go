@@ -9,6 +9,7 @@ import (
 
 	contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/backups"
+	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/databases"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/flavors"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/storage"
@@ -19,12 +20,13 @@ import (
 // Client which conforms to the OpenAPI3 specification for this service.
 type Client struct {
 	// list of connected client services
-	Backups  *backups.Client
-	Users    *users.Client
-	Storage  *storage.Client
-	Versions *versions.Client
-	Flavors  *flavors.Client
-	Instance *instance.Client
+	Backups   *backups.Client
+	Users     *users.Client
+	Storage   *storage.Client
+	Versions  *versions.Client
+	Flavors   *flavors.Client
+	Instance  *instance.Client
+	Databases *databases.Client
 
 	// The endpoint of the server conforming to this interface, with scheme,
 	// https://api.deepmap.com for example. This can contain a path relative
@@ -62,6 +64,7 @@ func NewRawClient(server string, opts ...ClientOption) (*Client, error) {
 	client.Versions = versions.NewRawClient(server, client.Client)
 	client.Flavors = flavors.NewRawClient(server, client.Client)
 	client.Instance = instance.NewRawClient(server, client.Client)
+	client.Databases = databases.NewRawClient(server, client.Client)
 
 	return &client, nil
 }
@@ -92,12 +95,13 @@ type ClientWithResponses struct {
 	Client *Client
 
 	// list of connected client services
-	Backups  *backups.ClientWithResponses
-	Users    *users.ClientWithResponses
-	Storage  *storage.ClientWithResponses
-	Versions *versions.ClientWithResponses
-	Flavors  *flavors.ClientWithResponses
-	Instance *instance.ClientWithResponses
+	Backups   *backups.ClientWithResponses
+	Users     *users.ClientWithResponses
+	Storage   *storage.ClientWithResponses
+	Versions  *versions.ClientWithResponses
+	Flavors   *flavors.ClientWithResponses
+	Instance  *instance.ClientWithResponses
+	Databases *databases.ClientWithResponses
 }
 
 // NewClient creates a new ClientWithResponses, which wraps
@@ -115,6 +119,7 @@ func NewClient(server string, opts ...ClientOption) (*ClientWithResponses, error
 	cwr.Versions = versions.NewClient(server, client.Client)
 	cwr.Flavors = flavors.NewClient(server, client.Client)
 	cwr.Instance = instance.NewClient(server, client.Client)
+	cwr.Databases = databases.NewClient(server, client.Client)
 
 	return cwr, nil
 }

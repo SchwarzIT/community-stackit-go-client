@@ -26,14 +26,16 @@ const (
 
 // InstanceACL defines model for instance.ACL.
 type InstanceACL struct {
-	// Items TODO validating in api (middleware)
 	Items *[]string `json:"items,omitempty"`
 }
 
 // InstanceCreateCloneInstanceRequest defines model for instance.CreateCloneInstanceRequest.
 type InstanceCreateCloneInstanceRequest struct {
-	InstanceID *string `json:"instanceId,omitempty"`
-	Timestamp  *string `json:"timestamp,omitempty"`
+	Class *string `json:"class,omitempty"`
+	Size  *int    `json:"size,omitempty"`
+
+	// Timestamp The timestamp should be specified in UTC time following the format provided in the example.
+	Timestamp *string `json:"timestamp,omitempty"`
 }
 
 // InstanceCreateCloneInstanceResponse defines model for instance.CreateCloneInstanceResponse.
@@ -43,17 +45,17 @@ type InstanceCreateCloneInstanceResponse struct {
 
 // InstanceCreateInstanceRequest defines model for instance.CreateInstanceRequest.
 type InstanceCreateInstanceRequest struct {
-	ACL            *InstanceACL `json:"acl,omitempty"`
-	BackupSchedule *string      `json:"backupSchedule,omitempty"`
-	FlavorID       *string      `json:"flavorId,omitempty"`
+	ACL            InstanceACL `json:"acl"`
+	BackupSchedule string      `json:"backupSchedule"`
+	FlavorID       string      `json:"flavorId"`
 
-	// Labels Following fields are not certain/clear
+	// Labels Labels field is not certain/clear
 	Labels   *map[string]string `json:"labels,omitempty"`
-	Name     *string            `json:"name,omitempty"`
-	Options  *map[string]string `json:"options,omitempty"`
-	Replicas *int               `json:"replicas,omitempty"`
-	Storage  *InstanceStorage   `json:"storage,omitempty"`
-	Version  *string            `json:"version,omitempty"`
+	Name     string             `json:"name"`
+	Options  map[string]string  `json:"options"`
+	Replicas int                `json:"replicas"`
+	Storage  InstanceStorage    `json:"storage"`
+	Version  string             `json:"version"`
 }
 
 // InstanceCreateInstanceResponse defines model for instance.CreateInstanceResponse.
@@ -91,9 +93,23 @@ type InstanceListInstance struct {
 
 // InstanceListInstanceResponse defines model for instance.ListInstanceResponse.
 type InstanceListInstanceResponse struct {
-	// Count TODO pagination ?
 	Count *int                    `json:"count,omitempty"`
 	Items *[]InstanceListInstance `json:"items,omitempty"`
+}
+
+// InstancePartialUpdateInstanceRequest defines model for instance.PartialUpdateInstanceRequest.
+type InstancePartialUpdateInstanceRequest struct {
+	ACL            *InstanceACL `json:"acl,omitempty"`
+	BackupSchedule *string      `json:"backupSchedule,omitempty"`
+	FlavorID       *string      `json:"flavorId,omitempty"`
+
+	// Labels Labels field is not certain/clear
+	Labels   *map[string]string `json:"labels,omitempty"`
+	Name     *string            `json:"name,omitempty"`
+	Options  *map[string]string `json:"options,omitempty"`
+	Replicas *int               `json:"replicas,omitempty"`
+	Storage  *InstanceStorage   `json:"storage,omitempty"`
+	Version  *string            `json:"version,omitempty"`
 }
 
 // InstanceSingleInstance defines model for instance.SingleInstance.
@@ -116,21 +132,6 @@ type InstanceStorage struct {
 	Size  *int    `json:"size,omitempty"`
 }
 
-// InstanceUpdateInstanceRequest defines model for instance.UpdateInstanceRequest.
-type InstanceUpdateInstanceRequest struct {
-	ACL            *InstanceACL `json:"acl,omitempty"`
-	BackupSchedule *string      `json:"backupSchedule,omitempty"`
-	FlavorID       *string      `json:"flavorId,omitempty"`
-
-	// Labels Following fields are not certain/clear
-	Labels   *map[string]string `json:"labels,omitempty"`
-	Name     *string            `json:"name,omitempty"`
-	Options  *map[string]string `json:"options,omitempty"`
-	Replicas *int               `json:"replicas,omitempty"`
-	Storage  *InstanceStorage   `json:"storage,omitempty"`
-	Version  *string            `json:"version,omitempty"`
-}
-
 // InstanceUpdateInstanceResponse defines model for instance.UpdateInstanceResponse.
 type InstanceUpdateInstanceResponse struct {
 	Item *InstanceSingleInstance `json:"item,omitempty"`
@@ -140,10 +141,10 @@ type InstanceUpdateInstanceResponse struct {
 type CreateJSONRequestBody = InstanceCreateInstanceRequest
 
 // PatchJSONRequestBody defines body for Patch for application/json ContentType.
-type PatchJSONRequestBody = InstanceUpdateInstanceRequest
+type PatchJSONRequestBody = InstancePartialUpdateInstanceRequest
 
 // PutJSONRequestBody defines body for Put for application/json ContentType.
-type PutJSONRequestBody = InstanceUpdateInstanceRequest
+type PutJSONRequestBody = InstancePartialUpdateInstanceRequest
 
 // CreateCloneJSONRequestBody defines body for CreateClone for application/json ContentType.
 type CreateCloneJSONRequestBody = InstanceCreateCloneInstanceRequest
@@ -176,6 +177,9 @@ func NewRawClient(server string, httpClient contracts.BaseClientInterface) *Clie
 
 // The interface specification for the client above.
 type rawClientInterface interface {
+	// DeleteV1ProjectsProjectID request
+	DeleteV1ProjectsProjectIDRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
 	// List request
 	ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error)
 
@@ -204,6 +208,21 @@ type rawClientInterface interface {
 	CreateCloneRawWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	CreateCloneRaw(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// DeleteForce request
+	DeleteForceRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+}
+
+func (c *Client) DeleteV1ProjectsProjectIDRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteV1ProjectsProjectIDRequest(ctx, c.Server, projectID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
 }
 
 func (c *Client) ListRaw(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -336,6 +355,52 @@ func (c *Client) CreateCloneRaw(ctx context.Context, projectID string, instanceI
 		return nil, err
 	}
 	return c.Client.Do(req)
+}
+
+func (c *Client) DeleteForceRaw(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewDeleteForceRequest(ctx, c.Server, projectID, instanceID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// NewDeleteV1ProjectsProjectIDRequest generates requests for DeleteV1ProjectsProjectID
+func NewDeleteV1ProjectsProjectIDRequest(ctx context.Context, server string, projectID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
 }
 
 // NewListRequest generates requests for List
@@ -663,6 +728,47 @@ func NewCreateCloneRequestWithBody(ctx context.Context, server string, projectID
 	return req, nil
 }
 
+// NewDeleteForceRequest generates requests for DeleteForce
+func NewDeleteForceRequest(ctx context.Context, server string, projectID string, instanceID string) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/force", pathParam0, pathParam1)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "DELETE", queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range additionalEditors {
 		if err := r(ctx, req); err != nil {
@@ -685,6 +791,9 @@ func NewClient(server string, httpClient contracts.BaseClientInterface) *ClientW
 
 // ClientWithResponsesInterface is the interface specification for the client with responses above.
 type ClientWithResponsesInterface interface {
+	// DeleteV1ProjectsProjectID request
+	DeleteV1ProjectsProjectID(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*DeleteV1ProjectsProjectIDResponse, error)
+
 	// List request
 	List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error)
 
@@ -713,6 +822,33 @@ type ClientWithResponsesInterface interface {
 	CreateCloneWithBody(ctx context.Context, projectID string, instanceID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error)
 
 	CreateClone(ctx context.Context, projectID string, instanceID string, body CreateCloneJSONRequestBody, reqEditors ...RequestEditorFn) (*CreateCloneResponse, error)
+
+	// DeleteForce request
+	DeleteForce(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeleteForceResponse, error)
+}
+
+type DeleteV1ProjectsProjectIDResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *InstanceError
+	JSON500      *InstanceError
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteV1ProjectsProjectIDResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteV1ProjectsProjectIDResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
 }
 
 type ListResponse struct {
@@ -767,6 +903,8 @@ type DeleteResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON400      *InstanceError
+	JSON404      *InstanceError
+	JSON500      *InstanceError
 	Error        error // Aggregated error
 }
 
@@ -882,6 +1020,39 @@ func (r CreateCloneResponse) StatusCode() int {
 	return 0
 }
 
+type DeleteForceResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON406      *InstanceError
+	JSON500      *InstanceError
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r DeleteForceResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r DeleteForceResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// DeleteV1ProjectsProjectID request returning *DeleteV1ProjectsProjectIDResponse
+func (c *ClientWithResponses) DeleteV1ProjectsProjectID(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*DeleteV1ProjectsProjectIDResponse, error) {
+	rsp, err := c.DeleteV1ProjectsProjectIDRaw(ctx, projectID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseDeleteV1ProjectsProjectIDResponse(rsp)
+}
+
 // List request returning *ListResponse
 func (c *ClientWithResponses) List(ctx context.Context, projectID string, reqEditors ...RequestEditorFn) (*ListResponse, error) {
 	rsp, err := c.ListRaw(ctx, projectID, reqEditors...)
@@ -977,6 +1148,49 @@ func (c *ClientWithResponses) CreateClone(ctx context.Context, projectID string,
 	return c.ParseCreateCloneResponse(rsp)
 }
 
+// DeleteForce request returning *DeleteForceResponse
+func (c *ClientWithResponses) DeleteForce(ctx context.Context, projectID string, instanceID string, reqEditors ...RequestEditorFn) (*DeleteForceResponse, error) {
+	rsp, err := c.DeleteForceRaw(ctx, projectID, instanceID, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParseDeleteForceResponse(rsp)
+}
+
+// ParseDeleteV1ProjectsProjectIDResponse parses an HTTP response from a DeleteV1ProjectsProjectID call
+func (c *ClientWithResponses) ParseDeleteV1ProjectsProjectIDResponse(rsp *http.Response) (*DeleteV1ProjectsProjectIDResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteV1ProjectsProjectIDResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
 // ParseListResponse parses an HTTP response from a List call
 func (c *ClientWithResponses) ParseListResponse(rsp *http.Response) (*ListResponse, error) {
 	bodyBytes, err := io.ReadAll(rsp.Body)
@@ -1066,6 +1280,20 @@ func (c *ClientWithResponses) ParseDeleteResponse(rsp *http.Response) (*DeleteRe
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
 
 	}
 
@@ -1202,6 +1430,40 @@ func (c *ClientWithResponses) ParseCreateCloneResponse(rsp *http.Response) (*Cre
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
+// ParseDeleteForceResponse parses an HTTP response from a DeleteForce call
+func (c *ClientWithResponses) ParseDeleteForceResponse(rsp *http.Response) (*DeleteForceResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &DeleteForceResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 406:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON406 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
 
 	}
 

@@ -49,6 +49,12 @@ type InstanceListUserResponse struct {
 	Items *[]InstanceListUser `json:"items,omitempty"`
 }
 
+// InstancePartialUpdateUserRequest defines model for instance.PartialUpdateUserRequest.
+type InstancePartialUpdateUserRequest struct {
+	Database *string   `json:"database,omitempty"`
+	Roles    *[]string `json:"roles,omitempty"`
+}
+
 // InstanceResetUserResponse defines model for instance.ResetUserResponse.
 type InstanceResetUserResponse struct {
 	Item *InstanceUser `json:"item,omitempty"`
@@ -88,6 +94,12 @@ type UserResponseUser struct {
 
 // CreateJSONRequestBody defines body for Create for application/json ContentType.
 type CreateJSONRequestBody = UserCreateUserRequest
+
+// PatchUserJSONRequestBody defines body for PatchUser for application/json ContentType.
+type PatchUserJSONRequestBody = InstancePartialUpdateUserRequest
+
+// PutUserJSONRequestBody defines body for PutUser for application/json ContentType.
+type PutUserJSONRequestBody = InstancePartialUpdateUserRequest
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
 type RequestEditorFn func(ctx context.Context, req *http.Request) error
@@ -130,6 +142,16 @@ type rawClientInterface interface {
 
 	// Get request
 	GetRaw(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PatchUser request with any body
+	PatchUserRawWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PatchUserRaw(ctx context.Context, projectID string, instanceID string, userID string, body PatchUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PutUser request with any body
+	PutUserRawWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PutUserRaw(ctx context.Context, projectID string, instanceID string, userID string, body PutUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// Reset request
 	ResetRaw(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -185,6 +207,54 @@ func (c *Client) DeleteRaw(ctx context.Context, projectID string, instanceID str
 
 func (c *Client) GetRaw(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetRequest(ctx, c.Server, projectID, instanceID, userID)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchUserRawWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchUserRequestWithBody(ctx, c.Server, projectID, instanceID, userID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PatchUserRaw(ctx context.Context, projectID string, instanceID string, userID string, body PatchUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPatchUserRequest(ctx, c.Server, projectID, instanceID, userID, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutUserRawWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutUserRequestWithBody(ctx, c.Server, projectID, instanceID, userID, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PutUserRaw(ctx context.Context, projectID string, instanceID string, userID string, body PutUserJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPutUserRequest(ctx, c.Server, projectID, instanceID, userID, body)
 	if err != nil {
 		return nil, err
 	}
@@ -398,6 +468,128 @@ func NewGetRequest(ctx context.Context, server string, projectID string, instanc
 	return req, nil
 }
 
+// NewPatchUserRequest calls the generic PatchUser builder with application/json body
+func NewPatchUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string, body PatchUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPatchUserRequestWithBody(ctx, server, projectID, instanceID, userID, "application/json", bodyReader)
+}
+
+// NewPatchUserRequestWithBody generates requests for PatchUser with any type of body
+func NewPatchUserRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, userID string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "userID", runtime.ParamLocationPath, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/users/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "PATCH", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPutUserRequest calls the generic PutUser builder with application/json body
+func NewPutUserRequest(ctx context.Context, server string, projectID string, instanceID string, userID string, body PutUserJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPutUserRequestWithBody(ctx, server, projectID, instanceID, userID, "application/json", bodyReader)
+}
+
+// NewPutUserRequestWithBody generates requests for PutUser with any type of body
+func NewPutUserRequestWithBody(ctx context.Context, server string, projectID string, instanceID string, userID string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithLocation("simple", false, "projectID", runtime.ParamLocationPath, projectID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam1 string
+
+	pathParam1, err = runtime.StyleParamWithLocation("simple", false, "instanceID", runtime.ParamLocationPath, instanceID)
+	if err != nil {
+		return nil, err
+	}
+
+	var pathParam2 string
+
+	pathParam2, err = runtime.StyleParamWithLocation("simple", false, "userID", runtime.ParamLocationPath, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/v1/projects/%s/instances/%s/users/%s", pathParam0, pathParam1, pathParam2)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "PUT", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 // NewResetRequest generates requests for Reset
 func NewResetRequest(ctx context.Context, server string, projectID string, instanceID string, userID string) (*http.Request, error) {
 	var err error
@@ -481,6 +673,16 @@ type ClientWithResponsesInterface interface {
 
 	// Get request
 	Get(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*GetResponse, error)
+
+	// PatchUser request with any body
+	PatchUserWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchUserResponse, error)
+
+	PatchUser(ctx context.Context, projectID string, instanceID string, userID string, body PatchUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchUserResponse, error)
+
+	// PutUser request with any body
+	PutUserWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutUserResponse, error)
+
+	PutUser(ctx context.Context, projectID string, instanceID string, userID string, body PutUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PutUserResponse, error)
 
 	// Reset request
 	Reset(ctx context.Context, projectID string, instanceID string, userID string, reqEditors ...RequestEditorFn) (*ResetResponse, error)
@@ -581,6 +783,54 @@ func (r GetResponse) StatusCode() int {
 	return 0
 }
 
+type PatchUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *InstanceError
+	JSON500      *InstanceError
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r PatchUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PatchUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PutUserResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON400      *InstanceError
+	JSON500      *InstanceError
+	Error        error // Aggregated error
+}
+
+// Status returns HTTPResponse.Status
+func (r PutUserResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PutUserResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 type ResetResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -649,6 +899,40 @@ func (c *ClientWithResponses) Get(ctx context.Context, projectID string, instanc
 		return nil, err
 	}
 	return c.ParseGetResponse(rsp)
+}
+
+// PatchUserWithBody request with arbitrary body returning *PatchUserResponse
+func (c *ClientWithResponses) PatchUserWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PatchUserResponse, error) {
+	rsp, err := c.PatchUserRawWithBody(ctx, projectID, instanceID, userID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParsePatchUserResponse(rsp)
+}
+
+func (c *ClientWithResponses) PatchUser(ctx context.Context, projectID string, instanceID string, userID string, body PatchUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PatchUserResponse, error) {
+	rsp, err := c.PatchUserRaw(ctx, projectID, instanceID, userID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParsePatchUserResponse(rsp)
+}
+
+// PutUserWithBody request with arbitrary body returning *PutUserResponse
+func (c *ClientWithResponses) PutUserWithBody(ctx context.Context, projectID string, instanceID string, userID string, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PutUserResponse, error) {
+	rsp, err := c.PutUserRawWithBody(ctx, projectID, instanceID, userID, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParsePutUserResponse(rsp)
+}
+
+func (c *ClientWithResponses) PutUser(ctx context.Context, projectID string, instanceID string, userID string, body PutUserJSONRequestBody, reqEditors ...RequestEditorFn) (*PutUserResponse, error) {
+	rsp, err := c.PutUserRaw(ctx, projectID, instanceID, userID, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return c.ParsePutUserResponse(rsp)
 }
 
 // Reset request returning *ResetResponse
@@ -783,6 +1067,74 @@ func (c *ClientWithResponses) ParseGetResponse(rsp *http.Response) (*GetResponse
 			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
 		}
 		response.JSON400 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
+// ParsePatchUserResponse parses an HTTP response from a PatchUser call
+func (c *ClientWithResponses) ParsePatchUserResponse(rsp *http.Response) (*PatchUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PatchUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, validate.ResponseObject(response)
+}
+
+// ParsePutUserResponse parses an HTTP response from a PutUser call
+func (c *ClientWithResponses) ParsePutUserResponse(rsp *http.Response) (*PutUserResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PutUserResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+	response.Error = validate.DefaultResponseErrorHandler(rsp)
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest InstanceError
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, errors.Wrap(err, fmt.Sprintf("body was: %s", string(bodyBytes)))
+		}
+		response.JSON500 = &dest
 
 	}
 

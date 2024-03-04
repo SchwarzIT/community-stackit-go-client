@@ -1,10 +1,129 @@
 {
   "components": {
     "schemas": {
-      "instance.Acl": {
+      "api.Configuration": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "setting": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "api.ExtensionConfigLoadResponse": {
+        "properties": {
+          "configuration": {
+            "description": "Returns marshalled JSON of the new configuration of whatever extension is called",
+            "items": {
+              "$ref": "#/components/schemas/api.Configuration"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "api.ExtensionConfigureResponse": {
+        "properties": {
+          "configuration": {
+            "description": "Returns marshalled JSON of the new configuration of whatever extension is called",
+            "items": {
+              "$ref": "#/components/schemas/api.Configuration"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "api.ExtensionDeleteResponse": {
+        "properties": {
+          "isSucceded": {
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "api.ExtensionList": {
+        "properties": {
+          "ID": {
+            "type": "integer"
+          },
+          "description": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "api.ExtensionLoadResponse": {
+        "properties": {
+          "extension": {
+            "$ref": "#/components/schemas/api.ExtensionList"
+          }
+        },
+        "type": "object"
+      },
+      "api.InstallResponse": {
+        "properties": {
+          "extension": {
+            "$ref": "#/components/schemas/api.ExtensionList"
+          }
+        },
+        "type": "object"
+      },
+      "api.InstalledListResponse": {
+        "properties": {
+          "installed": {
+            "items": {
+              "$ref": "#/components/schemas/api.ExtensionList"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "extensions.Configuration": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "setting": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "extensions.ExtensionListResponse": {
+        "properties": {
+          "list": {
+            "items": {
+              "$ref": "#/components/schemas/api.ExtensionList"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "extensions.NewConfig": {
+        "properties": {
+          "configuration": {
+            "items": {
+              "$ref": "#/components/schemas/extensions.Configuration"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "instance.ACL": {
         "properties": {
           "items": {
-            "description": "TODO validating in api (middleware)",
+            "example": [
+              "0.0.0.0/0"
+            ],
             "items": {
               "type": "string"
             },
@@ -50,10 +169,17 @@
       },
       "instance.CreateCloneInstanceRequest": {
         "properties": {
-          "instanceId": {
+          "class": {
+            "example": "premium-perf6-stackit",
             "type": "string"
           },
+          "size": {
+            "example": 10,
+            "type": "integer"
+          },
           "timestamp": {
+            "description": "The timestamp should be specified in UTC time following the format provided in the example.",
+            "example": "2023-04-17T09:28:00+00:00",
             "type": "string"
           }
         },
@@ -62,6 +188,31 @@
       "instance.CreateCloneInstanceResponse": {
         "properties": {
           "instanceId": {
+            "example": "df727477-8991-486c-a3ed-d11d9d9beb1c",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "instance.CreateDatabaseRequest": {
+        "properties": {
+          "name": {
+            "example": "Test",
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Database specific options",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "instance.CreateDatabaseResponse": {
+        "properties": {
+          "id": {
             "type": "string"
           }
         },
@@ -70,19 +221,21 @@
       "instance.CreateInstanceRequest": {
         "properties": {
           "acl": {
-            "$ref": "#/components/schemas/instance.Acl"
+            "$ref": "#/components/schemas/instance.ACL"
           },
           "backupSchedule": {
+            "example": "6 6 * * *",
             "type": "string"
           },
           "flavorId": {
+            "example": "1.1",
             "type": "string"
           },
           "labels": {
             "additionalProperties": {
               "type": "string"
             },
-            "description": "Following fields are not certain/clear",
+            "description": "Labels field is not certain/clear",
             "type": "object"
           },
           "name": {
@@ -95,20 +248,33 @@
             "type": "object"
           },
           "replicas": {
+            "example": 3,
             "type": "integer"
           },
           "storage": {
             "$ref": "#/components/schemas/instance.Storage"
           },
           "version": {
+            "example": "1.0",
             "type": "string"
           }
         },
+        "required": [
+          "acl",
+          "backupSchedule",
+          "flavorId",
+          "name",
+          "options",
+          "replicas",
+          "storage",
+          "version"
+        ],
         "type": "object"
       },
       "instance.CreateInstanceResponse": {
         "properties": {
           "id": {
+            "example": "df727477-8991-486c-a3ed-d11d9d9beb1c",
             "type": "string"
           }
         },
@@ -122,9 +288,38 @@
         },
         "type": "object"
       },
+      "instance.DataPoint": {
+        "properties": {
+          "timestamp": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "instance.Database": {
+        "properties": {
+          "id": {
+            "example": "1",
+            "type": "string"
+          },
+          "name": {
+            "example": "Peter_pan",
+            "type": "string"
+          },
+          "options": {
+            "description": "Database specific options",
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
       "instance.Error": {
         "properties": {
           "code": {
+            "example": 404,
             "type": "integer"
           },
           "fields": {
@@ -137,6 +332,7 @@
             "type": "object"
           },
           "message": {
+            "example": "database not found",
             "type": "string"
           },
           "type": {
@@ -148,15 +344,19 @@
       "instance.Flavor": {
         "properties": {
           "cpu": {
+            "example": 1,
             "type": "integer"
           },
           "description": {
+            "example": "Small, Compute optimized",
             "type": "string"
           },
           "id": {
+            "example": "1.1",
             "type": "string"
           },
           "memory": {
+            "example": 1,
             "type": "integer"
           }
         },
@@ -206,10 +406,44 @@
       "instance.GetVersionsResponse": {
         "properties": {
           "versions": {
+            "example": [
+              "1.0"
+            ],
             "items": {
               "type": "string"
             },
             "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "instance.Host": {
+        "properties": {
+          "hostMetrics": {
+            "items": {
+              "$ref": "#/components/schemas/instance.HostMetric"
+            },
+            "type": "array"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "instance.HostMetric": {
+        "properties": {
+          "datapoints": {
+            "items": {
+              "$ref": "#/components/schemas/instance.DataPoint"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "units": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -228,15 +462,28 @@
         },
         "type": "object"
       },
+      "instance.ListDatabasesResponse": {
+        "properties": {
+          "databases": {
+            "items": {
+              "$ref": "#/components/schemas/instance.Database"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "instance.ListInstance": {
         "properties": {
           "id": {
+            "example": "df727477-8991-486c-a3ed-d11d9d9beb1c",
             "type": "string"
           },
           "name": {
             "type": "string"
           },
           "status": {
+            "example": "RUNNING",
             "type": "string"
           }
         },
@@ -245,7 +492,6 @@
       "instance.ListInstanceResponse": {
         "properties": {
           "count": {
-            "description": "TODO pagination ?",
             "type": "integer"
           },
           "items": {
@@ -282,6 +528,74 @@
         },
         "type": "object"
       },
+      "instance.MetricsResponse": {
+        "properties": {
+          "hosts": {
+            "items": {
+              "$ref": "#/components/schemas/instance.Host"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "instance.PartialUpdateInstanceRequest": {
+        "properties": {
+          "acl": {
+            "$ref": "#/components/schemas/instance.ACL"
+          },
+          "backupSchedule": {
+            "example": "6 6 * * *",
+            "type": "string"
+          },
+          "flavorId": {
+            "example": "1.1",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Labels field is not certain/clear",
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "options": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "replicas": {
+            "example": 3,
+            "type": "integer"
+          },
+          "storage": {
+            "$ref": "#/components/schemas/instance.Storage"
+          },
+          "version": {
+            "example": "1.0",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "instance.PartialUpdateUserRequest": {
+        "properties": {
+          "database": {
+            "type": "string"
+          },
+          "roles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
       "instance.ResetUserResponse": {
         "properties": {
           "item": {
@@ -293,15 +607,17 @@
       "instance.SingleInstance": {
         "properties": {
           "acl": {
-            "$ref": "#/components/schemas/instance.Acl"
+            "$ref": "#/components/schemas/instance.ACL"
           },
           "backupSchedule": {
+            "example": "6 6 * * *",
             "type": "string"
           },
           "flavor": {
             "$ref": "#/components/schemas/instance.Flavor"
           },
           "id": {
+            "example": "df727477-8991-486c-a3ed-d11d9d9beb1c",
             "type": "string"
           },
           "name": {
@@ -314,15 +630,18 @@
             "type": "object"
           },
           "replicas": {
+            "example": 3,
             "type": "integer"
           },
           "status": {
+            "example": "RUNNING",
             "type": "string"
           },
           "storage": {
             "$ref": "#/components/schemas/instance.Storage"
           },
           "version": {
+            "example": "1.0",
             "type": "string"
           }
         },
@@ -334,6 +653,7 @@
             "type": "string"
           },
           "size": {
+            "example": 10,
             "type": "integer"
           }
         },
@@ -342,9 +662,11 @@
       "instance.StorageRange": {
         "properties": {
           "max": {
+            "example": 1000,
             "type": "integer"
           },
           "min": {
+            "example": 10,
             "type": "integer"
           }
         },
@@ -353,48 +675,13 @@
       "instance.UpdateBackupScheduleRequest": {
         "properties": {
           "backupSchedule": {
+            "example": "6 6 * * *",
             "type": "string"
           }
         },
-        "type": "object"
-      },
-      "instance.UpdateInstanceRequest": {
-        "properties": {
-          "acl": {
-            "$ref": "#/components/schemas/instance.Acl"
-          },
-          "backupSchedule": {
-            "type": "string"
-          },
-          "flavorId": {
-            "type": "string"
-          },
-          "labels": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "description": "Following fields are not certain/clear",
-            "type": "object"
-          },
-          "name": {
-            "type": "string"
-          },
-          "options": {
-            "additionalProperties": {
-              "type": "string"
-            },
-            "type": "object"
-          },
-          "replicas": {
-            "type": "integer"
-          },
-          "storage": {
-            "$ref": "#/components/schemas/instance.Storage"
-          },
-          "version": {
-            "type": "string"
-          }
-        },
+        "required": [
+          "backupSchedule"
+        ],
         "type": "object"
       },
       "instance.UpdateInstanceResponse": {
@@ -499,11 +786,85 @@
     },
     "description": "This is the documentation for the STACKIT postgres service",
     "termsOfService": "https://www.stackit.de/en/general-terms-and-conditions/",
-    "title": "STACKIT PostgreSQL Service API",
+    "title": "STACKIT PostgreSQL Flex API",
     "version": "1.0.0"
   },
   "openapi": "3.0.1",
   "paths": {
+    "/v1/projects/{projectId}": {
+      "delete": {
+        "description": "Termination is the deletion of a whole project which causes the deletion of all instances for this project. Only System with permission system.databases-project.remove is able to call this resource",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Terminate the Project",
+        "tags": [
+          "instance"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "system.databases-project.remove"
+          ],
+          "resource-id": "system",
+          "resource-id-type": "static",
+          "resource-type": "system"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "system.databases-project.remove"
+          ]
+        }
+      }
+    },
     "/v1/projects/{projectId}/flavors": {
       "get": {
         "description": "Get available flavors for a specific projectID",
@@ -556,7 +917,28 @@
         "summary": "Get Flavors",
         "tags": [
           "flavors"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.flavor.list"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.flavor.list"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances": {
@@ -611,7 +993,28 @@
         "summary": "List Instances",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instances.list"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instances.list"
+          ]
+        }
       },
       "post": {
         "description": "Create a new instance of a postgres database",
@@ -675,7 +1078,29 @@
         "summary": "Create Instance",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.create"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.create"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}": {
@@ -706,8 +1131,8 @@
           }
         ],
         "responses": {
-          "200": {
-            "description": "OK"
+          "202": {
+            "description": "Accepted"
           },
           "400": {
             "content": {
@@ -719,10 +1144,27 @@
             },
             "description": "Bad Request"
           },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
           "405": {
             "description": "Method Not Allowed"
           },
           "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
             "description": "Internal Server Error"
           }
         },
@@ -734,7 +1176,28 @@
         "summary": "Delete Instance",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.delete"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.delete"
+          ]
+        }
       },
       "get": {
         "description": "Get specific available instances",
@@ -798,10 +1261,31 @@
         "summary": "Get specific instance",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.get"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.get"
+          ]
+        }
       },
       "patch": {
-        "description": "Update available instance of a postgres database",
+        "description": "Update available instance of a postgres database. Supported Versions are 12, 13, 14, 15 -- only upgrades are allowed!",
         "parameters": [
           {
             "description": "Project ID",
@@ -830,7 +1314,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/instance.UpdateInstanceRequest"
+                "$ref": "#/components/schemas/instance.PartialUpdateInstanceRequest"
               }
             }
           },
@@ -873,10 +1357,32 @@
         "summary": "Update Instance",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.update"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.update"
+          ]
+        }
       },
       "put": {
-        "description": "Update available instance of a postgres database",
+        "description": "Update available instance of a postgres database. Supported Versions are 12, 13, 14, 15 -- only upgrades are allowed!",
         "parameters": [
           {
             "description": "Project ID",
@@ -905,7 +1411,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/instance.UpdateInstanceRequest"
+                "$ref": "#/components/schemas/instance.PartialUpdateInstanceRequest"
               }
             }
           },
@@ -948,7 +1454,29 @@
         "summary": "Update Instance",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.update"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.update"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}/backups": {
@@ -999,6 +1527,9 @@
             },
             "description": "Bad Request"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "405": {
             "description": "Method Not Allowed"
           },
@@ -1014,7 +1545,26 @@
         "summary": "List backups",
         "tags": [
           "backups"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
       },
       "put": {
         "description": "Update backup schedule",
@@ -1067,6 +1617,12 @@
             },
             "description": "Bad Request"
           },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
           "405": {
             "description": "Method Not Allowed"
           },
@@ -1082,7 +1638,29 @@
         "summary": "Update Backup Schedule",
         "tags": [
           "backups"
-        ]
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.backups.update"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.backups.update"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}/backups/{backupId}": {
@@ -1144,6 +1722,9 @@
             },
             "description": "Bad Request"
           },
+          "404": {
+            "description": "Not Found"
+          },
           "405": {
             "description": "Method Not Allowed"
           },
@@ -1159,7 +1740,28 @@
         "summary": "Get specific backup",
         "tags": [
           "backups"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.backups.get"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.backups.get"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}/clone": {
@@ -1236,7 +1838,1255 @@
         "summary": "Clone Instance",
         "tags": [
           "instance"
-        ]
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.clone"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.clone"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/databases": {
+      "get": {
+        "description": "List available databases for an instance",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.ListDatabasesResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "List Databases",
+        "tags": [
+          "databases"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.read"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.read"
+          ]
+        }
+      },
+      "post": {
+        "description": "Create database for a user\nNote: The name of a valid user must be provided in the \"options\" map field using the key \"owner\"",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.CreateDatabaseRequest"
+              }
+            }
+          },
+          "description": "body",
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.CreateDatabaseResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Create Database",
+        "tags": [
+          "databases"
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/databases/{databaseId}": {
+      "delete": {
+        "description": "Delete database for an instance",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Delete Database",
+        "tags": [
+          "databases"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/databases/{databaseId}/extensions": {
+      "get": {
+        "description": "Loading the extensions, currently active on instance",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.InstalledListResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Load all installed Extensions",
+        "tags": [
+          "extension"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.read"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.read"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/databases/{databaseId}/extensions/{extensionId}": {
+      "delete": {
+        "description": "Uninstall Extension on instance",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Extension ID",
+            "explode": false,
+            "in": "path",
+            "name": "extensionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.ExtensionDeleteResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Delete Extension",
+        "tags": [
+          "extension"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
+      },
+      "get": {
+        "description": "Loading one extension data, being ID, Name and Description",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Extension ID",
+            "explode": false,
+            "in": "path",
+            "name": "extensionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.ExtensionLoadResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Load Single Extension",
+        "tags": [
+          "extension"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.read"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.read"
+          ]
+        }
+      },
+      "post": {
+        "description": "Installing an extension on the instance",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Extension ID",
+            "explode": false,
+            "in": "path",
+            "name": "extensionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.InstallResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Install Extension",
+        "tags": [
+          "extension"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/databases/{databaseId}/extensions/{extensionId}/configurations": {
+      "get": {
+        "description": "Read current settings of extension",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Extension ID",
+            "explode": false,
+            "in": "path",
+            "name": "extensionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.ExtensionConfigLoadResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Load Extension Configuration",
+        "tags": [
+          "extension"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.read"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.read"
+          ]
+        }
+      },
+      "post": {
+        "description": "Accept the Configuration fom the call and set it on a Postgres database",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Database ID",
+            "explode": false,
+            "in": "path",
+            "name": "databaseId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Extension ID",
+            "explode": false,
+            "in": "path",
+            "name": "extensionId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/extensions.NewConfig"
+              }
+            }
+          },
+          "description": "Body",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/api.ExtensionConfigureResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Set Extension Configuration",
+        "tags": [
+          "extension"
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/extensions": {
+      "get": {
+        "description": "Loading all extensions we provide for the customer",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/extensions.ExtensionListResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Load all available Extensions",
+        "tags": [
+          "extension"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.read"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.read"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/force": {
+      "delete": {
+        "description": "Forces the deletion of an delayed deleted instance",
+        "parameters": [
+          {
+            "description": "Project ID",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "Instance ID",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "406": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Not Acceptable"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Force delete instance",
+        "tags": [
+          "instance"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.services.enable"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.services.enable"
+          ]
+        }
+      }
+    },
+    "/v1/projects/{projectId}/instances/{instanceId}/metrics/{metric}": {
+      "get": {
+        "description": "Returns a metric for an instance. The metric will only be for the master pod if needed. Granularity parameter is always needed. If start and end time is provided, period is not considered in max-connections and disk-use. If you provide start time, you have to provide end time as well and vice versa.",
+        "parameters": [
+          {
+            "description": "The UUID of the project.",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The UUID of the instance.",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The name of the metric. Valid metrics are 'cpu', 'memory', 'max-connections' and 'disk-use'.",
+            "explode": false,
+            "in": "path",
+            "name": "metric",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The granularity in ISO8601 e.g. 5 minutes are 'PT5M'.",
+            "explode": true,
+            "in": "query",
+            "name": "granularity",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "description": "The period in ISO8601 format e.g. 5 minutes are 'PT5M'. If no period is provided, the standard value of 5 minutes is used.",
+            "explode": true,
+            "in": "query",
+            "name": "period",
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "description": "The start of the timeframe as timestamp in ISO8601 (RFC3339) e.g. '2023-08-28T07:10:52.536Z'. If no start time is provided, current server time as UTC is used.",
+            "explode": true,
+            "in": "query",
+            "name": "start",
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          },
+          {
+            "description": "The end of the timeframe as timestamp in ISO8601 (RFC3339) e.g. '2023-08-28T07:10:52.536Z'.",
+            "explode": true,
+            "in": "query",
+            "name": "end",
+            "schema": {
+              "type": "string"
+            },
+            "style": "form"
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.MetricsResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Get Metric",
+        "tags": [
+          "metrics"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.read"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ]
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.read"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}/users": {
@@ -1302,7 +3152,28 @@
         "summary": "List Users",
         "tags": [
           "users"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.list"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.list"
+          ]
+        }
       },
       "post": {
         "description": "Create user for an instance",
@@ -1377,7 +3248,29 @@
         "summary": "Create User",
         "tags": [
           "users"
-        ]
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.create"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.create"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}/users/{userId}": {
@@ -1447,7 +3340,28 @@
         "summary": "Delete User",
         "tags": [
           "users"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.delete"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.delete"
+          ]
+        }
       },
       "get": {
         "description": "Get specific available user for an instance",
@@ -1522,7 +3436,238 @@
         "summary": "Get User",
         "tags": [
           "users"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.get"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.instance.users.get"
+          ]
+        }
+      },
+      "patch": {
+        "description": "Update user for an instance. Only the roles are updatable.",
+        "parameters": [
+          {
+            "description": "The ID of the project",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The ID of the instance",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The ID of the user in the database",
+            "explode": false,
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.PartialUpdateUserRequest"
+              }
+            }
+          },
+          "description": "The Request body only required in PUT endpoint. If empty request body is send via patch, then login and createdb roles are removed from user. The field "
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Update User",
+        "tags": [
+          "users"
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
+      },
+      "put": {
+        "description": "Update user for an instance. Only the roles are updatable.",
+        "parameters": [
+          {
+            "description": "The ID of the project",
+            "explode": false,
+            "in": "path",
+            "name": "projectId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The ID of the instance",
+            "explode": false,
+            "in": "path",
+            "name": "instanceId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          },
+          {
+            "description": "The ID of the user in the database",
+            "explode": false,
+            "in": "path",
+            "name": "userId",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "style": "simple"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/instance.PartialUpdateUserRequest"
+              }
+            }
+          },
+          "description": "The Request body only required in PUT endpoint. If empty request body is send via patch, then login and createdb roles are removed from user. The field "
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "405": {
+            "description": "Method Not Allowed"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/instance.Error"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "summary": "Update User",
+        "tags": [
+          "users"
+        ],
+        "x-codegen-request-body-name": "request",
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/instances/{instanceId}/users/{userId}/reset": {
@@ -1616,7 +3761,26 @@
         "summary": "Reset User",
         "tags": [
           "users"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/storages/{flavorId}": {
@@ -1682,7 +3846,28 @@
         "summary": "Get Storages",
         "tags": [
           "storage"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.storages.list"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.storages.list"
+          ]
+        }
       }
     },
     "/v1/projects/{projectId}/versions": {
@@ -1747,7 +3932,28 @@
         "summary": "Get Versions",
         "tags": [
           "versions"
-        ]
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.versions.list"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-signer": {
+          "audience": [
+            "postgres-flex-service"
+          ],
+          "inject-email": true
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "project.resources.edit",
+            "postgres-flex.versions.list"
+          ]
+        }
       }
     }
   },
@@ -1756,5 +3962,12 @@
       "description": "This is the documentation for the STACKIT postgres service",
       "url": "https://postgres-flex-service.api.eu01.stackit.cloud"
     }
-  ]
+  ],
+  "x-original-swagger-version": "2.0",
+  "x-stackit-api": {
+    "type": "stackit"
+  },
+  "x-stackit-scope": {
+    "visibility": "public"
+  }
 }

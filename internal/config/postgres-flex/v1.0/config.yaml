@@ -18,6 +18,7 @@ output-options:
     - versions
     - flavors
     - instance
+    - databases
   extend-response:
   - field: Error
     type: error
@@ -27,6 +28,7 @@ output-options:
       - "github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
       - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/flavors"
       - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/instance"
+      - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/databases"
       - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/versions"
       - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/backups"
       - "github.com/SchwarzIT/community-stackit-go-client/pkg/services/postgres-flex/v1.0/storage"
