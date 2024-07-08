@@ -1,0 +1,393 @@
+{
+  "components": {
+    "schemas": {
+      "ActionError": {
+        "description": "the last error for this service.",
+        "properties": {
+          "action": {
+            "description": "the last action which was triggered on this service",
+            "enum": [
+              "DISABLE",
+              "ENABLE"
+            ],
+            "example": "DISABLE",
+            "type": "string"
+          },
+          "code": {
+            "description": "the error code if provided by the service",
+            "example": "ABC-01",
+            "type": "string"
+          },
+          "reason": {
+            "description": "the error reason provided by the service",
+            "example": "something went wrong",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Dependencies": {
+        "properties": {
+          "hard": {
+            "description": "a list of service IDs which this service depend on. If the service is enabled, those service are enabled as well automatically.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceId"
+            },
+            "type": "array"
+          },
+          "soft": {
+            "description": "a list of service IDs which this service depend on. When they are disabled a notification is sent.",
+            "items": {
+              "$ref": "#/components/schemas/ServiceId"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "Parameters": {
+        "additionalProperties": {
+          "additionalProperties": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "example": {
+            "param1": "value1",
+            "param2": "value2"
+          },
+          "type": "object"
+        },
+        "description": "service parameters",
+        "example": {
+          "cloud.stackit.my-service": {
+            "param1": "value1",
+            "param2": "value2"
+          },
+          "general": {
+            "organizationId": "39fb3ac9-c5af-46a6-91d5-a2455047630f",
+            "projectName": "my new project name",
+            "projectScope": "PUBLIC"
+          }
+        },
+        "properties": {
+          "general": {
+            "properties": {
+              "organizationId": {
+                "example": "39fb3ac9-c5af-46a6-91d5-a2455047630f",
+                "type": "string"
+              },
+              "projectName": {
+                "type": "string"
+              },
+              "projectScope": {
+                "default": "PUBLIC",
+                "enum": [
+                  "SCHWARZ",
+                  "PUBLIC"
+                ],
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "type": "object"
+      },
+      "ProjectCloudService": {
+        "properties": {
+          "dependencies": {
+            "$ref": "#/components/schemas/Dependencies"
+          },
+          "enablement": {
+            "default": "REQUEST",
+            "enum": [
+              "REQUEST",
+              "AUTO"
+            ],
+            "type": "string"
+          },
+          "error": {
+            "$ref": "#/components/schemas/ActionError"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "category": "database"
+            },
+            "type": "object"
+          },
+          "lifecycle": {
+            "default": "FLEX",
+            "enum": [
+              "FLEX",
+              "PROJECT"
+            ],
+            "type": "string"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/Parameters"
+          },
+          "scope": {
+            "default": "PUBLIC",
+            "enum": [
+              "PRIVATE",
+              "PUBLIC"
+            ],
+            "type": "string"
+          },
+          "serviceId": {
+            "$ref": "#/components/schemas/ServiceId"
+          },
+          "state": {
+            "default": "ENABLED",
+            "description": "the state of a service within a project",
+            "enum": [
+              "ENABLED",
+              "ENABLING",
+              "DISABLED",
+              "DISABLING"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object",
+        "x-stackit-sdk": {
+          "schema-name": "ServiceStatus"
+        }
+      },
+      "ServiceId": {
+        "description": "the id of the service",
+        "example": "cloud.stackit.my-service",
+        "maxLength": 255,
+        "minLength": 10,
+        "pattern": "^[a-zA-Z0-9][a-zA-Z0-9._-]{1,254}$",
+        "type": "string"
+      }
+    }
+  },
+  "info": {
+    "description": "STACKIT Service Enablement API",
+    "title": "STACKIT Service Enablement API",
+    "version": "1.1"
+  },
+  "openapi": "3.0.3",
+  "paths": {
+    "/v1/projects/{projectId}/services": {
+      "get": {
+        "description": "returns a list of all available services for a project.",
+        "operationId": "listServices",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "$ref": "#/components/schemas/ProjectCloudService"
+                      },
+                      "type": "array"
+                    },
+                    "nextCursor": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Public"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "service-enablement.service-state.get"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-sdk": {
+          "include": true,
+          "method-name": "ListServiceStatus"
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "service-enablement.service-state.get"
+          ],
+          "implicit-actions": null
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "projectId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/v1/projects/{projectId}/services/{serviceId}": {
+      "delete": {
+        "description": "disables the service in a project.",
+        "operationId": "disableService",
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "404": {
+            "description": "service not found"
+          }
+        },
+        "tags": [
+          "Public"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "service-enablement.service-state.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-sdk": {
+          "include": true,
+          "method-name": "DisableService"
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "service-enablement.service-state.edit"
+          ],
+          "implicit-actions": null
+        }
+      },
+      "get": {
+        "description": "returns the current status of a service in a project.",
+        "operationId": "getService",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectCloudService"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "404": {
+            "description": "service not found"
+          }
+        },
+        "tags": [
+          "Public"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "service-enablement.service-state.get"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-sdk": {
+          "include": true,
+          "method-name": "GetServiceStatus"
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "service-enablement.service-state.get"
+          ],
+          "implicit-actions": null
+        }
+      },
+      "parameters": [
+        {
+          "in": "path",
+          "name": "projectId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "in": "path",
+          "name": "serviceId",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "post": {
+        "description": "enables the service in a project.",
+        "operationId": "enableService",
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          },
+          "404": {
+            "description": "service not found"
+          }
+        },
+        "tags": [
+          "Public"
+        ],
+        "x-stackit-authorization": {
+          "actions": [
+            "service-enablement.service-state.edit"
+          ],
+          "resource-id": "projectId",
+          "resource-id-type": "dynamic",
+          "resource-type": "project"
+        },
+        "x-stackit-sdk": {
+          "include": true,
+          "method-name": "EnableService"
+        },
+        "x-viewer-permissions": {
+          "actions": [
+            "service-enablement.service-state.edit"
+          ],
+          "implicit-actions": null
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Public"
+    }
+  ],
+  "servers": [
+    {
+      "description": "STACKIT Service Enablement API",
+      "url": "https://service-enablement.api.eu01.stackit.cloud"
+    }
+  ],
+  "x-stackit-api": {
+    "type": "stackit"
+  },
+  "x-stackit-portal": {
+    "cors": true
+  },
+  "x-stackit-scope": {
+    "visibility": "public"
+  }
+}

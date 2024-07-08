@@ -3,6 +3,7 @@ package services
 import (
 	"errors"
 	iaas "github.com/SchwarzIT/community-stackit-go-client/pkg/services/iaas-api/v1alpha"
+	serviceenablement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-enablement/v1"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
@@ -34,6 +35,7 @@ type Services struct {
 	ResourceManagement *resourcemanagement.ClientWithResponses
 	SecretsManager     *secretsmanager.ClientWithResponses
 	ServiceAccounts    *serviceaccounts.ClientWithResponses
+	ServiceEnablement  *serviceenablement.ClientWithResponses
 
 	// DSA
 	ElasticSearch *dataservices.ClientWithResponses
@@ -68,6 +70,7 @@ func Init(c contracts.BaseClientInterface) (*Services, error) {
 		ResourceManagement: resourcemanagement.NewService(newClient(c)),
 		ServiceAccounts:    serviceaccounts.NewService(newClient(c)),
 		SecretsManager:     secretsmanager.NewService(newClient(c)),
+		ServiceEnablement:  serviceenablement.NewService(newClient(c)),
 
 		// DSA
 		ElasticSearch: dataservices.NewService(newClient(c), dataservices.ElasticSearch),
