@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func (*GetServiceResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, serviceID string) *wait.Handler {
+func (*EnableServiceResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, projectID, serviceID string) *wait.Handler {
 	return wait.New(func() (res interface{}, done bool, err error) {
 
 		resp, err := c.GetService(ctx, projectID, serviceID)
