@@ -394,6 +394,28 @@ func TestPrefix(t *testing.T) {
 	}
 }
 
+func TestIP(t *testing.T) {
+	type args struct {
+		prefix string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{"not ok", args{"999.999.999.999"}, true},
+		{"ok [1]", args{"192.168.1.1"}, false},
+		{"ok [1]", args{"\"192.168.1.1\""}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := validate.IsIP(tt.args.prefix); (err != nil) != tt.wantErr {
+				t.Errorf("IsIP() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
 func TestPublicIP(t *testing.T) {
 	type args struct {
 		ip string

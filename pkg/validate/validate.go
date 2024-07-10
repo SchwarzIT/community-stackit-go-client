@@ -3,6 +3,7 @@ package validate
 import (
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"reflect"
 	"regexp"
@@ -251,6 +252,18 @@ func Prefix(pr string) error {
 	if !r.MatchString(pr) {
 		return fmt.Errorf("invalid prefix: %s. valid prefix shuld match expression: %s", pr, exp)
 	}
+	return nil
+}
+
+// IsIP validates a given IP
+func IsIP(pr string) error {
+	pr = strings.Trim(pr, "\"")
+
+	trial := net.ParseIP(pr)
+	if trial == nil {
+		return fmt.Errorf("given IP: %s. is not valid", pr)
+	}
+
 	return nil
 }
 
