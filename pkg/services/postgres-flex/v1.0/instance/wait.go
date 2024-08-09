@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/validate"
@@ -50,9 +51,16 @@ func (DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, p
 	return wait.New(func() (interface{}, bool, error) {
 		res, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(res, err); err != nil {
+			// old handling of not found
 			if res != nil && res.StatusCode() == http.StatusNotFound {
 				return nil, true, nil
 			}
+
+			// new soft-deletion
+			if res.JSON200 != nil && res.JSON200.Item.Status != nil && strings.ToUpper(*res.JSON200.Item.Status) != "DELETED" {
+				return nil, true, nil
+			}
+
 			return nil, false, err
 		}
 		return nil, false, nil
