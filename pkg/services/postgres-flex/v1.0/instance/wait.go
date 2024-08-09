@@ -56,13 +56,14 @@ func (DeleteResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, p
 				return nil, true, nil
 			}
 
-			// new soft-deletion
-			if res.JSON200 != nil && res.JSON200.Item.Status != nil && strings.ToUpper(*res.JSON200.Item.Status) != "DELETED" {
-				return nil, true, nil
-			}
-
 			return nil, false, err
 		}
+
+		// new soft-deletion
+		if res.JSON200 != nil && res.JSON200.Item.Status != nil && strings.ToUpper(*res.JSON200.Item.Status) != "DELETED" {
+			return nil, true, nil
+		}
+
 		return nil, false, nil
 	})
 }
