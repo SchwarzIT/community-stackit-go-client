@@ -34,12 +34,12 @@ const (
 
 var tokenAPI = baseurl.New(
 	"token",
-	"https://api.stackit.cloud/service-account/token",
+	"https://service-account.api.stackit.cloud/token",
 )
 
 var jsksAPI = baseurl.New(
 	"jwks",
-	"https://api.stackit.cloud/service-account/.well-known/jwks.json",
+	"https://service-account.api.stackit.cloud/.well-known/jwks.json",
 )
 
 const (
