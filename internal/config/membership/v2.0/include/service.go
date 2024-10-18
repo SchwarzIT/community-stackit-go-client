@@ -14,7 +14,7 @@ const (
 
 var BaseURLs = baseurl.New(
 	"membership",
-	"https://api.stackit.cloud/membership/",
+	"https://authorization.api.stackit.cloud/",
 )
 
 func NewService(c contracts.BaseClientInterface) *membership.ClientWithResponses {

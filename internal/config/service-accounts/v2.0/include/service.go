@@ -8,7 +8,7 @@ import (
 
 var BaseURLs = baseurl.New(
 	"service_accounts",
-	"https://api.stackit.cloud/service-account/",
+	"https://service-account.api.stackit.cloud/",
 )
 
 func NewService(c contracts.BaseClientInterface) *serviceaccounts.ClientWithResponses {
