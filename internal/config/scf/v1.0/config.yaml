@@ -1,0 +1,51 @@
+package: scf
+output: ../../../../pkg/services/scf/v1.0/scf.go
+generate:
+  models: true
+  client: true
+output-options:
+  custom-doer:
+    enabled: true
+    import: contracts "github.com/SchwarzIT/community-stackit-go-client/pkg/contracts"
+    name: "contracts.BaseClientInterface"
+  split-by-tags:
+    verbose: false
+    enabled: true
+    include:
+      - Organization
+      - Organization-Manager
+      - Quotas
+      - Organization-Roles
+      - Space
+      - Space-Roles
+      - Platform
+      - Region-Wide
+  copy:
+    - from: include/service.go
+      to: service.go
+      tidy:
+        - replace: "scf."
+          all: true
+        - replace: "https://api.stackit.cloud"
+          all: true
+          with: "https://scf.api.stackit.cloud"
+tidy:
+  verbose: false
+  functions:
+    - replace: Id
+      with: ID
+      all: true
+  params:
+    - replace: Id
+      with: ID
+      all: true
+  schemas:
+    - replace: Id
+      with: ID
+      all: true
+    - replace: Cf
+      with: CF
+      prefix: true
+    - replace: Guid
+      with: GUID
+      all: true
