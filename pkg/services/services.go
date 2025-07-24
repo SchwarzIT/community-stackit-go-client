@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	scf "github.com/SchwarzIT/community-stackit-go-client/pkg/services/scf/v1.0"
 	serviceenablement "github.com/SchwarzIT/community-stackit-go-client/pkg/services/service-enablement/v1"
 
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/clients"
@@ -36,6 +37,7 @@ type Services struct {
 	SecretsManager     *secretsmanager.ClientWithResponses
 	ServiceAccounts    *serviceaccounts.ClientWithResponses
 	ServiceEnablement  *serviceenablement.ClientWithResponses
+	SCF                *scf.ClientWithResponses
 
 	// DSA
 	ElasticSearch *dataservices.ClientWithResponses
