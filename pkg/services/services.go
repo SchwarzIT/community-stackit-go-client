@@ -73,6 +73,7 @@ func Init(c contracts.BaseClientInterface) (*Services, error) {
 		ServiceAccounts:    serviceaccounts.NewService(newClient(c)),
 		SecretsManager:     secretsmanager.NewService(newClient(c)),
 		ServiceEnablement:  serviceenablement.NewService(newClient(c)),
+		SCF:                scf.NewService(newClient(c)),
 
 		// DSA
 		ElasticSearch: dataservices.NewService(newClient(c), dataservices.ElasticSearch),
