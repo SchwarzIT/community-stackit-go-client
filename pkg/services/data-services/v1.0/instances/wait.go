@@ -3,6 +3,7 @@ package instances
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -52,7 +53,7 @@ func (UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, p
 			}
 			return nil, false, err
 		}
-		if s.JSON200.LastOperation.Type != UPDATE {
+		if s.JSON200.LastOperation.Type == UPDATE {
 			return nil, false, nil
 		}
 		if s.JSON200.LastOperation.State == SUCCEEDED {
@@ -61,7 +62,8 @@ func (UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, p
 		if s.JSON200.LastOperation.State == FAILED {
 			return nil, false, errors.New("received failed status from DSA instance")
 		}
-		return nil, false, nil
+
+		return nil, false, fmt.Errorf("received unexpected status from DSA instance: %s", s.JSON200.LastOperation.State)
 	})
 }
 
