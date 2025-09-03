@@ -108,7 +108,7 @@ type InstanceSensitiveData struct {
 	GrafanaPublicReadAccess bool      `json:"grafanaPublicReadAccess"`
 	GrafanaURL              string    `json:"grafanaUrl"`
 	Instance                string    `json:"instance"`
-	JaegerHttpURL           *string   `json:"jaegerHttpUrl,omitempty"`
+	JaegerHttpURL           string   `json:"jaegerHttpUrl"`
 	LogsPushURL             string    `json:"logsPushUrl"`
 	LogsURL                 string    `json:"logsUrl"`
 	MetricsRetentionTime1h  int       `json:"metricsRetentionTime1h"`
@@ -116,8 +116,8 @@ type InstanceSensitiveData struct {
 	MetricsRetentionTimeRaw int       `json:"metricsRetentionTimeRaw"`
 	MetricsURL              string    `json:"metricsUrl"`
 	Name                    *string   `json:"name,omitempty"`
-	OtlpGrpcTracesURL       *string   `json:"otlpGrpcTracesUrl,omitempty"`
-	OtlpHttpTracesURL       *string   `json:"otlpHttpTracesUrl,omitempty"`
+	OtlpGrpcTracesURL       string   `json:"otlpGrpcTracesUrl"`
+	OtlpHttpTracesURL       string   `json:"otlpHttpTracesUrl"`
 	Plan                    PlanModel `json:"plan"`
 	PushMetricsURL          string    `json:"pushMetricsUrl"`
 	TargetsURL              string    `json:"targetsUrl"`
