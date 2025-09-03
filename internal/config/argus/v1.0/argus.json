@@ -1321,14 +1321,9 @@
             "title": "Instance",
             "type": "string"
           },
-          "jaegerTracesUrl": {
+          "jaegerHttpUrl": {
             "minLength": 1,
             "title": "Jaegertracesurl",
-            "type": "string"
-          },
-          "jaegerUiUrl": {
-            "minLength": 1,
-            "title": "Jaegeruiurl",
             "type": "string"
           },
           "logsPushUrl": {
@@ -1367,9 +1362,14 @@
             "title": "Name",
             "type": "string"
           },
-          "otlpTracesUrl": {
+          "otlpHttpTracesUrl": {
             "minLength": 1,
-            "title": "Otlptracesurl",
+            "title": "OtlpHttptracesurl",
+            "type": "string"
+          },
+          "otlpGrpcTracesUrl": {
+            "minLength": 1,
+            "title": "OtlpGrpctracesurl",
             "type": "string"
           },
           "plan": {
