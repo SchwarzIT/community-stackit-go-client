@@ -29,7 +29,9 @@ func (*PatchResponse) WaitHandler(ctx context.Context, c *instance.ClientWithRes
 // returned interface is of *instance.InstanceSingleInstance
 func waitForCreateOrUpdate(ctx context.Context, c *instance.ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
-	time.Sleep(5 * time.Second)
+	// sometimes stackit takes longer to synnc
+	time.Sleep(30 * time.Second)
+
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200.Item"); err != nil {
