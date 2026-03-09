@@ -40,12 +40,12 @@ func TestWait_SetThrottle(t *testing.T) {
 		want error
 	}{
 		{"ok", args{10 * time.Second}, nil},
-		{"err", args{0 * time.Second}, errors.New("Throttle can't be 0")},
+		{"err", args{0 * time.Second}, errors.New("throttle duration cannot be 0")},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			w := New(simple)
-			got := w.SetThrottle(tt.args.d)
+			_, got := w.SetThrottle(tt.args.d)
 			if got == nil && tt.want != nil {
 				t.Errorf("Wait.SetThrottle() = %v, want %v", got, tt.want)
 			}

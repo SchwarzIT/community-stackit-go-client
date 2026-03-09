@@ -12,5 +12,5 @@ var BaseURLs = baseurl.New(
 )
 
 func NewService(c contracts.BaseClientInterface) (*iaas.ClientWithResponses, error) {
-	return iaas.NewClient(BaseURLs.Get(), c)
+	return iaas.NewClient(BaseURLs.Get(), iaas.WithHTTPClient(c))
 }
