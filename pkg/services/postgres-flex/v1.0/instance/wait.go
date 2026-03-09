@@ -30,17 +30,21 @@ func (*PatchResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, p
 func waitForCreateOrUpdate(ctx context.Context, c *ClientWithResponses, projectID, instanceID string) *wait.Handler {
 	// artifical wait for instance to change from status ready to updating
 	time.Sleep(5 * time.Second)
+
 	return wait.New(func() (res interface{}, done bool, err error) {
 		s, err := c.Get(ctx, projectID, instanceID)
 		if err = validate.Response(s, err, "JSON200.Item"); err != nil {
 			return nil, false, err
 		}
+
 		if *s.JSON200.Item.Status == STATUS_READY {
 			return s.JSON200.Item, true, nil
 		}
+
 		if *s.JSON200.Item.Status == STATUS_FAILED {
 			return s.JSON200.Item, false, errors.New("received status FAILED from server")
 		}
+
 		return s.JSON200.Item, false, nil
 	})
 }

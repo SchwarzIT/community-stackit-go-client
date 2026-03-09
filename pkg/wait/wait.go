@@ -10,12 +10,13 @@ import (
 type WaitFn func() (res interface{}, done bool, err error)
 
 type Handler struct {
-	fn       WaitFn
-	throttle time.Duration
-	timeout  time.Duration
+	fn           WaitFn
+	throttle     time.Duration
+	timeout      time.Duration
+	initialDelay time.Duration
 }
 
-// New creates a new Wait instance
+// New creates a new Handler instance with sensible defaults
 func New(f WaitFn) *Handler {
 	return &Handler{
 		fn:       f,
@@ -24,51 +25,49 @@ func New(f WaitFn) *Handler {
 	}
 }
 
-// SetThrottle sets the duration between func triggering
-func (w *Handler) SetThrottle(d time.Duration) error {
+// SetThrottle sets the duration between each poll. Returns *Handler for chaining.
+func (w *Handler) SetThrottle(d time.Duration) (*Handler, error) {
 	if d == 0 {
-		return errors.New("Throttle can't be 0")
+		return nil, errors.New("throttle duration cannot be 0")
 	}
 	w.throttle = d
-	return nil
+	return w, nil
 }
 
-// SetTimeout sets the duration for wait timeout
+// SetTimeout sets the maximum duration before Wait times out. Returns *Handler for chaining.
 func (w *Handler) SetTimeout(d time.Duration) *Handler {
 	w.timeout = d
 	return w
 }
 
-// Wait starts the wait until there's an error or wait is done
-func (w *Handler) Wait() (res interface{}, err error) {
-	var done bool
-	ctx, cancel := context.WithTimeout(context.Background(), w.timeout)
-	defer cancel()
-	for {
-		res, done, err = w.fn()
-		if err != nil || done {
-			return
-		}
-
-		// context timeout was chosen in order to support throttle = 0
-		tick, cancelTick := context.WithTimeout(context.Background(), w.throttle)
-		defer cancelTick()
-
-		select {
-		case <-tick.Done():
-			// continue
-		case <-ctx.Done():
-			return res, errors.New("Wait() has timed out")
-		}
-	}
+// SetInitialDelay sets an optional delay before the first poll is executed.
+// This is useful when an operation is known to need time before its status changes.
+func (w *Handler) SetInitialDelay(d time.Duration) *Handler {
+	w.initialDelay = d
+	return w
 }
 
-// WaitWithContext starts the wait until there's an error or wait is done
-func (w Handler) WaitWithContext(ctx context.Context) (res interface{}, err error) {
+// Wait starts polling until the WaitFn returns done, an error occurs, or the timeout is reached.
+func (w *Handler) Wait() (interface{}, error) {
+	return w.WaitWithContext(context.Background())
+}
+
+// WaitWithContext starts polling until the WaitFn returns done, an error occurs,
+// the provided context is cancelled, or the timeout is reached.
+func (w *Handler) WaitWithContext(ctx context.Context) (res interface{}, err error) {
 	var done bool
 
 	ctx, cancel := context.WithTimeout(ctx, w.timeout)
 	defer cancel()
+
+	if w.initialDelay > 0 {
+		select {
+		case <-time.After(w.initialDelay):
+			// proceed to polling
+		case <-ctx.Done():
+			return nil, errors.New("wait timed out during initial delay")
+		}
+	}
 
 	ticker := time.NewTicker(w.throttle)
 	defer ticker.Stop()
@@ -76,7 +75,7 @@ func (w Handler) WaitWithContext(ctx context.Context) (res interface{}, err erro
 	for {
 		res, done, err = w.fn()
 		if err != nil {
-			return res, errors.Wrap(err, "defined wait function returned an error")
+			return res, errors.Wrap(err, "wait function returned an error")
 		}
 		if done {
 			return res, nil
@@ -84,9 +83,9 @@ func (w Handler) WaitWithContext(ctx context.Context) (res interface{}, err erro
 
 		select {
 		case <-ticker.C:
-			// continue
+			// continue to next poll
 		case <-ctx.Done():
-			return res, errors.New("Wait() has timed out")
+			return res, errors.New("wait timed out")
 		}
 	}
 }
