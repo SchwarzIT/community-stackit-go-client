@@ -53,12 +53,16 @@ func (UpdateResponse) WaitHandler(ctx context.Context, c *ClientWithResponses, p
 			}
 			return nil, false, err
 		}
-		if s.JSON200.LastOperation.Type == UPDATE {
+		if s.JSON200.LastOperation.Type == UPDATE &&
+			s.JSON200.LastOperation.State != SUCCEEDED &&
+			s.JSON200.LastOperation.State != FAILED {
 			return nil, false, nil
 		}
+
 		if s.JSON200.LastOperation.State == SUCCEEDED {
 			return s, true, nil
 		}
+
 		if s.JSON200.LastOperation.State == FAILED {
 			return nil, false, errors.New("received failed status from DSA instance")
 		}
