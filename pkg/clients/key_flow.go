@@ -30,7 +30,7 @@ const (
 	PrivateKeyPath        = "STACKIT_PRIVATE_KEY_PATH"
 )
 
-v-ar tokenAPI = baseurl.New(
+var tokenAPI = baseurl.New(
 	"token",
 	"https://service-account.api.stackit.cloud/token",
 )
