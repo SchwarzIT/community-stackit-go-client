@@ -1,7 +1,6 @@
 package clients
 
 import (
-	"bytes"
 	"context"
 	"crypto/rand"
 	"crypto/rsa"
@@ -14,7 +13,9 @@ import (
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
@@ -345,6 +346,10 @@ func TestKeyFlow_validateToken(t *testing.T) {
 	}{
 		{"no token", "", false, false},
 		{"bad token - ask to recreate", "bad token", false, false},
+		{"token without exp claim - ask to recreate", unsignedTokenWithExpiry(t, nil), false, false},
+		{"expired token - ask to recreate", unsignedTokenWithExpiry(t, timePtr(time.Now().Add(-time.Minute))), false, false},
+		{"token expiring within the leeway - ask to recreate", unsignedTokenWithExpiry(t, timePtr(time.Now().Add(tokenExpirationLeeway/2))), false, false},
+		{"valid token", unsignedTokenWithExpiry(t, timePtr(time.Now().Add(time.Hour))), true, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -375,58 +380,44 @@ func (m *MockDoer) Do(client *http.Client, req *http.Request, cfg *RetryConfig) 
 	return args.Get(0).(*http.Response), args.Error(1)
 }
 
-func TestGetJwksJSON(t *testing.T) {
-	testCases := []struct {
-		name           string
-		token          string
-		mockResponse   *http.Response
-		mockError      error
-		expectedResult []byte
-		expectedError  error
-	}{
-		{
-			name:  "Success",
-			token: "test_token",
-			mockResponse: &http.Response{
-				StatusCode: 200,
-				Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"key": "value"}`))),
-			},
-			mockError:      nil,
-			expectedResult: []byte(`{"key": "value"}`),
-			expectedError:  nil,
-		},
-		{
-			name:           "Error",
-			token:          "test_token",
-			mockResponse:   nil,
-			mockError:      fmt.Errorf("some error"),
-			expectedResult: nil,
-			expectedError:  fmt.Errorf("some error"),
-		},
+func timePtr(t time.Time) *time.Time {
+	return &t
+}
+
+// unsignedTokenWithExpiry builds a JWT carrying the given expiry (or no exp
+// claim when nil). Its signature is never checked, so it does not need a key.
+func unsignedTokenWithExpiry(t *testing.T, expiresAt *time.Time) string {
+	t.Helper()
+
+	claims := jwt.RegisteredClaims{}
+	if expiresAt != nil {
+		claims.ExpiresAt = jwt.NewNumericDate(*expiresAt)
 	}
 
-	for _, tc := range testCases {
-		t.Run(tc.name, func(t *testing.T) {
-			mockDoer := new(MockDoer)
-			mockDoer.On("Do", mock.Anything).Return(tc.mockResponse, tc.mockError)
-
-			c := &KeyFlow{
-				config: &KeyFlowConfig{ClientRetry: NewRetryConfig()},
-				doer:   mockDoer.Do,
-			}
-
-			result, err := c.getJwksJSON()
-
-			if tc.expectedError != nil {
-				assert.Error(t, err)
-				assert.Equal(t, tc.expectedError.Error(), err.Error())
-			} else {
-				assert.NoError(t, err)
-			}
-
-			assert.Equal(t, tc.expectedResult, result)
-		})
+	token, err := jwt.NewWithClaims(jwt.SigningMethodNone, claims).
+		SignedString(jwt.UnsafeAllowNoneSignatureType)
+	if err != nil {
+		t.Fatal(err)
 	}
+	return token
+}
+
+// TestValidateTokenDoesNotCallOutForJWKS guards the fix for the retired JWKS
+// endpoint: token validation must be purely local.
+func TestValidateTokenDoesNotCallOutForJWKS(t *testing.T) {
+	mockDoer := new(MockDoer)
+	mockDoer.On("Do", mock.Anything).Return((*http.Response)(nil), fmt.Errorf("no request expected"))
+
+	c := &KeyFlow{
+		config: &KeyFlowConfig{ClientRetry: NewRetryConfig()},
+		doer:   mockDoer.Do,
+		token:  &TokenResponseBody{},
+	}
+
+	valid, err := c.validateToken(unsignedTokenWithExpiry(t, timePtr(time.Now().Add(time.Hour))))
+	assert.NoError(t, err)
+	assert.True(t, valid)
+	mockDoer.AssertNotCalled(t, "Do", mock.Anything)
 }
 
 func TestRequestToken(t *testing.T) {

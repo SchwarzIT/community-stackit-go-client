@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/MicahParks/keyfunc"
 	"github.com/SchwarzIT/community-stackit-go-client/pkg/baseurl"
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/google/uuid"
@@ -37,13 +35,13 @@ var tokenAPI = baseurl.New(
 	"https://service-account.api.stackit.cloud/token",
 )
 
-var jsksAPI = baseurl.New(
-	"jwks",
-	"https://service-account.api.stackit.cloud/.well-known/jwks.json",
-)
-
 const (
 	PrivateKeyBlockType = "PRIVATE KEY"
+
+	// tokenExpirationLeeway is subtracted from a token's expiration time when
+	// deciding whether it is still usable, to avoid it expiring between the
+	// validity check here and the API validating it upstream.
+	tokenExpirationLeeway = 5 * time.Second
 )
 
 // KeyFlow handles auth with SA key
@@ -376,36 +374,32 @@ func (c *KeyFlow) validateToken(token string) (bool, error) {
 		}
 		return false, err
 	}
-	return parsedToken.Valid, nil
+
+	claims, ok := parsedToken.Claims.(*jwt.RegisteredClaims)
+	if !ok || claims.ExpiresAt == nil {
+		c.token = new(TokenResponseBody)
+		return false, nil
+	}
+
+	// Pretend to be tokenExpirationLeeway into the future, so a token that is
+	// about to expire is recreated instead of being sent and rejected upstream.
+	return time.Now().Add(tokenExpirationLeeway).Before(claims.ExpiresAt.Time), nil
 }
 
-// parseToken parses and validates a JWT token
+// parseToken parses a JWT token without verifying its signature.
+//
+// The signature is intentionally not verified: the token was just obtained by
+// this client from the token endpoint over TLS, so it is not user input being
+// authenticated here - it is only inspected for its expiration time. The API
+// the token is sent to does verify it. The JWKS endpoint this used to fetch
+// (https://service-account.api.stackit.cloud/.well-known/jwks.json) has been
+// retired by STACKIT and now returns 404, which made every request fail with
+// "failed to validate existing keyflow token". The official SDK
+// (github.com/stackitcloud/stackit-sdk-go/core) does the same thing.
 func (c *KeyFlow) parseToken(token string) (*jwt.Token, error) {
-	b, err := c.getJwksJSON()
+	parsedToken, _, err := jwt.NewParser().ParseUnverified(token, &jwt.RegisteredClaims{})
 	if err != nil {
 		return nil, err
 	}
-	var jwksBytes = json.RawMessage(b)
-	jwks, err := keyfunc.NewJSON(jwksBytes)
-	if err != nil {
-		return nil, err
-	}
-
-	return jwt.Parse(token, jwks.Keyfunc)
-}
-
-func (c *KeyFlow) getJwksJSON() ([]byte, error) {
-	req, err := http.NewRequest("GET", jsksAPI.Get(), nil)
-	if err != nil {
-		return nil, err
-	}
-	res, err := c.doer(&http.Client{}, req, c.config.ClientRetry)
-	if err != nil {
-		return nil, err
-	}
-	if res.StatusCode == 200 {
-		return io.ReadAll(res.Body)
-	} else {
-		return nil, fmt.Errorf("error: %s", res.Status)
-	}
+	return parsedToken, nil
 }
